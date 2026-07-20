@@ -1,0 +1,33 @@
+{
+  "name": "Iniciativa Baby Codespace",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20",
+      "nodeGypDependencies": true
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-azuretools.vscode-docker",
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-pg"
+      ]
+    }
+  },
+  "forwardPorts": [3000, 3001, 3002, 5432, 6379, 8081],
+  "portsAttributes": {
+    "3000": { "label": "Backend API", "onAutoForward": "notify" },
+    "3001": { "label": "Admin Panel", "onAutoForward": "notify" },
+    "3002": { "label": "Web View", "onAutoForward": "notify" },
+    "5432": { "label": "PostgreSQL", "onAutoForward": "silent" },
+    "6379": { "label": "Redis", "onAutoForward": "silent" },
+    "8081": { "label": "Expo Server", "onAutoForward": "notify" }
+  },
+  "postCreateCommand": "npm install"
+}
