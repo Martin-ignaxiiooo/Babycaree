@@ -96,8 +96,6 @@ export default function AdminLogin() {
                   required
                   onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Por favor completa este campo")}
                   onInput={(e) => (e.target as HTMLInputElement).setCustomValidity("")}
-                  onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Por favor completa este campo")}
-                  onInput={(e) => (e.target as HTMLInputElement).setCustomValidity("")}
                   style={{ width: "100%", background: "#374151", border: "1px solid #4B5563", color: "#fff", padding: "12px 12px 12px 42px", borderRadius: "8px", outline: "none", fontSize: "15px" }}
                   placeholder="usuario@iniciativababy.cl"
                 />
@@ -113,8 +111,6 @@ export default function AdminLogin() {
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   required
-                  onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Por favor completa este campo")}
-                  onInput={(e) => (e.target as HTMLInputElement).setCustomValidity("")}
                   onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Por favor completa este campo")}
                   onInput={(e) => (e.target as HTMLInputElement).setCustomValidity("")}
                   style={{ width: "100%", background: "#374151", border: "1px solid #4B5563", color: "#fff", padding: "12px 12px 12px 42px", borderRadius: "8px", outline: "none", fontSize: "15px" }}
@@ -154,8 +150,6 @@ export default function AdminLogin() {
                   value={twoFaCode}
                   onChange={e => setTwoFaCode(e.target.value)}
                   required
-                  onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Por favor completa este campo")}
-                  onInput={(e) => (e.target as HTMLInputElement).setCustomValidity("")}
                   onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Por favor completa este campo")}
                   onInput={(e) => (e.target as HTMLInputElement).setCustomValidity("")}
                   maxLength={6}
