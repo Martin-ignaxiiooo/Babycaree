@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { connectRedis } from "./config/redis";
+// import { connectRedis } from "./config/redis";
 import { globalLimiter } from "./middlewares/rateLimit.middleware";
 import { verifyToken } from "./middlewares/auth.middleware";
 
@@ -61,7 +61,7 @@ app.use("/api/v1/comunidad", comunidadRoutes);
 // Iniciar servicios y servidor
 const startServer = async () => {
   try {
-    await connectRedis();
+    // await connectRedis(); // Redis not used and crashes Render free tier
 
     // Rutas de prueba
     app.get("/api/health", (req, res) => {
