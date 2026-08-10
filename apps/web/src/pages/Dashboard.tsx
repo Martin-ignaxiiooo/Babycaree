@@ -1,168 +1,469 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { Heart, Baby, LogOut, Calendar, Shield, TrendingUp, ChevronRight, Bell } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { 
+  Heart, Shield, TrendingUp, Bell, Plus, FileText, 
+  MessageCircle, Camera, Search, Users, Syringe, Stethoscope, LogOut, X
+} from "lucide-react";
 
-const API_URL = 'http://localhost:3000/api';
-
-function getBabyAge(dob: string): string {
-  const birth = new Date(dob);
-  const now = new Date();
-  const months = (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth());
-  if (months < 1) return 'Recién nacido';
-  if (months < 12) return `${months} ${months === 1 ? 'mes' : 'meses'}`;
-  const years = Math.floor(months / 12);
-  const rem = months % 12;
-  return rem > 0 ? `${years} año${years > 1 ? 's' : ''} y ${rem} mes${rem > 1 ? 'es' : ''}` : `${years} año${years > 1 ? 's' : ''}`;
-}
+const API_URL = "http://localhost:3000/api";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
-  const [babies, setBabies] = useState<any[]>([]);
+  const [activeBabyId, setActiveBabyId] = useState<string | null>(null);
+  const [homeData, setHomeData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [pesoInput, setPesoInput] = useState("");
+  const [tallaInput, setTallaInput] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+
+  const fetchDashboard = (token: string, babyId: string) => {
+    axios.get(`${API_URL}/v1/home/${babyId}`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(res => {
+        setHomeData(res.data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
+  };
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
-    if (!token || !storedUser) { navigate('/'); return; }
+    const token = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("user");
+    if (!token || !storedUser) {
+      navigate("/");
+      return;
+    }
     setUser(JSON.parse(storedUser));
-    axios.get(`${API_URL}/profiles/babies`, { headers: { Authorization: `Bearer ${token}` } })
-      .then(res => setBabies(res.data))
-      .catch(err => { if (err.response?.status === 401) { localStorage.clear(); navigate('/'); } });
+
+    const selectedBabyId = localStorage.getItem("selectedBabyId");
+    if (!selectedBabyId) {
+      navigate("/seleccionar-perfil");
+      return;
+    }
+    
+    setActiveBabyId(selectedBabyId);
+    fetchDashboard(token, selectedBabyId);
   }, [navigate]);
 
-  const handleLogout = () => { localStorage.clear(); navigate('/'); };
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/");
+  };
 
-  if (!user) return null;
+  const handleSaveGrowth = async () => {
+    if (!pesoInput || !tallaInput || !activeBabyId) return;
+    setIsSaving(true);
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(`${API_URL}/v1/home/${activeBabyId}/crecimiento`, {
+        peso: parseFloat(pesoInput),
+        talla: parseFloat(tallaInput)
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      
+      setIsModalOpen(false);
+      setPesoInput("");
+      setTallaInput("");
+      
+      // Refresh Dashboard data
+      if (token) fetchDashboard(token, activeBabyId);
+    } catch (error) {
+      console.error(error);
+      alert("Error al guardar las medidas");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (!user || loading) return <div style={{ padding: "40px", textAlign: "center", fontFamily: "Nunito", fontSize: "18px" }}>Cargando tu panel...</div>;
+
+  const hero = homeData?.hero || { nombre: "Sin perfiles registrados", edad_exacta: "-", peso_kg: "-", talla_cm: "-", percentil: "-" };
+  const notificaciones = homeData?.notificaciones || [];
+  
+  // Growth Chart Calculations
+  const seriePeso = homeData?.crecimiento?.serie_peso || [];
+  const etiquetasFecha = homeData?.crecimiento?.etiquetas_fecha || [];
+  const serieOms = homeData?.crecimiento?.serie_oms || [];
+  
+  // Create an array of 6 elements max, padded if fewer exist
+  const maxPoints = 6;
+  const paddingNeeded = maxPoints - seriePeso.length;
+  const displayPesos = paddingNeeded > 0 
+    ? [...Array(paddingNeeded).fill(null), ...seriePeso] 
+    : seriePeso.slice(-6);
+    
+  const displayFechas = paddingNeeded > 0
+    ? [...Array(paddingNeeded).fill(""), ...etiquetasFecha]
+    : etiquetasFecha.slice(-6);
+
+  const displayOms = paddingNeeded > 0
+    ? [...Array(paddingNeeded).fill(null), ...serieOms]
+    : serieOms.slice(-6);
+
+  // SVG Geometry
+  const xPositions = [60, 110, 160, 210, 260, 310];
+  const mapY = (val: number | null) => {
+    if (val === null || val === 0) return null;
+    // Map weight from 0kg (y=85) to 15kg (y=10)
+    // 15kg range = 75px. 1kg = 5px
+    const y = 85 - (val * 5); 
+    return Math.max(10, Math.min(85, y));
+  };
+
+  let pointsString = "";
+  displayPesos.forEach((w: number | null, i: number) => {
+    const y = mapY(w);
+    if (y !== null) {
+      pointsString += `${xPositions[i]},${y} `;
+    }
+  });
+
+  let omsPointsString = "";
+  displayOms.forEach((w: number | null, i: number) => {
+    const y = mapY(w);
+    if (y !== null) {
+      omsPointsString += `${xPositions[i]},${y} `;
+    }
+  });
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F8F7FC', fontFamily: "'Nunito', sans-serif", display: 'flex', flexDirection: 'column' }}>
-
-      {/* ── NAV ─────────────────────────────────────────────────── */}
-      <header style={{
-        background: 'white', borderBottom: '1px solid #EDE9F8',
-        boxShadow: '0 2px 16px rgba(45,38,64,0.04)',
-        position: 'sticky', top: 0, zIndex: 10,
+    <div style={{
+      minHeight: "100vh",
+      background: "#F8F7FC",
+      fontFamily: "'Nunito', sans-serif",
+      display: "flex",
+      flexDirection: "column",
+    }}>
+      {/* ── TOP NAV ── */}
+      <nav style={{
+        width: "100%",
+        background: "var(--theme-darker)",
+        color: "#fff",
+        padding: "16px 40px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        position: "sticky",
+        top: 0,
+        zIndex: 100,
+        boxShadow: "0 4px 12px rgba(0,0,0,.15)"
       }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 2.5rem', height: '70px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '14px', background: 'linear-gradient(135deg, #7C5CBF, #A07ADF)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(124,92,191,0.3)' }}>
-              <Heart size={18} color="white" fill="white" />
+        <div style={{ fontSize: "24px", fontWeight: 800, cursor: "pointer" }} onClick={() => navigate("/dashboard")}>
+          Iniciativa<span style={{ color: "var(--theme-light)" }}>Baby</span>
+        </div>
+        
+        <div style={{ display: "flex", gap: "32px", alignItems: "center" }}>
+          <div style={{ display: "flex", gap: "24px", fontWeight: 600, fontSize: "15px" }}>
+            <span style={{ cursor: "pointer", color: "var(--theme-light)" }} onClick={() => navigate("/dashboard")}>Inicio</span>
+            <span style={{ cursor: "pointer", transition: "color 0.2s" }} onMouseEnter={e => e.currentTarget.style.color="var(--theme-light)"} onMouseLeave={e => e.currentTarget.style.color="white"} onClick={() => navigate("/salud")}>Salud</span>
+            <span style={{ cursor: "pointer", transition: "color 0.2s" }} onMouseEnter={e => e.currentTarget.style.color="var(--theme-light)"} onMouseLeave={e => e.currentTarget.style.color="white"} onClick={() => navigate("/comunidad")}>Comunidad</span>
+          </div>
+          <div style={{ width: "1px", height: "24px", background: "rgba(255,255,255,0.2)" }}></div>
+          <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+            <div style={{ position: "relative", cursor: "pointer" }} onClick={() => alert("No tienes nuevas notificaciones")}>
+              <Bell size={22} />
+              {notificaciones.length > 0 && <span style={{ position: "absolute", top: -4, right: -4, background: "#EF4444", width: 10, height: 10, borderRadius: "50%" }}></span>}
             </div>
-            <span style={{ fontSize: '20px', fontWeight: 900, color: '#2D2640', letterSpacing: '-0.01em' }}>Iniciativa Baby</span>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <button style={{ width: '40px', height: '40px', borderRadius: '12px', border: '2px solid #EDE9F8', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-              <Bell size={18} color="#8A849C" />
-            </button>
-            <button
-              onClick={handleLogout}
-              style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '14px', border: '2px solid #EDE9F8', background: 'white', cursor: 'pointer', fontFamily: "'Nunito', sans-serif", fontSize: '14px', fontWeight: 700, color: '#5a5a5a', transition: 'all 0.2s' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#F8F7FC'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'white'; }}
-            >
-              <LogOut size={16} color="#8A849C" /> Salir
+            <div 
+              onClick={() => navigate("/mi-perfil")}
+              style={{ 
+                width: "36px", height: "36px", borderRadius: "50%", 
+                background: "var(--theme-primary)", display: "flex", 
+                alignItems: "center", justifyContent: "center", fontWeight: "bold",
+                fontSize: "16px", cursor: "pointer", border: "2px solid rgba(255,255,255,0.2)"
+              }}>
+              {user.nombre[0].toUpperCase()}
+            </div>
+            <button onClick={handleLogout} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.7)", cursor: "pointer", display: "flex", alignItems: "center" }} title="Cerrar sesión">
+              <LogOut size={20} />
             </button>
           </div>
         </div>
-      </header>
+      </nav>
 
-      {/* ── MAIN CONTENT ────────────────────────────────────────── */}
-      <main style={{ flex: 1, maxWidth: '1200px', width: '100%', margin: '0 auto', padding: '3rem 2.5rem' }}>
-
-        {/* Welcome */}
-        <div style={{ marginBottom: '3rem' }}>
-          <h1 style={{ fontSize: '2.8rem', fontWeight: 900, color: '#2D2640', marginBottom: '8px', letterSpacing: '-0.02em' }}>
-            ¡Hola, {user.nombre}! 👋
-          </h1>
-          <p style={{ fontSize: '18px', color: '#8A849C', fontWeight: 500 }}>Aquí tienes el resumen de tu familia.</p>
-        </div>
-
-        {/* Stats Row */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginBottom: '3rem' }}>
-          {[
-            { label: 'Bebés registrados', value: babies.length.toString(), icon: Baby, color: '#F4A0A0', bg: 'linear-gradient(135deg, #FFF0F0, #FFE5E5)' },
-            { label: 'Próximas vacunas', value: '—', icon: Shield, color: '#7C5CBF', bg: 'linear-gradient(135deg, #F0EBF8, #E5DBF5)' },
-            { label: 'Próximos controles', value: '—', icon: Calendar, color: '#6DBE9E', bg: 'linear-gradient(135deg, #EBF7F2, #DBF0EA)' },
-          ].map(({ label, value, icon: Icon, color, bg }) => (
-            <div key={label} style={{
-              background: 'white', borderRadius: '24px', padding: '2rem 2.5rem',
-              boxShadow: '0 4px 20px rgba(45,38,64,0.05)', border: '1px solid #F0EEF8',
-              display: 'flex', alignItems: 'center', gap: '20px',
-            }}>
-              <div style={{ width: '60px', height: '60px', borderRadius: '20px', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <Icon size={28} color={color} />
+      <div style={{ flex: 1, padding: "40px", maxWidth: "1400px", margin: "0 auto", width: "100%" }}>
+        
+        {/* ── HOME HERO FULL WIDTH ── */}
+        <div style={{
+          background: "linear-gradient(135deg, var(--theme-darker) 0%, var(--theme-primary) 100%)",
+          padding: "40px",
+          color: "#fff",
+          borderRadius: "24px",
+          boxShadow: "0 10px 30px var(--theme-shadow-bg)",
+          marginBottom: "32px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: "24px"
+        }}>
+          <div>
+            <div style={{ fontSize: "16px", opacity: 0.8, marginBottom: "12px" }}>Buenos días, {user.nombre} {user.apellidos || ""} 👋</div>
+            <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+              <div style={{
+                width: "80px", height: "80px", borderRadius: "50%", 
+                background: "var(--theme-bg-light)", display: "flex", 
+                alignItems: "center", justifyContent: "center", 
+                fontSize: "40px", border: "4px solid rgba(255,255,255,.4)"
+              }}>
+                👶
               </div>
               <div>
-                <p style={{ fontSize: '2.2rem', fontWeight: 900, color: '#2D2640', lineHeight: 1, marginBottom: '6px' }}>{value}</p>
-                <p style={{ fontSize: '14px', color: '#8A849C', fontWeight: 600 }}>{label}</p>
+                <div style={{ fontSize: "28px", fontWeight: 800, marginBottom: "4px" }}>{hero.nombre}</div>
+                <div style={{ fontSize: "15px", opacity: 0.9 }}>{hero.edad_exacta} · {hero.prevision}</div>
               </div>
             </div>
-          ))}
-        </div>
-
-        {/* Bebés */}
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-            <h2 style={{ fontSize: '22px', fontWeight: 900, color: '#2D2640' }}>Tus bebés</h2>
-            {babies.length > 0 && (
-              <button style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 20px', borderRadius: '14px', border: '2px solid #EDE9F8', background: 'white', cursor: 'pointer', fontFamily: "'Nunito', sans-serif", fontSize: '14px', fontWeight: 700, color: '#7C5CBF' }}>
-                Agregar bebé <ChevronRight size={16} />
-              </button>
-            )}
           </div>
 
-          {babies.length === 0 ? (
-            <div style={{ background: 'white', borderRadius: '28px', padding: '4rem', textAlign: 'center', boxShadow: '0 4px 20px rgba(45,38,64,0.05)', border: '2px dashed #EDE9F8' }}>
-              <div style={{ width: '80px', height: '80px', borderRadius: '24px', background: '#EDE9F8', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
-                <Baby size={36} color="#7C5CBF" />
+          <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+            <div style={{ background: "rgba(255,255,255,.15)", borderRadius: "16px", padding: "20px 30px", textAlign: "center", minWidth: "120px" }}>
+              <div style={{ fontSize: "24px", fontWeight: 800 }}>{hero.peso_kg !== "-" && hero.peso_kg !== 0 ? `${hero.peso_kg} kg` : "N/A"}</div>
+              <div style={{ fontSize: "13px", opacity: 0.8, marginTop: "4px" }}>Peso actual</div>
+            </div>
+            <div style={{ background: "rgba(255,255,255,.15)", borderRadius: "16px", padding: "20px 30px", textAlign: "center", minWidth: "120px" }}>
+              <div style={{ fontSize: "24px", fontWeight: 800 }}>{hero.talla_cm !== "-" && hero.talla_cm !== 0 ? `${hero.talla_cm} cm` : "N/A"}</div>
+              <div style={{ fontSize: "13px", opacity: 0.8, marginTop: "4px" }}>Talla actual</div>
+            </div>
+            <div style={{ background: "rgba(255,255,255,.15)", borderRadius: "16px", padding: "20px 30px", textAlign: "center", minWidth: "120px" }}>
+              <div style={{ fontSize: "24px", fontWeight: 800 }}>P{hero.percentil}</div>
+              <div style={{ fontSize: "13px", opacity: 0.8, marginTop: "4px" }}>Percentil OMS</div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── GRID DESKTOP (3 COLUMNAS) ── */}
+        <div style={{ 
+          display: "grid", 
+          gridTemplateColumns: "repeat(auto-fit, minmax(380px, 1fr))", 
+          gap: "24px",
+          alignItems: "start"
+        }}>
+          
+          {/* COLUMNA 1: Notificaciones y Gráfico */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+            {/* ── NOTIFICACIONES ── */}
+            {notificaciones.length > 0 && (
+              <div style={{ background: "#fff", borderRadius: "24px", padding: "28px", boxShadow: "0 4px 20px rgba(0,0,0,.04)" }}>
+                <h3 style={{ fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "20px", display: "flex", alignItems: "center", gap: "8px" }}>
+                  🔔 Alertas y Tareas
+                </h3>
+                
+                {notificaciones.map((n: any, idx: number) => {
+                  const bg = n.prioridad === 'alta' ? '#FEE2E2' : n.prioridad === 'media' ? '#FEF3C7' : 'var(--theme-bg-light)';
+                  const border = n.prioridad === 'alta' ? '#DC2626' : n.prioridad === 'media' ? '#D97706' : 'var(--theme-primary)';
+                  const icon = n.tipo.includes('vacuna') ? '💉' : n.tipo.includes('control') ? '🩺' : '📚';
+
+                  return (
+                    <div key={idx} 
+                      onClick={() => navigate("/salud")}
+                      style={{ 
+                        borderRadius: "16px", padding: "16px", marginBottom: "16px", 
+                        display: "flex", alignItems: "flex-start", gap: "16px", cursor: "pointer",
+                        background: bg, borderLeft: `5px solid ${border}`,
+                        transition: "transform 0.2s",
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.transform = "translateX(5px)"}
+                      onMouseLeave={e => e.currentTarget.style.transform = "translateX(0)"}
+                    >
+                      <span style={{ fontSize: "24px" }}>{icon}</span>
+                      <div>
+                        <strong style={{ display: "block", fontSize: "15px", color: "var(--theme-darker)", marginBottom: "4px" }}>{n.titulo}</strong>
+                        <span style={{ fontSize: "14px", color: "#4B5563", lineHeight: 1.5 }}>{n.mensaje}</span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-              <p style={{ fontSize: '20px', fontWeight: 800, color: '#2D2640', marginBottom: '8px' }}>Aún no hay perfiles registrados</p>
-              <p style={{ fontSize: '16px', color: '#8A849C', marginBottom: '2rem' }}>Registra a tu bebé para comenzar el seguimiento.</p>
-              <button
-                onClick={() => navigate('/registro')}
-                style={{ padding: '14px 32px', borderRadius: '16px', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #7C5CBF, #A07ADF)', color: 'white', fontSize: '16px', fontWeight: 800, fontFamily: "'Nunito', sans-serif", boxShadow: '0 8px 24px rgba(124,92,191,0.35)' }}
-              >
-                Agregar bebé
+            )}
+
+            {/* ── GRÁFICO DINÁMICO ── */}
+            <div style={{ background: "#fff", borderRadius: "24px", padding: "28px", boxShadow: "0 4px 20px rgba(0,0,0,.04)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+                <h3 style={{ fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)", margin: 0 }}>
+                  📈 Evolución de Crecimiento
+                </h3>
+                <button 
+                  onClick={() => setIsModalOpen(true)}
+                  style={{
+                    background: "var(--theme-primary)", color: "#fff",
+                    padding: "8px 16px", borderRadius: "12px", border: "none",
+                    fontSize: "13px", fontWeight: 700, cursor: "pointer",
+                    display: "flex", alignItems: "center", gap: "6px"
+                  }}
+                >
+                  <Plus size={16} /> Registrar Medidas
+                </button>
+              </div>
+              
+              <svg viewBox="0 0 340 120" style={{ width: "100%", height: "auto", overflow: "visible" }}>
+                <rect width="340" height="100" fill="#F9FAFB" rx="8"/>
+                
+                {/* Y Axes Lines */}
+                <line x1="40" y1="10" x2="40" y2="85" stroke="#E5E7EB" strokeWidth="0.8"/>
+                <line x1="40" y1="85" x2="330" y2="85" stroke="#E5E7EB" strokeWidth="0.8"/>
+                <line x1="40" y1="35" x2="330" y2="35" stroke="#F3F4F6" strokeWidth="0.6"/>
+                <line x1="40" y1="60" x2="330" y2="60" stroke="#F3F4F6" strokeWidth="0.6"/>
+                
+                {/* Y Axis Labels (Approx 15kg, 10kg, 5kg scale mapping) */}
+                <text x="35" y="13" textAnchor="end" fontSize="8" fill="#9CA3AF">15kg</text>
+                <text x="35" y="38" textAnchor="end" fontSize="8" fill="#9CA3AF">10kg</text>
+                <text x="35" y="63" textAnchor="end" fontSize="8" fill="#9CA3AF">5kg</text>
+                <text x="35" y="88" textAnchor="end" fontSize="8" fill="#9CA3AF">0kg</text>
+                
+                {/* X Axis Labels (Dates) */}
+                {displayFechas.map((fecha, idx) => (
+                  <text key={idx} x={xPositions[idx]} y="105" textAnchor="middle" fontSize="9" fill="#9CA3AF" fontWeight="600">
+                    {fecha || ""}
+                  </text>
+                ))}
+                
+                {/* P50 reference line (Dinámico OMS) */}
+                {omsPointsString && (
+                  <polyline points={omsPointsString} fill="none" stroke="#E5E7EB" strokeWidth="1.5" strokeDasharray="4,3"/>
+                )}
+                
+                {/* Dynamic Data Line */}
+                {pointsString && (
+                  <polyline points={pointsString} fill="none" stroke="var(--theme-primary)" strokeWidth="2.5" strokeLinejoin="round"/>
+                )}
+                
+                {/* Dynamic Data Points */}
+                {displayPesos.map((w: number | null, i: number) => {
+                  const y = mapY(w);
+                  if (y === null) return null;
+                  return <circle key={i} cx={xPositions[i]} cy={y} r={i === maxPoints - 1 && w !== null ? 4.5 : 3.5} 
+                    fill="var(--theme-primary)" stroke={i === maxPoints - 1 ? "#fff" : "none"} strokeWidth={2}/>;
+                })}
+              </svg>
+            </div>
+          </div>
+
+          {/* COLUMNA 2: Accesos Rápidos */}
+          <div style={{ background: "#fff", borderRadius: "24px", padding: "28px", boxShadow: "0 4px 20px rgba(0,0,0,.04)" }}>
+            <h3 style={{ fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "20px" }}>
+              🗂️ Módulos de Acceso Rápido
+            </h3>
+            
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+              
+              <div onClick={() => navigate(`/perfil/${hero.id}`)} style={{ background: "#F9FAFB", padding: "28px 16px", borderRadius: "20px", textAlign: "center", cursor: "pointer", border: "2px solid transparent", transition: "all 0.2s" }}
+                   onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--theme-primary)"; e.currentTarget.style.background = "var(--theme-bg-light)"; }}
+                   onMouseLeave={e => { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.background = "#F9FAFB"; }}>
+                <FileText size={36} color="var(--theme-primary)" style={{ margin: "0 auto 12px" }} />
+                <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--theme-darker)" }}>Perfil del bebé</div>
+                <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "6px" }}>Datos generales</div>
+              </div>
+
+              <div onClick={() => navigate("/salud")} style={{ background: "#F9FAFB", padding: "28px 16px", borderRadius: "20px", textAlign: "center", cursor: "pointer", border: "2px solid transparent", transition: "all 0.2s" }}
+                   onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--theme-primary)"; e.currentTarget.style.background = "var(--theme-bg-light)"; }}
+                   onMouseLeave={e => { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.background = "#F9FAFB"; }}>
+                <Syringe size={36} color="var(--theme-primary)" style={{ margin: "0 auto 12px" }} />
+                <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--theme-darker)" }}>Salud</div>
+                <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "6px" }}>Vacunas y controles</div>
+              </div>
+
+              <div onClick={() => navigate("/comunidad")} style={{ background: "#F9FAFB", padding: "28px 16px", borderRadius: "20px", textAlign: "center", cursor: "pointer", border: "2px solid transparent", transition: "all 0.2s" }}
+                   onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--theme-primary)"; e.currentTarget.style.background = "var(--theme-bg-light)"; }}
+                   onMouseLeave={e => { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.background = "#F9FAFB"; }}>
+                <MessageCircle size={36} color="var(--theme-primary)" style={{ margin: "0 auto 12px" }} />
+                <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--theme-darker)" }}>Comunidad</div>
+                <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "6px" }}>Foros y artículos</div>
+              </div>
+
+              <div onClick={() => alert("Módulo en desarrollo")} style={{ background: "#F9FAFB", padding: "28px 16px", borderRadius: "20px", textAlign: "center", cursor: "pointer", border: "2px solid transparent", transition: "all 0.2s" }}
+                   onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--theme-primary)"; e.currentTarget.style.background = "var(--theme-bg-light)"; }}
+                   onMouseLeave={e => { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.background = "#F9FAFB"; }}>
+                <Camera size={36} color="var(--theme-primary)" style={{ margin: "0 auto 12px" }} />
+                <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--theme-darker)" }}>Galería</div>
+                <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "6px" }}>Fotos e hitos</div>
+              </div>
+
+              <div onClick={() => navigate("/directorio")} style={{ background: "#F9FAFB", padding: "28px 16px", borderRadius: "20px", textAlign: "center", cursor: "pointer", border: "2px solid transparent", transition: "all 0.2s" }}
+                   onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--theme-primary)"; e.currentTarget.style.background = "var(--theme-bg-light)"; }}
+                   onMouseLeave={e => { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.background = "#F9FAFB"; }}>
+                <Search size={36} color="var(--theme-primary)" style={{ margin: "0 auto 12px" }} />
+                <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--theme-darker)" }}>Directorio</div>
+                <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "6px" }}>Especialistas</div>
+              </div>
+
+              <div onClick={() => navigate(`/perfil/${hero.id}?tab=compartir`)} style={{ background: "#F9FAFB", padding: "28px 16px", borderRadius: "20px", textAlign: "center", cursor: "pointer", border: "2px solid transparent", transition: "all 0.2s" }}
+                   onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--theme-primary)"; e.currentTarget.style.background = "var(--theme-bg-light)"; }}
+                   onMouseLeave={e => { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.background = "#F9FAFB"; }}>
+                <Users size={36} color="var(--theme-primary)" style={{ margin: "0 auto 12px" }} />
+                <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--theme-darker)" }}>Mi familia</div>
+                <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "6px" }}>Acceso compartido</div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      {/* ── MODAL REGISTRO CRECIMIENTO ── */}
+      {isModalOpen && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
+          background: "rgba(0,0,0,0.5)", zIndex: 9999,
+          display: "flex", alignItems: "center", justifyContent: "center"
+        }}>
+          <div style={{
+            background: "#fff", padding: "32px", borderRadius: "24px", width: "100%", maxWidth: "400px",
+            boxShadow: "0 10px 40px rgba(0,0,0,0.2)"
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
+              <h2 style={{ fontSize: "20px", fontWeight: 800, color: "var(--theme-darker)", margin: 0 }}>Registrar Medidas</h2>
+              <button onClick={() => setIsModalOpen(false)} style={{ background: "none", border: "none", cursor: "pointer" }}>
+                <X size={24} color="#6B7280" />
               </button>
             </div>
-          ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
-              {babies.map(baby => (
-                <div key={baby.id}
-                  style={{ background: 'white', borderRadius: '28px', padding: '2rem 2.5rem', boxShadow: '0 4px 20px rgba(45,38,64,0.05)', border: '1px solid #F0EEF8', cursor: 'pointer', transition: 'all 0.3s ease' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 16px 40px rgba(124,92,191,0.12)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ''; (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 20px rgba(45,38,64,0.05)'; }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                    <div style={{ width: '60px', height: '60px', borderRadius: '20px', background: 'linear-gradient(135deg, #F4A0A0, #f9c5c5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Baby size={28} color="white" />
-                    </div>
-                    <ChevronRight size={20} color="#DDD9F0" />
-                  </div>
-                  <h3 style={{ fontSize: '22px', fontWeight: 900, color: '#2D2640', marginBottom: '4px' }}>{baby.nombre}</h3>
-                  <p style={{ fontSize: '15px', fontWeight: 700, color: '#7C5CBF', marginBottom: '12px' }}>{getBabyAge(baby.fecha_nacimiento)}</p>
-                  <div style={{ height: '1px', background: '#F0EEF8', marginBottom: '14px' }} />
-                  <p style={{ fontSize: '13px', color: '#8A849C', fontWeight: 600 }}>
-                    Nacido el {new Date(baby.fecha_nacimiento).toLocaleDateString('es-CL', { day: '2-digit', month: 'long', year: 'numeric' })}
-                  </p>
-
-                  {/* Mini stats */}
-                  <div style={{ display: 'flex', gap: '12px', marginTop: '1.25rem' }}>
-                    {[{ label: 'Vacunas', icon: Shield, color: '#7C5CBF' }, { label: 'Controles', icon: TrendingUp, color: '#6DBE9E' }].map(({ label, icon: Icon, color }) => (
-                      <div key={label} style={{ flex: 1, padding: '10px 14px', borderRadius: '14px', background: '#F8F7FC', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Icon size={15} color={color} />
-                        <span style={{ fontSize: '12px', fontWeight: 700, color: '#8A849C' }}>{label}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
+            
+            <div style={{ marginBottom: "20px" }}>
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 700, marginBottom: "8px", color: "#4B5563" }}>Peso (kg)</label>
+              <input 
+                type="number" 
+                step="0.01"
+                value={pesoInput}
+                onChange={e => setPesoInput(e.target.value)}
+                placeholder="Ej. 7.4"
+                style={{ width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", outline: "none", fontSize: "15px" }}
+              />
             </div>
-          )}
+
+            <div style={{ marginBottom: "32px" }}>
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 700, marginBottom: "8px", color: "#4B5563" }}>Talla (cm)</label>
+              <input 
+                type="number" 
+                step="0.1"
+                value={tallaInput}
+                onChange={e => setTallaInput(e.target.value)}
+                placeholder="Ej. 67.5"
+                style={{ width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", outline: "none", fontSize: "15px" }}
+              />
+            </div>
+
+            <button 
+              onClick={handleSaveGrowth}
+              disabled={isSaving || !pesoInput || !tallaInput}
+              style={{ 
+                width: "100%", background: "var(--theme-primary)", color: "#fff", 
+                padding: "16px", borderRadius: "14px", border: "none", 
+                fontSize: "16px", fontWeight: 800, cursor: isSaving ? "not-allowed" : "pointer",
+                opacity: (isSaving || !pesoInput || !tallaInput) ? 0.6 : 1
+              }}
+            >
+              {isSaving ? "Guardando..." : "Guardar Registro"}
+            </button>
+          </div>
         </div>
-      </main>
+      )}
+
     </div>
   );
 }

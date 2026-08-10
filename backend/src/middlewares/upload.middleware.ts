@@ -1,9 +1,9 @@
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
-import { v4 as uuidv4 } from 'uuid';
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+import { v4 as uuidv4 } from "uuid";
 
-const uploadDir = path.join(__dirname, '../../uploads');
+const uploadDir = path.join(__dirname, "../../uploads");
 
 // Asegurar que el directorio uploads exista
 if (!fs.existsSync(uploadDir)) {
@@ -25,10 +25,10 @@ export const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // Límite de 5MB
   fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
+    if (file.mimetype.startsWith("image/")) {
       cb(null, true);
     } else {
-      cb(new Error('Solo se permiten imágenes'));
+      cb(new Error("Solo se permiten imágenes"));
     }
   },
 });
