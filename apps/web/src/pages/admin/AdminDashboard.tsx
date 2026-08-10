@@ -17,7 +17,7 @@ export default function AdminDashboard() {
         const token = localStorage.getItem("admin_token");
         if (!token) return navigate("/admin/login");
         const res = await axios.get(
-          "http://localhost:3000/api/v1/admin/dashboard/stats",
+          "https://babycare-backend-msyq.onrender.com/api/v1/admin/dashboard/stats",
           {
             headers: { Authorization: `Bearer ${token}` },
           },

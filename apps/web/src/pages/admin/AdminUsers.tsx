@@ -17,7 +17,7 @@ export default function AdminUsers() {
         const token = localStorage.getItem("admin_token");
         if (!token) return navigate("/admin/login");
 
-        const res = await fetch("http://localhost:3000/api/v1/admin/usuarios", {
+        const res = await fetch("https://babycare-backend-msyq.onrender.com/api/v1/admin/usuarios", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -28,7 +28,7 @@ export default function AdminUsers() {
           setUsuarios(data);
           
           const statsRes = await axios.get(
-            "http://localhost:3000/api/v1/admin/usuarios/stats",
+            "https://babycare-backend-msyq.onrender.com/api/v1/admin/usuarios/stats",
             { headers: { Authorization: `Bearer ${token}` } },
           );
           setStats(statsRes.data);
@@ -118,7 +118,7 @@ export default function AdminUsers() {
       return;
     try {
       const token = localStorage.getItem("admin_token");
-      await axios.delete(`http://localhost:3000/api/v1/admin/usuarios/${id}`, {
+      await axios.delete(`https://babycare-backend-msyq.onrender.com/api/v1/admin/usuarios/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUsuarios(usuarios.filter((u) => u.id !== id));
@@ -131,7 +131,7 @@ export default function AdminUsers() {
     try {
       const adminToken = localStorage.getItem("admin_token");
       const res = await axios.post(
-        `http://localhost:3000/api/v1/admin/usuarios/${id}/impersonate`,
+        `https://babycare-backend-msyq.onrender.com/api/v1/admin/usuarios/${id}/impersonate`,
         {},
         { headers: { Authorization: `Bearer ${adminToken}` } }
       );
@@ -159,13 +159,13 @@ export default function AdminUsers() {
       const token = localStorage.getItem("admin_token");
       if (isEditing) {
         await axios.put(
-          `http://localhost:3000/api/v1/admin/usuarios/${editId}`,
+          `https://babycare-backend-msyq.onrender.com/api/v1/admin/usuarios/${editId}`,
           formData,
           { headers: { Authorization: `Bearer ${token}` } },
         );
       } else {
         await axios.post(
-          `http://localhost:3000/api/v1/admin/usuarios`,
+          `https://babycare-backend-msyq.onrender.com/api/v1/admin/usuarios`,
           formData,
           { headers: { Authorization: `Bearer ${token}` } },
         );
@@ -175,13 +175,13 @@ export default function AdminUsers() {
       
       // Refetch usuarios
       const res = await axios.get(
-        "http://localhost:3000/api/v1/admin/usuarios",
+        "https://babycare-backend-msyq.onrender.com/api/v1/admin/usuarios",
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setUsuarios(res.data);
       
       const statsRes = await axios.get(
-        "http://localhost:3000/api/v1/admin/usuarios/stats",
+        "https://babycare-backend-msyq.onrender.com/api/v1/admin/usuarios/stats",
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setStats(statsRes.data);

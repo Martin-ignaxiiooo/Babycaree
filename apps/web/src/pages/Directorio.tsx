@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 import axios from "axios";
 
-const API_URL = "http://localhost:3000/api/v1";
+const API_URL = "https://babycare-backend-msyq.onrender.com/api/v1";
 
 interface Medico {
   id: string;

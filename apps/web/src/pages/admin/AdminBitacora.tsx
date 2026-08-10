@@ -13,7 +13,7 @@ export default function AdminBitacora() {
         const token = localStorage.getItem("admin_token");
         if (!token) return navigate("/admin/login");
         const res = await axios.get(
-          "http://localhost:3000/api/v1/admin/bitacora",
+          "https://babycare-backend-msyq.onrender.com/api/v1/admin/bitacora",
           {
             headers: { Authorization: `Bearer ${token}` },
           },

@@ -78,7 +78,7 @@ export default function AdminArticulos() {
       return;
     try {
       const token = localStorage.getItem("admin_token");
-      await axios.delete(`http://localhost:3000/api/v1/admin/articulos/${id}`, {
+      await axios.delete(`https://babycare-backend-msyq.onrender.com/api/v1/admin/articulos/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchData();
@@ -92,13 +92,13 @@ export default function AdminArticulos() {
       const token = localStorage.getItem("admin_token");
       if (!token) return navigate("/admin/login");
       const res = await axios.get(
-        "http://localhost:3000/api/v1/admin/articulos",
+        "https://babycare-backend-msyq.onrender.com/api/v1/admin/articulos",
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setData(res.data);
 
       const statsRes = await axios.get(
-        "http://localhost:3000/api/v1/admin/articulos/stats",
+        "https://babycare-backend-msyq.onrender.com/api/v1/admin/articulos/stats",
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setStats(statsRes.data);
@@ -118,7 +118,7 @@ export default function AdminArticulos() {
       const token = localStorage.getItem("admin_token");
       if (isEditing) {
         await axios.put(
-          `http://localhost:3000/api/v1/admin/articulos/${editId}`,
+          `https://babycare-backend-msyq.onrender.com/api/v1/admin/articulos/${editId}`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -126,7 +126,7 @@ export default function AdminArticulos() {
         );
       } else {
         await axios.post(
-          "http://localhost:3000/api/v1/admin/articulos",
+          "https://babycare-backend-msyq.onrender.com/api/v1/admin/articulos",
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },

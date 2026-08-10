@@ -48,7 +48,7 @@ export default function AdminCentros() {
     try {
       const token = localStorage.getItem("admin_token");
       await axios.delete(
-        `http://localhost:3000/api/v1/admin/directorio/centros/${codigo}`,
+        `https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/centros/${codigo}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -64,7 +64,7 @@ export default function AdminCentros() {
       const token = localStorage.getItem("admin_token");
       if (!token) return navigate("/admin/login");
       const res = await axios.get(
-        "http://localhost:3000/api/v1/admin/directorio/centros",
+        "https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/centros",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -86,7 +86,7 @@ export default function AdminCentros() {
       const token = localStorage.getItem("admin_token");
       if (isEditing) {
         await axios.put(
-          `http://localhost:3000/api/v1/admin/directorio/centros/${editId}`,
+          `https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/centros/${editId}`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -94,7 +94,7 @@ export default function AdminCentros() {
         );
       } else {
         await axios.post(
-          "http://localhost:3000/api/v1/admin/directorio/centros",
+          "https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/centros",
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },

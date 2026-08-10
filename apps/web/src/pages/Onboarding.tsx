@@ -17,7 +17,7 @@ import {
   EyeOff,
 } from "lucide-react";
 
-const API_URL = "http://localhost:3000/api";
+const API_URL = "https://babycare-backend-msyq.onrender.com/api";
 const TOTAL_STEPS = 4;
 
 // ─── Input reutilizable FUERA de cualquier componente (fix de re-render) ──────
@@ -1073,7 +1073,7 @@ export default function Onboarding() {
       setConsentError(false);
       setLoading(true);
       try {
-        const authRes = await axios.post(`http://localhost:3000/api/auth/register`, {
+        const authRes = await axios.post(`https://babycare-backend-msyq.onrender.com/api/auth/register`, {
           email: account.email,
           password: account.password,
           nombre: account.nombre,
@@ -1086,7 +1086,7 @@ export default function Onboarding() {
         localStorage.setItem("user", JSON.stringify(authRes.data.user));
 
         const babyRes = await axios.post(
-          `http://localhost:3000/api/profiles/babies`,
+          `https://babycare-backend-msyq.onrender.com/api/profiles/babies`,
           {
             nombre: baby.nombre,
             fecha_nacimiento: baby.fecha_nacimiento,

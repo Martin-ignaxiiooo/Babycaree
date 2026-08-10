@@ -20,7 +20,7 @@ export default function Salud() {
     }
 
     // Obtener el bebé activo
-    fetch("http://localhost:3000/api/profiles/babies", {
+    fetch("https://babycare-backend-msyq.onrender.com/api/profiles/babies", {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -42,7 +42,7 @@ export default function Salud() {
 
   const fetchVacunas = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/v1/salud/${bebeId}/vacunas`, {
+      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/vacunas`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) setVacunas(await res.json());
@@ -57,7 +57,7 @@ export default function Salud() {
 
   const toggleVacuna = async (vacunaId: number, aplicadaActual: boolean) => {
     try {
-      const res = await fetch(`http://localhost:3000/api/v1/salud/${bebeId}/vacunas/${vacunaId}`, {
+      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/vacunas/${vacunaId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -83,7 +83,7 @@ export default function Salud() {
     if (!vacuna) return;
 
     try {
-      await fetch(`http://localhost:3000/api/v1/salud/${bebeId}/vacunas/${vacunaId}`, {
+      await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/vacunas/${vacunaId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

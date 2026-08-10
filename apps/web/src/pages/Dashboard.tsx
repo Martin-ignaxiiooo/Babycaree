@@ -6,7 +6,7 @@ import {
   MessageCircle, Camera, Search, Users, Syringe, Stethoscope, LogOut, X
 } from "lucide-react";
 
-const API_URL = "http://localhost:3000/api";
+const API_URL = "https://babycare-backend-msyq.onrender.com/api";
 
 export default function Dashboard() {
   const navigate = useNavigate();

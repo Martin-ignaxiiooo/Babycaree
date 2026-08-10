@@ -63,7 +63,7 @@ export default function AdminEspecialidades() {
     try {
       const token = localStorage.getItem("admin_token");
       await axios.delete(
-        `http://localhost:3000/api/v1/admin/directorio/especialidades/${codigo}`,
+        `https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/especialidades/${codigo}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -80,13 +80,13 @@ export default function AdminEspecialidades() {
       if (!token) return navigate("/admin/login");
       
       const res = await axios.get(
-        "http://localhost:3000/api/v1/admin/directorio/especialidades",
+        "https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/especialidades",
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setData(res.data);
 
       const statsRes = await axios.get(
-        "http://localhost:3000/api/v1/admin/directorio/especialidades/stats",
+        "https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/especialidades/stats",
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setStats(statsRes.data);
@@ -106,7 +106,7 @@ export default function AdminEspecialidades() {
       const token = localStorage.getItem("admin_token");
       if (isEditing) {
         await axios.put(
-          `http://localhost:3000/api/v1/admin/directorio/especialidades/${editId}`,
+          `https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/especialidades/${editId}`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -114,7 +114,7 @@ export default function AdminEspecialidades() {
         );
       } else {
         await axios.post(
-          "http://localhost:3000/api/v1/admin/directorio/especialidades",
+          "https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/especialidades",
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },

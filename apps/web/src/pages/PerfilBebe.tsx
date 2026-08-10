@@ -56,7 +56,7 @@ export default function PerfilBebe() {
 
   const fetchPerfil = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/v1/perfiles-bebe/${id}`, {
+      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/perfiles-bebe/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -76,7 +76,7 @@ export default function PerfilBebe() {
 
   const fetchAccesos = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/v1/perfiles-bebe/${id}/accesos`, {
+      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/perfiles-bebe/${id}/accesos`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) setAccesos(await res.json());
@@ -87,7 +87,7 @@ export default function PerfilBebe() {
 
   const fetchAuditoria = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/v1/perfiles-bebe/${id}/auditoria`, {
+      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/perfiles-bebe/${id}/auditoria`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) setAuditoria(await res.json());
@@ -102,7 +102,7 @@ export default function PerfilBebe() {
 
   const handleSave = async (confirmado = false) => {
     try {
-      const res = await fetch(`http://localhost:3000/api/v1/perfiles-bebe/${id}`, {
+      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/perfiles-bebe/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -141,7 +141,7 @@ export default function PerfilBebe() {
         setSearchResults([]);
         return;
       }
-      const res = await fetch(`http://localhost:3000/api/v1/personas/buscar?q=${encodeURIComponent(query)}&fuente=${fuente}`, {
+      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/personas/buscar?q=${encodeURIComponent(query)}&fuente=${fuente}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -160,7 +160,7 @@ export default function PerfilBebe() {
     const hashes = mockContacts.map(c => CryptoJS.SHA256(c.email.trim().toLowerCase()).toString(CryptoJS.enc.Hex));
     
     try {
-      const res = await fetch(`http://localhost:3000/api/v1/personas/sincronizar-contactos`, {
+      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/personas/sincronizar-contactos`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -182,7 +182,7 @@ export default function PerfilBebe() {
     const correo = targetEmail || (selectedInvite ? selectedInvite.email : searchQuery);
     if (!correo) return;
     try {
-      const res = await fetch(`http://localhost:3000/api/v1/perfiles-bebe/${id}/accesos/invitar`, {
+      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/perfiles-bebe/${id}/accesos/invitar`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -211,7 +211,7 @@ export default function PerfilBebe() {
   const revocarAcceso = async (idAcceso: string) => {
     if (!window.confirm("¿Seguro que deseas revocar este acceso?")) return;
     try {
-      const res = await fetch(`http://localhost:3000/api/v1/perfiles-bebe/${id}/accesos/${idAcceso}`, {
+      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/perfiles-bebe/${id}/accesos/${idAcceso}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -229,7 +229,7 @@ export default function PerfilBebe() {
 
   const modificarPermiso = async (idAcceso: string, nivel_permiso: string) => {
     try {
-      const res = await fetch(`http://localhost:3000/api/v1/perfiles-bebe/${id}/accesos/${idAcceso}`, {
+      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/perfiles-bebe/${id}/accesos/${idAcceso}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

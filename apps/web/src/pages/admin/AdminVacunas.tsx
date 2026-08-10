@@ -47,7 +47,7 @@ export default function AdminVacunas() {
       return;
     try {
       const token = localStorage.getItem("admin_token");
-      await axios.delete(`http://localhost:3000/api/v1/admin/vacunas/${id}`, {
+      await axios.delete(`https://babycare-backend-msyq.onrender.com/api/v1/admin/vacunas/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchData();
@@ -61,7 +61,7 @@ export default function AdminVacunas() {
       const token = localStorage.getItem("admin_token");
       if (!token) return navigate("/admin/login");
       const res = await axios.get(
-        "http://localhost:3000/api/v1/admin/vacunas",
+        "https://babycare-backend-msyq.onrender.com/api/v1/admin/vacunas",
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -83,7 +83,7 @@ export default function AdminVacunas() {
       const token = localStorage.getItem("admin_token");
       if (isEditing) {
         await axios.put(
-          `http://localhost:3000/api/v1/admin/vacunas/${editId}`,
+          `https://babycare-backend-msyq.onrender.com/api/v1/admin/vacunas/${editId}`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -91,7 +91,7 @@ export default function AdminVacunas() {
         );
       } else {
         await axios.post(
-          "http://localhost:3000/api/v1/admin/vacunas",
+          "https://babycare-backend-msyq.onrender.com/api/v1/admin/vacunas",
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },

@@ -15,7 +15,7 @@ export default function AdminAdmins() {
       const token = localStorage.getItem("admin_token");
       if (!token) return navigate("/admin/login");
 
-      const res = await fetch("http://localhost:3000/api/v1/admin/administradores", {
+      const res = await fetch("https://babycare-backend-msyq.onrender.com/api/v1/admin/administradores", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -24,7 +24,7 @@ export default function AdminAdmins() {
         setAdmins(data);
 
         const statsRes = await axios.get(
-          "http://localhost:3000/api/v1/admin/administradores/stats",
+          "https://babycare-backend-msyq.onrender.com/api/v1/admin/administradores/stats",
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setStats(statsRes.data);
@@ -117,7 +117,7 @@ export default function AdminAdmins() {
     try {
       const token = localStorage.getItem("admin_token");
       await axios.put(
-        `http://localhost:3000/api/v1/admin/administradores/${passwordEditId}/password`,
+        `https://babycare-backend-msyq.onrender.com/api/v1/admin/administradores/${passwordEditId}/password`,
         { nueva_contrasena: newPassword },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -132,7 +132,7 @@ export default function AdminAdmins() {
     if (!window.confirm("¿Estás seguro de que deseas eliminar este administrador?")) return;
     try {
       const token = localStorage.getItem("admin_token");
-      await axios.delete(`http://localhost:3000/api/v1/admin/administradores/${id}`, {
+      await axios.delete(`https://babycare-backend-msyq.onrender.com/api/v1/admin/administradores/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAdmins(admins.filter((a) => a.id !== id));
@@ -147,13 +147,13 @@ export default function AdminAdmins() {
       const token = localStorage.getItem("admin_token");
       if (isEditing) {
         await axios.put(
-          `http://localhost:3000/api/v1/admin/administradores/${editId}`,
+          `https://babycare-backend-msyq.onrender.com/api/v1/admin/administradores/${editId}`,
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
       } else {
         await axios.post(
-          `http://localhost:3000/api/v1/admin/administradores`,
+          `https://babycare-backend-msyq.onrender.com/api/v1/admin/administradores`,
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
         );

@@ -93,7 +93,7 @@ export default function AdminMedicos() {
     try {
       const token = localStorage.getItem("admin_token");
       await axios.delete(
-        `http://localhost:3000/api/v1/admin/directorio/medicos/${id}`,
+        `https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/medicos/${id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -109,7 +109,7 @@ export default function AdminMedicos() {
       const token = localStorage.getItem("admin_token");
       if (!token) return navigate("/admin/login");
       const res = await axios.get(
-        "http://localhost:3000/api/v1/admin/directorio/medicos",
+        "https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/medicos",
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -131,7 +131,7 @@ export default function AdminMedicos() {
       const token = localStorage.getItem("admin_token");
       if (isEditing) {
         await axios.put(
-          `http://localhost:3000/api/v1/admin/directorio/medicos/${editId}`,
+          `https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/medicos/${editId}`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -139,7 +139,7 @@ export default function AdminMedicos() {
         );
       } else {
         await axios.post(
-          "http://localhost:3000/api/v1/admin/directorio/medicos",
+          "https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/medicos",
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },

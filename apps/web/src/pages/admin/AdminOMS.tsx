@@ -30,13 +30,13 @@ export default function AdminOMS() {
       const token = localStorage.getItem("admin_token");
       if (!token) return navigate("/admin/login");
 
-      const res = await axios.get("http://localhost:3000/api/v1/admin/oms", {
+      const res = await axios.get("https://babycare-backend-msyq.onrender.com/api/v1/admin/oms", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setData(res.data);
 
       const statsRes = await axios.get(
-        "http://localhost:3000/api/v1/admin/oms/stats",
+        "https://babycare-backend-msyq.onrender.com/api/v1/admin/oms/stats",
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -80,7 +80,7 @@ export default function AdminOMS() {
       return;
     try {
       const token = localStorage.getItem("admin_token");
-      await axios.delete(`http://localhost:3000/api/v1/admin/oms/${id}`, {
+      await axios.delete(`https://babycare-backend-msyq.onrender.com/api/v1/admin/oms/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchData();
@@ -95,14 +95,14 @@ export default function AdminOMS() {
       const token = localStorage.getItem("admin_token");
       if (isEditing) {
         await axios.put(
-          `http://localhost:3000/api/v1/admin/oms/${editId}`,
+          `https://babycare-backend-msyq.onrender.com/api/v1/admin/oms/${editId}`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },
           },
         );
       } else {
-        await axios.post("http://localhost:3000/api/v1/admin/oms", formData, {
+        await axios.post("https://babycare-backend-msyq.onrender.com/api/v1/admin/oms", formData, {
           headers: { Authorization: `Bearer ${token}` },
         });
       }

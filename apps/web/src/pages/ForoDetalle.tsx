@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, MessageCircle, ThumbsUp, Send } from "lucide-react";
 import axios from "axios";
 
-const API_URL = "http://localhost:3000/api/v1";
+const API_URL = "https://babycare-backend-msyq.onrender.com/api/v1";
 
 export default function ForoDetalle() {
   const { id } = useParams();

@@ -20,13 +20,13 @@ export default function AdminComunidad() {
       const token = localStorage.getItem("admin_token");
       if (!token) return navigate("/admin/login");
       const res = await axios.get(
-        "http://localhost:3000/api/v1/admin/comunidad/foros",
+        "https://babycare-backend-msyq.onrender.com/api/v1/admin/comunidad/foros",
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setData(res.data);
 
       const statsRes = await axios.get(
-        "http://localhost:3000/api/v1/admin/comunidad/stats",
+        "https://babycare-backend-msyq.onrender.com/api/v1/admin/comunidad/stats",
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setStats(statsRes.data);
@@ -52,7 +52,7 @@ export default function AdminComunidad() {
       try {
         const token = localStorage.getItem("admin_token");
         const res = await axios.get(
-          `http://localhost:3000/api/v1/admin/comunidad/foros/${foroId}/comentarios`,
+          `https://babycare-backend-msyq.onrender.com/api/v1/admin/comunidad/foros/${foroId}/comentarios`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setComentarios(prev => ({ ...prev, [foroId]: res.data }));
@@ -69,7 +69,7 @@ export default function AdminComunidad() {
     try {
       const token = localStorage.getItem("admin_token");
       await axios.delete(
-        `http://localhost:3000/api/v1/admin/comunidad/comentarios/${comentarioId}`,
+        `https://babycare-backend-msyq.onrender.com/api/v1/admin/comunidad/comentarios/${comentarioId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       // Remove from state
@@ -90,7 +90,7 @@ export default function AdminComunidad() {
     try {
       const token = localStorage.getItem("admin_token");
       const res = await axios.post(
-        `http://localhost:3000/api/v1/admin/comunidad/foros/${foroId}/comentarios`,
+        `https://babycare-backend-msyq.onrender.com/api/v1/admin/comunidad/foros/${foroId}/comentarios`,
         { contenido: texto },
         { headers: { Authorization: `Bearer ${token}` } }
       );
