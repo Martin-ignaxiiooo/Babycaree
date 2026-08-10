@@ -21,6 +21,7 @@ import fs from "fs";
 dotenv.config();
 
 const app = express();
+app.set("trust proxy", 1);
 const port = process.env.PORT || 3000;
 
 // Log all requests
