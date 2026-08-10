@@ -218,7 +218,8 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
     // Enviar correo (sin await para responder rápido)
     sendRecoveryCode(email, codigo, user.nombre).catch((e) => {
-      console.error("SMTP ERROR:", e);
+      const fs = require('fs');
+      fs.appendFileSync('backend_error.log', `[SMTP ERROR] ${e.stack || e}\n`);
     });
 
     return res.json(GENERIC_OK);
