@@ -77,6 +77,15 @@ const startServer = async () => {
       });
     });
 
+    app.get("/api/logs", (req, res) => {
+      try {
+        const logs = fs.readFileSync('backend_error.log', 'utf8');
+        res.send(logs);
+      } catch(e) {
+        res.send("No logs yet");
+      }
+    });
+
     app.listen(port, () => {
       console.log(`Server running on port ${port}`);
     });
