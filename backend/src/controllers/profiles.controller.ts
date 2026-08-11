@@ -164,7 +164,11 @@ export const getMyBabies = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user.id;
     const result = await query(
-      "SELECT * FROM perfiles_bebes WHERE usuario_id = $1 ORDER BY fecha_creacion DESC",
+      `SELECT DISTINCT pb.* 
+       FROM perfiles_bebes pb 
+       LEFT JOIN accesos_compartidos_bebe acb ON acb.id_perfil_bebe = pb.id AND acb.estado = 'activo'
+       WHERE pb.usuario_id = $1 OR acb.id_usuario_invitado = $1 
+       ORDER BY pb.fecha_creacion DESC`,
       [userId],
     );
 

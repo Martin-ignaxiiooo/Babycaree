@@ -66,6 +66,20 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
     }
 
     const perfil = profileRes.rows[0];
+    const userId = (req as any).user?.id;
+    let rol_acceso = "propietario";
+
+    if (perfil.usuario_id !== userId) {
+      const accesoRes = await query(
+        `SELECT nivel_permiso FROM accesos_compartidos_bebe 
+         WHERE id_perfil_bebe = $1 AND id_usuario_invitado = $2 AND estado = 'activo'`,
+        [idPerfil, userId]
+      );
+      if (accesoRes.rows.length === 0) {
+        return res.status(403).json({ error: "No tienes permiso para ver este perfil" });
+      }
+      rol_acceso = accesoRes.rows[0].nivel_permiso;
+    }
 
     // 2. Fetch Latest Growth Record
     const growthRes = await query(
@@ -281,7 +295,8 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
       hero,
       notificaciones: notificaciones.slice(0, 3), // Max 3
       crecimiento,
-      total_alertas
+      total_alertas,
+      rol_acceso
     });
 
   } catch (error) {
@@ -297,6 +312,20 @@ export const addGrowthRecord = async (req: Request, res: Response) => {
 
     if (!peso || !talla) {
       return res.status(400).json({ error: "Peso y talla son requeridos" });
+    }
+
+    const userId = (req as any).user?.id;
+    const accessCheck = await query(
+      `SELECT b.id FROM perfiles_bebes b WHERE b.id = $1 AND b.usuario_id = $2
+       UNION
+       SELECT a.id_perfil_bebe FROM accesos_compartidos_bebe a 
+       WHERE a.id_perfil_bebe = $1 AND a.id_usuario_invitado = $2 AND a.estado = 'activo' 
+       AND a.nivel_permiso NOT IN ('solo_lectura', 'solo_lectura_galeria')`,
+      [idPerfil, userId]
+    );
+
+    if (accessCheck.rows.length === 0) {
+      return res.status(403).json({ error: "No tienes permiso para modificar este perfil" });
     }
 
     await query(

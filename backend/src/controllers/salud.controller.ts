@@ -50,7 +50,11 @@ export const updateVacuna = async (req: AuthRequest, res: Response) => {
     const { aplicada, fecha_aplicacion, notas, lugar_aplicacion } = req.body;
 
     const accessCheck = await query(
-      "SELECT id FROM perfiles_bebes WHERE id = $1 AND usuario_id = $2",
+      `SELECT b.id FROM perfiles_bebes b WHERE b.id = $1 AND b.usuario_id = $2
+       UNION
+       SELECT a.id_perfil_bebe FROM accesos_compartidos_bebe a 
+       WHERE a.id_perfil_bebe = $1 AND a.id_usuario_invitado = $2 AND a.estado = 'activo' 
+       AND a.nivel_permiso NOT IN ('solo_lectura', 'solo_lectura_galeria')`,
       [bebeId, req.user.id]
     );
 
@@ -116,7 +120,11 @@ export const createControl = async (req: AuthRequest, res: Response) => {
     const { fecha_registro, peso_kg, talla_cm, notas } = req.body;
 
     const accessCheck = await query(
-      "SELECT id FROM perfiles_bebes WHERE id = $1 AND usuario_id = $2",
+      `SELECT b.id FROM perfiles_bebes b WHERE b.id = $1 AND b.usuario_id = $2
+       UNION
+       SELECT a.id_perfil_bebe FROM accesos_compartidos_bebe a 
+       WHERE a.id_perfil_bebe = $1 AND a.id_usuario_invitado = $2 AND a.estado = 'activo' 
+       AND a.nivel_permiso NOT IN ('solo_lectura', 'solo_lectura_galeria')`,
       [bebeId, req.user.id]
     );
 

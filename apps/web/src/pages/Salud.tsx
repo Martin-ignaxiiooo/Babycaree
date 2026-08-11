@@ -20,6 +20,7 @@ export default function Salud() {
   const [pesoInput, setPesoInput] = useState("");
   const [tallaInput, setTallaInput] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [rolAcceso, setRolAcceso] = useState<string>("propietario");
 
   useEffect(() => {
     if (!token) {
@@ -46,6 +47,16 @@ export default function Salud() {
     if (bebeId && token) {
       if (activeTab === "vacunas") fetchVacunas();
       if (activeTab === "crecimiento") fetchCrecimientoData();
+      
+      // Fetch user role for this baby
+      fetch(`https://babycare-backend-msyq.onrender.com/api/v1/home/${bebeId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.rol_acceso) setRolAcceso(data.rol_acceso);
+      })
+      .catch(console.error);
     }
   }, [bebeId, activeTab, token]);
 
@@ -102,6 +113,7 @@ export default function Salud() {
 
 
   const toggleVacuna = async (vacunaId: number, aplicadaActual: boolean) => {
+    if (rolAcceso.startsWith('solo_lectura')) return;
     try {
       const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/vacunas/${vacunaId}`, {
         method: "PATCH",
@@ -306,17 +318,19 @@ export default function Salud() {
               <h2 style={{ fontSize: "20px", fontWeight: 800, color: "var(--theme-darker)", margin: 0 }}>
                 Evolución de Crecimiento
               </h2>
-              <button 
-                onClick={() => setIsModalOpen(true)}
-                style={{
-                  background: "var(--theme-primary)", color: "#fff",
-                  padding: "8px 16px", borderRadius: "12px", border: "none",
-                  fontSize: "13px", fontWeight: 700, cursor: "pointer",
-                  display: "flex", alignItems: "center", gap: "6px"
-                }}
-              >
-                <Plus size={16} /> Registrar Medidas
-              </button>
+              {!rolAcceso.startsWith('solo_lectura') && (
+                <button 
+                  onClick={() => setIsModalOpen(true)}
+                  style={{
+                    background: "var(--theme-primary)", color: "#fff",
+                    padding: "8px 16px", borderRadius: "12px", border: "none",
+                    fontSize: "13px", fontWeight: 700, cursor: "pointer",
+                    display: "flex", alignItems: "center", gap: "6px"
+                  }}
+                >
+                  <Plus size={16} /> Registrar Medidas
+                </button>
+              )}
             </div>
             
             <div style={{ width: "100%", overflowX: "auto" }}>

@@ -515,7 +515,8 @@ export default function PerfilBebe() {
                       </div>
                       <select value={acceso.nivel_permiso} onChange={(e) => modificarPermiso(acceso.id, e.target.value)} style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #E5E7EB", background: "#F9FAFB", color: "var(--theme-darker)", fontWeight: 700, marginRight: "16px" }}>
                         <option value="solo_lectura">Solo lectura</option>
-                        <option value="solo_lectura_galeria">Solo lectura + Galería</option>
+                        <option value="papa">Papá (Acceso a todo)</option>
+                        <option value="abuela">Abuela (Acceso a todo)</option>
                         <option value="ver_editar">Ver y editar</option>
                       </select>
                       <button onClick={() => revocarAcceso(acceso.id)} style={{ background: "#FEE2E2", color: "#EF4444", border: "none", padding: "10px", borderRadius: "8px", cursor: "pointer", fontWeight: "bold" }}>Revocar</button>
@@ -569,7 +570,8 @@ export default function PerfilBebe() {
                           style={{ padding: "6px 10px", borderRadius: "8px", border: "1px solid #E5E7EB", background: "#F9FAFB", color: "var(--theme-darker)", fontWeight: 700, marginRight: "12px", fontSize: "12px" }}
                         >
                           <option value="solo_lectura">Solo lectura</option>
-                          <option value="solo_lectura_galeria">Lectura + Galería</option>
+                          <option value="papa">Papá (Acceso a todo)</option>
+                          <option value="abuela">Abuela (Acceso a todo)</option>
                           <option value="ver_editar">Ver y editar</option>
                         </select>
                         <button onClick={() => { setSelectedInvite(res); handleInvitar(); }} style={{ background: "var(--theme-primary)", color: "#fff", border: "none", padding: "8px 16px", borderRadius: "20px", fontWeight: 700, cursor: "pointer", fontSize: "13px" }}>Invitar</button>
@@ -593,7 +595,8 @@ export default function PerfilBebe() {
                       style={{ padding: "6px 10px", borderRadius: "8px", border: "1px solid #E5E7EB", background: "#F9FAFB", color: "var(--theme-darker)", fontWeight: 700, marginRight: "12px", fontSize: "12px" }}
                     >
                       <option value="solo_lectura">Solo lectura</option>
-                      <option value="solo_lectura_galeria">Lectura + Galería</option>
+                      <option value="papa">Papá (Acceso a todo)</option>
+                      <option value="abuela">Abuela (Acceso a todo)</option>
                       <option value="ver_editar">Ver y editar</option>
                     </select>
                     <button onClick={() => { setSelectedInvite(null); handleInvitar(); }} style={{ background: "var(--theme-primary)", color: "#fff", border: "none", padding: "8px 16px", borderRadius: "20px", fontWeight: 700, cursor: "pointer", fontSize: "13px" }}>Enviar invitación</button>
@@ -614,7 +617,7 @@ export default function PerfilBebe() {
                       <div key={log.id} style={{ marginBottom: "16px", paddingLeft: "16px", borderLeft: "2px solid var(--theme-light)", position: "relative" }}>
                         <div style={{ position: "absolute", left: "-5px", top: "6px", width: "8px", height: "8px", borderRadius: "50%", background: "var(--theme-primary)" }}></div>
                         <div style={{ fontSize: "13px", color: "var(--theme-darker)", fontWeight: 500 }}>{log.descripcion}</div>
-                        <div style={{ fontSize: "11px", color: "#9CA3AF", marginTop: "4px" }}>{new Date(log.fecha).toLocaleString()}</div>
+                        <div style={{ fontSize: "11px", color: "#9CA3AF", marginTop: "4px" }}>{new Date(log.fecha_hora_utc).toLocaleString()}</div>
                       </div>
                     ))
                   )}

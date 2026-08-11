@@ -240,17 +240,19 @@ export default function Dashboard() {
                 <h3 style={{ fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)", margin: 0 }}>
                   📈 Evolución de Crecimiento
                 </h3>
-                <button 
-                  onClick={() => setIsModalOpen(true)}
-                  style={{
-                    background: "var(--theme-primary)", color: "#fff",
-                    padding: "8px 16px", borderRadius: "12px", border: "none",
-                    fontSize: "13px", fontWeight: 700, cursor: "pointer",
-                    display: "flex", alignItems: "center", gap: "6px"
-                  }}
-                >
-                  <Plus size={16} /> Registrar Medidas
-                </button>
+                {(!homeData?.rol_acceso || !homeData.rol_acceso.startsWith('solo_lectura')) && (
+                  <button 
+                    onClick={() => setIsModalOpen(true)}
+                    style={{
+                      background: "var(--theme-primary)", color: "#fff",
+                      padding: "8px 16px", borderRadius: "12px", border: "none",
+                      fontSize: "13px", fontWeight: 700, cursor: "pointer",
+                      display: "flex", alignItems: "center", gap: "6px"
+                    }}
+                  >
+                    <Plus size={16} /> Registrar Medidas
+                  </button>
+                )}
               </div>
               
               <svg viewBox="0 0 340 120" style={{ width: "100%", height: "auto", overflow: "visible" }}>

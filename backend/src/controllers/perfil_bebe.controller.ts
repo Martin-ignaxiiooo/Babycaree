@@ -42,7 +42,7 @@ export const actualizarPerfil = async (req: Request, res: Response): Promise<voi
     const accessCheck = await query(
       `SELECT 1 FROM perfiles_bebes pb 
        LEFT JOIN accesos_compartidos_bebe acb ON acb.id_perfil_bebe = pb.id AND acb.id_usuario_invitado = $2 AND acb.estado = 'activo'
-       WHERE pb.id = $1 AND (pb.usuario_id = $2 OR acb.nivel_permiso = 'ver_editar')`,
+       WHERE pb.id = $1 AND (pb.usuario_id = $2 OR acb.nivel_permiso IN ('ver_editar', 'papa', 'abuela'))`,
       [id, userId]
     );
 
