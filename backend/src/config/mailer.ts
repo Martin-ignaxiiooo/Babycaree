@@ -1,43 +1,44 @@
-import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-// Creates a fresh transporter each time so it always reads the latest env vars
-// (important for cloud environments like Render where env vars load after module init)
-const createTransporter = () =>
-  nodemailer.createTransport({
-    host: process.env.SMTP_HOST || "smtp.gmail.com",
-    port: parseInt(process.env.SMTP_PORT || "587"),
-    secure: process.env.SMTP_SECURE === "true",
-    auth: {
-      user: process.env.SMTP_USER || "",
-      pass: process.env.SMTP_PASS || "",
+const BREVO_API_KEY = process.env.BREVO_API_KEY || "";
+const SENDER_EMAIL = process.env.SMTP_FROM_EMAIL || "babyyycareee@gmail.com";
+const SENDER_NAME = "Iniciativa Baby";
+
+async function sendEmail(to: string, subject: string, html: string): Promise<void> {
+  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "api-key": BREVO_API_KEY,
+      "Content-Type": "application/json",
     },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
-    tls: {
-      rejectUnauthorized: false,
-    },
+    body: JSON.stringify({
+      sender: { name: SENDER_NAME, email: SENDER_EMAIL },
+      to: [{ email: to }],
+      subject,
+      htmlContent: html,
+    }),
   });
 
-const FROM =
-  process.env.SMTP_FROM ||
-  '"Iniciativa Baby" <babyyycareee@gmail.com>';
+  const data = await response.json() as any;
+
+  if (!response.ok) {
+    throw new Error(`Brevo API error ${response.status}: ${JSON.stringify(data)}`);
+  }
+
+  console.log(`[Brevo] Email sent to ${to} | messageId: ${data.messageId}`);
+}
 
 export const sendRecoveryCode = async (
   email: string,
   codigo: string,
   nombre: string,
 ): Promise<void> => {
-  const transporter = createTransporter();
-  console.log(`[SMTP] Sending recovery code to ${email} via ${process.env.SMTP_HOST}:${process.env.SMTP_PORT} user=${process.env.SMTP_USER}`);
-  await transporter.sendMail({
-    from: FROM,
-    to: email,
-    subject: "Tu código de recuperación — Iniciativa Baby",
-    html: `
+  await sendEmail(
+    email,
+    "Tu código de recuperación — Iniciativa Baby",
+    `
       <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 520px; margin: 0 auto; background: #f7f9fc; border-radius: 16px; overflow: hidden;">
         <div style="background: #1B3A6B; padding: 32px 40px; text-align: center;">
           <h1 style="color: #fff; font-size: 22px; margin: 0; font-weight: 900; letter-spacing: -0.5px;">Iniciativa<span style="color: #7FC8F8;">Baby</span></h1>
@@ -61,21 +62,18 @@ export const sendRecoveryCode = async (
           <p style="color: #9CA3AF; font-size: 11px; margin: 0;">Iniciativa Baby · Cumple con Ley 19.628 y Ley 21.719</p>
         </div>
       </div>
-    `,
-  });
-  console.log(`[SMTP] Recovery code sent successfully to ${email}`);
+    `
+  );
 };
 
 export const sendPasswordChangedAlert = async (
   email: string,
   nombre: string,
 ): Promise<void> => {
-  const transporter = createTransporter();
-  await transporter.sendMail({
-    from: FROM,
-    to: email,
-    subject: "Tu contraseña fue cambiada — Iniciativa Baby",
-    html: `
+  await sendEmail(
+    email,
+    "Tu contraseña fue cambiada — Iniciativa Baby",
+    `
       <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 520px; margin: 0 auto; background: #f7f9fc; border-radius: 16px; overflow: hidden;">
         <div style="background: #1B3A6B; padding: 32px 40px; text-align: center;">
           <h1 style="color: #fff; font-size: 22px; margin: 0; font-weight: 900;">Iniciativa<span style="color: #7FC8F8;">Baby</span></h1>
@@ -94,21 +92,18 @@ export const sendPasswordChangedAlert = async (
           </p>
         </div>
       </div>
-    `,
-  });
+    `
+  );
 };
 
 export const sendLoginBlockedAlert = async (
   email: string,
   nombre: string,
 ): Promise<void> => {
-  const transporter = createTransporter();
-  await transporter.sendMail({
-    from: FROM,
-    to: email,
-    subject:
-      "Alerta de seguridad: múltiples intentos fallidos — Iniciativa Baby",
-    html: `
+  await sendEmail(
+    email,
+    "Alerta de seguridad: múltiples intentos fallidos — Iniciativa Baby",
+    `
       <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 520px; margin: 0 auto; background: #f7f9fc; border-radius: 16px; overflow: hidden;">
         <div style="background: #1B3A6B; padding: 32px 40px; text-align: center;">
           <h1 style="color: #fff; font-size: 22px; margin: 0; font-weight: 900;">Iniciativa<span style="color: #7FC8F8;">Baby</span></h1>
@@ -128,8 +123,8 @@ export const sendLoginBlockedAlert = async (
           </p>
         </div>
       </div>
-    `,
-  });
+    `
+  );
 };
 
 export const sendInvitationAlert = async (
@@ -137,13 +132,10 @@ export const sendInvitationAlert = async (
   nombreFamiliar: string,
   nombreBebe: string,
 ): Promise<void> => {
-  const transporter = createTransporter();
-  console.log(`[SMTP] Sending invitation to ${email} via ${process.env.SMTP_HOST}:${process.env.SMTP_PORT} user=${process.env.SMTP_USER}`);
-  await transporter.sendMail({
-    from: FROM,
-    to: email,
-    subject: `Has sido invitado a ver el perfil de ${nombreBebe} — Iniciativa Baby`,
-    html: `
+  await sendEmail(
+    email,
+    `Has sido invitado a ver el perfil de ${nombreBebe} — Iniciativa Baby`,
+    `
       <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 520px; margin: 0 auto; background: #f7f9fc; border-radius: 16px; overflow: hidden;">
         <div style="background: #1B3A6B; padding: 32px 40px; text-align: center;">
           <h1 style="color: #fff; font-size: 22px; margin: 0; font-weight: 900;">Iniciativa<span style="color: #7FC8F8;">Baby</span></h1>
@@ -155,14 +147,13 @@ export const sendInvitationAlert = async (
             <strong>${nombreFamiliar}</strong> te ha invitado a ver el perfil de su bebé <strong>${nombreBebe}</strong> en Iniciativa Baby.
           </p>
           <a href="https://babycaree-web.vercel.app/seleccionar-perfil" style="display: block; text-decoration: none;">
-            <div style="background: #E0E7FF; border-left: 4px solid #4F46E5; border-radius: 10px; padding: 14px 18px; margin-bottom: 24px;">
-              <p style="color: #3730A3; font-size: 13px; margin: 0; font-weight: 600;">👉 Haz clic aquí para ingresar a la aplicación</p>
+            <div style="background: #E0E7FF; border-left: 4px solid #4F46E5; border-radius: 10px; padding: 18px 20px; margin-bottom: 24px; text-align: center;">
+              <p style="color: #3730A3; font-size: 14px; margin: 0; font-weight: 700;">👉 Ingresar a Iniciativa Baby</p>
             </div>
           </a>
           <p style="color: #9CA3AF; font-size: 12px;">Si no conoces a ${nombreFamiliar}, puedes ignorar este correo.</p>
         </div>
       </div>
-    `,
-  });
-  console.log(`[SMTP] Invitation sent successfully to ${email}`);
+    `
+  );
 };

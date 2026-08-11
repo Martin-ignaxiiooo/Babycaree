@@ -9,6 +9,7 @@
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
   },
   "dependencies": {
+    "@getbrevo/brevo": "^6.0.3",
     "@types/nodemailer": "^8.0.1",
     "@types/speakeasy": "^2.0.10",
     "bcrypt": "^6.0.0",
