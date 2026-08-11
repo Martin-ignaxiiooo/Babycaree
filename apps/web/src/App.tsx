@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import SeleccionarPerfil from "./pages/SeleccionarPerfil";
 import Dashboard from "./pages/Dashboard";
 import PerfilBebe from "./pages/PerfilBebe";
+import Galeria from "./pages/Galeria";
 import Salud from "./pages/Salud";
 import Comunidad from "./pages/Comunidad";
 import ForoDetalle from "./pages/ForoDetalle";
@@ -39,6 +40,7 @@ function App() {
         <Route path="/seleccionar-perfil" element={<SeleccionarPerfil />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/perfil/:id" element={<PerfilBebe />} />
+        <Route path="/galeria" element={<Galeria />} />
         <Route path="/salud" element={<Salud />} />
         <Route path="/comunidad" element={<Comunidad />} />
         <Route path="/comunidad/foro/:id" element={<ForoDetalle />} />

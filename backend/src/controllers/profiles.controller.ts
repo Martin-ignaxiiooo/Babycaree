@@ -100,6 +100,14 @@ export const createBabyProfile = async (req: AuthRequest, res: Response) => {
         });
     }
 
+    if (estado === "nacido" && fecha_nacimiento && new Date(fecha_nacimiento) > new Date()) {
+      return res
+        .status(400)
+        .json({
+          error: "La fecha de nacimiento no puede ser futura",
+        });
+    }
+
     if (estado === "embarazo" && !fecha_estimada_parto) {
       return res
         .status(400)

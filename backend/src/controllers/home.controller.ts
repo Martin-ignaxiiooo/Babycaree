@@ -164,10 +164,14 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
     });
 
     // C. Artículos Recomendados (Mock)
+    const exactAge = calculateExactAge(perfil.fecha_nacimiento);
+    const monthsMatch = exactAge.match(/(\d+) meses/);
+    const ageMonths = monthsMatch ? monthsMatch[1] : '0';
+
     notificaciones.push({
       tipo: "articulo",
       prioridad: "baja",
-      titulo: `Artículo para los ${calculateExactAge(perfil.fecha_nacimiento).split(" ")[1]} meses`,
+      titulo: `Artículo para los ${ageMonths} meses`,
       mensaje: "Cómo iniciar la alimentación complementaria con BLW."
     });
 

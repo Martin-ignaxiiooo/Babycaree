@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const comunidad_service_1 = require("./comunidad.service");
+const adminAuth_middleware_1 = require("../../middlewares/adminAuth.middleware");
+const router = (0, express_1.Router)();
+const allowedRoles = ["admin_general", "soporte_cliente", "auditor"];
+const deleteRoles = ["admin_general", "soporte_cliente"];
+router.get("/stats", (0, adminAuth_middleware_1.requireRole)(allowedRoles), comunidad_service_1.getComunidadStats);
+router.get("/foros", (0, adminAuth_middleware_1.requireRole)(allowedRoles), comunidad_service_1.getForos);
+router.get("/foros/:foroId/comentarios", (0, adminAuth_middleware_1.requireRole)(allowedRoles), comunidad_service_1.getComentarios);
+router.post("/foros/:foroId/comentarios", (0, adminAuth_middleware_1.requireRole)(deleteRoles), comunidad_service_1.createAdminComentario);
+router.delete("/comentarios/:id", (0, adminAuth_middleware_1.requireRole)(deleteRoles), comunidad_service_1.deleteComentario);
+exports.default = router;

@@ -1,7 +1,7 @@
 import { pool } from "../config/db";
 
 const previsiones = [
-  { codigo: 'PREV-FON-A', nombre: 'FONASA A (Indigente)', tipo: 'Público', orden: 1 },
+  { codigo: 'PREV-FON-A', nombre: 'FONASA A', tipo: 'Público', orden: 1 },
   { codigo: 'PREV-FON-B', nombre: 'FONASA B', tipo: 'Público', orden: 2 },
   { codigo: 'PREV-FON-C', nombre: 'FONASA C', tipo: 'Público', orden: 3 },
   { codigo: 'PREV-FON-D', nombre: 'FONASA D', tipo: 'Público', orden: 4 },

@@ -230,7 +230,7 @@ export default function SeleccionarPerfil() {
       {/* Modal */}
       {isModalOpen && (
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
-          <div style={{ background: "white", padding: "2.5rem", borderRadius: "24px", width: "90%", maxWidth: "500px", maxHeight: "90vh", overflowY: "auto", position: "relative" }}>
+          <div className="auth-box" style={{ background: "white", padding: "2.5rem", borderRadius: "24px", width: "90%", maxWidth: "500px", maxHeight: "90vh", overflowY: "auto", position: "relative" }}>
             <button 
               onClick={() => setIsModalOpen(false)}
               style={{ position: "absolute", right: "20px", top: "20px", background: "none", border: "none", cursor: "pointer", color: "#9CA3AF" }}
@@ -245,7 +245,7 @@ export default function SeleccionarPerfil() {
                 <input required type="text" placeholder="Ej: Sofía" value={babyForm.nombre} onChange={(e) => setBabyForm({...babyForm, nombre: e.target.value})} style={{ width: "100%", padding: "12px", border: "2px solid #E5E7EB", borderRadius: "12px", outline: "none", boxSizing: "border-box" }} />
               </div>
               
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem" }}>
                 <div>
                   <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "6px" }}>Fecha nacimiento *</label>
                   <input required type="date" value={babyForm.fecha_nacimiento} onChange={(e) => setBabyForm({...babyForm, fecha_nacimiento: e.target.value})} max={new Date().toISOString().split("T")[0]} style={{ width: "100%", padding: "12px", border: "2px solid #E5E7EB", borderRadius: "12px", outline: "none", boxSizing: "border-box" }} />
@@ -270,7 +270,7 @@ export default function SeleccionarPerfil() {
                 </select>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem" }}>
                 <div>
                   <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "6px" }}>Peso al nacer (kg)</label>
                   <input type="number" step="0.01" min="0.5" max="6" placeholder="Ej: 3.2" value={babyForm.peso} onChange={(e) => setBabyForm({...babyForm, peso: e.target.value})} style={{ width: "100%", padding: "12px", border: "2px solid #E5E7EB", borderRadius: "12px", outline: "none", boxSizing: "border-box" }} />

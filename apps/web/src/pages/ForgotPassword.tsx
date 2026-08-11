@@ -434,6 +434,7 @@ export default function ForgotPassword() {
       >
         <div style={{ width: "100%", maxWidth: "460px" }}>
           <div
+            className="auth-box"
             style={{
               background: "white",
               borderRadius: "32px",
@@ -698,8 +699,8 @@ export default function ForgotPassword() {
                   <div
                     style={{
                       display: "flex",
-                      gap: "8px",
-                      justifyContent: "space-between",
+                      gap: "4px",
+                      justifyContent: "center",
                       marginBottom: "20px",
                     }}
                   >

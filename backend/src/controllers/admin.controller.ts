@@ -70,21 +70,17 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ error: "Credenciales inválidas" });
     }
 
-    // Si tiene 2FA (simulamos 2FA)
-    if (admin.requiere_2fa) {
+    // Si tiene 2FA activo
+    if (admin.dos_fa_activo) {
       const tempToken = jwt.sign(
         { id: admin.id, pending2FA: true },
         JWT_ADMIN_SECRET,
         { expiresIn: "5m" },
       );
-      // Simulamos enviar código
-      console.log(`\n=== 2FA CODE PARA ${admin.correo_corporativo} ===`);
-      console.log(`Tu código es: 123456`);
-      console.log(`====================================================\n`);
       return res.json({
         require2FA: true,
         tempToken,
-        message: "Código enviado por correo/SMS",
+        message: "Introduce el código de tu aplicación autenticadora",
       });
     }
 
@@ -123,10 +119,6 @@ export const verify2fa = async (req: Request, res: Response) => {
   try {
     const { tempToken, code } = req.body;
 
-    if (code !== "123456") {
-      return res.status(401).json({ error: "Código 2FA incorrecto" });
-    }
-
     const decoded: any = jwt.verify(tempToken, JWT_ADMIN_SECRET);
     if (!decoded.pending2FA) {
       return res.status(401).json({ error: "Token inválido" });
@@ -136,6 +128,18 @@ export const verify2fa = async (req: Request, res: Response) => {
       decoded.id,
     ]);
     const admin = result.rows[0];
+
+    // Real speakeasy verify
+    const speakeasy = require("speakeasy");
+    const verified = speakeasy.totp.verify({
+      secret: admin.dos_fa_secret,
+      encoding: "base32",
+      token: code,
+    });
+
+    if (!verified) {
+      return res.status(401).json({ error: "Código 2FA incorrecto" });
+    }
 
     const jti = uuidv4();
     const token = jwt.sign(

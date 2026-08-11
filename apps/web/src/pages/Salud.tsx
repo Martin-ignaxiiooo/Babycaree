@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Syringe, Activity, Save, CheckCircle, Bell } from "lucide-react";
+import TopNav from "../components/TopNav";
 
 export default function Salud() {
   const navigate = useNavigate();
@@ -8,7 +9,7 @@ export default function Salud() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   const [bebeId, setBebeId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"vacunas">("vacunas");
+  const [activeTab, setActiveTab] = useState<"vacunas" | "controles" | "crecimiento">("vacunas");
   const [loading, setLoading] = useState(true);
 
   const [vacunas, setVacunas] = useState<any[]>([]);
@@ -108,33 +109,7 @@ export default function Salud() {
     <div style={{ minHeight: "100vh", background: "#F8F7FC", fontFamily: "'Nunito', sans-serif", display: "flex", flexDirection: "column" }}>
       
       {/* ── TOP NAV GLOBAL ── */}
-      <nav style={{
-        width: "100%", background: "var(--theme-darker)", color: "#fff", padding: "16px 40px",
-        display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100,
-        boxShadow: "0 4px 12px rgba(0,0,0,.15)"
-      }}>
-        <div style={{ fontSize: "24px", fontWeight: 800, cursor: "pointer" }} onClick={() => navigate("/dashboard")}>
-          Iniciativa<span style={{ color: "var(--theme-light)" }}>Baby</span>
-        </div>
-        
-        <div style={{ display: "flex", gap: "32px", alignItems: "center" }}>
-          <div style={{ display: "flex", gap: "24px", fontWeight: 600, fontSize: "15px" }}>
-            <span style={{ cursor: "pointer", color: "white" }} onClick={() => navigate("/dashboard")}>Inicio</span>
-            <span style={{ cursor: "pointer", color: "var(--theme-light)" }}>Salud</span>
-            <span style={{ cursor: "pointer", color: "white" }} onClick={() => navigate("/comunidad")}>Comunidad</span>
-          </div>
-          <div style={{ width: "1px", height: "24px", background: "rgba(255,255,255,0.2)" }}></div>
-          <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-            <div style={{ position: "relative", cursor: "pointer" }}><Bell size={22} /></div>
-            <div 
-              onClick={() => navigate("/mi-perfil")}
-              style={{ width: "36px", height: "36px", borderRadius: "50%", background: "var(--theme-light)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold", cursor: "pointer" }}
-            >
-              {user?.nombre ? user.nombre.charAt(0).toUpperCase() : "U"}
-            </div>
-          </div>
-        </div>
-      </nav>
+      <TopNav user={user} activePath="/salud" />
 
       {/* ── HEADER ── */}
       <div style={{ background: "linear-gradient(135deg, var(--theme-darker) 0%, var(--theme-dark) 100%)", color: "#fff", padding: "48px 40px 0" }}>
@@ -153,19 +128,30 @@ export default function Salud() {
         </div>
 
         {/* TABS */}
-        <div style={{ display: "flex", gap: "32px", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
+        <div className="responsive-overflow" style={{ display: "flex", gap: "32px", borderBottom: "1px solid rgba(255,255,255,0.1)", whiteSpace: "nowrap" }}>
           <button 
             style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "vacunas" ? "3px solid #fff" : "3px solid transparent", color: activeTab === "vacunas" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "16px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
             onClick={() => setActiveTab("vacunas")}
           >
             <Syringe size={18} /> Vacunas PNI
           </button>
-
+          <button 
+            style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "controles" ? "3px solid #fff" : "3px solid transparent", color: activeTab === "controles" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "16px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+            onClick={() => setActiveTab("controles")}
+          >
+            <Activity size={18} /> Controles Pediátricos
+          </button>
+          <button 
+            style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "crecimiento" ? "3px solid #fff" : "3px solid transparent", color: activeTab === "crecimiento" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "16px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+            onClick={() => setActiveTab("crecimiento")}
+          >
+            <Activity size={18} /> Crecimiento
+          </button>
         </div>
       </div>
 
       {/* ── CONTENT AREA ── */}
-      <div style={{ flex: 1, padding: "40px", width: "100%", maxWidth: "1200px", margin: "0 auto" }}>
+      <div className="page-container">
         
         {activeTab === "vacunas" && (
           <div style={{ background: "#fff", borderRadius: "16px", padding: "32px", boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}>
@@ -197,7 +183,7 @@ export default function Salud() {
                       </div>
 
                       {vacuna.aplicada && (
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginTop: "12px", padding: "16px", background: "#fff", borderRadius: "8px", border: "1px solid #DCFCE7" }}>
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px", marginTop: "12px", padding: "16px", background: "#fff", borderRadius: "8px", border: "1px solid #DCFCE7" }}>
                           <div>
                             <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#166534", marginBottom: "4px" }}>Fecha de aplicación</label>
                             <input 
@@ -228,7 +214,33 @@ export default function Salud() {
           </div>
         )}
 
+        {activeTab === "controles" && (
+          <div style={{ background: "#fff", borderRadius: "16px", padding: "32px", boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}>
+            <h2 style={{ fontSize: "20px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "24px" }}>Controles Médicos</h2>
+            <div style={{ textAlign: "center", padding: "40px", color: "#6B7280" }}>
+              <div style={{ fontSize: "40px", marginBottom: "16px" }}>🩺</div>
+              <h3 style={{ fontSize: "18px", color: "var(--theme-darker)", marginBottom: "8px" }}>Módulo en construcción</h3>
+              <p>Pronto podrás registrar y programar los controles del Niño Sano aquí.</p>
+            </div>
+          </div>
+        )}
 
+        {activeTab === "crecimiento" && (
+          <div style={{ background: "#fff", borderRadius: "16px", padding: "32px", boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}>
+            <h2 style={{ fontSize: "20px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "24px" }}>Evolución de Crecimiento</h2>
+            <div style={{ textAlign: "center", padding: "40px", color: "#6B7280" }}>
+              <div style={{ fontSize: "40px", marginBottom: "16px" }}>📈</div>
+              <h3 style={{ fontSize: "18px", color: "var(--theme-darker)", marginBottom: "8px" }}>Módulo en construcción</h3>
+              <p>Los gráficos y el registro histórico detallado de peso y talla estarán disponibles pronto.</p>
+              <button 
+                onClick={() => navigate("/dashboard")}
+                style={{ marginTop: "24px", background: "var(--theme-primary)", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "12px", cursor: "pointer" }}
+              >
+                Ver gráfico actual en el Dashboard
+              </button>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>

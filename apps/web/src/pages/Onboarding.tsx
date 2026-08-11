@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import {
@@ -391,7 +391,7 @@ function StepTwo({ account, setAccount, error }: any) {
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       {error && <ErrorBanner message={error} />}
       <div
-        style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}
+        style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}
       >
         <InputField
           label="Nombre"
@@ -422,7 +422,7 @@ function StepTwo({ account, setAccount, error }: any) {
         }
       />
       <div
-        style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}
+        style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}
       >
         <InputField
           label="Contraseña"
@@ -458,6 +458,14 @@ function StepTwo({ account, setAccount, error }: any) {
 
 // ─── Paso 3: Bebé ──────────────────────────────────────────────────────────────
 function StepThree({ baby, setBaby, flow, error }: any) {
+  const [previsiones, setPrevisiones] = useState<any[]>([]);
+  useEffect(() => {
+    fetch("https://babycare-backend-msyq.onrender.com/api/v1/directorio/previsiones")
+      .then(r => r.json())
+      .then(data => setPrevisiones(data))
+      .catch(e => console.error("Error fetching previsiones", e));
+  }, []);
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       {error && <ErrorBanner message={error} />}
@@ -471,7 +479,7 @@ function StepThree({ baby, setBaby, flow, error }: any) {
         }
       />
       <div
-        style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}
+        style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}
       >
         <div>
           <label
@@ -602,12 +610,9 @@ function StepThree({ baby, setBaby, flow, error }: any) {
           }}
         >
           <option value="">Seleccione previsión</option>
-          <option value="FONASA A (Indigente)">FONASA A (Indigente)</option>
-          <option value="FONASA B">FONASA B</option>
-          <option value="FONASA C">FONASA C</option>
-          <option value="FONASA D">FONASA D</option>
-          <option value="ISAPRE">ISAPRE</option>
-          <option value="FFAA">Fuerzas Armadas</option>
+          {previsiones.map(p => (
+            <option key={p.codigo} value={p.codigo}>{p.nombre_visible}</option>
+          ))}
         </select>
       </div>
 
@@ -1357,6 +1362,7 @@ export default function Onboarding() {
         <div style={{ width: "100%", maxWidth: "720px" }}>
           {/* Card principal */}
           <div
+            className="auth-box"
             style={{
               background: "white",
               borderRadius: "32px",

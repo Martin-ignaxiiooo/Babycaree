@@ -1,9 +1,9 @@
 import rateLimit from "express-rate-limit";
 
-// Límite global: 5000 peticiones por IP en 15 min para evitar bloqueos en pruebas
+// Límite global: 100 peticiones por IP en 1 min para evitar bloqueos masivos
 export const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 5000,
+  windowMs: 1 * 60 * 1000,
+  limit: 100,
   standardHeaders: "draft-7",
   legacyHeaders: false,
   message: {
@@ -12,10 +12,10 @@ export const globalLimiter = rateLimit({
   },
 });
 
-// Login: 10 intentos por IP en 15 min (el control de 5 intentos por cuenta está en el controller)
+// Login: 5 intentos por IP en 1 min (prevención estricta de fuerza bruta)
 export const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 10,
+  windowMs: 1 * 60 * 1000,
+  limit: 5,
   standardHeaders: "draft-7",
   legacyHeaders: false,
   message: {

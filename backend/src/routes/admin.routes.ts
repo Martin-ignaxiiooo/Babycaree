@@ -32,7 +32,9 @@ import comunidadRouter from "../microservices/comunidad/comunidad.routes";
 const router = Router();
 
 // Auth routes
-router.post("/auth/login", login);
+import { loginLimiter } from "../middlewares/rateLimit.middleware";
+
+router.post("/auth/login", loginLimiter, login);
 router.post("/auth/verificar-2fa", verify2fa);
 
 // Seed admin
@@ -40,6 +42,10 @@ router.get("/seed", seedAdmin);
 
 // Protected routes
 router.use(verifyAdminToken);
+
+import { generate2fa, enable2fa } from "../controllers/admin_2fa.controller";
+router.post("/auth/2fa/generate", generate2fa);
+router.post("/auth/2fa/enable", enable2fa);
 
 // Usuarios
 router.get(

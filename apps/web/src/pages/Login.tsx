@@ -303,6 +303,7 @@ export default function Login() {
       >
         <div style={{ width: "100%", maxWidth: "460px" }}>
           <div
+            className="auth-box"
             style={{
               background: "white",
               borderRadius: "32px",

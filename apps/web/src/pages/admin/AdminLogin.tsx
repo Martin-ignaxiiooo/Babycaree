@@ -68,7 +68,7 @@ export default function AdminLogin() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#111827", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Nunito', sans-serif" }}>
-      <div style={{ width: "100%", maxWidth: "420px", padding: "40px", background: "#1F2937", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.5)" }}>
+      <div className="auth-box" style={{ width: "100%", maxWidth: "420px", padding: "40px", background: "#1F2937", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.5)" }}>
         <div style={{ textAlign: "center", marginBottom: "32px" }}>
           <ShieldAlert size={48} color="#F59E0B" style={{ margin: "0 auto 16px" }} />
           <h1 style={{ color: "#fff", fontSize: "24px", fontWeight: 800, margin: 0 }}>Portal de Administración</h1>
@@ -138,7 +138,7 @@ export default function AdminLogin() {
         ) : (
           <form onSubmit={handleVerify2FA} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
             <p style={{ color: "#D1D5DB", fontSize: "14px", textAlign: "center", marginBottom: "8px" }}>
-              Hemos enviado un código de 6 dígitos a tu correo corporativo.
+              Introduce el código de 6 dígitos de tu aplicación autenticadora (ej. Google Authenticator).
             </p>
             
             <div>

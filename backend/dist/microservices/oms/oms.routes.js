@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const oms_service_1 = require("./oms.service");
+const adminAuth_middleware_1 = require("../../middlewares/adminAuth.middleware");
+const router = (0, express_1.Router)();
+const allowedRoles = ["admin_general", "medico", "auditor"];
+const writeRoles = ["admin_general", "medico"];
+router.get("/stats", (0, adminAuth_middleware_1.requireRole)(allowedRoles), oms_service_1.getOMSStats);
+router.get("/", (0, adminAuth_middleware_1.requireRole)(allowedRoles), oms_service_1.getOMSData);
+router.post("/", (0, adminAuth_middleware_1.requireRole)(writeRoles), oms_service_1.createOMSData);
+router.put("/:id", (0, adminAuth_middleware_1.requireRole)(writeRoles), oms_service_1.updateOMSData);
+router.delete("/:id", (0, adminAuth_middleware_1.requireRole)(writeRoles), oms_service_1.deleteOMSData);
+exports.default = router;

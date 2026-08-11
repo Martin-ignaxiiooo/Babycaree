@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 // import { connectRedis } from "./config/redis";
 import { globalLimiter } from "./middlewares/rateLimit.middleware";
 import { verifyToken } from "./middlewares/auth.middleware";
+import helmet from "helmet";
 
 import authRoutes from "./routes/auth.routes";
 import profilesRoutes from "./routes/profiles.routes";
@@ -43,6 +44,7 @@ const uploadDir = path.join(__dirname, "../../uploads");
 app.use("/uploads", express.static(uploadDir));
 
 // Middlewares
+app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(globalLimiter);

@@ -4,6 +4,7 @@ import {
   Bell, LogOut, Search, MapPin, Star, Phone, ShieldCheck, User 
 } from "lucide-react";
 import axios from "axios";
+import TopNav from "../components/TopNav";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api/v1";
 
@@ -81,53 +82,10 @@ export default function Directorio() {
       flexDirection: "column",
     }}>
       {/* ── TOP NAV ── */}
-      <nav style={{
-        width: "100%",
-        background: "var(--theme-darker)",
-        color: "#fff",
-        padding: "16px 40px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
-        boxShadow: "0 4px 12px rgba(0,0,0,.15)"
-      }}>
-        <div style={{ fontSize: "24px", fontWeight: 800, cursor: "pointer" }} onClick={() => navigate("/dashboard")}>
-          Iniciativa<span style={{ color: "var(--theme-light)" }}>Baby</span>
-        </div>
-        
-        <div style={{ display: "flex", gap: "32px", alignItems: "center" }}>
-          <div style={{ display: "flex", gap: "24px", fontWeight: 600, fontSize: "15px" }}>
-            <span style={{ cursor: "pointer", transition: "color 0.2s" }} onMouseEnter={e => e.currentTarget.style.color="var(--theme-light)"} onMouseLeave={e => e.currentTarget.style.color="white"} onClick={() => navigate("/dashboard")}>Inicio</span>
-            <span style={{ cursor: "pointer", transition: "color 0.2s" }} onMouseEnter={e => e.currentTarget.style.color="var(--theme-light)"} onMouseLeave={e => e.currentTarget.style.color="white"} onClick={() => navigate("/salud")}>Salud</span>
-            <span style={{ cursor: "pointer", transition: "color 0.2s" }} onMouseEnter={e => e.currentTarget.style.color="var(--theme-light)"} onMouseLeave={e => e.currentTarget.style.color="white"} onClick={() => navigate("/comunidad")}>Comunidad</span>
-          </div>
-          <div style={{ width: "1px", height: "24px", background: "rgba(255,255,255,0.2)" }}></div>
-          <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-            <div style={{ position: "relative", cursor: "pointer" }} onClick={() => alert("No tienes nuevas notificaciones")}>
-              <Bell size={22} />
-            </div>
-            <div 
-              onClick={() => navigate("/mi-perfil")}
-              style={{ 
-                width: "36px", height: "36px", borderRadius: "50%", 
-                background: "var(--theme-primary)", display: "flex", 
-                alignItems: "center", justifyContent: "center", fontWeight: "bold",
-                fontSize: "16px", cursor: "pointer", border: "2px solid rgba(255,255,255,0.2)"
-              }}>
-              {user?.nombre?.[0]?.toUpperCase() || "U"}
-            </div>
-            <button onClick={handleLogout} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.7)", cursor: "pointer", display: "flex", alignItems: "center" }} title="Cerrar sesión">
-              <LogOut size={20} />
-            </button>
-          </div>
-        </div>
-      </nav>
+      <TopNav user={user} activePath="/directorio" />
 
       {/* ── MAIN CONTENT ── */}
-      <div style={{ flex: 1, padding: "40px", maxWidth: "1200px", margin: "0 auto", width: "100%" }}>
+      <div className="page-container">
         
         {/* Header & Search */}
         <div style={{ marginBottom: "40px" }}>
@@ -174,7 +132,7 @@ export default function Directorio() {
             No se encontraron médicos con esos criterios.
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))", gap: "24px" }}>
+          <div className="responsive-grid">
             {filteredMedicos.map(medico => (
               <div key={medico.id} style={{ 
                 background: "#fff", borderRadius: "20px", padding: "24px",

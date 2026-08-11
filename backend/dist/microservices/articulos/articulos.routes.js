@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const articulos_service_1 = require("./articulos.service");
+const adminAuth_middleware_1 = require("../../middlewares/adminAuth.middleware");
+const router = (0, express_1.Router)();
+const allowedRoles = ["admin_general", "editor_contenido"];
+router.get("/stats", articulos_service_1.getArticulosStats);
+router.get("/", articulos_service_1.getArticulos);
+router.post("/", (0, adminAuth_middleware_1.requireRole)(allowedRoles), articulos_service_1.createArticulo);
+router.put("/:id", (0, adminAuth_middleware_1.requireRole)(allowedRoles), articulos_service_1.updateArticulo);
+router.delete("/:id", (0, adminAuth_middleware_1.requireRole)(allowedRoles), articulos_service_1.deleteArticulo);
+exports.default = router;

@@ -1235,3 +1235,13 @@
 [2026-08-10T13:12:50.723Z] GET /api/v1/comunidad/articulos
 [2026-08-10T13:12:50.907Z] GET /api/v1/comunidad/articulos
 [2026-08-10T13:12:50.915Z] GET /api/v1/comunidad/foros
+[2026-08-10T14:22:29.662Z] OPTIONS /api/v1/comunidad/foros
+[2026-08-10T14:22:29.717Z] GET /api/v1/comunidad/foros
+[2026-08-10T14:22:29.820Z] OPTIONS /api/v1/comunidad/articulos
+[2026-08-10T14:22:29.824Z] OPTIONS /api/v1/comunidad/foros
+[2026-08-10T14:22:29.827Z] OPTIONS /api/v1/comunidad/articulos
+[2026-08-10T14:22:29.830Z] GET /api/v1/comunidad/articulos
+-> RESPONSE ERROR: 500
+[2026-08-10T14:22:31.696Z] GET /api/v1/comunidad/foros
+[2026-08-10T14:22:31.712Z] GET /api/v1/comunidad/articulos
+-> RESPONSE ERROR: 500

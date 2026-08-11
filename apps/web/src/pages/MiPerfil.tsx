@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, User, Mail, Save } from "lucide-react";
+import TopNav from "../components/TopNav";
 
 export default function MiPerfil() {
   const navigate = useNavigate();
@@ -89,16 +90,9 @@ export default function MiPerfil() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#F8F7FC", fontFamily: "'Nunito', sans-serif" }}>
-      <nav style={{
-        width: "100%", background: "var(--theme-darker)", color: "#fff", padding: "16px 40px",
-        display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100
-      }}>
-        <div style={{ fontSize: "24px", fontWeight: 800, cursor: "pointer" }} onClick={() => navigate("/dashboard")}>
-          Iniciativa<span style={{ color: "var(--theme-light)" }}>Baby</span>
-        </div>
-      </nav>
+      <TopNav user={initialUser} activePath="/mi-perfil" />
 
-      <div style={{ maxWidth: "600px", margin: "40px auto", background: "#fff", padding: "40px", borderRadius: "16px", boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}>
+      <div className="auth-box" style={{ maxWidth: "600px", margin: "40px auto", background: "#fff", padding: "40px", borderRadius: "16px", boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}>
         <button onClick={() => navigate(-1)} style={{ background: "none", border: "none", color: "#6B7280", display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", marginBottom: "24px", fontWeight: 700 }}>
           <ArrowLeft size={16} /> Volver
         </button>

@@ -5,6 +5,7 @@ import {
   Heart, Shield, TrendingUp, Bell, Plus, FileText, 
   MessageCircle, Camera, Search, Users, Syringe, Stethoscope, LogOut, X
 } from "lucide-react";
+import TopNav from "../components/TopNav";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api";
 
@@ -133,6 +134,7 @@ export default function Dashboard() {
   });
 
   return (
+
     <div style={{
       minHeight: "100vh",
       background: "#F8F7FC",
@@ -140,54 +142,9 @@ export default function Dashboard() {
       display: "flex",
       flexDirection: "column",
     }}>
-      {/* ── TOP NAV ── */}
-      <nav style={{
-        width: "100%",
-        background: "var(--theme-darker)",
-        color: "#fff",
-        padding: "16px 40px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
-        boxShadow: "0 4px 12px rgba(0,0,0,.15)"
-      }}>
-        <div style={{ fontSize: "24px", fontWeight: 800, cursor: "pointer" }} onClick={() => navigate("/dashboard")}>
-          Iniciativa<span style={{ color: "var(--theme-light)" }}>Baby</span>
-        </div>
-        
-        <div style={{ display: "flex", gap: "32px", alignItems: "center" }}>
-          <div style={{ display: "flex", gap: "24px", fontWeight: 600, fontSize: "15px" }}>
-            <span style={{ cursor: "pointer", color: "var(--theme-light)" }} onClick={() => navigate("/dashboard")}>Inicio</span>
-            <span style={{ cursor: "pointer", transition: "color 0.2s" }} onMouseEnter={e => e.currentTarget.style.color="var(--theme-light)"} onMouseLeave={e => e.currentTarget.style.color="white"} onClick={() => navigate("/salud")}>Salud</span>
-            <span style={{ cursor: "pointer", transition: "color 0.2s" }} onMouseEnter={e => e.currentTarget.style.color="var(--theme-light)"} onMouseLeave={e => e.currentTarget.style.color="white"} onClick={() => navigate("/comunidad")}>Comunidad</span>
-          </div>
-          <div style={{ width: "1px", height: "24px", background: "rgba(255,255,255,0.2)" }}></div>
-          <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-            <div style={{ position: "relative", cursor: "pointer" }} onClick={() => alert("No tienes nuevas notificaciones")}>
-              <Bell size={22} />
-              {notificaciones.length > 0 && <span style={{ position: "absolute", top: -4, right: -4, background: "#EF4444", width: 10, height: 10, borderRadius: "50%" }}></span>}
-            </div>
-            <div 
-              onClick={() => navigate("/mi-perfil")}
-              style={{ 
-                width: "36px", height: "36px", borderRadius: "50%", 
-                background: "var(--theme-primary)", display: "flex", 
-                alignItems: "center", justifyContent: "center", fontWeight: "bold",
-                fontSize: "16px", cursor: "pointer", border: "2px solid rgba(255,255,255,0.2)"
-              }}>
-              {user.nombre[0].toUpperCase()}
-            </div>
-            <button onClick={handleLogout} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.7)", cursor: "pointer", display: "flex", alignItems: "center" }} title="Cerrar sesión">
-              <LogOut size={20} />
-            </button>
-          </div>
-        </div>
-      </nav>
+      <TopNav user={user} notificaciones={notificaciones} onLogout={handleLogout} activePath="/dashboard" />
 
-      <div style={{ flex: 1, padding: "40px", maxWidth: "1400px", margin: "0 auto", width: "100%" }}>
+      <div className="page-container">
         
         {/* ── HOME HERO FULL WIDTH ── */}
         <div style={{
@@ -221,7 +178,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+          <div className="hero-stats-grid">
             <div style={{ background: "rgba(255,255,255,.15)", borderRadius: "16px", padding: "20px 30px", textAlign: "center", minWidth: "120px" }}>
               <div style={{ fontSize: "24px", fontWeight: 800 }}>{hero.peso_kg !== "-" && hero.peso_kg !== 0 ? `${hero.peso_kg} kg` : "N/A"}</div>
               <div style={{ fontSize: "13px", opacity: 0.8, marginTop: "4px" }}>Peso actual</div>
@@ -237,13 +194,8 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* ── GRID DESKTOP (3 COLUMNAS) ── */}
-        <div style={{ 
-          display: "grid", 
-          gridTemplateColumns: "repeat(auto-fit, minmax(380px, 1fr))", 
-          gap: "24px",
-          alignItems: "start"
-        }}>
+        {/* ── GRID DESKTOP Y MOBILE ── */}
+        <div className="responsive-grid">
           
           {/* COLUMNA 1: Notificaciones y Gráfico */}
           <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
@@ -376,7 +328,7 @@ export default function Dashboard() {
                 <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "6px" }}>Foros y artículos</div>
               </div>
 
-              <div onClick={() => alert("Módulo en desarrollo")} style={{ background: "#F9FAFB", padding: "28px 16px", borderRadius: "20px", textAlign: "center", cursor: "pointer", border: "2px solid transparent", transition: "all 0.2s" }}
+              <div onClick={() => navigate("/galeria")} style={{ background: "#F9FAFB", padding: "28px 16px", borderRadius: "20px", textAlign: "center", cursor: "pointer", border: "2px solid transparent", transition: "all 0.2s" }}
                    onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--theme-primary)"; e.currentTarget.style.background = "var(--theme-bg-light)"; }}
                    onMouseLeave={e => { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.background = "#F9FAFB"; }}>
                 <Camera size={36} color="var(--theme-primary)" style={{ margin: "0 auto 12px" }} />
@@ -392,13 +344,7 @@ export default function Dashboard() {
                 <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "6px" }}>Especialistas</div>
               </div>
 
-              <div onClick={() => navigate(`/perfil/${hero.id}?tab=compartir`)} style={{ background: "#F9FAFB", padding: "28px 16px", borderRadius: "20px", textAlign: "center", cursor: "pointer", border: "2px solid transparent", transition: "all 0.2s" }}
-                   onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--theme-primary)"; e.currentTarget.style.background = "var(--theme-bg-light)"; }}
-                   onMouseLeave={e => { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.background = "#F9FAFB"; }}>
-                <Users size={36} color="var(--theme-primary)" style={{ margin: "0 auto 12px" }} />
-                <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--theme-darker)" }}>Mi familia</div>
-                <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "6px" }}>Acceso compartido</div>
-              </div>
+
 
             </div>
           </div>

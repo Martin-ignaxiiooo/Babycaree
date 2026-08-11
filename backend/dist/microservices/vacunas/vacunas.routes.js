@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const vacunas_service_1 = require("./vacunas.service");
+const adminAuth_middleware_1 = require("../../middlewares/adminAuth.middleware");
+const router = (0, express_1.Router)();
+router.get("/", adminAuth_middleware_1.requireAdmin, vacunas_service_1.getVacunas);
+router.post("/", adminAuth_middleware_1.requireAdmin, (0, adminAuth_middleware_1.requireRole)(["admin_general"]), vacunas_service_1.createVacuna);
+router.put("/:id", adminAuth_middleware_1.requireAdmin, (0, adminAuth_middleware_1.requireRole)(["admin_general"]), vacunas_service_1.updateVacuna);
+router.delete("/:id", adminAuth_middleware_1.requireAdmin, (0, adminAuth_middleware_1.requireRole)(["admin_general"]), vacunas_service_1.deleteVacuna);
+exports.default = router;

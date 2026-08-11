@@ -4,6 +4,7 @@ import CryptoJS from "crypto-js";
 import { 
   ArrowLeft, Camera, User, Search, Lock, Bell
 } from "lucide-react";
+import TopNav from "../components/TopNav";
 
 export default function PerfilBebe() {
   const { id } = useParams();
@@ -30,6 +31,7 @@ export default function PerfilBebe() {
   
   const [accesos, setAccesos] = useState<any[]>([]);
   const [auditoria, setAuditoria] = useState<any[]>([]);
+  const [previsiones, setPrevisiones] = useState<any[]>([]);
   
   const [showConfirmGestation, setShowConfirmGestation] = useState(false);
   const [pendingSave, setPendingSave] = useState(false);
@@ -43,6 +45,13 @@ export default function PerfilBebe() {
 
 
   const [errorPerfil, setErrorPerfil] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("https://babycare-backend-msyq.onrender.com/api/v1/directorio/previsiones")
+      .then(r => r.json())
+      .then(data => setPrevisiones(data))
+      .catch(e => console.error("Error fetching previsiones", e));
+  }, []);
 
   useEffect(() => {
     if (token && id) {
@@ -271,43 +280,7 @@ export default function PerfilBebe() {
     <div style={{ minHeight: "100vh", background: "#F8F7FC", fontFamily: "'Nunito', sans-serif", display: "flex", flexDirection: "column" }}>
       
       {/* ── TOP NAV GLOBAL ── */}
-      <nav style={{
-        width: "100%",
-        background: "var(--theme-darker)",
-        color: "#fff",
-        padding: "16px 40px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
-        boxShadow: "0 4px 12px rgba(0,0,0,.15)"
-      }}>
-        <div style={{ fontSize: "24px", fontWeight: 800, cursor: "pointer" }} onClick={() => navigate("/dashboard")}>
-          Iniciativa<span style={{ color: "var(--theme-light)" }}>Baby</span>
-        </div>
-        
-        <div style={{ display: "flex", gap: "32px", alignItems: "center" }}>
-          <div style={{ display: "flex", gap: "24px", fontWeight: 600, fontSize: "15px" }}>
-            <span style={{ cursor: "pointer", color: "white" }} onMouseEnter={e => e.currentTarget.style.color="var(--theme-light)"} onMouseLeave={e => e.currentTarget.style.color="white"} onClick={() => navigate("/dashboard")}>Inicio</span>
-            <span style={{ cursor: "pointer", color: "white" }} onMouseEnter={e => e.currentTarget.style.color="var(--theme-light)"} onMouseLeave={e => e.currentTarget.style.color="white"} onClick={() => navigate("/salud")}>Salud</span>
-            <span style={{ cursor: "pointer", color: "white" }} onMouseEnter={e => e.currentTarget.style.color="var(--theme-light)"} onMouseLeave={e => e.currentTarget.style.color="white"} onClick={() => navigate("/comunidad")}>Comunidad</span>
-          </div>
-          <div style={{ width: "1px", height: "24px", background: "rgba(255,255,255,0.2)" }}></div>
-          <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-            <div style={{ position: "relative", cursor: "pointer" }} onClick={() => alert("No tienes nuevas notificaciones")}>
-              <Bell size={22} />
-            </div>
-            <div 
-              onClick={() => navigate("/mi-perfil")}
-              style={{ width: "36px", height: "36px", borderRadius: "50%", background: "var(--theme-light)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold", cursor: "pointer" }}
-            >
-              {user?.nombre ? user.nombre.charAt(0).toUpperCase() : "U"}
-            </div>
-          </div>
-        </div>
-      </nav>
+      <TopNav user={user} activePath="/dashboard" />
 
       {/* ── PERFIL HEADER (Full width) ── */}
       <div style={{ background: "linear-gradient(135deg, var(--theme-darker) 0%, var(--theme-dark) 100%)", color: "#fff", padding: "48px 40px 0" }}>
@@ -362,7 +335,7 @@ export default function PerfilBebe() {
       </div>
 
       {/* ── CONTENT AREA ── */}
-      <div style={{ flex: 1, padding: "40px", display: "flex", gap: "40px", alignItems: "flex-start", width: "100%" }}>
+      <div className="page-container" style={{ display: "flex", gap: "40px", alignItems: "flex-start" }}>
         
         {activeTab === "detalle" && (
           <div style={{ width: "100%" }}>
@@ -377,7 +350,7 @@ export default function PerfilBebe() {
               </div>
             )}
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+            <div className="responsive-grid">
               {/* DATOS GENERALES */}
               <div style={cardStyle}>
                 <h3 style={{ fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "20px", borderBottom: "1px solid #E5E7EB", paddingBottom: "12px" }}>Datos Generales</h3>
@@ -410,22 +383,19 @@ export default function PerfilBebe() {
                 <div style={{ display: "flex", gap: "16px" }}>
                   <div style={{ flex: 1 }}>
                     <label style={labelStyle}>Fecha de nacimiento</label>
-                    {editMode ? <input type="date" name="fecha_nacimiento" value={editData.fecha_nacimiento ? editData.fecha_nacimiento.split('T')[0] : ""} onChange={handleChange} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.fecha_nacimiento ? new Date(perfil.fecha_nacimiento).toLocaleDateString() : "-"}</div>}
+                    {editMode ? <input type="date" name="fecha_nacimiento" max={new Date().toISOString().split('T')[0]} value={editData.fecha_nacimiento ? editData.fecha_nacimiento.split('T')[0] : ""} onChange={handleChange} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.fecha_nacimiento ? new Date(perfil.fecha_nacimiento).toLocaleDateString() : "-"}</div>}
                   </div>
                   <div style={{ flex: 1 }}>
                     <label style={labelStyle}>Previsión de salud</label>
                     {editMode ? (
                       <select name="prevision_salud" value={editData.prevision_salud || ""} onChange={handleChange} style={inputStyle}>
                         <option value="">Seleccione</option>
-                        <option value="FONASA A (Indigente)">FONASA A (Indigente)</option>
-                        <option value="FONASA B">FONASA B</option>
-                        <option value="FONASA C">FONASA C</option>
-                        <option value="FONASA D">FONASA D</option>
-                        <option value="ISAPRE">ISAPRE</option>
-                        <option value="FFAA">Fuerzas Armadas</option>
+                        {previsiones.map(p => (
+                          <option key={p.codigo} value={p.codigo}>{p.nombre_visible}</option>
+                        ))}
                       </select>
                     ) : (
-                      <div style={readOnlyStyle}>{perfil.prevision_salud || "-"}</div>
+                      <div style={readOnlyStyle}>{perfil.nombre_prevision || perfil.prevision_salud || "-"}</div>
                     )}
                   </div>
                 </div>
@@ -456,7 +426,7 @@ export default function PerfilBebe() {
               <div style={{ ...cardStyle, gridColumn: "1 / -1" }}>
                 <h3 style={{ fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "20px", borderBottom: "1px solid #E5E7EB", paddingBottom: "12px" }}>Información Médica</h3>
                 
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "24px", marginBottom: "24px" }}>
+                <div className="hero-stats-grid" style={{ marginBottom: "24px" }}>
                   <div>
                     <label style={labelStyle}>Tipo de sangre</label>
                     {editMode ? (
@@ -486,7 +456,7 @@ export default function PerfilBebe() {
                   </div>
                 </div>
 
-                <div style={{ display: "flex", gap: "24px" }}>
+                <div className="hero-stats-grid">
                   <div style={{ flex: 1 }}>
                     <label style={labelStyle}>Alergias conocidas</label>
                     {editMode ? <textarea name="alergias" rows={3} value={editData.alergias || ""} onChange={handleChange} style={inputStyle}></textarea> : <div style={{ ...readOnlyStyle, minHeight: "80px" }}>{perfil.alergias || "-"}</div>}
@@ -513,7 +483,7 @@ export default function PerfilBebe() {
         )}
 
         {activeTab === "compartir" && (
-          <div style={{ width: "100%", display: "grid", gridTemplateColumns: "2fr 1fr", gap: "32px" }}>
+          <div className="responsive-grid" style={{ width: "100%" }}>
             
             {/* LEFT COLUMN: LIST & SEARCH */}
             <div>

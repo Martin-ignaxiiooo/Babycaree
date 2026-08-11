@@ -9,7 +9,10 @@ export const getPerfil = async (req: Request, res: Response): Promise<void> => {
 
     // TODO: Verify if user is owner or has active access
     const result = await query(
-      `SELECT * FROM perfiles_bebes WHERE id = $1 AND (usuario_id = $2 OR EXISTS (SELECT 1 FROM accesos_compartidos_bebe WHERE id_perfil_bebe = $1 AND id_usuario_invitado = $2 AND estado = 'activo'))`,
+      `SELECT pb.*, tp.nombre_visible as nombre_prevision 
+       FROM perfiles_bebes pb 
+       LEFT JOIN tipos_prevision tp ON pb.prevision_salud = tp.codigo
+       WHERE pb.id = $1 AND (pb.usuario_id = $2 OR EXISTS (SELECT 1 FROM accesos_compartidos_bebe WHERE id_perfil_bebe = $1 AND id_usuario_invitado = $2 AND estado = 'activo'))`,
       [id, userId]
     );
 
@@ -45,6 +48,11 @@ export const actualizarPerfil = async (req: Request, res: Response): Promise<voi
 
     if (accessCheck.rows.length === 0) {
       res.status(403).json({ error: 'No tienes permiso para editar este perfil' });
+      return;
+    }
+
+    if (fecha_nacimiento && new Date(fecha_nacimiento) > new Date()) {
+      res.status(400).json({ error: 'La fecha de nacimiento no puede ser futura' });
       return;
     }
 

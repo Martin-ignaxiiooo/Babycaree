@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const auth_middleware_1 = require("../middlewares/auth.middleware");
+const perfil_bebe_controller_1 = require("../controllers/perfil_bebe.controller");
+const router = (0, express_1.Router)();
+router.use(auth_middleware_1.verifyToken);
+router.get('/:id', perfil_bebe_controller_1.getPerfil);
+router.patch('/:id', perfil_bebe_controller_1.actualizarPerfil);
+router.get('/:id/accesos', perfil_bebe_controller_1.listarAccesos);
+router.post('/:id/accesos/invitar', perfil_bebe_controller_1.invitarAcceso);
+router.patch('/:id/accesos/:idAcceso', perfil_bebe_controller_1.modificarPermiso);
+router.delete('/:id/accesos/:idAcceso', perfil_bebe_controller_1.revocarAcceso);
+router.get('/:id/auditoria', perfil_bebe_controller_1.listarAuditoria);
+exports.default = router;
