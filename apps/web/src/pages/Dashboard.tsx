@@ -44,7 +44,8 @@ export default function Dashboard() {
     setUser(JSON.parse(storedUser));
 
     const selectedBabyId = localStorage.getItem("selectedBabyId");
-    if (!selectedBabyId) {
+    if (!selectedBabyId || selectedBabyId === "undefined") {
+      localStorage.removeItem("selectedBabyId");
       navigate("/seleccionar-perfil");
       return;
     }

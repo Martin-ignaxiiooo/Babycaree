@@ -27,20 +27,14 @@ export default function Salud() {
       navigate("/");
       return;
     }
-
-    // Obtener el bebé activo
-    fetch("https://babycare-backend-msyq.onrender.com/api/profiles/babies", {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.length > 0) {
-          setBebeId(data[0].id);
-        } else {
-          setLoading(false);
-        }
-      })
-      .catch(err => console.error(err));
+    const savedBebeId = localStorage.getItem("selectedBabyId");
+    if (!savedBebeId || savedBebeId === "undefined") {
+      localStorage.removeItem("selectedBabyId");
+      navigate("/seleccionar-perfil");
+      return;
+    }
+    setBebeId(savedBebeId);
+    setLoading(false);
   }, [token, navigate]);
 
   useEffect(() => {
