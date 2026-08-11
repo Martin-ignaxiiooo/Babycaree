@@ -61,6 +61,16 @@ const getHomeDashboard = async (req, res) => {
             return res.status(404).json({ error: "Perfil no encontrado" });
         }
         const perfil = profileRes.rows[0];
+        const userId = req.user?.id;
+        let rol_acceso = "propietario";
+        if (perfil.usuario_id !== userId) {
+            const accesoRes = await (0, db_1.query)(`SELECT nivel_permiso FROM accesos_compartidos_bebe 
+         WHERE id_perfil_bebe = $1 AND id_usuario_invitado = $2 AND estado = 'activo'`, [idPerfil, userId]);
+            if (accesoRes.rows.length === 0) {
+                return res.status(403).json({ error: "No tienes permiso para ver este perfil" });
+            }
+            rol_acceso = accesoRes.rows[0].nivel_permiso;
+        }
         // 2. Fetch Latest Growth Record
         const growthRes = await (0, db_1.query)(`SELECT peso_kg, talla_cm 
        FROM registros_crecimiento 
@@ -236,7 +246,8 @@ const getHomeDashboard = async (req, res) => {
             hero,
             notificaciones: notificaciones.slice(0, 3), // Max 3
             crecimiento,
-            total_alertas
+            total_alertas,
+            rol_acceso
         });
     }
     catch (error) {
@@ -251,6 +262,15 @@ const addGrowthRecord = async (req, res) => {
         const { peso, talla } = req.body;
         if (!peso || !talla) {
             return res.status(400).json({ error: "Peso y talla son requeridos" });
+        }
+        const userId = req.user?.id;
+        const accessCheck = await (0, db_1.query)(`SELECT b.id FROM perfiles_bebes b WHERE b.id = $1 AND b.usuario_id = $2
+       UNION
+       SELECT a.id_perfil_bebe FROM accesos_compartidos_bebe a 
+       WHERE a.id_perfil_bebe = $1 AND a.id_usuario_invitado = $2 AND a.estado = 'activo' 
+       AND a.nivel_permiso NOT IN ('solo_lectura', 'solo_lectura_galeria')`, [idPerfil, userId]);
+        if (accessCheck.rows.length === 0) {
+            return res.status(403).json({ error: "No tienes permiso para modificar este perfil" });
         }
         await (0, db_1.query)(`INSERT INTO registros_crecimiento (bebe_id, fecha_registro, peso_kg, talla_cm)
        VALUES ($1, CURRENT_DATE, $2, $3)`, [idPerfil, peso, talla]);

@@ -31,7 +31,7 @@ const actualizarPerfil = async (req, res) => {
         // Check ownership or 'ver_editar' access
         const accessCheck = await (0, db_1.query)(`SELECT 1 FROM perfiles_bebes pb 
        LEFT JOIN accesos_compartidos_bebe acb ON acb.id_perfil_bebe = pb.id AND acb.id_usuario_invitado = $2 AND acb.estado = 'activo'
-       WHERE pb.id = $1 AND (pb.usuario_id = $2 OR acb.nivel_permiso = 'ver_editar')`, [id, userId]);
+       WHERE pb.id = $1 AND (pb.usuario_id = $2 OR acb.nivel_permiso IN ('ver_editar', 'papa', 'abuela'))`, [id, userId]);
         if (accessCheck.rows.length === 0) {
             res.status(403).json({ error: 'No tienes permiso para editar este perfil' });
             return;
@@ -123,7 +123,10 @@ const invitarAcceso = async (req, res) => {
         const id_usuario_invitado = userCheck.rows.length > 0 ? userCheck.rows[0].id : null;
         const insert = await (0, db_1.query)(`INSERT INTO accesos_compartidos_bebe (id_perfil_bebe, id_usuario_invitado, correo_invitado, nivel_permiso, invitado_por, fecha_expiracion) 
        VALUES ($1, $2, $3, $4, $5, now() + interval '7 days') RETURNING *`, [id, id_usuario_invitado, correo_invitado, nivel_permiso, userId]);
-        await (0, mailer_1.sendInvitationAlert)(correo_invitado, nombre_familiar, nombre_bebe);
+        // Run email sending in the background without awaiting to prevent hanging the API request
+        (0, mailer_1.sendInvitationAlert)(correo_invitado, nombre_familiar, nombre_bebe).catch(emailError => {
+            console.error("Error sending email, but invitation was created:", emailError);
+        });
         await (0, db_1.query)(`INSERT INTO auditoria_perfil_bebe (id_perfil_bebe, id_usuario_ejecutor, tipo_accion, nivel_importancia) VALUES ($1, $2, 'invitacion_creada', 'normal')`, [id, userId]);
         res.json(insert.rows[0]);
     }

@@ -13,6 +13,9 @@ const transporter = nodemailer.createTransport({
   },
   connectionTimeout: 5000, // 5 seconds
   greetingTimeout: 5000,
+  tls: {
+    rejectUnauthorized: false
+  }
 });
 
 const FROM =

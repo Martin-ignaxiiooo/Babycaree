@@ -15,6 +15,8 @@ const transporter = nodemailer_1.default.createTransport({
         user: process.env.SMTP_USER || "",
         pass: process.env.SMTP_PASS || "",
     },
+    connectionTimeout: 5000, // 5 seconds
+    greetingTimeout: 5000,
 });
 const FROM = process.env.SMTP_FROM || '"Iniciativa Baby" <noreply@iniciativababy.cl>';
 const sendRecoveryCode = async (email, codigo, nombre) => {
@@ -123,9 +125,11 @@ const sendInvitationAlert = async (email, nombreFamiliar, nombreBebe) => {
           <p style="color: #6B7280; font-size: 14px; line-height: 1.6; margin-bottom: 24px;">
             <strong>${nombreFamiliar}</strong> te ha invitado a ver el perfil de su bebé <strong>${nombreBebe}</strong> en Iniciativa Baby.
           </p>
-          <div style="background: #E0E7FF; border-left: 4px solid #4F46E5; border-radius: 10px; padding: 14px 18px; margin-bottom: 24px;">
-            <p style="color: #3730A3; font-size: 13px; margin: 0; font-weight: 600;">Ingresa a la aplicación para ver los detalles.</p>
-          </div>
+          <a href="https://aree-web.vercel.app/seleccionar-perfil" style="display: block; text-decoration: none;">
+            <div style="background: #E0E7FF; border-left: 4px solid #4F46E5; border-radius: 10px; padding: 14px 18px; margin-bottom: 24px;">
+              <p style="color: #3730A3; font-size: 13px; margin: 0; font-weight: 600;">Ingresa a la aplicación para ver los detalles.</p>
+            </div>
+          </a>
         </div>
       </div>
     `,

@@ -42,7 +42,11 @@ const updateVacuna = async (req, res) => {
     try {
         const { bebeId, vacunaId } = req.params;
         const { aplicada, fecha_aplicacion, notas, lugar_aplicacion } = req.body;
-        const accessCheck = await (0, db_1.query)("SELECT id FROM perfiles_bebes WHERE id = $1 AND usuario_id = $2", [bebeId, req.user.id]);
+        const accessCheck = await (0, db_1.query)(`SELECT b.id FROM perfiles_bebes b WHERE b.id = $1 AND b.usuario_id = $2
+       UNION
+       SELECT a.id_perfil_bebe FROM accesos_compartidos_bebe a 
+       WHERE a.id_perfil_bebe = $1 AND a.id_usuario_invitado = $2 AND a.estado = 'activo' 
+       AND a.nivel_permiso NOT IN ('solo_lectura', 'solo_lectura_galeria')`, [bebeId, req.user.id]);
         if (accessCheck.rows.length === 0) {
             return res.status(403).json({ error: "No tienes permiso para modificar este perfil" });
         }
@@ -95,7 +99,11 @@ const createControl = async (req, res) => {
     try {
         const { bebeId } = req.params;
         const { fecha_registro, peso_kg, talla_cm, notas } = req.body;
-        const accessCheck = await (0, db_1.query)("SELECT id FROM perfiles_bebes WHERE id = $1 AND usuario_id = $2", [bebeId, req.user.id]);
+        const accessCheck = await (0, db_1.query)(`SELECT b.id FROM perfiles_bebes b WHERE b.id = $1 AND b.usuario_id = $2
+       UNION
+       SELECT a.id_perfil_bebe FROM accesos_compartidos_bebe a 
+       WHERE a.id_perfil_bebe = $1 AND a.id_usuario_invitado = $2 AND a.estado = 'activo' 
+       AND a.nivel_permiso NOT IN ('solo_lectura', 'solo_lectura_galeria')`, [bebeId, req.user.id]);
         if (accessCheck.rows.length === 0) {
             return res.status(403).json({ error: "No tienes permiso para modificar este perfil" });
         }
