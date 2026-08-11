@@ -24,6 +24,9 @@ export default function PerfilBebe() {
       setActiveTab(tab);
     }
   }, [location.search]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isInviting, setIsInviting] = useState(false);
   const [editMode, setEditMode] = useState(false);
   
   const [perfil, setPerfil] = useState<any>(null);
@@ -190,6 +193,7 @@ export default function PerfilBebe() {
   const handleInvitar = async (targetEmail?: string) => {
     const correo = targetEmail || (selectedInvite ? selectedInvite.email : searchQuery);
     if (!correo) return;
+    setIsInviting(true);
     try {
       const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/perfiles-bebe/${id}/accesos/invitar`, {
         method: "POST",
@@ -214,6 +218,9 @@ export default function PerfilBebe() {
       }
     } catch (error) {
       console.error(error);
+      alert("Error de red al intentar invitar.");
+    } finally {
+      setIsInviting(false);
     }
   };
 
@@ -574,7 +581,13 @@ export default function PerfilBebe() {
                           <option value="abuela">Abuela (Acceso a todo)</option>
                           <option value="ver_editar">Ver y editar</option>
                         </select>
-                        <button onClick={() => { setSelectedInvite(res); handleInvitar(); }} style={{ background: "var(--theme-primary)", color: "#fff", border: "none", padding: "8px 16px", borderRadius: "20px", fontWeight: 700, cursor: "pointer", fontSize: "13px" }}>Invitar</button>
+                        <button 
+                          onClick={() => { setSelectedInvite(res); handleInvitar(res.email); }} 
+                          disabled={isInviting}
+                          style={{ background: "var(--theme-primary)", color: "#fff", border: "none", padding: "8px 16px", borderRadius: "20px", fontWeight: 700, cursor: isInviting ? "not-allowed" : "pointer", fontSize: "13px", opacity: isInviting ? 0.6 : 1 }}
+                        >
+                          {isInviting ? "Enviando..." : "Invitar"}
+                        </button>
                       </div>
                     ))}
                   </div>
@@ -599,7 +612,13 @@ export default function PerfilBebe() {
                       <option value="abuela">Abuela (Acceso a todo)</option>
                       <option value="ver_editar">Ver y editar</option>
                     </select>
-                    <button onClick={() => { setSelectedInvite(null); handleInvitar(); }} style={{ background: "var(--theme-primary)", color: "#fff", border: "none", padding: "8px 16px", borderRadius: "20px", fontWeight: 700, cursor: "pointer", fontSize: "13px" }}>Enviar invitación</button>
+                    <button 
+                      onClick={() => { setSelectedInvite(null); handleInvitar(); }} 
+                      disabled={isInviting}
+                      style={{ background: "var(--theme-primary)", color: "#fff", border: "none", padding: "8px 16px", borderRadius: "20px", fontWeight: 700, cursor: isInviting ? "not-allowed" : "pointer", fontSize: "13px", opacity: isInviting ? 0.6 : 1 }}
+                    >
+                      {isInviting ? "Enviando..." : "Enviar invitación"}
+                    </button>
                   </div>
                 )}
               </div>

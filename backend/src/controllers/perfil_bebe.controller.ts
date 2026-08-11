@@ -158,7 +158,11 @@ export const invitarAcceso = async (req: Request, res: Response): Promise<void> 
       [id, id_usuario_invitado, correo_invitado, nivel_permiso, userId]
     );
 
-    await sendInvitationAlert(correo_invitado, nombre_familiar, nombre_bebe);
+    try {
+      await sendInvitationAlert(correo_invitado, nombre_familiar, nombre_bebe);
+    } catch (emailError) {
+      console.error("Error sending email, but invitation was created:", emailError);
+    }
 
     await query(
       `INSERT INTO auditoria_perfil_bebe (id_perfil_bebe, id_usuario_ejecutor, tipo_accion, nivel_importancia) VALUES ($1, $2, 'invitacion_creada', 'normal')`,
