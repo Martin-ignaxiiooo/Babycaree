@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Syringe, Activity, Save, CheckCircle, Bell } from "lucide-react";
+import { ArrowLeft, Syringe, Activity, Save, CheckCircle, Bell, Plus, X } from "lucide-react";
 import TopNav from "../components/TopNav";
 
 export default function Salud() {
@@ -13,6 +13,13 @@ export default function Salud() {
   const [loading, setLoading] = useState(true);
 
   const [vacunas, setVacunas] = useState<any[]>([]);
+
+  // Estado para Crecimiento
+  const [crecimientoData, setCrecimientoData] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [pesoInput, setPesoInput] = useState("");
+  const [tallaInput, setTallaInput] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (!token) {
@@ -38,6 +45,7 @@ export default function Salud() {
   useEffect(() => {
     if (bebeId && token) {
       if (activeTab === "vacunas") fetchVacunas();
+      if (activeTab === "crecimiento") fetchCrecimientoData();
     }
   }, [bebeId, activeTab, token]);
 
@@ -54,6 +62,43 @@ export default function Salud() {
     }
   };
 
+
+  const fetchCrecimientoData = async () => {
+    try {
+      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/home/${bebeId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setCrecimientoData(data.crecimiento);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleSaveGrowth = async () => {
+    if (!pesoInput || !tallaInput || !bebeId) return;
+    setIsSaving(true);
+    try {
+      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/home/${bebeId}/crecimiento`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ peso: parseFloat(pesoInput), talla: parseFloat(tallaInput) })
+      });
+      if (res.ok) {
+        setIsModalOpen(false);
+        setPesoInput("");
+        setTallaInput("");
+        fetchCrecimientoData();
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Error al guardar las medidas");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
 
   const toggleVacuna = async (vacunaId: number, aplicadaActual: boolean) => {
@@ -104,6 +149,36 @@ export default function Salud() {
 
   if (loading) return <div style={{ padding: "40px", textAlign: "center" }}>Cargando módulo de salud...</div>;
   if (!bebeId) return <div style={{ padding: "40px", textAlign: "center" }}>Debes registrar un bebé primero.</div>;
+
+  // Cálculos para el Gráfico de Crecimiento
+  const seriePeso = crecimientoData?.serie_peso || [];
+  const etiquetasFecha = crecimientoData?.etiquetas_fecha || [];
+  const serieOms = crecimientoData?.serie_oms || [];
+  
+  const maxPoints = 6;
+  const paddingNeeded = maxPoints - seriePeso.length;
+  const displayPesos = paddingNeeded > 0 ? [...Array(paddingNeeded).fill(null), ...seriePeso] : seriePeso.slice(-6);
+  const displayFechas = paddingNeeded > 0 ? [...Array(paddingNeeded).fill(""), ...etiquetasFecha] : etiquetasFecha.slice(-6);
+  const displayOms = paddingNeeded > 0 ? [...Array(paddingNeeded).fill(null), ...serieOms] : serieOms.slice(-6);
+
+  const xPositions = [60, 110, 160, 210, 260, 310];
+  const mapY = (val: number | null) => {
+    if (val === null || val === 0) return null;
+    const y = 85 - (val * 5); 
+    return Math.max(10, Math.min(85, y));
+  };
+
+  let pointsString = "";
+  displayPesos.forEach((w: number | null, i: number) => {
+    const y = mapY(w);
+    if (y !== null) pointsString += `${xPositions[i]},${y} `;
+  });
+
+  let omsPointsString = "";
+  displayOms.forEach((w: number | null, i: number) => {
+    const y = mapY(w);
+    if (y !== null) omsPointsString += `${xPositions[i]},${y} `;
+  });
 
   return (
     <div style={{ minHeight: "100vh", background: "#F8F7FC", fontFamily: "'Nunito', sans-serif", display: "flex", flexDirection: "column" }}>
@@ -227,22 +302,127 @@ export default function Salud() {
 
         {activeTab === "crecimiento" && (
           <div style={{ background: "#fff", borderRadius: "16px", padding: "32px", boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}>
-            <h2 style={{ fontSize: "20px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "24px" }}>Evolución de Crecimiento</h2>
-            <div style={{ textAlign: "center", padding: "40px", color: "#6B7280" }}>
-              <div style={{ fontSize: "40px", marginBottom: "16px" }}>📈</div>
-              <h3 style={{ fontSize: "18px", color: "var(--theme-darker)", marginBottom: "8px" }}>Módulo en construcción</h3>
-              <p>Los gráficos y el registro histórico detallado de peso y talla estarán disponibles pronto.</p>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+              <h2 style={{ fontSize: "20px", fontWeight: 800, color: "var(--theme-darker)", margin: 0 }}>
+                Evolución de Crecimiento
+              </h2>
               <button 
-                onClick={() => navigate("/dashboard")}
-                style={{ marginTop: "24px", background: "var(--theme-primary)", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "12px", cursor: "pointer" }}
+                onClick={() => setIsModalOpen(true)}
+                style={{
+                  background: "var(--theme-primary)", color: "#fff",
+                  padding: "8px 16px", borderRadius: "12px", border: "none",
+                  fontSize: "13px", fontWeight: 700, cursor: "pointer",
+                  display: "flex", alignItems: "center", gap: "6px"
+                }}
               >
-                Ver gráfico actual en el Dashboard
+                <Plus size={16} /> Registrar Medidas
               </button>
+            </div>
+            
+            <div style={{ width: "100%", overflowX: "auto" }}>
+              <svg viewBox="0 0 340 120" style={{ width: "100%", height: "auto", overflow: "visible", minWidth: "340px" }}>
+                <rect width="340" height="100" fill="#F9FAFB" rx="8"/>
+                
+                {/* Y Axes Lines */}
+                <line x1="40" y1="10" x2="40" y2="85" stroke="#E5E7EB" strokeWidth="0.8"/>
+                <line x1="40" y1="85" x2="330" y2="85" stroke="#E5E7EB" strokeWidth="0.8"/>
+                <line x1="40" y1="35" x2="330" y2="35" stroke="#F3F4F6" strokeWidth="0.6"/>
+                <line x1="40" y1="60" x2="330" y2="60" stroke="#F3F4F6" strokeWidth="0.6"/>
+                
+                {/* Y Axis Labels */}
+                <text x="35" y="13" textAnchor="end" fontSize="8" fill="#9CA3AF">15kg</text>
+                <text x="35" y="38" textAnchor="end" fontSize="8" fill="#9CA3AF">10kg</text>
+                <text x="35" y="63" textAnchor="end" fontSize="8" fill="#9CA3AF">5kg</text>
+                <text x="35" y="88" textAnchor="end" fontSize="8" fill="#9CA3AF">0kg</text>
+                
+                {/* X Axis Labels (Dates) */}
+                {displayFechas.map((fecha: string, idx: number) => (
+                  <text key={idx} x={xPositions[idx]} y="105" textAnchor="middle" fontSize="9" fill="#9CA3AF" fontWeight="600">
+                    {fecha || ""}
+                  </text>
+                ))}
+                
+                {/* P50 reference line (OMS) */}
+                {omsPointsString && (
+                  <polyline points={omsPointsString} fill="none" stroke="#E5E7EB" strokeWidth="1.5" strokeDasharray="4,3"/>
+                )}
+                
+                {/* Dynamic Data Line */}
+                {pointsString && (
+                  <polyline points={pointsString} fill="none" stroke="var(--theme-primary)" strokeWidth="2.5" strokeLinejoin="round"/>
+                )}
+                
+                {/* Dynamic Data Points */}
+                {displayPesos.map((w: number | null, i: number) => {
+                  const y = mapY(w);
+                  if (y === null) return null;
+                  return <circle key={i} cx={xPositions[i]} cy={y} r={i === maxPoints - 1 && w !== null ? 4.5 : 3.5} 
+                    fill="var(--theme-primary)" stroke={i === maxPoints - 1 ? "#fff" : "none"} strokeWidth={2}/>;
+                })}
+              </svg>
             </div>
           </div>
         )}
 
       </div>
+
+      {/* ── MODAL REGISTRO CRECIMIENTO ── */}
+      {isModalOpen && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
+          background: "rgba(0,0,0,0.5)", zIndex: 9999,
+          display: "flex", alignItems: "center", justifyContent: "center"
+        }}>
+          <div style={{
+            background: "#fff", padding: "32px", borderRadius: "24px", width: "90%", maxWidth: "400px",
+            boxShadow: "0 10px 40px rgba(0,0,0,0.2)"
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
+              <h2 style={{ fontSize: "20px", fontWeight: 800, color: "var(--theme-darker)", margin: 0 }}>Registrar Medidas</h2>
+              <button onClick={() => setIsModalOpen(false)} style={{ background: "none", border: "none", cursor: "pointer" }}>
+                <X size={24} color="#6B7280" />
+              </button>
+            </div>
+            
+            <div style={{ marginBottom: "20px" }}>
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 700, marginBottom: "8px", color: "#4B5563" }}>Peso (kg)</label>
+              <input 
+                type="number" 
+                step="0.01"
+                value={pesoInput}
+                onChange={e => setPesoInput(e.target.value)}
+                placeholder="Ej. 7.4"
+                style={{ width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", outline: "none", fontSize: "15px" }}
+              />
+            </div>
+
+            <div style={{ marginBottom: "32px" }}>
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 700, marginBottom: "8px", color: "#4B5563" }}>Talla (cm)</label>
+              <input 
+                type="number" 
+                step="0.1"
+                value={tallaInput}
+                onChange={e => setTallaInput(e.target.value)}
+                placeholder="Ej. 67.5"
+                style={{ width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", outline: "none", fontSize: "15px" }}
+              />
+            </div>
+
+            <button 
+              onClick={handleSaveGrowth}
+              disabled={isSaving || !pesoInput || !tallaInput}
+              style={{ 
+                width: "100%", background: "var(--theme-primary)", color: "#fff", 
+                padding: "16px", borderRadius: "14px", border: "none", 
+                fontSize: "16px", fontWeight: 800, cursor: isSaving ? "not-allowed" : "pointer",
+                opacity: (isSaving || !pesoInput || !tallaInput) ? 0.6 : 1
+              }}
+            >
+              {isSaving ? "Guardando..." : "Guardar Registro"}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
