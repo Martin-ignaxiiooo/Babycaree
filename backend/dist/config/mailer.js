@@ -7,7 +7,9 @@ exports.sendInvitationAlert = exports.sendLoginBlockedAlert = exports.sendPasswo
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-const transporter = nodemailer_1.default.createTransport({
+// Creates a fresh transporter each time so it always reads the latest env vars
+// (important for cloud environments like Render where env vars load after module init)
+const createTransporter = () => nodemailer_1.default.createTransport({
     host: process.env.SMTP_HOST || "smtp.gmail.com",
     port: parseInt(process.env.SMTP_PORT || "587"),
     secure: process.env.SMTP_SECURE === "true",
@@ -15,11 +17,18 @@ const transporter = nodemailer_1.default.createTransport({
         user: process.env.SMTP_USER || "",
         pass: process.env.SMTP_PASS || "",
     },
-    connectionTimeout: 5000, // 5 seconds
-    greetingTimeout: 5000,
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
+    tls: {
+        rejectUnauthorized: false,
+    },
 });
-const FROM = process.env.SMTP_FROM || '"Iniciativa Baby" <noreply@iniciativababy.cl>';
+const FROM = process.env.SMTP_FROM ||
+    '"Iniciativa Baby" <babyyycareee@gmail.com>';
 const sendRecoveryCode = async (email, codigo, nombre) => {
+    const transporter = createTransporter();
+    console.log(`[SMTP] Sending recovery code to ${email} via ${process.env.SMTP_HOST}:${process.env.SMTP_PORT} user=${process.env.SMTP_USER}`);
     await transporter.sendMail({
         from: FROM,
         to: email,
@@ -50,9 +59,11 @@ const sendRecoveryCode = async (email, codigo, nombre) => {
       </div>
     `,
     });
+    console.log(`[SMTP] Recovery code sent successfully to ${email}`);
 };
 exports.sendRecoveryCode = sendRecoveryCode;
 const sendPasswordChangedAlert = async (email, nombre) => {
+    const transporter = createTransporter();
     await transporter.sendMail({
         from: FROM,
         to: email,
@@ -81,6 +92,7 @@ const sendPasswordChangedAlert = async (email, nombre) => {
 };
 exports.sendPasswordChangedAlert = sendPasswordChangedAlert;
 const sendLoginBlockedAlert = async (email, nombre) => {
+    const transporter = createTransporter();
     await transporter.sendMail({
         from: FROM,
         to: email,
@@ -110,6 +122,8 @@ const sendLoginBlockedAlert = async (email, nombre) => {
 };
 exports.sendLoginBlockedAlert = sendLoginBlockedAlert;
 const sendInvitationAlert = async (email, nombreFamiliar, nombreBebe) => {
+    const transporter = createTransporter();
+    console.log(`[SMTP] Sending invitation to ${email} via ${process.env.SMTP_HOST}:${process.env.SMTP_PORT} user=${process.env.SMTP_USER}`);
     await transporter.sendMail({
         from: FROM,
         to: email,
@@ -125,14 +139,16 @@ const sendInvitationAlert = async (email, nombreFamiliar, nombreBebe) => {
           <p style="color: #6B7280; font-size: 14px; line-height: 1.6; margin-bottom: 24px;">
             <strong>${nombreFamiliar}</strong> te ha invitado a ver el perfil de su bebé <strong>${nombreBebe}</strong> en Iniciativa Baby.
           </p>
-          <a href="https://aree-web.vercel.app/seleccionar-perfil" style="display: block; text-decoration: none;">
+          <a href="https://babycaree-web.vercel.app/seleccionar-perfil" style="display: block; text-decoration: none;">
             <div style="background: #E0E7FF; border-left: 4px solid #4F46E5; border-radius: 10px; padding: 14px 18px; margin-bottom: 24px;">
-              <p style="color: #3730A3; font-size: 13px; margin: 0; font-weight: 600;">Ingresa a la aplicación para ver los detalles.</p>
+              <p style="color: #3730A3; font-size: 13px; margin: 0; font-weight: 600;">👉 Haz clic aquí para ingresar a la aplicación</p>
             </div>
           </a>
+          <p style="color: #9CA3AF; font-size: 12px;">Si no conoces a ${nombreFamiliar}, puedes ignorar este correo.</p>
         </div>
       </div>
     `,
     });
+    console.log(`[SMTP] Invitation sent successfully to ${email}`);
 };
 exports.sendInvitationAlert = sendInvitationAlert;

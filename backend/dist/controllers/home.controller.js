@@ -61,7 +61,8 @@ const getHomeDashboard = async (req, res) => {
             return res.status(404).json({ error: "Perfil no encontrado" });
         }
         const perfil = profileRes.rows[0];
-        const userId = req.user?.id;
+        const userId = req.user?.id || req.user?.userId; // Fallback just in case
+        console.log("home.controller: perfil.usuario_id =", perfil.usuario_id, "userId =", userId);
         let rol_acceso = "propietario";
         if (perfil.usuario_id !== userId) {
             const accesoRes = await (0, db_1.query)(`SELECT nivel_permiso FROM accesos_compartidos_bebe 

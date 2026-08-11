@@ -126,10 +126,11 @@ exports.createBabyProfile = createBabyProfile;
 const getMyBabies = async (req, res) => {
     try {
         const userId = req.user.id;
-        const result = await (0, db_1.query)(`SELECT DISTINCT pb.* 
+        const result = await (0, db_1.query)(`SELECT pb.* 
        FROM perfiles_bebes pb 
        LEFT JOIN accesos_compartidos_bebe acb ON acb.id_perfil_bebe = pb.id AND acb.estado = 'activo'
        WHERE pb.usuario_id = $1 OR acb.id_usuario_invitado = $1 
+       GROUP BY pb.id
        ORDER BY pb.fecha_creacion DESC`, [userId]);
         res.json(result.rows);
     }
