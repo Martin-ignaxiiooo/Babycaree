@@ -28,7 +28,8 @@ export default function Salud() {
       return;
     }
     const savedBebeId = localStorage.getItem("selectedBabyId");
-    if (!savedBebeId || savedBebeId === "undefined") {
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!savedBebeId || !uuidRegex.test(savedBebeId)) {
       localStorage.removeItem("selectedBabyId");
       navigate("/seleccionar-perfil");
       return;

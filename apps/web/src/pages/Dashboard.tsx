@@ -44,7 +44,8 @@ export default function Dashboard() {
     setUser(JSON.parse(storedUser));
 
     const selectedBabyId = localStorage.getItem("selectedBabyId");
-    if (!selectedBabyId || selectedBabyId === "undefined") {
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!selectedBabyId || !uuidRegex.test(selectedBabyId)) {
       localStorage.removeItem("selectedBabyId");
       navigate("/seleccionar-perfil");
       return;
