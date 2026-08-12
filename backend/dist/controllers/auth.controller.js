@@ -30,6 +30,9 @@ const register = async (req, res) => {
         const passwordHash = await bcrypt_1.default.hash(password, 12);
         const result = await (0, db_1.query)("INSERT INTO usuarios (email, password_hash, nombre, apellidos) VALUES ($1, $2, $3, $4) RETURNING id, email, nombre, apellidos, rol", [email.toLowerCase(), passwordHash, nombre, apellidos]);
         const newUser = result.rows[0];
+        // Vincular invitaciones pendientes a esta cuenta recién creada
+        await (0, db_1.query)(`UPDATE accesos_compartidos_bebe SET id_usuario_invitado = $1, estado = 'activo'
+       WHERE LOWER(correo_invitado) = LOWER($2) AND id_usuario_invitado IS NULL`, [newUser.id, email]).catch(() => { }); // No fallar si hay error en este paso
         const token = jsonwebtoken_1.default.sign({ id: newUser.id, email: newUser.email, rol: newUser.rol }, JWT_SECRET, { expiresIn: "7d" });
         res.status(201).json({ user: newUser, token });
     }
@@ -86,6 +89,9 @@ const login = async (req, res) => {
         // Login exitoso: resetear contadores
         const tokenExpiry = recordar_sesion ? "30d" : "7d";
         await (0, db_1.query)("UPDATE usuarios SET ultima_conexion = CURRENT_TIMESTAMP, intentos_login_fallidos = 0, bloqueado_hasta = NULL WHERE id = $1", [user.id]);
+        // Vincular invitaciones pendientes por email a esta cuenta
+        await (0, db_1.query)(`UPDATE accesos_compartidos_bebe SET id_usuario_invitado = $1, estado = 'activo'
+       WHERE LOWER(correo_invitado) = LOWER($2) AND id_usuario_invitado IS NULL`, [user.id, user.email]).catch(() => { }); // No fallar si hay error en este paso
         const token = jsonwebtoken_1.default.sign({ id: user.id, email: user.email, rol: user.rol }, JWT_SECRET, { expiresIn: tokenExpiry });
         res.json({
             user: {

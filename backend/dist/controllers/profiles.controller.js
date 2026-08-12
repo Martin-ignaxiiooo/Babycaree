@@ -126,12 +126,15 @@ exports.createBabyProfile = createBabyProfile;
 const getMyBabies = async (req, res) => {
     try {
         const userId = req.user.id;
+        const userEmail = req.user?.email || '';
         const result = await (0, db_1.query)(`SELECT pb.* 
        FROM perfiles_bebes pb 
        LEFT JOIN accesos_compartidos_bebe acb ON acb.id_perfil_bebe = pb.id AND acb.estado = 'activo'
-       WHERE pb.usuario_id = $1 OR acb.id_usuario_invitado = $1 
+       WHERE pb.usuario_id = $1 
+         OR acb.id_usuario_invitado = $1 
+         OR (LOWER(acb.correo_invitado) = LOWER($2) AND acb.id_usuario_invitado IS NULL)
        GROUP BY pb.id
-       ORDER BY pb.fecha_creacion DESC`, [userId]);
+       ORDER BY pb.fecha_creacion DESC`, [userId, userEmail]);
         res.json(result.rows);
     }
     catch (error) {
