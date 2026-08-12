@@ -19,6 +19,7 @@ import {
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api";
 const TOTAL_STEPS = 4;
+// v2.0 - embarazo flow fix
 
 // ─── Input reutilizable FUERA de cualquier componente (fix de re-render) ──────
 interface InputFieldProps {
