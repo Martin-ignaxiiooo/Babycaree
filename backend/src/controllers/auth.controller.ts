@@ -53,7 +53,7 @@ export const register = async (req: Request, res: Response) => {
     // Vincular invitaciones pendientes a esta cuenta recién creada
     await query(
       `UPDATE accesos_compartidos_bebe SET id_usuario_invitado = $1, estado = 'activo'
-       WHERE LOWER(correo_invitado) = LOWER($2) AND id_usuario_invitado IS NULL`,
+       WHERE LOWER(correo_invitado) = LOWER($2) AND estado = 'pendiente'`,
       [newUser.id, email]
     ).catch(() => {}); // No fallar si hay error en este paso
 
@@ -147,7 +147,7 @@ export const login = async (req: Request, res: Response) => {
     // Vincular invitaciones pendientes por email a esta cuenta
     await query(
       `UPDATE accesos_compartidos_bebe SET id_usuario_invitado = $1, estado = 'activo'
-       WHERE LOWER(correo_invitado) = LOWER($2) AND id_usuario_invitado IS NULL`,
+       WHERE LOWER(correo_invitado) = LOWER($2) AND estado = 'pendiente'`,
       [user.id, user.email]
     ).catch(() => {}); // No fallar si hay error en este paso
 

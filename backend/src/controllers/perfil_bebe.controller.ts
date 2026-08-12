@@ -152,10 +152,12 @@ export const invitarAcceso = async (req: Request, res: Response): Promise<void> 
     const userCheck = await query(`SELECT id FROM usuarios WHERE email = $1`, [correo_invitado]);
     const id_usuario_invitado = userCheck.rows.length > 0 ? userCheck.rows[0].id : null;
 
+    const estado = id_usuario_invitado ? 'activo' : 'pendiente';
+
     const insert = await query(
-      `INSERT INTO accesos_compartidos_bebe (id_perfil_bebe, id_usuario_invitado, correo_invitado, nivel_permiso, invitado_por, fecha_expiracion) 
-       VALUES ($1, $2, $3, $4, $5, now() + interval '7 days') RETURNING *`,
-      [id, id_usuario_invitado, correo_invitado, nivel_permiso, userId]
+      `INSERT INTO accesos_compartidos_bebe (id_perfil_bebe, id_usuario_invitado, correo_invitado, nivel_permiso, invitado_por, fecha_expiracion, estado) 
+       VALUES ($1, $2, $3, $4, $5, now() + interval '7 days', $6) RETURNING *`,
+      [id, id_usuario_invitado, correo_invitado, nivel_permiso, userId, estado]
     );
 
     // Run email sending in the background without awaiting to prevent hanging the API request
