@@ -4,8 +4,8 @@ import { verifyToken } from "../middlewares/auth.middleware";
 
 const router = Router();
 
-// Protect all public directory routes with normal user auth
-router.use(verifyToken);
+// Eliminar verifyToken para que sea público y pueda usarse en Onboarding (antes de iniciar sesión)
+// router.use(verifyToken);
 
 router.get("/previsiones", async (req: Request, res: Response) => {
   try {

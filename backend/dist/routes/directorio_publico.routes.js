@@ -2,10 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const db_1 = require("../config/db");
-const auth_middleware_1 = require("../middlewares/auth.middleware");
 const router = (0, express_1.Router)();
-// Protect all public directory routes with normal user auth
-router.use(auth_middleware_1.verifyToken);
+// Eliminar verifyToken para que sea público y pueda usarse en Onboarding (antes de iniciar sesión)
+// router.use(verifyToken);
 router.get("/previsiones", async (req, res) => {
     try {
         const result = await (0, db_1.query)(`SELECT codigo, nombre_visible 

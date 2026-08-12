@@ -462,7 +462,14 @@ function StepThree({ baby, setBaby, flow, error }: any) {
   useEffect(() => {
     fetch("https://babycare-backend-msyq.onrender.com/api/v1/directorio/previsiones")
       .then(r => r.json())
-      .then(data => setPrevisiones(data))
+      .then(data => {
+        if (Array.isArray(data)) {
+          setPrevisiones(data);
+        } else {
+          console.error("Respuesta inesperada de previsiones:", data);
+          setPrevisiones([]);
+        }
+      })
       .catch(e => console.error("Error fetching previsiones", e));
   }, []);
 
