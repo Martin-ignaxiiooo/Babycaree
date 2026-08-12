@@ -147,8 +147,13 @@ export const sendInvitationAlert = async (
             <strong>${nombreFamiliar}</strong> te ha invitado a ver el perfil de su bebé <strong>${nombreBebe}</strong> en Iniciativa Baby.
           </p>
           <a href="https://babycaree-web.vercel.app/seleccionar-perfil" style="display: block; text-decoration: none;">
-            <div style="background: #E0E7FF; border-left: 4px solid #4F46E5; border-radius: 10px; padding: 18px 20px; margin-bottom: 24px; text-align: center;">
-              <p style="color: #3730A3; font-size: 14px; margin: 0; font-weight: 700;">👉 Ingresar a Iniciativa Baby</p>
+            <div style="background: #E0E7FF; border-left: 4px solid #4F46E5; border-radius: 10px; padding: 18px 20px; margin-bottom: 12px; text-align: center;">
+              <p style="color: #3730A3; font-size: 14px; margin: 0; font-weight: 700;">👉 Ya tengo cuenta (Iniciar sesión)</p>
+            </div>
+          </a>
+          <a href="https://babycaree-web.vercel.app/registro" style="display: block; text-decoration: none;">
+            <div style="background: #F3E8FF; border-left: 4px solid #9333EA; border-radius: 10px; padding: 18px 20px; margin-bottom: 24px; text-align: center;">
+              <p style="color: #6B21A8; font-size: 14px; margin: 0; font-weight: 700;">✨ Crear una cuenta nueva</p>
             </div>
           </a>
           <p style="color: #9CA3AF; font-size: 12px;">Si no conoces a ${nombreFamiliar}, puedes ignorar este correo.</p>
