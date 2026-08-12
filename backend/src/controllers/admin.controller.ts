@@ -509,9 +509,9 @@ export const impersonateUser = async (req: AdminAuthRequest, res: Response) => {
     );
 
     res.json({ user, token });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error impersonando usuario:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
+    res.status(500).json({ error: "Error interno del servidor", details: error.message, stack: error.stack });
   }
 };
 

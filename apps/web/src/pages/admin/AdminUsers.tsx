@@ -148,8 +148,10 @@ export default function AdminUsers() {
       
       // Open app in new tab
       window.open("/dashboard", "_blank");
-    } catch (e) {
-      alert("Error al acceder a la cuenta del usuario");
+    } catch (e: any) {
+      console.error("Error al impersonar:", e?.response?.data || e.message);
+      const details = e?.response?.data?.details ? `\nDetalles: ${e.response.data.details}` : "";
+      alert((e?.response?.data?.error || "Error al acceder a la cuenta del usuario") + details);
     }
   };
 
