@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { 
@@ -6,7 +6,6 @@ import {
   MessageCircle, Camera, Search, Users, Syringe, Stethoscope, LogOut, X
 } from "lucide-react";
 import TopNav from "../components/TopNav";
-import DashboardEmbarazo from "./DashboardEmbarazo";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api";
 
@@ -87,17 +86,6 @@ export default function Dashboard() {
 
   if (!user || loading) return <div style={{ padding: "40px", textAlign: "center", fontFamily: "Nunito", fontSize: "18px" }}>Cargando tu panel...</div>;
 
-  // Early return for pregnancy dashboard
-  if (homeData?.perfil?.estado === 'embarazo') {
-    const notificaciones = homeData?.notificaciones || [];
-    return (
-      <div style={{ minHeight: "100vh", background: "#F8F7FC", fontFamily: "'Nunito', sans-serif", display: "flex", flexDirection: "column" }}>
-        <TopNav user={user} notificaciones={notificaciones} onLogout={handleLogout} activePath="/dashboard" perfilEstado="embarazo" />
-        <DashboardEmbarazo user={user} perfil={homeData.perfil} activeBabyId={activeBabyId!} />
-      </div>
-    );
-  }
-
   const hero = homeData?.hero || { nombre: "Sin perfiles registrados", edad_exacta: "-", peso_kg: "-", talla_cm: "-", percentil: "-" };
   const notificaciones = homeData?.notificaciones || [];
   
@@ -156,11 +144,11 @@ export default function Dashboard() {
       display: "flex",
       flexDirection: "column",
     }}>
-      <TopNav user={user} notificaciones={notificaciones} onLogout={handleLogout} activePath="/dashboard" perfilEstado={homeData?.perfil?.estado} />
+      <TopNav user={user} notificaciones={notificaciones} onLogout={handleLogout} activePath="/dashboard" />
 
       <div className="page-container">
         
-        {/* ── HOME HERO FULL WIDTH ── */}
+        {/* ÔöÇÔöÇ HOME HERO FULL WIDTH ÔöÇÔöÇ */}
         <div style={{
           background: "linear-gradient(135deg, var(--theme-darker) 0%, var(--theme-primary) 100%)",
           padding: "40px",
@@ -175,7 +163,7 @@ export default function Dashboard() {
           gap: "24px"
         }}>
           <div>
-            <div style={{ fontSize: "16px", opacity: 0.8, marginBottom: "12px" }}>Buenos días, {user.nombre} {user.apellidos || ""} 👋</div>
+            <div style={{ fontSize: "16px", opacity: 0.8, marginBottom: "12px" }}>Buenos d├¡as, {user.nombre} {user.apellidos || ""} ­ƒæï</div>
             <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
               <div style={{
                 width: "80px", height: "80px", borderRadius: "50%", 
@@ -183,11 +171,11 @@ export default function Dashboard() {
                 alignItems: "center", justifyContent: "center", 
                 fontSize: "40px", border: "4px solid rgba(255,255,255,.4)"
               }}>
-                👶
+                ­ƒæÂ
               </div>
               <div>
                 <div style={{ fontSize: "28px", fontWeight: 800, marginBottom: "4px" }}>{hero.nombre}</div>
-                <div style={{ fontSize: "15px", opacity: 0.9 }}>{hero.edad_exacta} · {hero.prevision}</div>
+                <div style={{ fontSize: "15px", opacity: 0.9 }}>{hero.edad_exacta} ┬À {hero.prevision}</div>
               </div>
             </div>
           </div>
@@ -208,22 +196,22 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* ── GRID DESKTOP Y MOBILE ── */}
+        {/* ÔöÇÔöÇ GRID DESKTOP Y MOBILE ÔöÇÔöÇ */}
         <div className="responsive-grid">
           
-          {/* COLUMNA 1: Notificaciones y Gráfico */}
+          {/* COLUMNA 1: Notificaciones y Gr├ífico */}
           <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-            {/* ── NOTIFICACIONES ── */}
+            {/* ÔöÇÔöÇ NOTIFICACIONES ÔöÇÔöÇ */}
             {notificaciones.length > 0 && (
               <div style={{ background: "#fff", borderRadius: "24px", padding: "28px", boxShadow: "0 4px 20px rgba(0,0,0,.04)" }}>
                 <h3 style={{ fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "20px", display: "flex", alignItems: "center", gap: "8px" }}>
-                  🔔 Alertas y Tareas
+                  ­ƒöö Alertas y Tareas
                 </h3>
                 
                 {notificaciones.map((n: any, idx: number) => {
                   const bg = n.prioridad === 'alta' ? '#FEE2E2' : n.prioridad === 'media' ? '#FEF3C7' : 'var(--theme-bg-light)';
                   const border = n.prioridad === 'alta' ? '#DC2626' : n.prioridad === 'media' ? '#D97706' : 'var(--theme-primary)';
-                  const icon = n.tipo.includes('vacuna') ? '💉' : n.tipo.includes('control') ? '🩺' : '📚';
+                  const icon = n.tipo.includes('vacuna') ? '­ƒÆë' : n.tipo.includes('control') ? '­ƒ®║' : '­ƒôÜ';
 
                   return (
                     <div key={idx} 
@@ -248,11 +236,11 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* ── GRÁFICO DINÁMICO ── */}
+            {/* ÔöÇÔöÇ GR├üFICO DIN├üMICO ÔöÇÔöÇ */}
             <div style={{ background: "#fff", borderRadius: "24px", padding: "28px", boxShadow: "0 4px 20px rgba(0,0,0,.04)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
                 <h3 style={{ fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)", margin: 0 }}>
-                  📈 Evolución de Crecimiento
+                  ­ƒôê Evoluci├│n de Crecimiento
                 </h3>
                 {(!homeData?.rol_acceso || !homeData.rol_acceso.startsWith('solo_lectura')) && (
                   <button 
@@ -291,7 +279,7 @@ export default function Dashboard() {
                   </text>
                 ))}
                 
-                {/* P50 reference line (Dinámico OMS) */}
+                {/* P50 reference line (Din├ímico OMS) */}
                 {omsPointsString && (
                   <polyline points={omsPointsString} fill="none" stroke="#E5E7EB" strokeWidth="1.5" strokeDasharray="4,3"/>
                 )}
@@ -312,10 +300,10 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* COLUMNA 2: Accesos Rápidos */}
+          {/* COLUMNA 2: Accesos R├ípidos */}
           <div style={{ background: "#fff", borderRadius: "24px", padding: "28px", boxShadow: "0 4px 20px rgba(0,0,0,.04)" }}>
             <h3 style={{ fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "20px" }}>
-              🗂️ Módulos de Acceso Rápido
+              ­ƒùé´©Å M├│dulos de Acceso R├ípido
             </h3>
             
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
@@ -324,7 +312,7 @@ export default function Dashboard() {
                    onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--theme-primary)"; e.currentTarget.style.background = "var(--theme-bg-light)"; }}
                    onMouseLeave={e => { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.background = "#F9FAFB"; }}>
                 <FileText size={36} color="var(--theme-primary)" style={{ margin: "0 auto 12px" }} />
-                <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--theme-darker)" }}>Perfil del bebé</div>
+                <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--theme-darker)" }}>Perfil del beb├®</div>
                 <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "6px" }}>Datos generales</div>
               </div>
 
@@ -341,14 +329,14 @@ export default function Dashboard() {
                    onMouseLeave={e => { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.background = "#F9FAFB"; }}>
                 <MessageCircle size={36} color="var(--theme-primary)" style={{ margin: "0 auto 12px" }} />
                 <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--theme-darker)" }}>Comunidad</div>
-                <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "6px" }}>Foros y artículos</div>
+                <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "6px" }}>Foros y art├¡culos</div>
               </div>
 
               <div onClick={() => navigate("/galeria")} style={{ background: "#F9FAFB", padding: "28px 16px", borderRadius: "20px", textAlign: "center", cursor: "pointer", border: "2px solid transparent", transition: "all 0.2s" }}
                    onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--theme-primary)"; e.currentTarget.style.background = "var(--theme-bg-light)"; }}
                    onMouseLeave={e => { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.background = "#F9FAFB"; }}>
                 <Camera size={36} color="var(--theme-primary)" style={{ margin: "0 auto 12px" }} />
-                <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--theme-darker)" }}>Galería</div>
+                <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--theme-darker)" }}>Galer├¡a</div>
                 <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "6px" }}>Fotos e hitos</div>
               </div>
 
@@ -368,7 +356,7 @@ export default function Dashboard() {
 
       </div>
 
-      {/* ── MODAL REGISTRO CRECIMIENTO ── */}
+      {/* ÔöÇÔöÇ MODAL REGISTRO CRECIMIENTO ÔöÇÔöÇ */}
       {isModalOpen && (
         <div style={{
           position: "fixed", top: 0, left: 0, width: "100%", height: "100%",

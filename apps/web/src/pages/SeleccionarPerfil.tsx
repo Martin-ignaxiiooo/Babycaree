@@ -298,19 +298,27 @@ export default function SeleccionarPerfil() {
                 </select>
               </div>
 
-                  {babyForm.es_prematuro && <Check size={14} color="white" />}
-                </div>
-                <span style={{ fontSize: "14px", fontWeight: 700, color: "var(--theme-darker)" }}>Mi bebé nació prematuro</span>
-              </div>
-
-              {babyForm.es_prematuro && (
-                <div>
-                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "6px" }}>Semanas de gestación al nacer *</label>
-                  <input required={babyForm.es_prematuro} type="number" min="20" max="36" placeholder="Ej: 34" value={babyForm.semanas_gestacion} onChange={(e) => setBabyForm({...babyForm, semanas_gestacion: e.target.value})} style={{ width: "100%", padding: "12px", border: "2px solid #E5E7EB", borderRadius: "12px", outline: "none", boxSizing: "border-box" }} />
+              {babyForm.flow === "hijo" && (
+                <div style={{ background: "rgba(124,92,191,0.03)", padding: "1.5rem", borderRadius: "16px", border: "1px solid rgba(124,92,191,0.1)" }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "14px", fontWeight: 700, color: "var(--theme-darker)", cursor: "pointer" }}>
+                    <div 
+                      onClick={() => setBabyForm({...babyForm, es_prematuro: !babyForm.es_prematuro})}
+                      style={{ width: "24px", height: "24px", borderRadius: "6px", border: "2px solid var(--theme-primary)", display: "flex", alignItems: "center", justifyContent: "center", background: babyForm.es_prematuro ? "var(--theme-primary)" : "transparent", cursor: "pointer" }}
+                    >
+                      {babyForm.es_prematuro && <Check size={14} color="white" />}
+                    </div>
+                    Mi bebé nació prematuro
+                  </label>
+                  {babyForm.es_prematuro && (
+                    <div style={{ marginTop: "1rem" }}>
+                      <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "6px" }}>Semanas de gestación al nacer *</label>
+                      <input required={babyForm.es_prematuro} type="number" min="20" max="36" placeholder="Ej: 34" value={babyForm.semanas_gestacion} onChange={(e) => setBabyForm({...babyForm, semanas_gestacion: e.target.value})} style={{ width: "100%", padding: "12px", border: "2px solid #E5E7EB", borderRadius: "12px", outline: "none", boxSizing: "border-box" }} />
+                    </div>
+                  )}
                 </div>
               )}
 
-              <button disabled={isSaving} type="submit" style={{ width: "100%", padding: "16px", background: "var(--theme-primary)", color: "white", border: "none", borderRadius: "16px", fontSize: "16px", fontWeight: 800, marginTop: "16px", cursor: "pointer", opacity: isSaving ? 0.7 : 1 }}>
+              <button disabled={isSaving} type="submit" style={{ width: "100%", padding: "16px", background: "var(--theme-primary)", color: "white", border: "none", borderRadius: "16px", fontSize: "16px", fontWeight: 800, marginTop: "8px", cursor: "pointer", opacity: isSaving ? 0.7 : 1 }}>
                 {isSaving ? "Guardando..." : "Guardar Perfil"}
               </button>
             </form>
