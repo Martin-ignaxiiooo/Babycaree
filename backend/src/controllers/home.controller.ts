@@ -297,7 +297,12 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
       notificaciones: notificaciones.slice(0, 3), // Max 3
       crecimiento,
       total_alertas,
-      rol_acceso
+      rol_acceso,
+      perfil: {
+        estado: perfil.estado,
+        fecha_estimada_parto: perfil.fecha_estimada_parto,
+        fecha_nacimiento: perfil.fecha_nacimiento
+      }
     });
 
   } catch (error) {

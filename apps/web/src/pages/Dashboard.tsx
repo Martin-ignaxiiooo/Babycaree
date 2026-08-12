@@ -6,6 +6,7 @@ import {
   MessageCircle, Camera, Search, Users, Syringe, Stethoscope, LogOut, X
 } from "lucide-react";
 import TopNav from "../components/TopNav";
+import DashboardEmbarazo from "./DashboardEmbarazo";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api";
 
@@ -144,10 +145,14 @@ export default function Dashboard() {
       display: "flex",
       flexDirection: "column",
     }}>
-      <TopNav user={user} notificaciones={notificaciones} onLogout={handleLogout} activePath="/dashboard" />
+      <TopNav user={user} notificaciones={notificaciones} onLogout={handleLogout} activePath="/dashboard" perfilEstado={homeData?.perfil?.estado} />
 
-      <div className="page-container">
-        
+      {homeData?.perfil?.estado === 'embarazo' ? (
+        <DashboardEmbarazo user={user} perfil={homeData.perfil} activeBabyId={activeBabyId!} />
+      ) : (
+        <div className="page-container">
+          
+
         {/* ── HOME HERO FULL WIDTH ── */}
         <div style={{
           background: "linear-gradient(135deg, var(--theme-darker) 0%, var(--theme-primary) 100%)",
@@ -353,8 +358,7 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-
-      </div>
+      )}
 
       {/* ── MODAL REGISTRO CRECIMIENTO ── */}
       {isModalOpen && (

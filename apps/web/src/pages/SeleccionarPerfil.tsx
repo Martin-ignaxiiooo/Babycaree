@@ -16,6 +16,7 @@ export default function SeleccionarPerfil() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [babyForm, setBabyForm] = useState({
+    flow: "hijo", // "hijo" | "embarazo"
     nombre: "",
     fecha_nacimiento: "",
     sexo: "",
@@ -80,9 +81,19 @@ export default function SeleccionarPerfil() {
     setIsSaving(true);
     try {
       const token = localStorage.getItem("token");
+      
+      let fechaEstimadaParto = null;
+      if (babyForm.flow === "embarazo" && babyForm.fecha_nacimiento) {
+        const fur = new Date(babyForm.fecha_nacimiento);
+        fur.setDate(fur.getDate() + 280);
+        fechaEstimadaParto = fur.toISOString().split('T')[0];
+      }
+
       await axios.post(`${API_URL}/profiles/babies`, {
         nombre: babyForm.nombre,
-        fecha_nacimiento: babyForm.fecha_nacimiento,
+        fecha_nacimiento: babyForm.flow === "hijo" ? babyForm.fecha_nacimiento : null,
+        estado: babyForm.flow === "embarazo" ? "embarazo" : "nacido",
+        fecha_estimada_parto: fechaEstimadaParto,
         sexo: babyForm.sexo || "N/A",
         prevision_salud: babyForm.prevision,
         es_prematuro: babyForm.es_prematuro,
@@ -93,7 +104,7 @@ export default function SeleccionarPerfil() {
         headers: { Authorization: `Bearer ${token}` }
       });
       setIsModalOpen(false);
-      setBabyForm({ nombre: "", fecha_nacimiento: "", sexo: "", prevision: "", es_prematuro: false, semanas_gestacion: "", peso: "", talla: "" });
+      setBabyForm({ flow: "hijo", nombre: "", fecha_nacimiento: "", sexo: "", prevision: "", es_prematuro: false, semanas_gestacion: "", peso: "", talla: "" });
       fetchBabies();
     } catch (err: any) {
       alert(err.response?.data?.error || "Error al crear el perfil.");
@@ -237,17 +248,34 @@ export default function SeleccionarPerfil() {
             >
               <X size={24} />
             </button>
-            <h2 style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "1.5rem" }}>Agregar un bebé</h2>
+            <h2 style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "1.5rem" }}>Agregar un perfil</h2>
             
+            <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+              <button 
+                type="button"
+                onClick={() => setBabyForm({...babyForm, flow: "hijo"})}
+                style={{ flex: 1, padding: "12px", borderRadius: "12px", border: babyForm.flow === "hijo" ? "2px solid var(--theme-primary)" : "2px solid #E5E7EB", background: babyForm.flow === "hijo" ? "rgba(124,92,191,0.05)" : "white", fontWeight: 700, color: babyForm.flow === "hijo" ? "var(--theme-primary)" : "#6B7280", cursor: "pointer" }}
+              >
+                Bebé Nacido
+              </button>
+              <button 
+                type="button"
+                onClick={() => setBabyForm({...babyForm, flow: "embarazo"})}
+                style={{ flex: 1, padding: "12px", borderRadius: "12px", border: babyForm.flow === "embarazo" ? "2px solid var(--theme-primary)" : "2px solid #E5E7EB", background: babyForm.flow === "embarazo" ? "rgba(124,92,191,0.05)" : "white", fontWeight: 700, color: babyForm.flow === "embarazo" ? "var(--theme-primary)" : "#6B7280", cursor: "pointer" }}
+              >
+                Estoy en Embarazo
+              </button>
+            </div>
+
             <form onSubmit={handleCreateBaby} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <div>
-                <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "6px" }}>Nombre del bebé *</label>
-                <input required type="text" placeholder="Ej: Sofía" value={babyForm.nombre} onChange={(e) => setBabyForm({...babyForm, nombre: e.target.value})} style={{ width: "100%", padding: "12px", border: "2px solid #E5E7EB", borderRadius: "12px", outline: "none", boxSizing: "border-box" }} />
+                <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "6px" }}>{babyForm.flow === "hijo" ? "Nombre del bebé *" : "Apodo o nombre del bebé *"}</label>
+                <input required type="text" placeholder={babyForm.flow === "hijo" ? "Ej: Sofía" : "Ej: Porotito"} value={babyForm.nombre} onChange={(e) => setBabyForm({...babyForm, nombre: e.target.value})} style={{ width: "100%", padding: "12px", border: "2px solid #E5E7EB", borderRadius: "12px", outline: "none", boxSizing: "border-box" }} />
               </div>
               
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem" }}>
                 <div>
-                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "6px" }}>Fecha nacimiento *</label>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "6px" }}>{babyForm.flow === "hijo" ? "Fecha nacimiento *" : "Última Regla (FUR) *"}</label>
                   <input required type="date" value={babyForm.fecha_nacimiento} onChange={(e) => setBabyForm({...babyForm, fecha_nacimiento: e.target.value})} max={new Date().toISOString().split("T")[0]} style={{ width: "100%", padding: "12px", border: "2px solid #E5E7EB", borderRadius: "12px", outline: "none", boxSizing: "border-box" }} />
                 </div>
                 <div>
@@ -270,23 +298,6 @@ export default function SeleccionarPerfil() {
                 </select>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem" }}>
-                <div>
-                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "6px" }}>Peso al nacer (kg)</label>
-                  <input type="number" step="0.01" min="0.5" max="6" placeholder="Ej: 3.2" value={babyForm.peso} onChange={(e) => setBabyForm({...babyForm, peso: e.target.value})} style={{ width: "100%", padding: "12px", border: "2px solid #E5E7EB", borderRadius: "12px", outline: "none", boxSizing: "border-box" }} />
-                  <span style={{ fontSize: "10px", color: "#6B7280" }}>Mín: 0.5kg, Máx: 6kg</span>
-                </div>
-                <div>
-                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "6px" }}>Talla al nacer (cm)</label>
-                  <input type="number" step="0.1" placeholder="Ej: 50.5" value={babyForm.talla} onChange={(e) => setBabyForm({...babyForm, talla: e.target.value})} style={{ width: "100%", padding: "12px", border: "2px solid #E5E7EB", borderRadius: "12px", outline: "none", boxSizing: "border-box" }} />
-                </div>
-              </div>
-
-              <div 
-                onClick={() => setBabyForm({...babyForm, es_prematuro: !babyForm.es_prematuro})}
-                style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", marginTop: "10px" }}
-              >
-                <div style={{ width: "20px", height: "20px", borderRadius: "6px", border: `2px solid ${babyForm.es_prematuro ? "var(--theme-primary)" : "#CCC"}`, background: babyForm.es_prematuro ? "var(--theme-primary)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   {babyForm.es_prematuro && <Check size={14} color="white" />}
                 </div>
                 <span style={{ fontSize: "14px", fontWeight: 700, color: "var(--theme-darker)" }}>Mi bebé nació prematuro</span>

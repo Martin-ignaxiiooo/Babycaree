@@ -7,9 +7,10 @@ interface TopNavProps {
   notificaciones?: any[];
   onLogout?: () => void;
   activePath?: string;
+  perfilEstado?: string;
 }
 
-export default function TopNav({ user, notificaciones = [], onLogout, activePath = "/dashboard" }: TopNavProps) {
+export default function TopNav({ user, notificaciones = [], onLogout, activePath = "/dashboard", perfilEstado }: TopNavProps) {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -42,18 +43,22 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
       >
         Comunidad
       </span>
-      <span 
-        style={{ cursor: "pointer", color: activePath.includes("directorio") ? "var(--theme-light)" : "white" }} 
-        onClick={() => { setMobileMenuOpen(false); navigate("/directorio"); }}
-      >
-        Directorio
-      </span>
-      <span 
-        style={{ cursor: "pointer", color: activePath.includes("galeria") ? "var(--theme-light)" : "white" }} 
-        onClick={() => { setMobileMenuOpen(false); navigate("/galeria"); }}
-      >
-        Galería
-      </span>
+      {perfilEstado !== "embarazo" && (
+        <>
+          <span 
+            style={{ cursor: "pointer", color: activePath.includes("directorio") ? "var(--theme-light)" : "white" }} 
+            onClick={() => { setMobileMenuOpen(false); navigate("/directorio"); }}
+          >
+            Directorio
+          </span>
+          <span 
+            style={{ cursor: "pointer", color: activePath.includes("galeria") ? "var(--theme-light)" : "white" }} 
+            onClick={() => { setMobileMenuOpen(false); navigate("/galeria"); }}
+          >
+            Galería
+          </span>
+        </>
+      )}
     </>
   );
 

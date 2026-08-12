@@ -1097,11 +1097,20 @@ export default function Onboarding() {
         localStorage.setItem("token", userToken);
         localStorage.setItem("user", JSON.stringify(authRes.data.user));
 
+        let fechaEstimadaParto = null;
+        if (flow === "embarazo" && baby.fecha_nacimiento) {
+          const fur = new Date(baby.fecha_nacimiento);
+          fur.setDate(fur.getDate() + 280);
+          fechaEstimadaParto = fur.toISOString().split('T')[0];
+        }
+
         const babyRes = await axios.post(
           `https://babycare-backend-msyq.onrender.com/api/profiles/babies`,
           {
             nombre: baby.nombre,
-            fecha_nacimiento: baby.fecha_nacimiento,
+            fecha_nacimiento: flow === "hijo" ? baby.fecha_nacimiento : null,
+            estado: flow === "embarazo" ? "embarazo" : "nacido",
+            fecha_estimada_parto: fechaEstimadaParto,
             sexo: baby.sexo || "N/A",
             prevision_salud: baby.prevision,
             es_prematuro: baby.es_prematuro,

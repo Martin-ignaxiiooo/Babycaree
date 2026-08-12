@@ -148,3 +148,68 @@ export const createControl = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ error: "Error interno del servidor" });
   }
 };
+
+export const getCitas = async (req: AuthRequest, res: Response) => {
+  try {
+    const { bebeId } = req.params;
+    
+    const accessCheck = await query(
+      `SELECT b.id FROM perfiles_bebes b WHERE b.id = $1 AND b.usuario_id = $2
+       UNION
+       SELECT a.id_perfil_bebe FROM accesos_compartidos_bebe a 
+       WHERE a.id_perfil_bebe = $1 AND a.id_usuario_invitado = $2 AND a.estado = 'activo'`,
+      [bebeId, req.user.id]
+    );
+
+    if (accessCheck.rows.length === 0) {
+      return res.status(403).json({ error: "No tienes permiso para ver este perfil" });
+    }
+
+    const result = await query(`
+      SELECT id, especialidad, medico, lugar, fecha_cita, notas, estado, fecha_creacion
+      FROM citas_medicas
+      WHERE bebe_id = $1
+      ORDER BY fecha_cita ASC
+    `, [bebeId]);
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error en getCitas:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
+export const createCita = async (req: AuthRequest, res: Response) => {
+  try {
+    const { bebeId } = req.params;
+    const { fecha_cita, medico, lugar, notas, especialidad } = req.body;
+
+    const accessCheck = await query(
+      `SELECT b.id FROM perfiles_bebes b WHERE b.id = $1 AND b.usuario_id = $2
+       UNION
+       SELECT a.id_perfil_bebe FROM accesos_compartidos_bebe a 
+       WHERE a.id_perfil_bebe = $1 AND a.id_usuario_invitado = $2 AND a.estado = 'activo' 
+       AND a.nivel_permiso NOT IN ('solo_lectura', 'solo_lectura_galeria')`,
+      [bebeId, req.user.id]
+    );
+
+    if (accessCheck.rows.length === 0) {
+      return res.status(403).json({ error: "No tienes permiso para modificar este perfil" });
+    }
+
+    if (!fecha_cita) {
+      return res.status(400).json({ error: "Falta la fecha de la cita" });
+    }
+
+    const result = await query(`
+      INSERT INTO citas_medicas (bebe_id, fecha_cita, medico, lugar, notas, especialidad, estado)
+      VALUES ($1, $2, $3, $4, $5, $6, 'programada')
+      RETURNING *
+    `, [bebeId, fecha_cita, medico || null, lugar || null, notas || null, especialidad || null]);
+
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error("Error en createCita:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};

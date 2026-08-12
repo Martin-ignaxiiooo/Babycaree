@@ -21,6 +21,14 @@ export default function Salud() {
   const [tallaInput, setTallaInput] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [rolAcceso, setRolAcceso] = useState<string>("propietario");
+  const [perfilEstado, setPerfilEstado] = useState<string>("nacido");
+
+  // Estado para Citas / Controles
+  const [citas, setCitas] = useState<any[]>([]);
+  const [fechaCita, setFechaCita] = useState("");
+  const [medico, setMedico] = useState("");
+  const [notas, setNotas] = useState("");
+  const [isSavingCita, setIsSavingCita] = useState(false);
 
   useEffect(() => {
     if (!token) {
@@ -42,14 +50,22 @@ export default function Salud() {
     if (bebeId && token) {
       if (activeTab === "vacunas") fetchVacunas();
       if (activeTab === "crecimiento") fetchCrecimientoData();
+      if (activeTab === "controles") fetchCitas();
       
-      // Fetch user role for this baby
+      // Fetch user role and profile state for this baby
       fetch(`https://babycare-backend-msyq.onrender.com/api/v1/home/${bebeId}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then(res => res.json())
       .then(data => {
         if (data.rol_acceso) setRolAcceso(data.rol_acceso);
+        if (data.perfil?.estado) {
+          setPerfilEstado(data.perfil.estado);
+          if (data.perfil.estado === "embarazo") {
+            setActiveTab("controles");
+            fetchCitas();
+          }
+        }
       })
       .catch(console.error);
     }
@@ -83,6 +99,19 @@ export default function Salud() {
     }
   };
 
+  const fetchCitas = async () => {
+    try {
+      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/citas`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setCitas(await res.json());
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handleSaveGrowth = async () => {
     if (!pesoInput || !tallaInput || !bebeId) return;
     setIsSaving(true);
@@ -103,6 +132,30 @@ export default function Salud() {
       alert("Error al guardar las medidas");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleSaveCita = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!fechaCita) return;
+    setIsSavingCita(true);
+    try {
+      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/citas`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ fecha_cita: fechaCita, medico, notas, especialidad: "Control" })
+      });
+      if (res.ok) {
+        setFechaCita("");
+        setMedico("");
+        setNotas("");
+        fetchCitas();
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Error al guardar la cita");
+    } finally {
+      setIsSavingCita(false);
     }
   };
 
@@ -191,7 +244,7 @@ export default function Salud() {
     <div style={{ minHeight: "100vh", background: "#F8F7FC", fontFamily: "'Nunito', sans-serif", display: "flex", flexDirection: "column" }}>
       
       {/* ── TOP NAV GLOBAL ── */}
-      <TopNav user={user} activePath="/salud" />
+      <TopNav user={user} activePath="/salud" perfilEstado={perfilEstado} />
 
       {/* ── HEADER ── */}
       <div style={{ background: "linear-gradient(135deg, var(--theme-darker) 0%, var(--theme-dark) 100%)", color: "#fff", padding: "48px 40px 0" }}>
@@ -211,24 +264,30 @@ export default function Salud() {
 
         {/* TABS */}
         <div className="responsive-overflow" style={{ display: "flex", gap: "32px", borderBottom: "1px solid rgba(255,255,255,0.1)", whiteSpace: "nowrap" }}>
-          <button 
-            style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "vacunas" ? "3px solid #fff" : "3px solid transparent", color: activeTab === "vacunas" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "16px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
-            onClick={() => setActiveTab("vacunas")}
-          >
-            <Syringe size={18} /> Vacunas PNI
-          </button>
+          {perfilEstado !== "embarazo" && (
+            <button 
+              style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "vacunas" ? "3px solid #fff" : "3px solid transparent", color: activeTab === "vacunas" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "16px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+              onClick={() => setActiveTab("vacunas")}
+            >
+              <Syringe size={18} /> Vacunas PNI
+            </button>
+          )}
+          
           <button 
             style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "controles" ? "3px solid #fff" : "3px solid transparent", color: activeTab === "controles" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "16px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
             onClick={() => setActiveTab("controles")}
           >
-            <Activity size={18} /> Controles Pediátricos
+            <Activity size={18} /> {perfilEstado === "embarazo" ? "Controles Prenatales" : "Controles Pediátricos"}
           </button>
-          <button 
-            style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "crecimiento" ? "3px solid #fff" : "3px solid transparent", color: activeTab === "crecimiento" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "16px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
-            onClick={() => setActiveTab("crecimiento")}
-          >
-            <Activity size={18} /> Crecimiento
-          </button>
+
+          {perfilEstado !== "embarazo" && (
+            <button 
+              style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "crecimiento" ? "3px solid #fff" : "3px solid transparent", color: activeTab === "crecimiento" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "16px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+              onClick={() => setActiveTab("crecimiento")}
+            >
+              <Activity size={18} /> Crecimiento
+            </button>
+          )}
         </div>
       </div>
 
@@ -298,11 +357,121 @@ export default function Salud() {
 
         {activeTab === "controles" && (
           <div style={{ background: "#fff", borderRadius: "16px", padding: "32px", boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}>
-            <h2 style={{ fontSize: "20px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "24px" }}>Controles Médicos</h2>
-            <div style={{ textAlign: "center", padding: "40px", color: "#6B7280" }}>
-              <div style={{ fontSize: "40px", marginBottom: "16px" }}>🩺</div>
-              <h3 style={{ fontSize: "18px", color: "var(--theme-darker)", marginBottom: "8px" }}>Módulo en construcción</h3>
-              <p>Pronto podrás registrar y programar los controles del Niño Sano aquí.</p>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
+              <h2 style={{ fontSize: "20px", fontWeight: 800, color: "var(--theme-darker)", margin: 0 }}>
+                {perfilEstado === "embarazo" ? "Controles Prenatales" : "Controles Médicos"}
+              </h2>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "30px" }}>
+              {loading ? (
+                <p style={{ color: "rgba(0,0,0,0.5)" }}>Cargando citas...</p>
+              ) : citas.length === 0 ? (
+                <p style={{ color: "rgba(0,0,0,0.5)", fontSize: "14px" }}>No tienes controles registrados aún.</p>
+              ) : (
+                citas.map(cita => {
+                  const date = new Date(cita.fecha_cita);
+                  const isPast = date < new Date();
+                  return (
+                    <div key={cita.id} style={{ 
+                      background: isPast ? "#F9FAFB" : "#FDF4FF", 
+                      borderRadius: "16px", 
+                      padding: "16px",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      borderLeft: `4px solid ${isPast ? "#E5E7EB" : "#D4A5E3"}`
+                    }}>
+                      <div>
+                        <h4 style={{ margin: "0 0 6px 0", fontSize: "16px", color: isPast ? "#6B7280" : "var(--theme-darker)" }}>
+                          {cita.notas || "Control Médico"}
+                        </h4>
+                        <div style={{ fontSize: "13px", color: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", gap: "10px" }}>
+                          <span>{cita.medico || "Sin especificar doctor"}</span>
+                          {cita.lugar && <span>• {cita.lugar}</span>}
+                        </div>
+                      </div>
+                      <div style={{ textAlign: "right" }}>
+                        <div style={{ fontWeight: 700, fontSize: "15px", color: isPast ? "#6B7280" : "#D4A5E3" }}>
+                          {date.toLocaleDateString("es-ES", { day: 'numeric', month: 'short' })}
+                        </div>
+                        <div style={{ fontSize: "12px", color: "rgba(0,0,0,0.5)" }}>
+                          {date.toLocaleTimeString("es-ES", { hour: '2-digit', minute:'2-digit' })}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Formulario Nueva Cita */}
+            <div style={{ borderTop: "1px solid #E5E7EB", paddingTop: "24px" }}>
+              <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "16px", color: "var(--theme-darker)" }}>Agregar Nueva Cita</h3>
+              
+              <form onSubmit={handleSaveCita} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+                  <div style={{ flex: "1 1 200px" }}>
+                    <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Fecha y Hora</label>
+                    <input 
+                      type="datetime-local" 
+                      value={fechaCita}
+                      onChange={e => setFechaCita(e.target.value)}
+                      required
+                      style={{ 
+                        width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", 
+                        background: "#fff", outline: "none", boxSizing: "border-box", fontFamily: "Nunito"
+                      }} 
+                    />
+                  </div>
+                  <div style={{ flex: "1 1 200px" }}>
+                    <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Doctor/Centro (Opcional)</label>
+                    <input 
+                      type="text" 
+                      placeholder="Ej. Dr. Silva - Centro Médico"
+                      value={medico}
+                      onChange={e => setMedico(e.target.value)}
+                      style={{ 
+                        width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", 
+                        background: "#fff", outline: "none", boxSizing: "border-box", fontFamily: "Nunito"
+                      }} 
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Notas / Título</label>
+                  <input 
+                    type="text" 
+                    placeholder="Ej. Ecografía Estructural"
+                    value={notas}
+                    onChange={e => setNotas(e.target.value)}
+                    style={{ 
+                      width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", 
+                      background: "#fff", outline: "none", boxSizing: "border-box", fontFamily: "Nunito"
+                    }} 
+                  />
+                </div>
+
+                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "8px" }}>
+                  <button 
+                    type="submit" 
+                    disabled={isSavingCita || !fechaCita}
+                    style={{ 
+                      background: isSavingCita || !fechaCita ? "#F3F4F6" : "var(--theme-primary)",
+                      color: isSavingCita || !fechaCita ? "#9CA3AF" : "#fff",
+                      border: "none",
+                      padding: "12px 24px",
+                      borderRadius: "12px",
+                      fontWeight: 700,
+                      cursor: isSavingCita || !fechaCita ? "not-allowed" : "pointer",
+                      transition: "all 0.2s"
+                    }}
+                  >
+                    {isSavingCita ? "Guardando..." : "Guardar Cita"}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}
