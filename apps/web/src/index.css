@@ -592,8 +592,28 @@ body {
   
   /* Form responsives */
   .auth-box {
-    padding: 24px !important;
-    width: 90% !important;
+    padding: 28px 24px !important;
+    border-radius: 20px !important;
+  }
+
+  /* Auth page layout: ocultar panel izquierdo, centrar el derecho */
+  #left-panel {
+    display: none !important;
+  }
+
+  .auth-right-panel {
+    flex: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 24px 16px !important;
+    min-height: 100vh !important;
+    width: 100% !important;
+  }
+
+  .auth-right-panel > div {
+    width: 100% !important;
+    max-width: 100% !important;
   }
   
   /* Tables and overflows */

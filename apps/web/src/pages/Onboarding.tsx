@@ -1350,6 +1350,7 @@ export default function Onboarding() {
 
       {/* Panel Derecho */}
       <div
+        className="auth-right-panel"
         style={{
           flex: 1,
           display: "flex",
