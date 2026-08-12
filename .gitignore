@@ -1,3 +1,18 @@
 node_modules/
 .env
+.env.*
 .DS_Store
+
+# Scripts temporales de migración/test con credenciales
+run_migration.js
+test_db.js
+test_smtp.js
+migrate*.js
+seed*.js
+
+# Archivos de log con posibles credenciales
+*.log
+backend_error.log
+
+# Dist no es necesario en el repositorio
+# backend/dist/
