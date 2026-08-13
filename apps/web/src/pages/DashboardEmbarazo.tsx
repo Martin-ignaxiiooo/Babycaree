@@ -146,12 +146,9 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
           }}>
             Semana {semanas} de 40
           </div>
-          <h1 style={{ fontSize: "32px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "6px", lineHeight: 1.15 }}>
+          <h1 style={{ fontSize: "32px", fontWeight: 800, color: "var(--theme-darker)", lineHeight: 1.15 }}>
             Seguimiento - Mes {mes} ({etiquetaMes})
           </h1>
-          <p style={{ fontSize: "16px", color: "#8A849C", fontWeight: 600 }}>
-            Acá vas a ver cómo crece tu bebé y llevar el registro de tus controles médicos.
-          </p>
         </div>
 
         <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", alignItems: "flex-start" }}>
