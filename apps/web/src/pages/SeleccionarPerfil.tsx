@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Plus, X, Check, Trash2 } from "lucide-react";
+import DateSelect from "../components/DateSelect";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api";
 
@@ -276,7 +277,7 @@ export default function SeleccionarPerfil() {
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem" }}>
                 <div>
                   <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "6px" }}>{babyForm.flow === "hijo" ? "Fecha nacimiento *" : "Última Regla (FUR) *"}</label>
-                  <input required type="date" lang="es-CL" value={babyForm.fecha_nacimiento} onChange={(e) => setBabyForm({...babyForm, fecha_nacimiento: e.target.value})} max={new Date().toISOString().split("T")[0]} style={{ width: "100%", padding: "12px", border: "2px solid #E5E7EB", borderRadius: "12px", outline: "none", boxSizing: "border-box" }} />
+                  <DateSelect required value={babyForm.fecha_nacimiento} onChange={(isoDate) => setBabyForm({...babyForm, fecha_nacimiento: isoDate})} max={new Date().toISOString().split("T")[0]} variant="light" />
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "6px" }}>Sexo</label>

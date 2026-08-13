@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Syringe, Activity, Save, CheckCircle, Bell, Plus, X } from "lucide-react";
 import TopNav from "../components/TopNav";
+import DateSelect from "../components/DateSelect";
 
 export default function Salud() {
   const navigate = useNavigate();
@@ -330,12 +331,11 @@ export default function Salud() {
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px", marginTop: "12px", padding: "16px", background: "#fff", borderRadius: "8px", border: "1px solid #DCFCE7" }}>
                           <div>
                             <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#166534", marginBottom: "4px" }}>Fecha de aplicación</label>
-                            <input 
-                              type="date" 
-                              lang="es-CL"
-                              defaultValue={vacuna.fecha_aplicacion ? vacuna.fecha_aplicacion.split('T')[0] : ""}
-                              onBlur={(e) => updateVacunaInfo(vacuna.vacuna_id, "fecha_aplicacion", e.target.value)}
-                              style={{ width: "100%", padding: "8px", border: "1px solid #E5E7EB", borderRadius: "6px", fontSize: "14px", outline: "none" }}
+                            <DateSelect
+                              value={vacuna.fecha_aplicacion ? vacuna.fecha_aplicacion.split('T')[0] : ""}
+                              onChange={(isoDate) => updateVacunaInfo(vacuna.vacuna_id, "fecha_aplicacion", isoDate)}
+                              max={new Date().toISOString().split('T')[0]}
+                              variant="light"
                             />
                           </div>
                           <div>
@@ -415,18 +415,13 @@ export default function Salud() {
               
               <form onSubmit={handleSaveCita} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                 <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
-                  <div style={{ flex: "1 1 160px" }}>
+                  <div style={{ flex: "1 1 220px" }}>
                     <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Fecha</label>
-                    <input 
-                      type="date" 
-                      lang="es-CL"
+                    <DateSelect
                       value={fechaCitaDate}
-                      onChange={e => setFechaCitaDate(e.target.value)}
+                      onChange={setFechaCitaDate}
                       required
-                      style={{ 
-                        width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", 
-                        background: "#fff", outline: "none", boxSizing: "border-box", fontFamily: "Nunito"
-                      }} 
+                      variant="light"
                     />
                   </div>
                   <div style={{ flex: "1 1 120px" }}>

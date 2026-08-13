@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import DateSelect from "../components/DateSelect";
 import {
   Shield,
   Heart,
@@ -504,30 +505,17 @@ function StepThree({ baby, setBaby, flow, error }: any) {
             {flow === "hijo" ? "Fecha nacimiento" : "Última Regla (FUR)"}{" "}
             <span style={{ color: "#F4A0A0" }}>*</span>
           </label>
-          <input
-            type="date"
-            lang="es-CL"
+          <DateSelect
             value={baby.fecha_nacimiento}
-            onChange={(e) =>
+            onChange={(isoDate) =>
               setBaby((prev: any) => ({
                 ...prev,
-                fecha_nacimiento: e.target.value,
+                fecha_nacimiento: isoDate,
               }))
             }
             max={new Date().toISOString().split("T")[0]}
-            style={{
-              width: "100%",
-              padding: "14px 18px",
-              border: "2px solid var(--theme-bg-light)",
-              borderRadius: "16px",
-              fontSize: "15px",
-              fontFamily: "'Nunito', sans-serif",
-              fontWeight: 500,
-              color: "var(--theme-darker)",
-              background: "#FDFCFF",
-              outline: "none",
-              boxSizing: "border-box",
-            }}
+            required
+            variant="light"
           />
         </div>
         <div>

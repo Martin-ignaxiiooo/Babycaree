@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Calendar, Heart } from "lucide-react";
+import DateSelect from "../components/DateSelect";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api";
 
@@ -219,17 +220,13 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
             
             <form onSubmit={handleSaveCita} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
-                <div style={{ flex: "1 1 160px" }}>
+                <div style={{ flex: "1 1 220px" }}>
                   <label style={{ display: "block", fontSize: "12px", fontWeight: 700, marginBottom: "8px", color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Fecha</label>
-                  <input 
-                    type="date" 
-                    lang="es-CL"
+                  <DateSelect
                     value={fechaCitaDate}
-                    onChange={e => setFechaCitaDate(e.target.value)}
+                    onChange={setFechaCitaDate}
                     required
-                    style={inputStyle} 
-                    onFocus={(e) => { e.target.style.borderColor = "var(--theme-light)"; e.target.style.background = "rgba(255,255,255,0.14)"; }}
-                    onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.15)"; e.target.style.background = "rgba(255,255,255,0.08)"; }}
+                    variant="dark"
                   />
                 </div>
                 <div style={{ flex: "1 1 120px" }}>

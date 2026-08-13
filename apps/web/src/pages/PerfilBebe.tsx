@@ -5,6 +5,7 @@ import {
   ArrowLeft, Camera, User, Search, Lock, Bell
 } from "lucide-react";
 import TopNav from "../components/TopNav";
+import DateSelect from "../components/DateSelect";
 
 export default function PerfilBebe() {
   const { id } = useParams();
@@ -390,7 +391,7 @@ export default function PerfilBebe() {
                 <div style={{ display: "flex", gap: "16px" }}>
                   <div style={{ flex: 1 }}>
                     <label style={labelStyle}>Fecha de nacimiento</label>
-                    {editMode ? <input type="date" lang="es-CL" name="fecha_nacimiento" max={new Date().toISOString().split('T')[0]} value={editData.fecha_nacimiento ? editData.fecha_nacimiento.split('T')[0] : ""} onChange={handleChange} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.fecha_nacimiento ? new Date(perfil.fecha_nacimiento).toLocaleDateString('es-CL') : "-"}</div>}
+                    {editMode ? <DateSelect value={editData.fecha_nacimiento ? editData.fecha_nacimiento.split('T')[0] : ""} onChange={(isoDate) => setEditData({ ...editData, fecha_nacimiento: isoDate })} max={new Date().toISOString().split('T')[0]} variant="light" /> : <div style={readOnlyStyle}>{perfil.fecha_nacimiento ? new Date(perfil.fecha_nacimiento).toLocaleDateString('es-CL') : "-"}</div>}
                   </div>
                   <div style={{ flex: 1 }}>
                     <label style={labelStyle}>Previsión de salud</label>
