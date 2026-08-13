@@ -99,15 +99,40 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
       ? parseFloat(growthRes.rows[0].talla_cm) 
       : (perfil.talla_nacimiento_cm ? parseFloat(perfil.talla_nacimiento_cm) : 0);
 
+    let fruta_embarazo = null;
+    let semanas_embarazo = null;
+
+    if (perfil.estado === 'embarazo' && perfil.fecha_estimada_parto) {
+      const fur = new Date(perfil.fecha_estimada_parto);
+      fur.setDate(fur.getDate() - 280); 
+      const hoy = new Date();
+      const diffTime = Math.abs(hoy.getTime() - fur.getTime());
+      semanas_embarazo = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 7));
+      if (semanas_embarazo > 42) semanas_embarazo = 42;
+      if (semanas_embarazo < 1) semanas_embarazo = 1;
+
+      const frutaRes = await query(
+        `SELECT fruta FROM embarazo_hitos_tamano WHERE semana = $1`,
+        [semanas_embarazo]
+      );
+      if (frutaRes.rows.length > 0) {
+        fruta_embarazo = frutaRes.rows[0].fruta;
+      } else {
+        fruta_embarazo = semanas_embarazo < 4 ? "Semillita" : "Sandía";
+      }
+    }
+
     // 3. Build Hero Object
     const hero = {
       id: perfil.id,
       nombre: perfil.nombre,
-      edad_exacta: calculateExactAge(perfil.fecha_nacimiento),
+      edad_exacta: perfil.fecha_nacimiento ? calculateExactAge(perfil.fecha_nacimiento) : "En gestación",
       prevision: perfil.nombre_prevision || perfil.prevision_salud || "Sin previsión", 
       peso_kg,
       talla_cm,
-      percentil: calculateApproxPercentile(peso_kg, perfil.fecha_nacimiento)
+      percentil: perfil.fecha_nacimiento ? calculateApproxPercentile(peso_kg, perfil.fecha_nacimiento) : 0,
+      semanas_embarazo,
+      fruta_embarazo
     };
 
     // 4. Fetch Notifications
@@ -301,7 +326,9 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
       perfil: {
         estado: perfil.estado,
         fecha_estimada_parto: perfil.fecha_estimada_parto,
-        fecha_nacimiento: perfil.fecha_nacimiento
+        fecha_nacimiento: perfil.fecha_nacimiento,
+        semanas_embarazo,
+        fruta_embarazo
       }
     });
 

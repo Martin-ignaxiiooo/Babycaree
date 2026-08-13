@@ -66,35 +66,13 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
     }
   };
 
-  // Calcular semanas de gestación
-  let semanas = 0;
+  // Extraer datos del backend
+  const semanas = perfil?.semanas_embarazo || 0;
   let porcentaje = 0;
-  
-  if (perfil?.fecha_estimada_parto) {
-    const fur = new Date(perfil.fecha_estimada_parto);
-    // Asumiendo que fecha_estimada_parto es la FPP y no la FUR, restamos 280 días (40 semanas) para sacar la FUR
-    fur.setDate(fur.getDate() - 280); 
-    
-    const hoy = new Date();
-    const diffTime = Math.abs(hoy.getTime() - fur.getTime());
-    semanas = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 7));
-    if (semanas > 40) semanas = 40;
-    
+  if (semanas > 0) {
     porcentaje = Math.round((semanas / 40) * 100);
   }
-
-  // Frutas por semana
-  const frutasSemanas: Record<number, string> = {
-    4: "Semilla de Amapola", 5: "Semilla de Sésamo", 6: "Lenteja", 7: "Arándano",
-    8: "Frambuesa", 9: "Uva", 10: "Aceituna", 11: "Higo", 12: "Ciruela", 13: "Melocotón",
-    14: "Limón", 15: "Manzana", 16: "Aguacate", 17: "Nabo", 18: "Pimiento", 19: "Tomate",
-    20: "Plátano", 21: "Zanahoria", 22: "Papaya", 23: "Toronja", 24: "Berenjena",
-    25: "Coliflor", 26: "Lechuga", 27: "Nabo", 28: "Berenjena grande", 29: "Calabaza bellota",
-    30: "Repollo", 31: "Coco", 32: "Jícama", 33: "Piña", 34: "Melón", 35: "Melón verde",
-    36: "Lechuga romana", 37: "Acelga", 38: "Puerro", 39: "Mini sandía", 40: "Sandía pequeña"
-  };
-
-  const frutaActual = frutasSemanas[semanas] || (semanas < 4 ? "Semillita" : "Sandía");
+  const frutaActual = perfil?.fruta_embarazo || "Semillita";
 
   return (
     <div style={{ padding: "40px 20px", maxWidth: "1000px", margin: "0 auto", fontFamily: "Nunito" }}>
