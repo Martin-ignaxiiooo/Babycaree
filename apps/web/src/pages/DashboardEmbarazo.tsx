@@ -203,7 +203,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
             </div>
           </div>
 
-          <div style={{ flex: "1 1 380px", display: "flex", flexDirection: "column", gap: "24px", minWidth: 0 }}>
+          <div style={{ flex: "1 1 320px", display: "flex", flexDirection: "column", gap: "24px", minWidth: 0 }}>
 
             {/* TARJETA 2: Controles Prenatales */}
             <div style={cardStyle}>
