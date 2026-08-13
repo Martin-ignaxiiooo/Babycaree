@@ -32,10 +32,10 @@ import comunidadRouter from "../microservices/comunidad/comunidad.routes";
 const router = Router();
 
 // Auth routes
-import { loginLimiter } from "../middlewares/rateLimit.middleware";
+import { loginLimiter, adminTwoFaLimiter } from "../middlewares/rateLimit.middleware";
 
 router.post("/auth/login", loginLimiter, login);
-router.post("/auth/verificar-2fa", verify2fa);
+router.post("/auth/verificar-2fa", adminTwoFaLimiter, verify2fa);
 
 // Seed admin
 router.get("/seed", seedAdmin);

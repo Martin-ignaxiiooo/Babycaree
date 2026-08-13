@@ -68,6 +68,18 @@ router.post("/foros", async (req: AuthRequest, res: Response) => {
     const userId = req.user.id;
     const { titulo, contenido, categoria } = req.body;
 
+    if (typeof titulo !== "string" || typeof contenido !== "string") {
+      return res.status(400).json({ error: "Título y contenido son obligatorios" });
+    }
+    const tituloTrim = titulo.trim();
+    const contenidoTrim = contenido.trim();
+    if (tituloTrim.length === 0 || tituloTrim.length > 200) {
+      return res.status(400).json({ error: "El título debe tener entre 1 y 200 caracteres" });
+    }
+    if (contenidoTrim.length === 0 || contenidoTrim.length > 5000) {
+      return res.status(400).json({ error: "El contenido debe tener entre 1 y 5000 caracteres" });
+    }
+
     // Obtener nombre del usuario
     const userRes = await query("SELECT nombre, apellidos FROM usuarios WHERE id = $1", [userId]);
     const autorNombre = `${userRes.rows[0].nombre} ${userRes.rows[0].apellidos}`;
@@ -76,7 +88,7 @@ router.post("/foros", async (req: AuthRequest, res: Response) => {
       INSERT INTO comunidad_foros (titulo, contenido, autor_nombre, categoria, usuario_id, tiempo_publicacion)
       VALUES ($1, $2, $3, $4, $5, 'Hace un momento')
       RETURNING *
-    `, [titulo, contenido, autorNombre, categoria || 'General', userId]);
+    `, [tituloTrim, contenidoTrim, autorNombre, categoria || 'General', userId]);
 
     res.status(201).json(result.rows[0]);
   } catch (error) {
@@ -118,6 +130,14 @@ router.post("/foros/:id/respuestas", async (req: AuthRequest, res: Response) => 
     const foroId = req.params.id;
     const { contenido } = req.body;
 
+    if (typeof contenido !== "string") {
+      return res.status(400).json({ error: "El contenido es obligatorio" });
+    }
+    const contenidoTrim = contenido.trim();
+    if (contenidoTrim.length === 0 || contenidoTrim.length > 2000) {
+      return res.status(400).json({ error: "El contenido debe tener entre 1 y 2000 caracteres" });
+    }
+
     const userRes = await query("SELECT nombre, apellidos FROM usuarios WHERE id = $1", [userId]);
     const autorNombre = `${userRes.rows[0].nombre} ${userRes.rows[0].apellidos}`;
 
@@ -125,7 +145,7 @@ router.post("/foros/:id/respuestas", async (req: AuthRequest, res: Response) => 
       INSERT INTO comunidad_respuestas (foro_id, usuario_id, autor_nombre, contenido)
       VALUES ($1, $2, $3, $4)
       RETURNING *
-    `, [foroId, userId, autorNombre, contenido]);
+    `, [foroId, userId, autorNombre, contenidoTrim]);
 
     // Incrementar contador de respuestas
     await query("UPDATE comunidad_foros SET respuestas = respuestas + 1 WHERE id = $1", [foroId]);

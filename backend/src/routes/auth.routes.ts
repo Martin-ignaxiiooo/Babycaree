@@ -9,13 +9,14 @@ import {
 } from "../controllers/auth.controller";
 import {
   loginLimiter,
+  registerLimiter,
   forgotPasswordLimiter,
   codeVerifyLimiter,
 } from "../middlewares/rateLimit.middleware";
 
 const router = Router();
 
-router.post("/register", register);
+router.post("/register", registerLimiter, register);
 router.post("/login", loginLimiter, login);
 router.post("/forgot-password", forgotPasswordLimiter, forgotPassword);
 router.post("/verify-code", codeVerifyLimiter, verifyCode);
