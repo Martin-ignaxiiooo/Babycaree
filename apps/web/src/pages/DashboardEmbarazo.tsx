@@ -159,7 +159,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
             Tamaño del Bebé
           </h2>
 
-          <BabyGrowthIcon porcentaje={porcentaje} />
+          <BabyGrowthIcon semanas={semanas} porcentaje={porcentaje} />
 
           <div style={{ width: "100%", marginTop: "20px" }}>
             <div style={{ width: "100%", background: "var(--theme-bg-light)", borderRadius: "10px", height: "8px", overflow: "hidden", marginBottom: "10px" }}>
