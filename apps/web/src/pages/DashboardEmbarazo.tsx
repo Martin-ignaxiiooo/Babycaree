@@ -14,7 +14,9 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
   const [citas, setCitas] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
-  const [fechaCita, setFechaCita] = useState("");
+  const [fechaCitaDate, setFechaCitaDate] = useState("");
+  const [fechaCitaTime, setFechaCitaTime] = useState("");
+  const fechaCita = fechaCitaDate && fechaCitaTime ? `${fechaCitaDate}T${fechaCitaTime}` : "";
   const [medico, setMedico] = useState("");
   const [notas, setNotas] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -54,7 +56,8 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      setFechaCita("");
+      setFechaCitaDate("");
+      setFechaCitaTime("");
       setMedico("");
       setNotas("");
       fetchCitas();
@@ -216,13 +219,26 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
             
             <form onSubmit={handleSaveCita} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
-                <div style={{ flex: "1 1 200px" }}>
-                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, marginBottom: "8px", color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Fecha y Hora</label>
+                <div style={{ flex: "1 1 160px" }}>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, marginBottom: "8px", color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Fecha</label>
                   <input 
-                    type="datetime-local" 
+                    type="date" 
                     lang="es-CL"
-                    value={fechaCita}
-                    onChange={e => setFechaCita(e.target.value)}
+                    value={fechaCitaDate}
+                    onChange={e => setFechaCitaDate(e.target.value)}
+                    required
+                    style={inputStyle} 
+                    onFocus={(e) => { e.target.style.borderColor = "var(--theme-light)"; e.target.style.background = "rgba(255,255,255,0.14)"; }}
+                    onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.15)"; e.target.style.background = "rgba(255,255,255,0.08)"; }}
+                  />
+                </div>
+                <div style={{ flex: "1 1 120px" }}>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, marginBottom: "8px", color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Hora</label>
+                  <input 
+                    type="time" 
+                    lang="es-CL"
+                    value={fechaCitaTime}
+                    onChange={e => setFechaCitaTime(e.target.value)}
                     required
                     style={inputStyle} 
                     onFocus={(e) => { e.target.style.borderColor = "var(--theme-light)"; e.target.style.background = "rgba(255,255,255,0.14)"; }}

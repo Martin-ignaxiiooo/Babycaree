@@ -25,7 +25,9 @@ export default function Salud() {
 
   // Estado para Citas / Controles
   const [citas, setCitas] = useState<any[]>([]);
-  const [fechaCita, setFechaCita] = useState("");
+  const [fechaCitaDate, setFechaCitaDate] = useState("");
+  const [fechaCitaTime, setFechaCitaTime] = useState("");
+  const fechaCita = fechaCitaDate && fechaCitaTime ? `${fechaCitaDate}T${fechaCitaTime}` : "";
   const [medico, setMedico] = useState("");
   const [notas, setNotas] = useState("");
   const [isSavingCita, setIsSavingCita] = useState(false);
@@ -146,7 +148,8 @@ export default function Salud() {
         body: JSON.stringify({ fecha_cita: fechaCita, medico, notas, especialidad: "Control" })
       });
       if (res.ok) {
-        setFechaCita("");
+        setFechaCitaDate("");
+        setFechaCitaTime("");
         setMedico("");
         setNotas("");
         fetchCitas();
@@ -394,10 +397,10 @@ export default function Salud() {
                       </div>
                       <div style={{ textAlign: "right" }}>
                         <div style={{ fontWeight: 700, fontSize: "15px", color: isPast ? "#6B7280" : "#D4A5E3" }}>
-                          {date.toLocaleDateString("es-ES", { day: 'numeric', month: 'short' })}
+                          {date.toLocaleDateString("es-CL", { day: 'numeric', month: 'short' })}
                         </div>
                         <div style={{ fontSize: "12px", color: "rgba(0,0,0,0.5)" }}>
-                          {date.toLocaleTimeString("es-ES", { hour: '2-digit', minute:'2-digit' })}
+                          {date.toLocaleTimeString("es-CL", { hour: '2-digit', minute:'2-digit' })}
                         </div>
                       </div>
                     </div>
@@ -412,13 +415,27 @@ export default function Salud() {
               
               <form onSubmit={handleSaveCita} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                 <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
-                  <div style={{ flex: "1 1 200px" }}>
-                    <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Fecha y Hora</label>
+                  <div style={{ flex: "1 1 160px" }}>
+                    <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Fecha</label>
                     <input 
-                      type="datetime-local" 
+                      type="date" 
                       lang="es-CL"
-                      value={fechaCita}
-                      onChange={e => setFechaCita(e.target.value)}
+                      value={fechaCitaDate}
+                      onChange={e => setFechaCitaDate(e.target.value)}
+                      required
+                      style={{ 
+                        width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", 
+                        background: "#fff", outline: "none", boxSizing: "border-box", fontFamily: "Nunito"
+                      }} 
+                    />
+                  </div>
+                  <div style={{ flex: "1 1 120px" }}>
+                    <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Hora</label>
+                    <input 
+                      type="time" 
+                      lang="es-CL"
+                      value={fechaCitaTime}
+                      onChange={e => setFechaCitaTime(e.target.value)}
                       required
                       style={{ 
                         width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", 
