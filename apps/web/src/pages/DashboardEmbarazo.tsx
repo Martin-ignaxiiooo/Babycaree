@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Calendar, CalendarPlus, Plus } from "lucide-react";
+import { Calendar, CalendarPlus, Plus, Sparkles } from "lucide-react";
 import DateSelect from "../components/DateSelect";
 import TimeSelect from "../components/TimeSelect";
 import BabyGrowthIcon, { HITOS_POR_MES, ETIQUETA_POR_MES, SEMANA_RANGO_POR_MES, mesDesdeSemanas } from "../components/BabyGrowthIcon";
@@ -195,10 +195,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
               </div>
 
               <div>
-                <p style={{ fontSize: "15px", color: "#6B647F", lineHeight: 1.6, margin: "0 0 10px 0" }}>
-                  {hito}
-                </p>
-                <p style={{ fontSize: "14px", color: "#8A849C", lineHeight: 1.5, margin: 0 }}>
+                <p style={{ fontSize: "15px", color: "#6B647F", lineHeight: 1.5, margin: 0 }}>
                   Tiene el tamaño de un/a{" "}
                   <strong style={{ color: "#E8607F" }}>{frutaActual}</strong>.
                 </p>
@@ -357,6 +354,27 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
 
           </div>
         </div>
+
+        {/* TARJETA 4: Texto del hito de la semana (ancho completo) */}
+        {hito && (
+          <div style={{ ...cardStyle, marginTop: "24px" }}>
+            <div style={cardHeaderBannerStyle}>
+              <Sparkles size={18} />
+              Tu semana {semanas}
+            </div>
+            <div style={{ padding: "24px" }}>
+              <p style={{
+                fontSize: "15px",
+                color: "#6B647F",
+                lineHeight: 1.7,
+                margin: 0,
+                whiteSpace: "pre-line",
+              }}>
+                {hito}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
