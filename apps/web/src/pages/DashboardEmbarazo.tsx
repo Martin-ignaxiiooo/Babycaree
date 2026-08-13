@@ -80,6 +80,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
   }
   const mes = mesDesdeSemanas(semanas);
   const hito = HITOS_POR_MES[mes];
+  const frutaActual = perfil?.fruta_embarazo || "Semillita";
   const etiquetaMes = ETIQUETA_POR_MES[mes];
   const rangoSemana = SEMANA_RANGO_POR_MES[mes];
 
@@ -192,9 +193,15 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
                 </div>
               </div>
 
-              <p style={{ fontSize: "15px", color: "#6B647F", lineHeight: 1.5, margin: 0 }}>
-                {hito}
-              </p>
+              <div>
+                <p style={{ fontSize: "15px", color: "#6B647F", lineHeight: 1.5, margin: "0 0 6px 0" }}>
+                  {hito}
+                </p>
+                <p style={{ fontSize: "14px", color: "#8A849C", lineHeight: 1.5, margin: 0 }}>
+                  Tiene el tamaño de un/a{" "}
+                  <strong style={{ color: "#E8607F" }}>{frutaActual}</strong>.
+                </p>
+              </div>
             </div>
           </div>
 
