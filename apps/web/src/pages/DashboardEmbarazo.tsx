@@ -130,19 +130,10 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
   return (
     <div style={{
       padding: "40px clamp(12px, 4vw, 20px)",
-      background: "linear-gradient(135deg, var(--theme-bg-light) 0%, #FDF2F2 50%, var(--theme-bg-light) 100%)",
-      minHeight: "100%",
+      background: "linear-gradient(135deg, var(--theme-primary) 0%, #F4A0A0 50%, var(--theme-light) 100%)",
+      minHeight: "100vh",
+      flex: 1,
     }}>
-      <div style={{
-        maxWidth: "1060px", margin: "0 auto",
-        background: "linear-gradient(135deg, var(--theme-primary) 0%, #F4A0A0 50%, var(--theme-light) 100%)",
-        borderRadius: "28px", padding: "3px",
-        boxShadow: "0 12px 40px rgba(124, 92, 191, 0.2)",
-      }}>
-        <div style={{
-          background: "linear-gradient(160deg, var(--theme-bg-light) 0%, #FDF2F2 50%, #F3EEFB 100%)",
-          borderRadius: "26px", padding: "clamp(20px, 4vw, 36px)",
-        }}>
       <div style={{ maxWidth: "1020px", margin: "0 auto", fontFamily: "Nunito" }}>
 
         <div style={{ marginBottom: "32px" }}>
@@ -365,8 +356,6 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
             </div>
 
           </div>
-        </div>
-      </div>
         </div>
       </div>
     </div>
