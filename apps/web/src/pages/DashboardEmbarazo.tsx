@@ -155,8 +155,8 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
         <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", alignItems: "stretch" }}>
 
           {/* TARJETA 1: Tamaño del bebé */}
-          <div style={{ ...cardStyle, flex: "1 1 320px", padding: "24px", display: "flex", flexDirection: "column", justifyContent: "center", gap: "20px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "10px" }}>
+          <div style={{ ...cardStyle, flex: "1 1 320px", padding: "24px", display: "flex", flexDirection: "column" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "10px", marginBottom: "20px" }}>
               <h2 style={{ fontSize: "19px", fontWeight: 800, color: "var(--theme-darker)", margin: 0 }}>
                 Tamaño del Bebé
               </h2>
@@ -169,31 +169,33 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
               </div>
             </div>
 
-            <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
-              <BabyGrowthIcon semanas={semanas} porcentaje={porcentaje} />
-              <div style={{ flex: "1 1 140px" }}>
-                <div style={{ fontSize: "26px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "8px" }}>
-                  {Math.min(porcentaje, 100)}%
-                </div>
-                <div style={{ width: "100%", background: "var(--theme-bg-light)", borderRadius: "10px", height: "8px", overflow: "hidden", marginBottom: "8px" }}>
-                  <div style={{
-                    width: `${Math.max(Math.min(porcentaje, 100), 3)}%`,
-                    height: "100%",
-                    background: "linear-gradient(90deg, #F4A0A0 0%, #E8607F 100%)",
-                    borderRadius: "10px",
-                    transition: "width 0.4s ease",
-                  }}></div>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#8A849C", fontWeight: 700 }}>
-                  <span>Semana 1</span>
-                  <span>Semana 40</span>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: "20px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
+                <BabyGrowthIcon semanas={semanas} porcentaje={porcentaje} />
+                <div style={{ flex: "1 1 140px" }}>
+                  <div style={{ fontSize: "26px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "8px" }}>
+                    {Math.min(porcentaje, 100)}%
+                  </div>
+                  <div style={{ width: "100%", background: "var(--theme-bg-light)", borderRadius: "10px", height: "8px", overflow: "hidden", marginBottom: "8px" }}>
+                    <div style={{
+                      width: `${Math.max(Math.min(porcentaje, 100), 3)}%`,
+                      height: "100%",
+                      background: "linear-gradient(90deg, #F4A0A0 0%, #E8607F 100%)",
+                      borderRadius: "10px",
+                      transition: "width 0.4s ease",
+                    }}></div>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#8A849C", fontWeight: 700 }}>
+                    <span>Semana 1</span>
+                    <span>Semana 40</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <p style={{ fontSize: "15px", color: "#6B647F", lineHeight: 1.5, margin: 0 }}>
-              {hito}
-            </p>
+              <p style={{ fontSize: "15px", color: "#6B647F", lineHeight: 1.5, margin: 0 }}>
+                {hito}
+              </p>
+            </div>
           </div>
 
           <div style={{ flex: "1 1 380px", display: "flex", flexDirection: "column", gap: "24px", minWidth: 0 }}>
