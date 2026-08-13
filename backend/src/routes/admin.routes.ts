@@ -2,7 +2,6 @@ import { Router } from "express";
 import {
   login,
   verify2fa,
-  seedAdmin,
   getUsuarios,
   getUsuariosStats,
   createUsuario,
@@ -36,9 +35,6 @@ import { loginLimiter, adminTwoFaLimiter } from "../middlewares/rateLimit.middle
 
 router.post("/auth/login", loginLimiter, login);
 router.post("/auth/verificar-2fa", adminTwoFaLimiter, verify2fa);
-
-// Seed admin
-router.get("/seed", seedAdmin);
 
 // Protected routes
 router.use(verifyAdminToken);

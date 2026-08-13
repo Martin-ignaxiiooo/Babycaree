@@ -517,24 +517,8 @@ export const impersonateUser = async (req: AdminAuthRequest, res: Response) => {
 };
 
 // Seed de un admin inicial (solo para desarrollo/pruebas)
-export const seedAdmin = async (req: Request, res: Response) => {
-  try {
-    const check = await query("SELECT COUNT(*) FROM administradores");
-    if (parseInt(check.rows[0].count) > 0) {
-      return res.status(400).json({ message: "Ya existen administradores" });
-    }
-
-    const hash = await bcrypt.hash("Administrador2026", 12);
-    await query(
-      `INSERT INTO administradores (nombre_completo, correo_corporativo, rol, hash_contrasena, requiere_2fa) 
-                 VALUES ('César Peña', 'cesar.pena@iniciativababy.cl', 'admin_general', $1, true)`,
-      [hash],
-    );
-
-    res.json({
-      message: "Admin inicial creado (cesar.pena@iniciativababy.cl / Administrador2026)",
-    });
-  } catch (error) {
-    res.status(500).json({ error: "Error seeding admin" });
-  }
-};
+// La función seedAdmin (endpoint público GET /api/v1/admin/seed) se eliminó:
+// no requería autenticación y creaba un admin con contraseña hardcodeada
+// ("Administrador2026") cada vez que la tabla administradores estuviera vacía.
+// Para crear el primer admin usar backend/scripts/seed_admin.ts, que ahora
+// exige ADMIN_NAME/ADMIN_EMAIL/ADMIN_PASSWORD por variable de entorno.
