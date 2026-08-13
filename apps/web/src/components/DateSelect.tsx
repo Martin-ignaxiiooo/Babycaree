@@ -68,54 +68,93 @@ export default function DateSelect({
   };
 
   const isDark = variant === "dark";
-  const selectStyle: React.CSSProperties = {
-    flex: 1,
-    padding: "13px 10px",
+
+  const containerStyle: React.CSSProperties = {
+    display: "flex",
+    alignItems: "stretch",
     borderRadius: "14px",
     border: isDark ? "1px solid rgba(255,255,255,0.15)" : "2px solid var(--theme-bg-light)",
     background: isDark ? "rgba(255,255,255,0.08)" : "#FDFCFF",
+    overflow: "hidden",
+    transition: "border-color 0.2s, background 0.2s",
+  };
+
+  const dividerStyle: React.CSSProperties = {
+    width: "1px",
+    background: isDark ? "rgba(255,255,255,0.15)" : "var(--theme-bg-light)",
+    alignSelf: "stretch",
+    margin: "8px 0",
+  };
+
+  const chevron = isDark
+    ? "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'><path d='M1 1L5 5L9 1' stroke='rgba(255,255,255,0.55)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>"
+    : "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'><path d='M1 1L5 5L9 1' stroke='%237C5CBF' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>";
+
+  const selectStyle: React.CSSProperties = {
+    flex: 1,
+    minWidth: 0,
+    padding: "13px 26px 13px 12px",
+    border: "none",
+    background: `url("${chevron}") no-repeat right 10px center`,
     color: isDark ? "white" : "var(--theme-darker)",
     outline: "none",
     fontFamily: "'Nunito', sans-serif",
     fontSize: "14px",
-    fontWeight: 600,
+    fontWeight: 700,
     cursor: "pointer",
+    appearance: "none",
+    WebkitAppearance: "none",
+    MozAppearance: "none",
   };
 
+  const emptyOptionColor = isDark ? "rgba(255,255,255,0.45)" : "#B0ABC4";
+
   return (
-    <div style={{ display: "flex", gap: "8px" }}>
+    <div
+      style={containerStyle}
+      onFocus={(e) => {
+        e.currentTarget.style.borderColor = "var(--theme-light)";
+        if (isDark) e.currentTarget.style.background = "rgba(255,255,255,0.14)";
+      }}
+      onBlur={(e) => {
+        e.currentTarget.style.borderColor = isDark ? "rgba(255,255,255,0.15)" : "var(--theme-bg-light)";
+        if (isDark) e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+      }}
+    >
       <select
         aria-label="Día"
         required={required}
         value={day ? parseInt(day, 10) : ""}
         onChange={(e) => emit(e.target.value, month, year)}
-        style={{ ...selectStyle, flex: "0 1 78px" }}
+        style={{ ...selectStyle, flex: "0 1 56px" }}
       >
-        <option value="">Día</option>
+        <option value="" style={{ color: emptyOptionColor }}>Día</option>
         {days.map((d) => (
           <option key={d} value={d}>{d}</option>
         ))}
       </select>
+      <div style={dividerStyle} />
       <select
         aria-label="Mes"
         required={required}
         value={month ? parseInt(month, 10) : ""}
         onChange={(e) => emit(day, e.target.value, year)}
-        style={{ ...selectStyle, flex: "1 1 120px" }}
+        style={{ ...selectStyle, flex: "1 1 96px" }}
       >
-        <option value="">Mes</option>
+        <option value="" style={{ color: emptyOptionColor }}>Mes</option>
         {MESES.map((nombre, idx) => (
           <option key={nombre} value={idx + 1}>{nombre}</option>
         ))}
       </select>
+      <div style={dividerStyle} />
       <select
         aria-label="Año"
         required={required}
         value={year || ""}
         onChange={(e) => emit(day, month, e.target.value)}
-        style={{ ...selectStyle, flex: "0 1 90px" }}
+        style={{ ...selectStyle, flex: "0 1 74px" }}
       >
-        <option value="">Año</option>
+        <option value="" style={{ color: emptyOptionColor }}>Año</option>
         {years.map((y) => (
           <option key={y} value={y}>{y}</option>
         ))}

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Syringe, Activity, Save, CheckCircle, Bell, Plus, X } from "lucide-react";
 import TopNav from "../components/TopNav";
 import DateSelect from "../components/DateSelect";
+import TimeSelect from "../components/TimeSelect";
 
 export default function Salud() {
   const navigate = useNavigate();
@@ -424,18 +425,13 @@ export default function Salud() {
                       variant="light"
                     />
                   </div>
-                  <div style={{ flex: "1 1 120px" }}>
+                  <div style={{ flex: "1 1 140px" }}>
                     <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Hora</label>
-                    <input 
-                      type="time" 
-                      lang="es-CL"
+                    <TimeSelect
                       value={fechaCitaTime}
-                      onChange={e => setFechaCitaTime(e.target.value)}
+                      onChange={setFechaCitaTime}
                       required
-                      style={{ 
-                        width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", 
-                        background: "#fff", outline: "none", boxSizing: "border-box", fontFamily: "Nunito"
-                      }} 
+                      variant="light"
                     />
                   </div>
                   <div style={{ flex: "1 1 200px" }}>
