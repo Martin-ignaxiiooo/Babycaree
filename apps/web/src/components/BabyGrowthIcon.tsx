@@ -1,38 +1,79 @@
+import mes1 from "../assets/baby/mes_1.png";
+import mes2 from "../assets/baby/mes_2.png";
+import mes3 from "../assets/baby/mes_3.png";
+import mes4 from "../assets/baby/mes_4.png";
+import mes5 from "../assets/baby/mes_5.png";
+import mes6 from "../assets/baby/mes_6.png";
+import mes7 from "../assets/baby/mes_7.png";
+import mes8 from "../assets/baby/mes_8.png";
+import mes9 from "../assets/baby/mes_9.png";
+
+const IMAGENES_POR_MES: Record<number, string> = {
+  1: mes1, 2: mes2, 3: mes3, 4: mes4, 5: mes5,
+  6: mes6, 7: mes7, 8: mes8, 9: mes9,
+};
+
+export const HITOS_POR_MES: Record<number, string> = {
+  1: "Tu bebé es apenas un embrión pequeño",
+  2: "Se están formando los órganos principales.",
+  3: "¡Ya es un feto! Empieza a moverse suavemente",
+  4: "Tu bebé ya puede gesticular y succionar",
+  5: "¡Mitad de camino! El bebé ya tiene pelo y cejas",
+  6: "La piel es traslúcida y los pulmones se desarrollan",
+  7: "El bebé ya abre los ojos y percibe la luz",
+  8: "Ganando peso rápidamente para el nacimiento",
+  9: "¡Casi listo para conocerte! El desarrollo está completo",
+};
+
+export const ETIQUETA_POR_MES: Record<number, string> = {
+  1: "Embrión",
+  2: "Desarrollo",
+  3: "Feto",
+  4: "Gesticulación",
+  5: "Crecimiento",
+  6: "Pulmones",
+  7: "Sentidos",
+  8: "Peso",
+  9: "Final",
+};
+
+export const SEMANA_RANGO_POR_MES: Record<number, string> = {
+  1: "Semana 4", 2: "Semana 8", 3: "Semana 12", 4: "Semana 16",
+  5: "Semana 20", 6: "Semana 24", 7: "Semana 28", 8: "Semana 32",
+  9: "Semana 36-40",
+};
+
+/** Calcula el mes de embarazo (1 a 9) a partir de la semana */
+export function mesDesdeSemanas(semanas: number): number {
+  if (semanas <= 4) return 1;
+  if (semanas <= 8) return 2;
+  if (semanas <= 12) return 3;
+  if (semanas <= 16) return 4;
+  if (semanas <= 20) return 5;
+  if (semanas <= 24) return 6;
+  if (semanas <= 28) return 7;
+  if (semanas <= 32) return 8;
+  return 9;
+}
+
 interface BabyGrowthIconProps {
   /** Semana de embarazo (1 a 40) */
   semanas: number;
-  /** 0 a 100, porcentaje de las 40 semanas (usado para tamaño y color) */
+  /** 0 a 100, porcentaje de las 40 semanas (usado para el tamaño) */
   porcentaje: number;
 }
 
-function lerpColor(hexA: string, hexB: string, t: number): string {
-  const a = [1, 3, 5].map((i) => parseInt(hexA.slice(i, i + 2), 16));
-  const b = [1, 3, 5].map((i) => parseInt(hexB.slice(i, i + 2), 16));
-  const rgb = a.map((v, i) => Math.round(v + (b[i] - v) * t));
-  return `rgb(${rgb.join(",")})`;
-}
-
 /**
- * Ilustración propia (SVG, no una foto) del bebé que cambia de FORMA según
- * la etapa real del embarazo, no solo de tamaño/color:
- *  - Semanas 1-8:   embrión (una forma simple, apenas curvada)
- *  - Semanas 9-16:  feto temprano (cabeza + cuerpo curvado, sin
- *                    extremidades definidas todavía)
- *  - Semanas 17-28: feto (piernas y brazo ya se distinguen)
- *  - Semanas 29-40: bebé a término (orejita, ojitos cerrados durmiendo,
- *                    extremidades bien definidas)
- * Tamaño y color siguen escalando de forma continua dentro de cada etapa.
+ * Muestra la ilustración real del bebé (hecha en Stitch por el dueño del
+ * proyecto, 9 imágenes, una por mes de embarazo) correspondiente al mes
+ * actual. El tamaño del contenedor escala según el porcentaje de las 40
+ * semanas, para que la imagen represente qué tan grande está el bebé.
  */
 export default function BabyGrowthIcon({ semanas, porcentaje }: BabyGrowthIconProps) {
   const clamped = Math.max(0, Math.min(100, porcentaje));
   const t = clamped / 100;
-
-  const size = 30 + (128 - 30) * t;
-  const bodyColor = lerpColor("#C9BEE8", "#E8607F", t);
-  const shadowColor = lerpColor("#A79BD1", "#C94764", t);
-  const opacity = 0.55 + 0.45 * t;
-
-  const stage = semanas <= 8 ? 1 : semanas <= 16 ? 2 : semanas <= 28 ? 3 : 4;
+  const size = 64 + (148 - 64) * t;
+  const mes = mesDesdeSemanas(semanas);
 
   return (
     <div
@@ -44,112 +85,17 @@ export default function BabyGrowthIcon({ semanas, porcentaje }: BabyGrowthIconPr
         justifyContent: "center",
       }}
     >
-      <svg
-        width={size}
-        height={size}
-        viewBox="0 0 100 100"
-        style={{ transition: "width 0.4s ease, height 0.4s ease", opacity }}
-      >
-        {stage === 1 && (
-          // Embrión: una sola forma simple, apenas curvada, sin cabeza
-          // ni extremidades diferenciadas
-          <g transform="translate(50,52)">
-            <path
-              d="M -10,-14 C 8,-18 16,-4 10,10 C 6,18 -8,20 -14,10
-                 C -18,2 -16,-10 -10,-14 Z"
-              fill={bodyColor}
-            />
-          </g>
-        )}
-
-        {stage === 2 && (
-          // Feto temprano: cabeza y cuerpo curvado, sin brazos/piernas
-          <g transform="translate(50,54)">
-            <path
-              d="M -6,-6 C 14,-11 24,4 18,18 C 14,28 -2,31 -13,23
-                 C -22,16 -19,-2 -6,-6 Z"
-              fill={bodyColor}
-            />
-            <circle cx="-4" cy="-16" r="13" fill={bodyColor} />
-          </g>
-        )}
-
-        {stage === 3 && (
-          // Feto: cuerpo, una pierna doblada y un brazo ya se distinguen
-          <g transform="translate(50,56)">
-            <path
-              d="M 4,2 C 18,1 23,15 18,25 C 15,32 4,34 -3,31
-                 C -11,28 -13,18 -9,12 C -7,6 -1,2 4,2 Z"
-              fill={bodyColor}
-            />
-            <path
-              d="M -6,4 C 2,-4 4,-13 -3,-16"
-              stroke={bodyColor}
-              strokeWidth="7"
-              strokeLinecap="round"
-              fill="none"
-            />
-            <path
-              d="M 8,14 C 17,17 21,26 16,33"
-              stroke={bodyColor}
-              strokeWidth="7"
-              strokeLinecap="round"
-              fill="none"
-            />
-            <circle cx="-10" cy="-12" r="16" fill={bodyColor} />
-          </g>
-        )}
-
-        {stage === 4 && (
-          // Bebé a término: cabeza grande con orejita, ojitos cerrados,
-          // brazo cruzado y las dos piernas dobladas
-          <g transform="translate(43,42) scale(0.62)">
-            <path
-              d="M 6,4 C 24,2 30,20 24,34 C 20,44 6,46 -4,42
-                 C -14,38 -16,26 -12,18 C -10,10 -2,4 6,4 Z"
-              fill={bodyColor}
-            />
-            <path
-              d="M -6,6 C 6,-4 8,-16 -2,-20"
-              stroke={bodyColor}
-              strokeWidth="10"
-              strokeLinecap="round"
-              fill="none"
-            />
-            <path
-              d="M 10,18 C 22,20 30,30 26,42 C 24,50 16,54 8,52"
-              stroke={bodyColor}
-              strokeWidth="11"
-              strokeLinecap="round"
-              fill="none"
-            />
-            <path
-              d="M -8,22 C -20,26 -26,38 -20,48 C -17,54 -8,56 -2,52"
-              stroke={bodyColor}
-              strokeWidth="11"
-              strokeLinecap="round"
-              fill="none"
-            />
-            <circle cx="-14" cy="-16" r="23" fill={bodyColor} />
-            <circle cx="-32" cy="-14" r="7" fill={bodyColor} />
-            <path
-              d="M -24,-18 Q -20,-15 -16,-18"
-              stroke={shadowColor}
-              strokeWidth="2"
-              strokeLinecap="round"
-              fill="none"
-            />
-            <path
-              d="M -10,-18 Q -6,-15 -2,-18"
-              stroke={shadowColor}
-              strokeWidth="2"
-              strokeLinecap="round"
-              fill="none"
-            />
-            <circle cx="-22" cy="-10" r="4" fill={shadowColor} opacity="0.35" />
-          </g>
-        )}
-      </svg>
+      <img
+        src={IMAGENES_POR_MES[mes]}
+        alt={`Ilustración del bebé en el mes ${mes} de embarazo`}
+        style={{
+          width: `${size}px`,
+          height: `${size}px`,
+          borderRadius: "50%",
+          objectFit: "cover",
+          transition: "width 0.4s ease, height 0.4s ease",
+        }}
+      />
     </div>
   );
 }
