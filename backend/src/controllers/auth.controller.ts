@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { OAuth2Client } from "google-auth-library";
 import { query } from "../config/db";
+import { AuthRequest } from "../middlewares/auth.middleware";
 import {
   sendRecoveryCode,
   sendPasswordChangedAlert,
@@ -33,7 +34,7 @@ const getClientIp = (req: Request): string =>
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { email, password, nombre, apellidos } = req.body;
+    const { email, password, nombre, apellidos, consentimiento_ley_19628, consentimiento_ley_21719 } = req.body;
 
     if (!email || !password || !nombre || !apellidos) {
       return res.status(400).json({ error: "Faltan campos obligatorios" });
@@ -50,8 +51,17 @@ export const register = async (req: Request, res: Response) => {
     const passwordHash = await bcrypt.hash(password, 12);
 
     const result = await query(
-      "INSERT INTO usuarios (email, password_hash, nombre, apellidos) VALUES ($1, $2, $3, $4) RETURNING id, email, nombre, apellidos, rol",
-      [email.toLowerCase(), passwordHash, nombre, apellidos],
+      `INSERT INTO usuarios (email, password_hash, nombre, apellidos, consentimiento_ley_19628, consentimiento_ley_21719)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING id, email, nombre, apellidos, rol`,
+      [
+        email.toLowerCase(),
+        passwordHash,
+        nombre,
+        apellidos,
+        !!consentimiento_ley_19628,
+        !!consentimiento_ley_21719,
+      ],
     );
 
     const newUser = result.rows[0];
@@ -112,6 +122,7 @@ export const googleAuth = async (req: Request, res: Response) => {
     const googleId = payload.sub;
     const nombre = payload.given_name || payload.name || "Usuario";
     const apellidos = payload.family_name || "";
+    let esNuevo = false;
 
     // 1) Buscar por google_id (login recurrente)
     let userRes = await query(
@@ -146,6 +157,7 @@ export const googleAuth = async (req: Request, res: Response) => {
           [email, passwordHash, nombre, apellidos, googleId],
         );
         userRes = insertRes;
+        esNuevo = true;
 
         // Vincular invitaciones pendientes a esta cuenta recién creada
         await query(
@@ -163,10 +175,35 @@ export const googleAuth = async (req: Request, res: Response) => {
       { expiresIn: "7d" },
     );
 
-    res.json({ user, token });
+    res.json({ user, token, esNuevo });
   } catch (error) {
     console.error("Error en login con Google:", error);
     res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
+// ─── CONSENTIMIENTO (usuarios ya autenticados, ej. cuentas creadas por Google) ──
+// El registro normal guarda el consentimiento en el mismo INSERT. Las cuentas
+// creadas por Google se crean antes de mostrar la pantalla de consentimiento,
+// así que necesitan este endpoint aparte para guardarlo una vez que el usuario
+// acepta los 3 checks en el onboarding.
+export const registrarConsentimiento = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user.id;
+    const { consentimiento_ley_19628, consentimiento_ley_21719 } = req.body;
+
+    if (!consentimiento_ley_19628 || !consentimiento_ley_21719) {
+      return res.status(400).json({ error: "Debes aceptar ambos consentimientos" });
+    }
+
+    await query(
+      "UPDATE usuarios SET consentimiento_ley_19628 = TRUE, consentimiento_ley_21719 = TRUE WHERE id = $1",
+      [userId],
+    );
+
+    res.json({ message: "Consentimiento registrado" });
+  } catch (error) {
+    res.status(500).json({ error: "Error al registrar el consentimiento" });
   }
 };
 

@@ -1012,6 +1012,9 @@ function SuccessScreen({
 // ─── MAIN ──────────────────────────────────────────────────────────────────────
 export default function Onboarding() {
   const navigate = useNavigate();
+  const viaGoogle =
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("origen") === "google";
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [flow, setFlow] = useState<string | null>(null);
@@ -1073,7 +1076,7 @@ export default function Onboarding() {
 
   const handleNext = async () => {
     if (step === 1 && flow) {
-      setStep(2);
+      setStep(viaGoogle ? 3 : 2);
     } else if (step === 2) {
       if (validateAccount()) setStep(3);
     } else if (step === 3) {
@@ -1086,17 +1089,40 @@ export default function Onboarding() {
       setConsentError(false);
       setLoading(true);
       try {
-        const authRes = await axios.post(`https://babycare-backend-msyq.onrender.com/api/auth/register`, {
-          email: account.email,
-          password: account.password,
-          nombre: account.nombre,
-          apellidos: account.apellidos,
-        });
-        const userToken = authRes.data.token;
-        
-        // Guardamos el token en localStorage para que el usuario esté "logueado" inmediatamente
-        localStorage.setItem("token", userToken);
-        localStorage.setItem("user", JSON.stringify(authRes.data.user));
+        let userToken: string;
+
+        if (viaGoogle) {
+          // Ya se autenticó con Google en el paso anterior (Login.tsx) y
+          // tiene token válido guardado; no hay que volver a registrarse,
+          // pero sí guardar que aceptó los consentimientos ahora.
+          const existingToken = localStorage.getItem("token");
+          if (!existingToken) {
+            throw new Error("Tu sesión de Google expiró, por favor volvé a iniciar sesión.");
+          }
+          userToken = existingToken;
+          await axios.post(
+            `https://babycare-backend-msyq.onrender.com/api/auth/consentimiento`,
+            {
+              consentimiento_ley_19628: true,
+              consentimiento_ley_21719: true,
+            },
+            { headers: { Authorization: `Bearer ${userToken}` } },
+          );
+        } else {
+          const authRes = await axios.post(`https://babycare-backend-msyq.onrender.com/api/auth/register`, {
+            email: account.email,
+            password: account.password,
+            nombre: account.nombre,
+            apellidos: account.apellidos,
+            consentimiento_ley_19628: true,
+            consentimiento_ley_21719: true,
+          });
+          userToken = authRes.data.token;
+
+          // Guardamos el token en localStorage para que el usuario esté "logueado" inmediatamente
+          localStorage.setItem("token", userToken);
+          localStorage.setItem("user", JSON.stringify(authRes.data.user));
+        }
 
         let fechaEstimadaParto = null;
         if (flow === "embarazo" && baby.fecha_nacimiento) {
@@ -1128,10 +1154,11 @@ export default function Onboarding() {
         setSuccessBabyName(baby.nombre);
         setStep(5);
       } catch (err: any) {
-        alert(
-          err.response?.data?.error ||
-            "Ocurrió un error. Por favor intenta de nuevo.",
-        );
+        if (err.response) {
+          alert(err.response?.data?.error || "Ocurrió un error. Por favor intenta de nuevo.");
+        } else {
+          alert(err.message || "Ocurrió un error. Por favor intenta de nuevo.");
+        }
       } finally {
         setLoading(false);
       }
@@ -1449,7 +1476,7 @@ export default function Onboarding() {
               <div style={{ display: "flex", gap: "14px", marginTop: "3rem" }}>
                 {step > 1 && (
                   <button
-                    onClick={() => setStep(step - 1)}
+                    onClick={() => setStep(viaGoogle && step === 3 ? 1 : step - 1)}
                     disabled={loading}
                     style={{
                       display: "flex",

@@ -3,6 +3,7 @@ import {
   register,
   login,
   googleAuth,
+  registrarConsentimiento,
   forgotPassword,
   verifyCode,
   resetPassword,
@@ -14,12 +15,14 @@ import {
   forgotPasswordLimiter,
   codeVerifyLimiter,
 } from "../middlewares/rateLimit.middleware";
+import { verifyToken } from "../middlewares/auth.middleware";
 
 const router = Router();
 
 router.post("/register", registerLimiter, register);
 router.post("/login", loginLimiter, login);
 router.post("/google", loginLimiter, googleAuth);
+router.post("/consentimiento", verifyToken, registrarConsentimiento);
 router.post("/forgot-password", forgotPasswordLimiter, forgotPassword);
 router.post("/verify-code", codeVerifyLimiter, verifyCode);
 router.post("/reset-password", resetPassword);

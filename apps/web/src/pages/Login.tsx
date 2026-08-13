@@ -75,7 +75,11 @@ export default function Login() {
       });
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
-      navigate("/seleccionar-perfil");
+      if (res.data.esNuevo) {
+        navigate("/registro?origen=google");
+      } else {
+        navigate("/seleccionar-perfil");
+      }
     } catch (err: any) {
       setError(
         err.response?.data?.error || "No se pudo iniciar sesión con Google.",
