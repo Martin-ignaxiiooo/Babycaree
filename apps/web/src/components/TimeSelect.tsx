@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from "react";
+
 interface TimeSelectProps {
   /** Valor en formato "HH:mm" (24h), o "" si está vacío */
   value: string;
@@ -10,6 +12,9 @@ interface TimeSelectProps {
  * Selector de hora con 2 dropdowns (Hora / Minuto) en formato 24h, hermano
  * visual de DateSelect. Evita el control nativo type="time", cuyo formato
  * (12h con AM/PM vs 24h) también depende del idioma del navegador.
+ *
+ * Igual que DateSelect: mantiene hora/minuto en estado interno propio para
+ * que elegir uno de los dos no se borre solo mientras el otro sigue vacío.
  */
 export default function TimeSelect({
   value,
@@ -17,14 +22,31 @@ export default function TimeSelect({
   required,
   variant = "light",
 }: TimeSelectProps) {
-  const [hour, minute] = value ? value.split(":") : ["", ""];
+  const parseValue = (v: string) => {
+    const [h, m] = v ? v.split(":") : ["", ""];
+    return { h: h ?? "", m: m ?? "" };
+  };
+
+  const [{ h: hour, m: minute }, setParts] = useState(() => parseValue(value));
+  const lastEmitted = useRef(value);
+
+  useEffect(() => {
+    if (value !== lastEmitted.current) {
+      setParts(parseValue(value));
+      lastEmitted.current = value;
+    }
+  }, [value]);
 
   const pad = (n: string | number) => String(n).padStart(2, "0");
 
   const emit = (newHour: string, newMinute: string) => {
+    setParts({ h: newHour, m: newMinute });
     if (newHour !== "" && newMinute !== "") {
-      onChange(`${pad(newHour)}:${pad(newMinute)}`);
+      const time = `${pad(newHour)}:${pad(newMinute)}`;
+      lastEmitted.current = time;
+      onChange(time);
     } else {
+      lastEmitted.current = "";
       onChange("");
     }
   };

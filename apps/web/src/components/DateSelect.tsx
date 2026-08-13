@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const MESES = [
   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -26,6 +26,15 @@ interface DateSelectProps {
  * HTML), así que un usuario con Chrome en inglés ve mm/dd/aaaa sin que
  * podamos evitarlo. Con dropdowns propios el orden día/mes/año queda
  * garantizado siempre, en cualquier navegador.
+ *
+ * Mantiene día/mes/año en estado interno propio (no 100% controlado por
+ * `value`): mientras la fecha está incompleta, el padre recibe onChange("")
+ * y por lo tanto no puede "recordar" la selección parcial. Si sincronizáramos
+ * los 3 dropdowns directo desde `value` en cada render, elegir el Día antes
+ * que el Mes se borraría solo apenas el padre re-renderice. Solo resincroniza
+ * desde `value` cuando el cambio viene de AFUERA (el padre cargó datos async,
+ * o reseteó el form) usando una referencia al último valor que este mismo
+ * componente emitió.
  */
 export default function DateSelect({
   value,
@@ -35,7 +44,20 @@ export default function DateSelect({
   required,
   variant = "light",
 }: DateSelectProps) {
-  const [year, month, day] = value ? value.split("-") : ["", "", ""];
+  const parseValue = (v: string) => {
+    const [y, m, d] = v ? v.split("-") : ["", "", ""];
+    return { y: y || "", m: m || "", d: d || "" };
+  };
+
+  const [{ y: year, m: month, d: day }, setParts] = useState(() => parseValue(value));
+  const lastEmitted = useRef(value);
+
+  useEffect(() => {
+    if (value !== lastEmitted.current) {
+      setParts(parseValue(value));
+      lastEmitted.current = value;
+    }
+  }, [value]);
 
   const maxYear = max ? parseInt(max.split("-")[0], 10) : new Date().getFullYear() + 1;
   const minYear = min ? parseInt(min.split("-")[0], 10) : maxYear - 110;
@@ -60,9 +82,13 @@ export default function DateSelect({
   const pad = (n: string | number) => String(n).padStart(2, "0");
 
   const emit = (newDay: string, newMonth: string, newYear: string) => {
+    setParts({ d: newDay, m: newMonth, y: newYear });
     if (newDay && newMonth && newYear) {
-      onChange(`${newYear}-${pad(newMonth)}-${pad(newDay)}`);
+      const iso = `${newYear}-${pad(newMonth)}-${pad(newDay)}`;
+      lastEmitted.current = iso;
+      onChange(iso);
     } else {
+      lastEmitted.current = "";
       onChange("");
     }
   };
