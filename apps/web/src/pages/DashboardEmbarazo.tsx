@@ -195,7 +195,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
               </div>
 
               <div>
-                <p style={{ fontSize: "15px", color: "#6B647F", lineHeight: 1.5, margin: "0 0 6px 0" }}>
+                <p style={{ fontSize: "15px", color: "#6B647F", lineHeight: 1.6, margin: "0 0 10px 0" }}>
                   {hito}
                 </p>
                 <p style={{ fontSize: "14px", color: "#8A849C", lineHeight: 1.5, margin: 0 }}>

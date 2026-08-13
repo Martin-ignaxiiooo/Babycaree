@@ -355,7 +355,11 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
         fecha_estimada_parto: perfil.fecha_estimada_parto,
         fecha_nacimiento: perfil.fecha_nacimiento,
         semanas_embarazo,
-        fruta_embarazo
+        fruta_embarazo,
+        mes_embarazo,
+        hito_embarazo,
+        etiqueta_mes_embarazo,
+        rango_semana_mes_embarazo
       }
     });
 
