@@ -61,6 +61,8 @@ interface BabyGrowthIconProps {
   semanas: number;
   /** 0 a 100, porcentaje de las 40 semanas (usado para el tamaño) */
   porcentaje: number;
+  /** Si true, la imagen crece para llenar el alto disponible del contenedor */
+  fill?: boolean;
 }
 
 /**
@@ -69,7 +71,7 @@ interface BabyGrowthIconProps {
  * actual. El tamaño del contenedor escala según el porcentaje de las 40
  * semanas, para que la imagen represente qué tan grande está el bebé.
  */
-export default function BabyGrowthIcon({ semanas, porcentaje }: BabyGrowthIconProps) {
+export default function BabyGrowthIcon({ semanas, porcentaje, fill }: BabyGrowthIconProps) {
   const clamped = Math.max(0, Math.min(100, porcentaje));
   const t = clamped / 100;
   const size = 135 + (185 - 135) * t;
@@ -78,19 +80,23 @@ export default function BabyGrowthIcon({ semanas, porcentaje }: BabyGrowthIconPr
   return (
     <div
       style={{
-        width: "185px",
-        height: "185px",
+        width: `${size}px`,
+        height: fill ? "100%" : `${size}px`,
+        minHeight: `${size}px`,
+        maxHeight: fill ? "290px" : undefined,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        flexShrink: 0,
       }}
     >
       <img
         src={IMAGENES_POR_MES[mes]}
         alt={`Ilustración del bebé en el mes ${mes} de embarazo`}
         style={{
-          width: `${size}px`,
-          height: `${size}px`,
+          width: "100%",
+          height: fill ? "100%" : `${size}px`,
+          maxHeight: "100%",
           borderRadius: "50%",
           objectFit: "cover",
           transition: "width 0.4s ease, height 0.4s ease",

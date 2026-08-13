@@ -169,8 +169,8 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
             </div>
 
             <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: "22px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
-                <BabyGrowthIcon semanas={semanas} porcentaje={porcentaje} />
+              <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap", minHeight: 0 }}>
+                <BabyGrowthIcon semanas={semanas} porcentaje={porcentaje} fill />
                 <div style={{ flex: "1 1 140px" }}>
                   <div style={{ fontSize: "26px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "8px" }}>
                     {Math.min(porcentaje, 100)}%
