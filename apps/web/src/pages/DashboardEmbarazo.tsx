@@ -152,10 +152,10 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
           </p>
         </div>
 
-        <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", alignItems: "flex-start" }}>
+        <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", alignItems: "stretch" }}>
 
           {/* TARJETA 1: Tamaño del bebé */}
-          <div style={{ ...cardStyle, flex: "1 1 320px", padding: "24px" }}>
+          <div style={{ ...cardStyle, flex: "1 1 320px", padding: "24px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "18px", flexWrap: "wrap", gap: "10px" }}>
               <h2 style={{ fontSize: "19px", fontWeight: 800, color: "var(--theme-darker)", margin: 0 }}>
                 Tamaño del Bebé
