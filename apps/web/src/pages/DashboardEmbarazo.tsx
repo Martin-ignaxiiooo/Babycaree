@@ -104,7 +104,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
   };
 
   return (
-    <div style={{ padding: "40px 20px", maxWidth: "1020px", margin: "0 auto", fontFamily: "Nunito" }}>
+    <div style={{ padding: "40px clamp(12px, 4vw, 20px)", maxWidth: "1020px", margin: "0 auto", fontFamily: "Nunito" }}>
       
       <div style={{ marginBottom: "32px" }}>
         <div style={{
@@ -123,14 +123,14 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
         </p>
       </div>
 
-      <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", alignItems: "stretch" }}>
+      <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", alignItems: "flex-start" }}>
         
         {/* LADO IZQUIERDO: Tamaño del bebé */}
         <div style={{
           flex: "1 1 320px",
           background: "linear-gradient(155deg, var(--theme-darker) 0%, var(--theme-dark) 60%, var(--theme-primary) 130%)",
           borderRadius: "24px",
-          padding: "36px 30px",
+          padding: "32px clamp(20px, 6vw, 30px)",
           display: "flex",
           flexDirection: "column",
           color: "white",
