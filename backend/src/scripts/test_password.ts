@@ -4,7 +4,11 @@ import jwt from 'jsonwebtoken';
 
 async function testPasswordReset() {
   try {
-    const JWT_ADMIN_SECRET = process.env.JWT_ADMIN_SECRET || "supersecret_admin_key_fallback";
+    const JWT_ADMIN_SECRET = process.env.JWT_ADMIN_SECRET;
+    if (!JWT_ADMIN_SECRET) {
+      console.error("Definí JWT_ADMIN_SECRET como variable de entorno para correr este script.");
+      process.exit(1);
+    }
 
     // 1. Get admin_general
     const userRes = await query("SELECT * FROM administradores WHERE rol = 'admin_general' LIMIT 1");

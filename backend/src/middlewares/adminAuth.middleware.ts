@@ -2,8 +2,10 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { query } from "../config/db";
 
-const JWT_ADMIN_SECRET =
-  process.env.JWT_ADMIN_SECRET || "supersecret_admin_key_fallback";
+const JWT_ADMIN_SECRET = process.env.JWT_ADMIN_SECRET;
+if (!JWT_ADMIN_SECRET) {
+  throw new Error("JWT_ADMIN_SECRET no está definido en las variables de entorno. El servidor no puede iniciar sin esta clave.");
+}
 
 export interface AdminAuthRequest extends Request {
   admin?: any;

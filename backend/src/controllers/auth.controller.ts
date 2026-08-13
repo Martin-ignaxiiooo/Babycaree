@@ -9,9 +9,11 @@ import {
   sendLoginBlockedAlert,
 } from "../config/mailer";
 
-const JWT_SECRET = process.env.JWT_SECRET || "supersecret_fallback_key";
-const JWT_RECOVERY_SECRET =
-  process.env.JWT_RECOVERY_SECRET || "supersecret_recovery_key";
+const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_RECOVERY_SECRET = process.env.JWT_RECOVERY_SECRET;
+if (!JWT_SECRET || !JWT_RECOVERY_SECRET) {
+  throw new Error("JWT_SECRET y JWT_RECOVERY_SECRET deben estar definidos en las variables de entorno.");
+}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

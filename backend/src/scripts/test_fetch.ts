@@ -8,9 +8,13 @@ async function testFetch() {
     if (!userRes.rows.length) return;
     const user = userRes.rows[0];
     
+    if (!process.env.JWT_SECRET) {
+      console.error("Definí JWT_SECRET como variable de entorno para correr este script.");
+      process.exit(1);
+    }
     const token = jwt.sign(
       { id: user.id, email: user.email, rol: user.rol },
-      process.env.JWT_SECRET || "supersecret_fallback_key",
+      process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 

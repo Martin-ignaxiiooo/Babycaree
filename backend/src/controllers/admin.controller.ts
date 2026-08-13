@@ -5,10 +5,11 @@ import { v4 as uuidv4 } from "uuid";
 import { query } from "../config/db";
 import { AdminAuthRequest } from "../middlewares/adminAuth.middleware";
 
-const JWT_ADMIN_SECRET =
-  process.env.JWT_ADMIN_SECRET || "supersecret_admin_key_fallback";
-const JWT_SECRET = 
-  process.env.JWT_SECRET || "supersecret_fallback_key";
+const JWT_ADMIN_SECRET = process.env.JWT_ADMIN_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_ADMIN_SECRET || !JWT_SECRET) {
+  throw new Error("JWT_ADMIN_SECRET y JWT_SECRET deben estar definidos en las variables de entorno.");
+}
 
 export const logAudit = async (
   id_admin: string,

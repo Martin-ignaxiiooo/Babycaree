@@ -25,15 +25,13 @@ const app = express();
 app.set("trust proxy", 1);
 const port = process.env.PORT || 3000;
 
-// Log all requests
+// Log de peticiones solo a stdout (Render ya captura esto en sus propios logs).
+// Antes esto se escribía a un archivo en disco que además quedaba commiteado al
+// repo y se servía públicamente sin autenticación en /api/logs — se eliminó.
 app.use((req, res, next) => {
-  const log = `[${new Date().toISOString()}] ${req.method} ${req.url}\n`;
-  fs.appendFileSync('backend_error.log', log);
-  
-  // Intercept response finish
   res.on('finish', () => {
     if (res.statusCode >= 400) {
-      fs.appendFileSync('backend_error.log', `-> RESPONSE ERROR: ${res.statusCode}\n`);
+      console.error(`[${new Date().toISOString()}] ${req.method} ${req.url} -> ${res.statusCode}`);
     }
   });
   next();
@@ -45,7 +43,26 @@ app.use("/uploads", express.static(uploadDir));
 
 // Middlewares
 app.use(helmet());
-app.use(cors());
+
+// CORS restringido a los orígenes conocidos del frontend (antes estaba abierto
+// a cualquier origen). Se puede agregar más orígenes vía la variable de entorno
+// CORS_EXTRA_ORIGINS (separados por coma), útil para previews de Vercel.
+const allowedOrigins = [
+  "https://babycaree-web.vercel.app",
+  "http://localhost:5173",
+  ...(process.env.CORS_EXTRA_ORIGINS?.split(",").map((o) => o.trim()).filter(Boolean) || []),
+];
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("No permitido por CORS"));
+    }
+  },
+  credentials: true,
+}));
+
 app.use(express.json());
 app.use(globalLimiter);
 
@@ -79,15 +96,6 @@ const startServer = async () => {
       });
     });
 
-    app.get("/api/logs", (req, res) => {
-      try {
-        const logs = fs.readFileSync('backend_error.log', 'utf8');
-        res.send(logs);
-      } catch(e) {
-        res.send("No logs yet");
-      }
-    });
-
     app.listen(port, () => {
       console.log(`Server running on port ${port}`);
     });
@@ -101,8 +109,8 @@ startServer();
 
 // Global error logger
 process.on('uncaughtException', (err) => {
-  fs.appendFileSync('backend_error.log', `[UNCAUGHT] ${err.stack}\n`);
+  console.error(`[UNCAUGHT] ${err.stack}`);
 });
-process.on('unhandledRejection', (reason, p) => {
-  fs.appendFileSync('backend_error.log', `[UNHANDLED] ${reason}\n`);
+process.on('unhandledRejection', (reason) => {
+  console.error(`[UNHANDLED] ${reason}`);
 });
