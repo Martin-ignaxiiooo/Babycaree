@@ -133,6 +133,16 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
       background: "linear-gradient(135deg, var(--theme-bg-light) 0%, #FDF2F2 50%, var(--theme-bg-light) 100%)",
       minHeight: "100%",
     }}>
+      <div style={{
+        maxWidth: "1060px", margin: "0 auto",
+        background: "linear-gradient(135deg, var(--theme-primary) 0%, #F4A0A0 50%, var(--theme-light) 100%)",
+        borderRadius: "28px", padding: "3px",
+        boxShadow: "0 12px 40px rgba(124, 92, 191, 0.2)",
+      }}>
+        <div style={{
+          background: "linear-gradient(160deg, var(--theme-bg-light) 0%, #FDF2F2 50%, #F3EEFB 100%)",
+          borderRadius: "26px", padding: "clamp(20px, 4vw, 36px)",
+        }}>
       <div style={{ maxWidth: "1020px", margin: "0 auto", fontFamily: "Nunito" }}>
 
         <div style={{ marginBottom: "32px" }}>
@@ -153,10 +163,10 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
           </p>
         </div>
 
-        <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", alignItems: "stretch" }}>
+        <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", alignItems: "flex-start" }}>
 
           {/* TARJETA 1: Tamaño del bebé */}
-          <div style={{ ...cardStyle, flex: "1 1 320px", padding: "24px", display: "flex", flexDirection: "column" }}>
+          <div style={{ ...cardStyle, flex: "1 1 320px", padding: "24px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "10px", marginBottom: "20px" }}>
               <h2 style={{ fontSize: "19px", fontWeight: 800, color: "var(--theme-darker)", margin: 0 }}>
                 Tamaño del Bebé
@@ -170,7 +180,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
               </div>
             </div>
 
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: "20px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
                 <BabyGrowthIcon semanas={semanas} porcentaje={porcentaje} />
                 <div style={{ flex: "1 1 140px" }}>
@@ -355,6 +365,8 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
             </div>
 
           </div>
+        </div>
+      </div>
         </div>
       </div>
     </div>
