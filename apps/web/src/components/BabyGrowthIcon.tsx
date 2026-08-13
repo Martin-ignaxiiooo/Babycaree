@@ -30,25 +30,21 @@ export default function BabyGrowthIcon({ porcentaje }: BabyGrowthIconProps) {
         viewBox="0 0 100 100"
         style={{ transition: "width 0.4s ease, height 0.4s ease" }}
       >
-        <g transform="translate(50,52)">
-          {/* Cuerpo curvado en posición fetal */}
+        <g transform="translate(50,54)">
+          {/* Cuerpo curvado en posición fetal, superpuesto con la cabeza
+              usando el MISMO color para que se lea como una sola silueta
+              continua en vez de dos círculos separados */}
           <path
-            d="M -8,-2
-               C 18,-14 30,10 18,28
-               C 10,40 -12,40 -20,26
-               C -28,12 -24,-6 -8,-2 Z"
-            fill="#F7C9B6"
+            d="M -6,-10
+               C 18,-16 30,4 24,22
+               C 19,36 -4,40 -18,30
+               C -30,20 -24,-4 -6,-10 Z"
+            fill="#F6C7AF"
           />
-          {/* Cabeza */}
-          <circle cx="-6" cy="-20" r="17" fill="#FBDCCB" />
-          {/* Bracito */}
-          <path
-            d="M 6,-6 C 16,-2 18,8 10,12"
-            stroke="#F7C9B6"
-            strokeWidth="7"
-            strokeLinecap="round"
-            fill="none"
-          />
+          {/* Cabeza, mismo color, bien superpuesta al cuerpo */}
+          <circle cx="-4" cy="-22" r="18" fill="#F6C7AF" />
+          {/* Mejilla / sombra suave para dar volumen sin romper la silueta */}
+          <ellipse cx="4" cy="-16" rx="10" ry="8" fill="#F0AF8F" opacity="0.35" />
         </g>
       </svg>
     </div>
