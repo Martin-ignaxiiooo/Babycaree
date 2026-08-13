@@ -80,10 +80,11 @@ export default function BabyGrowthIcon({ semanas, porcentaje, fill }: BabyGrowth
   return (
     <div
       style={{
-        width: `${size}px`,
+        width: fill ? "auto" : `${size}px`,
         height: fill ? "100%" : `${size}px`,
+        aspectRatio: "1 / 1",
         minHeight: `${size}px`,
-        maxHeight: fill ? "290px" : undefined,
+        maxHeight: fill ? "260px" : undefined,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -95,8 +96,7 @@ export default function BabyGrowthIcon({ semanas, porcentaje, fill }: BabyGrowth
         alt={`Ilustración del bebé en el mes ${mes} de embarazo`}
         style={{
           width: "100%",
-          height: fill ? "100%" : `${size}px`,
-          maxHeight: "100%",
+          height: "100%",
           borderRadius: "50%",
           objectFit: "cover",
           transition: "width 0.4s ease, height 0.4s ease",
