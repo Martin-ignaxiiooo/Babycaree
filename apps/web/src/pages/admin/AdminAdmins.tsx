@@ -253,7 +253,7 @@ export default function AdminAdmins() {
                   </span>
                 </td>
                 <td className="text-gray-500 text-sm">
-                  {admin.ultimo_acceso ? new Date(admin.ultimo_acceso).toLocaleDateString() : "Nunca"}
+                  {admin.ultimo_acceso ? new Date(admin.ultimo_acceso).toLocaleDateString('es-CL') : "Nunca"}
                 </td>
                 <td>
                   <span className={`admin-status-badge ${admin.estado === "activo" ? "admin-status-active" : "admin-status-blocked"}`}>

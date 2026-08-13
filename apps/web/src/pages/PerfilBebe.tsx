@@ -390,7 +390,7 @@ export default function PerfilBebe() {
                 <div style={{ display: "flex", gap: "16px" }}>
                   <div style={{ flex: 1 }}>
                     <label style={labelStyle}>Fecha de nacimiento</label>
-                    {editMode ? <input type="date" name="fecha_nacimiento" max={new Date().toISOString().split('T')[0]} value={editData.fecha_nacimiento ? editData.fecha_nacimiento.split('T')[0] : ""} onChange={handleChange} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.fecha_nacimiento ? new Date(perfil.fecha_nacimiento).toLocaleDateString() : "-"}</div>}
+                    {editMode ? <input type="date" lang="es-CL" name="fecha_nacimiento" max={new Date().toISOString().split('T')[0]} value={editData.fecha_nacimiento ? editData.fecha_nacimiento.split('T')[0] : ""} onChange={handleChange} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.fecha_nacimiento ? new Date(perfil.fecha_nacimiento).toLocaleDateString('es-CL') : "-"}</div>}
                   </div>
                   <div style={{ flex: 1 }}>
                     <label style={labelStyle}>Previsión de salud</label>
@@ -636,7 +636,7 @@ export default function PerfilBebe() {
                       <div key={log.id} style={{ marginBottom: "16px", paddingLeft: "16px", borderLeft: "2px solid var(--theme-light)", position: "relative" }}>
                         <div style={{ position: "absolute", left: "-5px", top: "6px", width: "8px", height: "8px", borderRadius: "50%", background: "var(--theme-primary)" }}></div>
                         <div style={{ fontSize: "13px", color: "var(--theme-darker)", fontWeight: 500 }}>{log.descripcion}</div>
-                        <div style={{ fontSize: "11px", color: "#9CA3AF", marginTop: "4px" }}>{new Date(log.fecha_hora_utc).toLocaleString()}</div>
+                        <div style={{ fontSize: "11px", color: "#9CA3AF", marginTop: "4px" }}>{new Date(log.fecha_hora_utc).toLocaleString('es-CL')}</div>
                       </div>
                     ))
                   )}

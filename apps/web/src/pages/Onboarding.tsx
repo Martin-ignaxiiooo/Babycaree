@@ -506,6 +506,7 @@ function StepThree({ baby, setBaby, flow, error }: any) {
           </label>
           <input
             type="date"
+            lang="es-CL"
             value={baby.fecha_nacimiento}
             onChange={(e) =>
               setBaby((prev: any) => ({

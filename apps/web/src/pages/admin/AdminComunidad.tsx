@@ -184,7 +184,7 @@ export default function AdminComunidad() {
                   <td>
                     <span style={{ fontWeight: 500, color: "#374151" }}>{item.autor_nombre}</span>
                   </td>
-                  <td>{new Date(item.fecha_creacion).toLocaleDateString()}</td>
+                  <td>{new Date(item.fecha_creacion).toLocaleDateString('es-CL')}</td>
                   <td>
                     <span style={{ fontWeight: 600, color: "#3B82F6" }}>{item.likes}</span>
                   </td>
@@ -242,7 +242,7 @@ export default function AdminComunidad() {
                                       </div>
                                       {com.autor_nombre} 
                                       {com.es_admin && <span style={{ background: "#DBEAFE", color: "#1D4ED8", padding: "2px 6px", borderRadius: "4px", fontSize: "10px", fontWeight: "bold" }}>ADMIN</span>}
-                                      <span style={{ fontWeight: 400, color: "#9CA3AF", fontSize: "12px" }}>• {new Date(com.fecha_creacion).toLocaleString()}</span>
+                                      <span style={{ fontWeight: 400, color: "#9CA3AF", fontSize: "12px" }}>• {new Date(com.fecha_creacion).toLocaleString('es-CL')}</span>
                                     </div>
                                     <div style={{ fontSize: "14px", color: "#4B5563", lineHeight: "1.5", marginLeft: "32px" }}>{com.contenido}</div>
                                   </div>

@@ -318,7 +318,7 @@ export default function AdminUsers() {
                 </td>
                 <td className="text-gray-500 text-sm">
                   {u.fecha_registro
-                    ? new Date(u.fecha_registro).toLocaleDateString()
+                    ? new Date(u.fecha_registro).toLocaleDateString('es-CL')
                     : ""}
                 </td>
                 {canManageUsers && (

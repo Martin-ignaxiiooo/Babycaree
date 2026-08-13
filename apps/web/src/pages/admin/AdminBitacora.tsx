@@ -55,7 +55,7 @@ export default function AdminBitacora() {
             {data.map((item) => (
               <tr key={item.id}>
                 <td className="font-medium text-gray-900">
-                  {new Date(item.fecha_hora_utc).toLocaleString()}
+                  {new Date(item.fecha_hora_utc).toLocaleString('es-CL')}
                 </td>
                 <td>
                   {item.admin_nombre} ({item.rol})

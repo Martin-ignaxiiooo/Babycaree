@@ -92,7 +92,7 @@ export default function ForoDetalle() {
             <span style={{ fontSize: "12px", fontWeight: 800, color: "var(--theme-darker)", background: "var(--theme-light)", padding: "4px 12px", borderRadius: "12px" }}>
               {foro.categoria}
             </span>
-            <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.7)" }}>Por {foro.autor_nombre} · {new Date(foro.fecha_creacion).toLocaleDateString()}</span>
+            <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.7)" }}>Por {foro.autor_nombre} · {new Date(foro.fecha_creacion).toLocaleDateString('es-CL')}</span>
           </div>
           <h1 style={{ fontSize: "32px", fontWeight: 900, margin: "0 0 16px 0", lineHeight: "1.2" }}>{foro.titulo}</h1>
           <p style={{ fontSize: "16px", lineHeight: "1.6", margin: "0 0 24px 0", color: "rgba(255,255,255,0.9)", whiteSpace: "pre-wrap" }}>
@@ -142,7 +142,7 @@ export default function ForoDetalle() {
                 </div>
                 <div>
                   <div style={{ fontWeight: 700, color: "var(--theme-darker)", fontSize: "15px" }}>{res.autor_nombre}</div>
-                  <div style={{ fontSize: "12px", color: "#9CA3AF" }}>{new Date(res.fecha_creacion).toLocaleString()}</div>
+                  <div style={{ fontSize: "12px", color: "#9CA3AF" }}>{new Date(res.fecha_creacion).toLocaleString('es-CL')}</div>
                 </div>
               </div>
               <p style={{ margin: 0, fontSize: "15px", color: "#4B5563", lineHeight: "1.6", whiteSpace: "pre-wrap" }}>

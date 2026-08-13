@@ -198,6 +198,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
                   <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "rgba(255,255,255,0.6)" }}>Fecha y Hora</label>
                   <input 
                     type="datetime-local" 
+                    lang="es-CL"
                     value={fechaCita}
                     onChange={e => setFechaCita(e.target.value)}
                     required

@@ -329,6 +329,7 @@ export default function Salud() {
                             <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#166534", marginBottom: "4px" }}>Fecha de aplicación</label>
                             <input 
                               type="date" 
+                              lang="es-CL"
                               defaultValue={vacuna.fecha_aplicacion ? vacuna.fecha_aplicacion.split('T')[0] : ""}
                               onBlur={(e) => updateVacunaInfo(vacuna.vacuna_id, "fecha_aplicacion", e.target.value)}
                               style={{ width: "100%", padding: "8px", border: "1px solid #E5E7EB", borderRadius: "6px", fontSize: "14px", outline: "none" }}
@@ -415,6 +416,7 @@ export default function Salud() {
                     <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Fecha y Hora</label>
                     <input 
                       type="datetime-local" 
+                      lang="es-CL"
                       value={fechaCita}
                       onChange={e => setFechaCita(e.target.value)}
                       required

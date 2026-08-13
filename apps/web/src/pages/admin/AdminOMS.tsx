@@ -312,7 +312,7 @@ export default function AdminOMS() {
                 <td>{item.peso_esperado_kg} kg</td>
                 <td>{item.talla_esperada_cm} cm</td>
                 <td className="text-gray-500">
-                  {new Date(item.fecha_creacion).toLocaleDateString()}
+                  {new Date(item.fecha_creacion).toLocaleDateString('es-CL')}
                 </td>
                 {canManageOMS && (
                   <td>
