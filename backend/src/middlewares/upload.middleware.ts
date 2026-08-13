@@ -21,14 +21,19 @@ const storage = multer.diskStorage({
   },
 });
 
+// El mimetype que reporta el cliente se puede falsificar, así que además
+// exigimos que la extensión del archivo esté en una whitelist conocida.
+const ALLOWED_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif"]);
+
 export const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // Límite de 5MB
   fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith("image/")) {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (file.mimetype.startsWith("image/") && ALLOWED_EXTENSIONS.has(ext)) {
       cb(null, true);
     } else {
-      cb(new Error("Solo se permiten imágenes"));
+      cb(new Error("Solo se permiten imágenes (jpg, jpeg, png, webp, gif)"));
     }
   },
 });

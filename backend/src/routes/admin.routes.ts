@@ -2,7 +2,8 @@ import { Router } from "express";
 import {
   login,
   verify2fa,
-  seedAdmin,
+  logoutAdmin,
+  revocarSesionesAdmin,
   getUsuarios,
   getUsuariosStats,
   createUsuario,
@@ -32,13 +33,10 @@ import comunidadRouter from "../microservices/comunidad/comunidad.routes";
 const router = Router();
 
 // Auth routes
-import { loginLimiter } from "../middlewares/rateLimit.middleware";
+import { loginLimiter, adminTwoFaLimiter } from "../middlewares/rateLimit.middleware";
 
 router.post("/auth/login", loginLimiter, login);
-router.post("/auth/verificar-2fa", verify2fa);
-
-// Seed admin
-router.get("/seed", seedAdmin);
+router.post("/auth/verificar-2fa", adminTwoFaLimiter, verify2fa);
 
 // Protected routes
 router.use(verifyAdminToken);
@@ -46,6 +44,12 @@ router.use(verifyAdminToken);
 import { generate2fa, enable2fa } from "../controllers/admin_2fa.controller";
 router.post("/auth/2fa/generate", generate2fa);
 router.post("/auth/2fa/enable", enable2fa);
+router.post("/auth/logout", logoutAdmin);
+router.post(
+  "/administradores/:id/revocar-sesiones",
+  requireRole(["admin_general"]),
+  revocarSesionesAdmin,
+);
 
 // Usuarios
 router.get(

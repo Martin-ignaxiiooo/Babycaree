@@ -25,6 +25,31 @@ export const loginLimiter = rateLimit({
   },
 });
 
+// Registro: 10 cuentas nuevas por IP en 1 hora (evita creación masiva de cuentas por bots)
+export const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 10,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: {
+    status: 429,
+    error: "Demasiados registros desde esta conexión. Intenta más tarde.",
+  },
+});
+
+// Verificación de 2FA de admin: 5 intentos por IP en 5 min (defensa en profundidad
+// contra fuerza bruta del código TOTP, además del límite global)
+export const adminTwoFaLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  limit: 5,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: {
+    status: 429,
+    error: "Demasiados intentos de verificación 2FA. Intenta en unos minutos.",
+  },
+});
+
 // Solicitud de código: 10 solicitudes por IP en 1 hora
 export const forgotPasswordLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,

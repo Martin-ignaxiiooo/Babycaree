@@ -15,10 +15,22 @@ export default function AdminTopbar() {
     }
   }, [navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("admin_token");
-    localStorage.removeItem("admin_user");
-    navigate("/admin/login");
+  const handleLogout = async () => {
+    const token = localStorage.getItem("admin_token");
+    try {
+      if (token) {
+        await fetch("https://babycare-backend-msyq.onrender.com/api/v1/admin/auth/logout", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
+    } catch {
+      // Best-effort: si falla la llamada de red, igual cerramos sesión localmente.
+    } finally {
+      localStorage.removeItem("admin_token");
+      localStorage.removeItem("admin_user");
+      navigate("/admin/login");
+    }
   };
 
   if (!user) return <header className="admin-topbar"></header>;
