@@ -2,6 +2,8 @@ import { Router } from "express";
 import {
   login,
   verify2fa,
+  logoutAdmin,
+  revocarSesionesAdmin,
   getUsuarios,
   getUsuariosStats,
   createUsuario,
@@ -42,6 +44,12 @@ router.use(verifyAdminToken);
 import { generate2fa, enable2fa } from "../controllers/admin_2fa.controller";
 router.post("/auth/2fa/generate", generate2fa);
 router.post("/auth/2fa/enable", enable2fa);
+router.post("/auth/logout", logoutAdmin);
+router.post(
+  "/administradores/:id/revocar-sesiones",
+  requireRole(["admin_general"]),
+  revocarSesionesAdmin,
+);
 
 // Usuarios
 router.get(

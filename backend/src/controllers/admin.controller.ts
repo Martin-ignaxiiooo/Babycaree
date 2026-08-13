@@ -41,6 +41,38 @@ export const logAudit = async (
   }
 };
 
+export const logoutAdmin = async (req: AdminAuthRequest, res: Response) => {
+  try {
+    const jti = req.admin?.jti;
+    if (!jti) {
+      return res.status(400).json({ error: "Sesión sin identificador válido" });
+    }
+    await query(
+      "UPDATE sesiones_admin SET valido = FALSE WHERE token_jti = $1",
+      [jti],
+    );
+    res.json({ message: "Sesión cerrada correctamente" });
+  } catch (error) {
+    res.status(500).json({ error: "Error al cerrar sesión" });
+  }
+};
+
+// Permite a un admin_general revocar TODAS las sesiones activas de un
+// administrador puntual (por ejemplo, si sospecha que su token o el de otro
+// admin se filtró, sin tener que rotar el secreto JWT para todos).
+export const revocarSesionesAdmin = async (req: AdminAuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const result = await query(
+      "UPDATE sesiones_admin SET valido = FALSE WHERE id_admin = $1 AND valido = TRUE RETURNING id",
+      [id],
+    );
+    res.json({ message: `${result.rows.length} sesión(es) revocada(s)` });
+  } catch (error) {
+    res.status(500).json({ error: "Error al revocar sesiones" });
+  }
+};
+
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
