@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
     fecha_registro TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     ultima_conexion TIMESTAMP WITH TIME ZONE,
     correo_hash VARCHAR(64) GENERATED ALWAYS AS (encode(digest(lower(trim(email)), 'sha256'), 'hex')) STORED,
-    telefono_hash VARCHAR(64)
+    telefono_hash VARCHAR(64),
+    google_id VARCHAR(255) UNIQUE
 );
 
 -- Tabla de Perfiles de Bebés

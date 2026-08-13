@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import { OAuth2Client } from "google-auth-library";
 import { query } from "../config/db";
 import {
   sendRecoveryCode,
@@ -14,6 +15,9 @@ const JWT_RECOVERY_SECRET = process.env.JWT_RECOVERY_SECRET;
 if (!JWT_SECRET || !JWT_RECOVERY_SECRET) {
   throw new Error("JWT_SECRET y JWT_RECOVERY_SECRET deben estar definidos en las variables de entorno.");
 }
+
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const googleClient = GOOGLE_CLIENT_ID ? new OAuth2Client(GOOGLE_CLIENT_ID) : null;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -67,6 +71,101 @@ export const register = async (req: Request, res: Response) => {
 
     res.status(201).json({ user: newUser, token });
   } catch (error) {
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
+// ─── LOGIN CON GOOGLE ────────────────────────────────────────────────────────
+// El frontend nos manda el "credential" (un ID token JWT) que devuelve
+// Google Identity Services. Acá lo verificamos contra los servidores de
+// Google (firma, audiencia, expiración) — nunca confiamos en datos de
+// usuario/email que pudieran venir directamente del cliente sin validar.
+export const googleAuth = async (req: Request, res: Response) => {
+  try {
+    if (!googleClient || !GOOGLE_CLIENT_ID) {
+      return res.status(503).json({
+        error: "El login con Google no está configurado en el servidor todavía.",
+      });
+    }
+
+    const { credential } = req.body;
+    if (!credential || typeof credential !== "string") {
+      return res.status(400).json({ error: "Falta el token de Google" });
+    }
+
+    let payload;
+    try {
+      const ticket = await googleClient.verifyIdToken({
+        idToken: credential,
+        audience: GOOGLE_CLIENT_ID,
+      });
+      payload = ticket.getPayload();
+    } catch {
+      return res.status(401).json({ error: "Token de Google inválido o expirado" });
+    }
+
+    if (!payload || !payload.email || !payload.email_verified) {
+      return res.status(401).json({ error: "No se pudo verificar tu cuenta de Google" });
+    }
+
+    const email = payload.email.toLowerCase();
+    const googleId = payload.sub;
+    const nombre = payload.given_name || payload.name || "Usuario";
+    const apellidos = payload.family_name || "";
+
+    // 1) Buscar por google_id (login recurrente)
+    let userRes = await query(
+      "SELECT id, email, nombre, apellidos, rol FROM usuarios WHERE google_id = $1",
+      [googleId],
+    );
+
+    if (userRes.rows.length === 0) {
+      // 2) Buscar por email: si ya existe una cuenta con contraseña, la
+      // vinculamos (el email ya está verificado por Google, es seguro).
+      userRes = await query(
+        "SELECT id, email, nombre, apellidos, rol FROM usuarios WHERE LOWER(email) = $1",
+        [email],
+      );
+
+      if (userRes.rows.length > 0) {
+        await query("UPDATE usuarios SET google_id = $1 WHERE id = $2", [
+          googleId,
+          userRes.rows[0].id,
+        ]);
+      } else {
+        // 3) Cuenta nueva. Se genera un password_hash aleatorio que el
+        // usuario nunca ve ni necesita (siempre entra por Google), porque
+        // la columna es NOT NULL.
+        const randomPassword = crypto.randomBytes(32).toString("hex");
+        const passwordHash = await bcrypt.hash(randomPassword, 12);
+
+        const insertRes = await query(
+          `INSERT INTO usuarios (email, password_hash, nombre, apellidos, google_id)
+           VALUES ($1, $2, $3, $4, $5)
+           RETURNING id, email, nombre, apellidos, rol`,
+          [email, passwordHash, nombre, apellidos, googleId],
+        );
+        userRes = insertRes;
+
+        // Vincular invitaciones pendientes a esta cuenta recién creada
+        await query(
+          `UPDATE accesos_compartidos_bebe SET id_usuario_invitado = $1, estado = 'activo'
+           WHERE LOWER(correo_invitado) = LOWER($2) AND estado = 'pendiente'`,
+          [insertRes.rows[0].id, email],
+        ).catch(() => {});
+      }
+    }
+
+    const user = userRes.rows[0];
+    const token = jwt.sign(
+      { id: user.id, email: user.email, rol: user.rol },
+      JWT_SECRET,
+      { expiresIn: "7d" },
+    );
+
+    res.json({ user, token });
+  } catch (error) {
+    console.error("Error en login con Google:", error);
     res.status(500).json({ error: "Error interno del servidor" });
   }
 };

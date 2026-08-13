@@ -1,9 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { Shield, Heart, TrendingUp, Lock, Eye, EyeOff } from "lucide-react";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api";
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined;
+
+declare global {
+  interface Window {
+    google?: any;
+  }
+}
 
 export default function Login() {
   const navigate = useNavigate();
@@ -55,21 +62,74 @@ export default function Login() {
     }
   };
 
-  const handleOAuthLogin = (provider: string) => {
+  const googleBtnRef = useRef<HTMLDivElement>(null);
+  const [googleReady, setGoogleReady] = useState(false);
+  const [googleError, setGoogleError] = useState("");
+
+  const handleGoogleCredential = async (response: { credential: string }) => {
     setLoading(true);
-    setTimeout(() => {
-      const mockUser = {
-        id: `oauth-${provider.toLowerCase()}-123`,
-        email: `usuario@${provider.toLowerCase()}.com`,
-        nombre: "Usuario",
-        apellidos: provider,
-        rol: "user",
-      };
-      localStorage.setItem("token", "mock-oauth-token");
-      localStorage.setItem("user", JSON.stringify(mockUser));
+    setError("");
+    try {
+      const res = await axios.post(`${API_URL}/auth/google`, {
+        credential: response.credential,
+      });
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
       navigate("/seleccionar-perfil");
-    }, 1000);
+    } catch (err: any) {
+      setError(
+        err.response?.data?.error || "No se pudo iniciar sesión con Google.",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID) {
+      setGoogleError("Login con Google no configurado");
+      return;
+    }
+
+    let cancelled = false;
+
+    const initGoogle = () => {
+      if (cancelled || !window.google || !googleBtnRef.current) return;
+      window.google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleGoogleCredential,
+      });
+      window.google.accounts.id.renderButton(googleBtnRef.current, {
+        theme: "outline",
+        size: "large",
+        width: 396,
+        shape: "pill",
+        text: "continue_with",
+      });
+      setGoogleReady(true);
+    };
+
+    if (window.google) {
+      initGoogle();
+    } else {
+      const interval = setInterval(() => {
+        if (window.google) {
+          clearInterval(interval);
+          initGoogle();
+        }
+      }, 200);
+      const timeout = setTimeout(() => clearInterval(interval), 8000);
+      return () => {
+        cancelled = true;
+        clearInterval(interval);
+        clearTimeout(timeout);
+      };
+    }
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const minutosBloqueo = bloqueadoHasta
     ? Math.max(
@@ -640,65 +700,30 @@ export default function Login() {
                   — o continúa con —
                 </div>
 
-                <div style={{ display: "flex", gap: "16px" }}>
-                  <button
-                    type="button"
-                    onClick={() => handleOAuthLogin("Apple")}
-                    style={{
-                      flex: 1,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "8px",
-                      background: "white",
-                      border: "2px solid var(--theme-bg-light)",
-                      borderRadius: "16px",
-                      padding: "14px",
-                      fontSize: "15px",
-                      fontWeight: 800,
-                      cursor: "pointer",
-                      color: "var(--theme-darker)",
-                      fontFamily: "'Nunito', sans-serif",
-                      transition: "background 0.2s, border-color 0.2s",
-                    }}
-                    onMouseEnter={(e) =>
-                      (e.currentTarget.style.borderColor = "var(--theme-primary)")
-                    }
-                    onMouseLeave={(e) =>
-                      (e.currentTarget.style.borderColor = "var(--theme-bg-light)")
-                    }
-                  >
-                    🍎 Apple
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleOAuthLogin("Google")}
-                    style={{
-                      flex: 1,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "8px",
-                      background: "white",
-                      border: "2px solid var(--theme-bg-light)",
-                      borderRadius: "16px",
-                      padding: "14px",
-                      fontSize: "15px",
-                      fontWeight: 800,
-                      cursor: "pointer",
-                      color: "var(--theme-darker)",
-                      fontFamily: "'Nunito', sans-serif",
-                      transition: "background 0.2s, border-color 0.2s",
-                    }}
-                    onMouseEnter={(e) =>
-                      (e.currentTarget.style.borderColor = "var(--theme-primary)")
-                    }
-                    onMouseLeave={(e) =>
-                      (e.currentTarget.style.borderColor = "var(--theme-bg-light)")
-                    }
-                  >
-                    🔵 Google
-                  </button>
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                  <div ref={googleBtnRef} />
+                  {!GOOGLE_CLIENT_ID && (
+                    <div
+                      style={{
+                        width: "100%",
+                        textAlign: "center",
+                        fontSize: "13px",
+                        color: "#B0ABC4",
+                        padding: "14px",
+                        border: "2px dashed var(--theme-bg-light)",
+                        borderRadius: "16px",
+                      }}
+                    >
+                      Login con Google no disponible por ahora
+                    </div>
+                  )}
+                  {GOOGLE_CLIENT_ID && !googleReady && !googleError && (
+                    <div
+                      style={{ fontSize: "13px", color: "#B0ABC4", padding: "10px" }}
+                    >
+                      Cargando Google...
+                    </div>
+                  )}
                 </div>
               </form>
             )}
