@@ -151,10 +151,10 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
           </h1>
         </div>
 
-        <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", alignItems: "flex-start" }}>
+        <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", alignItems: "stretch" }}>
 
           {/* TARJETA 1: Tamaño del bebé */}
-          <div style={{ ...cardStyle, flex: "1 1 320px", padding: "24px" }}>
+          <div style={{ ...cardStyle, flex: "1 1 320px", padding: "24px", display: "flex", flexDirection: "column" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "10px", marginBottom: "20px" }}>
               <h2 style={{ fontSize: "19px", fontWeight: 800, color: "var(--theme-darker)", margin: 0 }}>
                 Tamaño del Bebé
@@ -168,7 +168,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
               </div>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-evenly", gap: "18px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
                 <BabyGrowthIcon semanas={semanas} porcentaje={porcentaje} />
                 <div style={{ flex: "1 1 140px" }}>
