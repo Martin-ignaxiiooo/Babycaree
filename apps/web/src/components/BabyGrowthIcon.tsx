@@ -72,14 +72,14 @@ interface BabyGrowthIconProps {
 export default function BabyGrowthIcon({ semanas, porcentaje }: BabyGrowthIconProps) {
   const clamped = Math.max(0, Math.min(100, porcentaje));
   const t = clamped / 100;
-  const size = 64 + (148 - 64) * t;
+  const size = 118 + (168 - 118) * t;
   const mes = mesDesdeSemanas(semanas);
 
   return (
     <div
       style={{
-        width: "148px",
-        height: "148px",
+        width: "168px",
+        height: "168px",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
