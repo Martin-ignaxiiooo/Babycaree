@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Calendar, Heart, Sparkles, CalendarPlus, Plus } from "lucide-react";
+import { Calendar, Sparkles, CalendarPlus, Plus } from "lucide-react";
 import DateSelect from "../components/DateSelect";
 import TimeSelect from "../components/TimeSelect";
+import BabyGrowthIcon from "../components/BabyGrowthIcon";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api";
 
@@ -15,7 +16,7 @@ interface DashboardEmbarazoProps {
 export default function DashboardEmbarazo({ user, perfil, activeBabyId }: DashboardEmbarazoProps) {
   const [citas, setCitas] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [fechaCitaDate, setFechaCitaDate] = useState("");
   const [fechaCitaTime, setFechaCitaTime] = useState("");
   const fechaCita = fechaCitaDate && fechaCitaTime ? `${fechaCitaDate}T${fechaCitaTime}` : "";
@@ -45,7 +46,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
   const handleSaveCita = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fechaCita) return;
-    
+
     setIsSaving(true);
     try {
       const token = localStorage.getItem("token");
@@ -57,7 +58,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       setFechaCitaDate("");
       setFechaCitaTime("");
       setMedico("");
@@ -79,18 +80,26 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
   }
   const frutaActual = perfil?.fruta_embarazo || "Semillita";
 
+  const cardStyle: React.CSSProperties = {
+    background: "white",
+    border: "2px solid var(--theme-bg-light)",
+    borderRadius: "24px",
+    padding: "28px",
+    boxShadow: "0 4px 16px rgba(124, 92, 191, 0.06)",
+  };
+
   const inputStyle: React.CSSProperties = {
     width: "100%",
     padding: "13px 14px",
     borderRadius: "14px",
-    border: "1px solid rgba(255,255,255,0.15)",
-    background: "rgba(255,255,255,0.08)",
-    color: "white",
+    border: "2px solid var(--theme-bg-light)",
+    background: "#FDFCFF",
+    color: "var(--theme-darker)",
     outline: "none",
     boxSizing: "border-box",
     fontFamily: "'Nunito', sans-serif",
     fontSize: "14px",
-    transition: "border-color 0.2s, background 0.2s",
+    transition: "border-color 0.2s",
   };
 
   const labelStyle: React.CSSProperties = {
@@ -98,14 +107,30 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
     fontSize: "12px",
     fontWeight: 700,
     marginBottom: "8px",
-    color: "rgba(255,255,255,0.6)",
+    color: "#8A849C",
     textTransform: "uppercase",
     letterSpacing: "0.05em",
   };
 
+  const cardHeaderStyle: React.CSSProperties = {
+    fontSize: "17px",
+    fontWeight: 800,
+    color: "var(--theme-darker)",
+    marginBottom: "20px",
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+  };
+
+  const iconBadgeStyle: React.CSSProperties = {
+    width: "36px", height: "36px", borderRadius: "12px",
+    background: "var(--theme-bg-light)",
+    display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+  };
+
   return (
     <div style={{ padding: "40px clamp(12px, 4vw, 20px)", maxWidth: "1020px", margin: "0 auto", fontFamily: "Nunito" }}>
-      
+
       <div style={{ marginBottom: "32px" }}>
         <div style={{
           display: "inline-flex", alignItems: "center", gap: "8px",
@@ -124,157 +149,122 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
       </div>
 
       <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", alignItems: "flex-start" }}>
-        
-        {/* LADO IZQUIERDO: Tamaño del bebé */}
-        <div style={{
-          flex: "1 1 320px",
-          background: "linear-gradient(155deg, var(--theme-darker) 0%, var(--theme-dark) 60%, var(--theme-primary) 130%)",
-          borderRadius: "24px",
-          padding: "32px clamp(20px, 6vw, 30px)",
-          display: "flex",
-          flexDirection: "column",
-          color: "white",
-          boxShadow: "0 10px 30px var(--theme-shadow)",
-          position: "relative",
-          overflow: "hidden",
-        }}>
-          {/* Glow decorativo, atmósfera sutil */}
-          <div style={{
-            position: "absolute", top: "-60px", right: "-60px", width: "180px", height: "180px",
-            borderRadius: "50%", background: "radial-gradient(circle, rgba(244,160,160,0.25) 0%, transparent 70%)",
-            pointerEvents: "none",
-          }} />
 
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1, position: "relative" }}>
-            <div style={{
-              width: "112px",
-              height: "112px",
-              borderRadius: "50%",
-              background: "rgba(255,255,255,0.1)",
-              border: "1px solid rgba(255,255,255,0.15)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              marginBottom: "24px",
-              boxShadow: "0 0 0 8px rgba(255,255,255,0.04)",
-            }}>
-              <Heart size={46} color="#F4A0A0" fill="#F4A0A0" />
+        {/* TARJETA 1: Tamaño del bebé */}
+        <div style={{ ...cardStyle, flex: "1 1 320px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <h2 style={{ ...cardHeaderStyle, alignSelf: "flex-start" }}>
+            <div style={iconBadgeStyle}>
+              <Sparkles size={18} color="var(--theme-primary)" />
             </div>
+            Tamaño del Bebé
+          </h2>
 
-            <h2 style={{ fontSize: "22px", fontWeight: 800, marginBottom: "10px", textAlign: "center" }}>Tamaño del Bebé</h2>
-            <p style={{ fontSize: "15px", color: "rgba(255,255,255,0.7)", textAlign: "center", marginBottom: "28px", lineHeight: 1.5 }}>
-              Esta semana, tu bebé tiene el tamaño de un/a<br />
-              <strong style={{ color: "#F4A0A0", fontSize: "17px" }}>{frutaActual}</strong>
-            </p>
-          </div>
+          <BabyGrowthIcon porcentaje={porcentaje} />
 
-          <div>
-            <div style={{ width: "100%", background: "rgba(255,255,255,0.12)", borderRadius: "10px", height: "8px", overflow: "hidden", marginBottom: "10px" }}>
-              <div style={{ 
-                width: `${Math.max(Math.min(porcentaje, 100), 3)}%`, 
-                height: "100%", 
-                background: "linear-gradient(90deg, #F4A0A0 0%, var(--theme-light) 100%)",
+          <div style={{ width: "100%", marginTop: "20px" }}>
+            <div style={{ width: "100%", background: "var(--theme-bg-light)", borderRadius: "10px", height: "8px", overflow: "hidden", marginBottom: "10px" }}>
+              <div style={{
+                width: `${Math.max(Math.min(porcentaje, 100), 3)}%`,
+                height: "100%",
+                background: "linear-gradient(90deg, #F4A0A0 0%, var(--theme-primary) 100%)",
                 borderRadius: "10px",
                 transition: "width 0.4s ease",
               }}></div>
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "rgba(255,255,255,0.55)", fontWeight: 600 }}>
-              <span>Concepción</span>
-              <span style={{ color: "#F4A0A0", fontWeight: 800 }}>{Math.min(porcentaje, 100)}%</span>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#8A849C", fontWeight: 700 }}>
+              <span>{Math.min(porcentaje, 100)}% · Semana {semanas}</span>
               <span>Semana 40</span>
             </div>
           </div>
+
+          <p style={{ fontSize: "15px", color: "#6B647F", textAlign: "center", marginTop: "20px", lineHeight: 1.5 }}>
+            Esta semana, tu bebé tiene el tamaño de un/a{" "}
+            <strong style={{ color: "#E8607F" }}>{frutaActual}</strong>.
+          </p>
         </div>
 
-        {/* LADO DERECHO: Controles Prenatales */}
-        <div style={{
-          flex: "2 1 450px",
-          background: "linear-gradient(160deg, var(--theme-darker) 0%, var(--theme-dark) 100%)",
-          borderRadius: "24px",
-          padding: "30px",
-          color: "white",
-          boxShadow: "0 10px 30px var(--theme-shadow)",
-          display: "flex",
-          flexDirection: "column",
-        }}>
-          <h2 style={{ fontSize: "19px", fontWeight: 800, marginBottom: "20px", display: "flex", alignItems: "center", gap: "12px" }}>
-            <div style={{
-              width: "36px", height: "36px", borderRadius: "12px",
-              background: "rgba(160,122,223,0.25)",
-              display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0
-            }}>
-              <Calendar size={18} color="var(--theme-light)" />
-            </div>
-            Controles Prenatales
-          </h2>
+        <div style={{ flex: "1 1 380px", display: "flex", flexDirection: "column", gap: "24px", minWidth: 0 }}>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "26px", maxHeight: "280px", overflowY: "auto", paddingRight: "6px" }}>
-            {loading ? (
-              <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "14px" }}>Cargando citas...</p>
-            ) : citas.length === 0 ? (
-              <div style={{
-                display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center",
-                padding: "28px 16px", background: "rgba(255,255,255,0.04)", borderRadius: "16px",
-                border: "1px dashed rgba(255,255,255,0.15)",
-              }}>
-                <div style={{
-                  width: "44px", height: "44px", borderRadius: "50%", background: "rgba(255,255,255,0.08)",
-                  display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "12px",
-                }}>
-                  <CalendarPlus size={20} color="rgba(255,255,255,0.5)" />
-                </div>
-                <p style={{ color: "rgba(255,255,255,0.75)", fontSize: "14px", fontWeight: 700, margin: "0 0 4px 0" }}>
-                  Todavía no tienes controles agendados
-                </p>
-                <p style={{ color: "rgba(255,255,255,0.45)", fontSize: "13px", margin: 0 }}>
-                  Agregá tu próxima cita médica más abajo.
-                </p>
+          {/* TARJETA 2: Controles Prenatales (solo lista) */}
+          <div style={cardStyle}>
+            <h2 style={cardHeaderStyle}>
+              <div style={iconBadgeStyle}>
+                <Calendar size={18} color="var(--theme-primary)" />
               </div>
-            ) : (
-              citas.map(cita => {
-                const date = new Date(cita.fecha_cita);
-                const isPast = date < new Date();
-                return (
-                  <div key={cita.id} style={{ 
-                    background: "rgba(255,255,255,0.06)", 
-                    borderRadius: "16px", 
-                    padding: "14px 16px",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    gap: "12px",
-                    borderLeft: `4px solid ${isPast ? "rgba(255,255,255,0.2)" : "var(--theme-light)"}`
+              Controles Prenatales
+            </h2>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px", maxHeight: "280px", overflowY: "auto", paddingRight: "4px" }}>
+              {loading ? (
+                <p style={{ color: "#B0ABC4", fontSize: "14px" }}>Cargando citas...</p>
+              ) : citas.length === 0 ? (
+                <div style={{
+                  display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center",
+                  padding: "24px 16px", background: "var(--theme-bg-light)", borderRadius: "16px",
+                }}>
+                  <div style={{
+                    width: "44px", height: "44px", borderRadius: "50%", background: "white",
+                    display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "12px",
                   }}>
-                    <div style={{ minWidth: 0 }}>
-                      <h4 style={{ margin: "0 0 4px 0", fontSize: "15px", color: isPast ? "rgba(255,255,255,0.6)" : "white", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {cita.notas || "Control Médico"}
-                      </h4>
-                      <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)", display: "flex", alignItems: "center", gap: "8px" }}>
-                        <span>{cita.medico || "Sin especificar doctor"}</span>
-                        {cita.lugar && <span>• {cita.lugar}</span>}
-                      </div>
-                    </div>
-                    <div style={{ textAlign: "right", flexShrink: 0 }}>
-                      <div style={{ fontWeight: 800, fontSize: "14px", color: isPast ? "rgba(255,255,255,0.6)" : "#F4A0A0" }}>
-                        {date.toLocaleDateString("es-CL", { day: 'numeric', month: 'short' })}
-                      </div>
-                      <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)" }}>
-                        {date.toLocaleTimeString("es-CL", { hour: '2-digit', minute:'2-digit', hour12: false })}
-                      </div>
-                    </div>
+                    <CalendarPlus size={20} color="var(--theme-primary)" />
                   </div>
-                );
-              })
-            )}
+                  <p style={{ color: "var(--theme-darker)", fontSize: "14px", fontWeight: 700, margin: "0 0 4px 0" }}>
+                    Todavía no tienes controles agendados
+                  </p>
+                  <p style={{ color: "#8A849C", fontSize: "13px", margin: 0 }}>
+                    Agregá tu próxima cita médica más abajo.
+                  </p>
+                </div>
+              ) : (
+                citas.map(cita => {
+                  const date = new Date(cita.fecha_cita);
+                  const isPast = date < new Date();
+                  return (
+                    <div key={cita.id} style={{
+                      background: "var(--theme-bg-light)",
+                      borderRadius: "16px",
+                      padding: "14px 16px",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      gap: "12px",
+                      borderLeft: `4px solid ${isPast ? "#D3CDE8" : "var(--theme-primary)"}`,
+                      opacity: isPast ? 0.7 : 1,
+                    }}>
+                      <div style={{ minWidth: 0 }}>
+                        <h4 style={{ margin: "0 0 4px 0", fontSize: "15px", color: "var(--theme-darker)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {cita.notas || "Control Médico"}
+                        </h4>
+                        <div style={{ fontSize: "13px", color: "#8A849C", display: "flex", alignItems: "center", gap: "8px" }}>
+                          <span>{cita.medico || "Sin especificar doctor"}</span>
+                          {cita.lugar && <span>• {cita.lugar}</span>}
+                        </div>
+                      </div>
+                      <div style={{ textAlign: "right", flexShrink: 0 }}>
+                        <div style={{ fontWeight: 800, fontSize: "14px", color: "var(--theme-primary)" }}>
+                          {date.toLocaleDateString("es-CL", { day: 'numeric', month: 'short' })}
+                        </div>
+                        <div style={{ fontSize: "12px", color: "#8A849C" }}>
+                          {date.toLocaleTimeString("es-CL", { hour: '2-digit', minute: '2-digit', hour12: false })}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
           </div>
 
-          {/* Formulario Nueva Cita */}
-          <div style={{ borderTop: "1px solid rgba(255,255,255,0.12)", paddingTop: "22px", marginTop: "auto" }}>
-            <h3 style={{ fontSize: "15px", fontWeight: 800, marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
-              <Plus size={16} color="var(--theme-light)" /> Agregar Nueva Cita
-            </h3>
-            
-            <form onSubmit={handleSaveCita} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+          {/* TARJETA 3: Agregar Nueva Cita (formulario, tarjeta separada) */}
+          <div style={cardStyle}>
+            <h2 style={cardHeaderStyle}>
+              <div style={iconBadgeStyle}>
+                <Plus size={18} color="var(--theme-primary)" />
+              </div>
+              Agregar Nueva Cita
+            </h2>
+
+            <form onSubmit={handleSaveCita} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
                 <div style={{ flex: "1 1 200px" }}>
                   <label style={labelStyle}>Fecha</label>
@@ -282,7 +272,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
                     value={fechaCitaDate}
                     onChange={setFechaCitaDate}
                     required
-                    variant="dark"
+                    variant="light"
                   />
                 </div>
                 <div style={{ flex: "1 1 140px" }}>
@@ -291,43 +281,43 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
                     value={fechaCitaTime}
                     onChange={setFechaCitaTime}
                     required
-                    variant="dark"
+                    variant="light"
                   />
                 </div>
               </div>
               <div>
                 <label style={labelStyle}>Doctor/Centro (Opcional)</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   placeholder="Ej. Dr. Silva - Centro Médico"
                   value={medico}
                   onChange={e => setMedico(e.target.value)}
-                  style={inputStyle} 
-                  onFocus={(e) => { e.target.style.borderColor = "var(--theme-light)"; e.target.style.background = "rgba(255,255,255,0.14)"; }}
-                  onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.15)"; e.target.style.background = "rgba(255,255,255,0.08)"; }}
+                  style={inputStyle}
+                  onFocus={(e) => { e.target.style.borderColor = "var(--theme-light)"; }}
+                  onBlur={(e) => { e.target.style.borderColor = "var(--theme-bg-light)"; }}
                 />
               </div>
-              
+
               <div>
                 <label style={labelStyle}>Notas / Título</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   placeholder="Ej. Ecografía Estructural"
                   value={notas}
                   onChange={e => setNotas(e.target.value)}
-                  style={inputStyle} 
-                  onFocus={(e) => { e.target.style.borderColor = "var(--theme-light)"; e.target.style.background = "rgba(255,255,255,0.14)"; }}
-                  onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.15)"; e.target.style.background = "rgba(255,255,255,0.08)"; }}
+                  style={inputStyle}
+                  onFocus={(e) => { e.target.style.borderColor = "var(--theme-light)"; }}
+                  onBlur={(e) => { e.target.style.borderColor = "var(--theme-bg-light)"; }}
                 />
               </div>
 
               <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "4px" }}>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={isSaving || !fechaCita}
-                  style={{ 
-                    background: isSaving || !fechaCita ? "rgba(255,255,255,0.12)" : "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
-                    color: isSaving || !fechaCita ? "rgba(255,255,255,0.4)" : "white",
+                  style={{
+                    background: isSaving || !fechaCita ? "var(--theme-bg-light)" : "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
+                    color: isSaving || !fechaCita ? "#B0ABC4" : "white",
                     border: "none",
                     padding: "13px 28px",
                     borderRadius: "14px",
