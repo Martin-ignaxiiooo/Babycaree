@@ -78,11 +78,14 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
   if (semanas > 0) {
     porcentaje = Math.round((semanas / 40) * 100);
   }
-  const mes = mesDesdeSemanas(semanas);
-  const hito = HITOS_POR_MES[mes];
+  // Estos textos ahora viven en la tabla embarazo_hitos_mes y llegan desde el
+  // backend. Los objetos locales quedan solo como respaldo por si la tabla
+  // todavía no está creada en ese ambiente.
+  const mes = perfil?.mes_embarazo || mesDesdeSemanas(semanas);
+  const hito = perfil?.hito_embarazo || HITOS_POR_MES[mes];
   const frutaActual = perfil?.fruta_embarazo || "Semillita";
-  const etiquetaMes = ETIQUETA_POR_MES[mes];
-  const rangoSemana = SEMANA_RANGO_POR_MES[mes];
+  const etiquetaMes = perfil?.etiqueta_mes_embarazo || ETIQUETA_POR_MES[mes];
+  const rangoSemana = perfil?.rango_semana_mes_embarazo || SEMANA_RANGO_POR_MES[mes];
 
   const cardStyle: React.CSSProperties = {
     background: "white",

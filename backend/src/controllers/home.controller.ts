@@ -101,6 +101,10 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
 
     let fruta_embarazo = null;
     let semanas_embarazo = null;
+    let mes_embarazo = null;
+    let hito_embarazo = null;
+    let etiqueta_mes_embarazo = null;
+    let rango_semana_mes_embarazo = null;
 
     if (perfil.estado === 'embarazo' && perfil.fecha_estimada_parto) {
       const fur = new Date(perfil.fecha_estimada_parto);
@@ -120,6 +124,25 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
       } else {
         fruta_embarazo = semanas_embarazo < 4 ? "Semillita" : "Sandía";
       }
+
+      // Hito de desarrollo del mes correspondiente (tabla embarazo_hitos_mes).
+      // Cada mes cubre 4 semanas; el mes 9 cubre de la semana 33 en adelante.
+      mes_embarazo = Math.min(Math.ceil(semanas_embarazo / 4), 9);
+      try {
+        const hitoRes = await query(
+          `SELECT etiqueta, rango_semana, descripcion FROM embarazo_hitos_mes WHERE mes = $1`,
+          [mes_embarazo]
+        );
+        if (hitoRes.rows.length > 0) {
+          hito_embarazo = hitoRes.rows[0].descripcion;
+          etiqueta_mes_embarazo = hitoRes.rows[0].etiqueta;
+          rango_semana_mes_embarazo = hitoRes.rows[0].rango_semana;
+        }
+      } catch (e) {
+        // Si la tabla todavía no existe en este ambiente, el frontend usa sus
+        // valores por defecto en vez de romper el dashboard entero.
+        console.error("No se pudo leer embarazo_hitos_mes:", e);
+      }
     }
 
     // 3. Build Hero Object
@@ -132,7 +155,11 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
       talla_cm,
       percentil: perfil.fecha_nacimiento ? calculateApproxPercentile(peso_kg, perfil.fecha_nacimiento) : 0,
       semanas_embarazo,
-      fruta_embarazo
+      fruta_embarazo,
+      mes_embarazo,
+      hito_embarazo,
+      etiqueta_mes_embarazo,
+      rango_semana_mes_embarazo
     };
 
     // 4. Fetch Notifications
