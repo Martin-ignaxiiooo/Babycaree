@@ -166,14 +166,42 @@ export default function Dashboard() {
     navigate("/");
   };
 
+  const [growthError, setGrowthError] = useState("");
+
+  // Rango realista para un niño de 0 a 12 años aprox. Evita errores como
+  // escribir 3500 (confundiendo gramos con kilos) y que el guardado falle
+  // silenciosamente por desbordar la columna numérica en la base de datos.
+  const PESO_MIN_KG = 0.3;
+  const PESO_MAX_KG = 60;
+  const TALLA_MIN_CM = 20;
+  const TALLA_MAX_CM = 180;
+
   const handleSaveGrowth = async () => {
     if (!pesoInput || !tallaInput || !activeBabyId) return;
+
+    const peso = parseFloat(pesoInput);
+    const talla = parseFloat(tallaInput);
+
+    if (isNaN(peso) || peso < PESO_MIN_KG || peso > PESO_MAX_KG) {
+      const pesoEnKg = peso / 1000;
+      const sugerenciaConversion = peso > PESO_MAX_KG && pesoEnKg >= PESO_MIN_KG && pesoEnKg <= PESO_MAX_KG
+        ? ` ¿Quisiste decir ${pesoEnKg.toFixed(2)}kg?`
+        : "";
+      setGrowthError(`El peso debe estar entre ${PESO_MIN_KG}kg y ${PESO_MAX_KG}kg.${sugerenciaConversion}`);
+      return;
+    }
+    if (isNaN(talla) || talla < TALLA_MIN_CM || talla > TALLA_MAX_CM) {
+      setGrowthError(`La talla debe estar entre ${TALLA_MIN_CM}cm y ${TALLA_MAX_CM}cm.`);
+      return;
+    }
+
+    setGrowthError("");
     setIsSaving(true);
     try {
       const token = localStorage.getItem("token");
       await axios.post(`${API_URL}/v1/home/${activeBabyId}/crecimiento`, {
-        peso: parseFloat(pesoInput),
-        talla: parseFloat(tallaInput)
+        peso,
+        talla
       }, { headers: { Authorization: `Bearer ${token}` } });
       
       setIsModalOpen(false);
@@ -182,9 +210,9 @@ export default function Dashboard() {
       
       // Refresh Dashboard data
       if (token) fetchDashboard(token, activeBabyId);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert("Error al guardar las medidas");
+      setGrowthError(error.response?.data?.error || "Error al guardar las medidas. Intenta de nuevo.");
     } finally {
       setIsSaving(false);
     }
@@ -576,7 +604,7 @@ export default function Dashboard() {
 
                   return (
                     <div key={idx}
-                      onClick={() => navigate("/salud")}
+                      onClick={() => n.tipo === "articulo" && n.articulo_id ? navigate(`/comunidad/articulo/${n.articulo_id}`) : navigate("/salud")}
                       style={{
                         borderRadius: "999px", padding: "12px 18px", marginBottom: "10px",
                         display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", cursor: "pointer",
@@ -612,7 +640,7 @@ export default function Dashboard() {
                 </h3>
                 {(!homeData?.rol_acceso || !homeData.rol_acceso.startsWith('solo_lectura')) && (
                   <button 
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={() => { setIsModalOpen(true); setGrowthError(""); }}
                     style={{
                       background: "var(--theme-primary)", color: "#fff",
                       padding: "8px 16px", borderRadius: "12px", border: "none",
@@ -717,10 +745,19 @@ export default function Dashboard() {
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
               <h2 style={{ fontSize: "20px", fontWeight: 800, color: "var(--theme-darker)", margin: 0 }}>Registrar Medidas</h2>
-              <button onClick={() => setIsModalOpen(false)} style={{ background: "none", border: "none", cursor: "pointer" }}>
+              <button onClick={() => { setIsModalOpen(false); setGrowthError(""); }} style={{ background: "none", border: "none", cursor: "pointer" }}>
                 <X size={24} color="#6B7280" />
               </button>
             </div>
+
+            {growthError && (
+              <div style={{
+                background: "#FFF0F0", borderLeft: "4px solid #DC2626", borderRadius: "10px",
+                padding: "12px 16px", marginBottom: "18px", fontSize: "13px", color: "#7F1D1D", fontWeight: 600,
+              }}>
+                {growthError}
+              </div>
+            )}
             
             <div style={{ marginBottom: "20px" }}>
               <label style={{ display: "block", fontSize: "14px", fontWeight: 700, marginBottom: "8px", color: "#4B5563" }}>Peso (kg)</label>
@@ -728,7 +765,7 @@ export default function Dashboard() {
                 type="number" 
                 step="0.01"
                 value={pesoInput}
-                onChange={e => setPesoInput(e.target.value)}
+                onChange={e => { setPesoInput(e.target.value); setGrowthError(""); }}
                 placeholder="Ej. 7.4"
                 style={{ width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", outline: "none", fontSize: "15px" }}
               />
@@ -740,7 +777,7 @@ export default function Dashboard() {
                 type="number" 
                 step="0.1"
                 value={tallaInput}
-                onChange={e => setTallaInput(e.target.value)}
+                onChange={e => { setTallaInput(e.target.value); setGrowthError(""); }}
                 placeholder="Ej. 67.5"
                 style={{ width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", outline: "none", fontSize: "15px" }}
               />

@@ -167,6 +167,7 @@ export default function Salud() {
 
   const toggleVacuna = async (vacunaId: number, aplicadaActual: boolean) => {
     if (rolAcceso.startsWith('solo_lectura')) return;
+    const vacuna = vacunas.find(v => v.vacuna_id === vacunaId);
     try {
       const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/vacunas/${vacunaId}`, {
         method: "PATCH",
@@ -176,7 +177,9 @@ export default function Salud() {
         },
         body: JSON.stringify({ 
           aplicada: !aplicadaActual,
-          fecha_aplicacion: !aplicadaActual ? new Date().toISOString().split('T')[0] : null
+          fecha_aplicacion: !aplicadaActual ? new Date().toISOString().split('T')[0] : null,
+          notas: vacuna?.notas ?? null,
+          lugar_aplicacion: vacuna?.lugar_aplicacion ?? null,
         })
       });
       
@@ -189,9 +192,25 @@ export default function Salud() {
   };
 
   const updateVacunaInfo = async (vacunaId: number, field: string, value: string) => {
-    // Busca el estado actual en la UI para no perder el 'aplicada'
+    // Busca el estado actual en la UI para no perder el resto de los campos.
+    // Antes se mandaba solo el campo que cambió (ej. { notas: "..." }), y el
+    // backend hace un upsert de TODOS los campos en cada llamada — eso
+    // pisaba con null cualquier campo que no viniera en esa petición puntual
+    // (por eso la fecha se borraba al editar las notas, y viceversa).
     const vacuna = vacunas.find(v => v.vacuna_id === vacunaId);
     if (!vacuna) return;
+
+    const payload = {
+      aplicada: vacuna.aplicada,
+      fecha_aplicacion: vacuna.fecha_aplicacion ? vacuna.fecha_aplicacion.split('T')[0] : null,
+      notas: vacuna.notas ?? null,
+      lugar_aplicacion: vacuna.lugar_aplicacion ?? null,
+      [field]: value,
+    };
+
+    // Actualiza el estado local de inmediato para que el campo no "salte"
+    // al valor anterior mientras se espera la respuesta del servidor.
+    setVacunas(prev => prev.map(v => v.vacuna_id === vacunaId ? { ...v, [field]: value } : v));
 
     try {
       await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/vacunas/${vacunaId}`, {
@@ -200,10 +219,7 @@ export default function Salud() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ 
-          aplicada: vacuna.aplicada,
-          [field]: value
-        })
+        body: JSON.stringify(payload)
       });
     } catch (error) {
       console.error(error);

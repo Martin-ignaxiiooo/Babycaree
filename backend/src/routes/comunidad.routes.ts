@@ -159,9 +159,14 @@ router.post("/foros/:id/respuestas", async (req: AuthRequest, res: Response) => 
 
 router.get("/articulos", async (req: AuthRequest, res: Response) => {
   try {
-    const result = await query(
-      "SELECT * FROM articulos_educativos WHERE estado = 'publicado' ORDER BY fecha_creacion DESC"
-    );
+    const userId = req.user.id;
+    const result = await query(`
+      SELECT a.*,
+        EXISTS(SELECT 1 FROM comunidad_articulo_likes l WHERE l.articulo_id = a.id AND l.usuario_id = $1) as has_liked
+      FROM articulos_educativos a
+      WHERE a.estado = 'publicado'
+      ORDER BY a.fecha_creacion DESC
+    `, [userId]);
     res.json(result.rows);
   } catch (error) {
     console.error("Error fetching articulos:", error);
@@ -172,15 +177,18 @@ router.get("/articulos", async (req: AuthRequest, res: Response) => {
 // Obtener un articulo específico
 router.get("/articulos/:id", async (req: AuthRequest, res: Response) => {
   try {
+    const userId = req.user.id;
     const articuloId = req.params.id;
     
     // Sumar 1 al contador de lecturas
     await query("UPDATE articulos_educativos SET contador_lecturas = contador_lecturas + 1 WHERE id = $1", [articuloId]);
 
-    const result = await query(
-      "SELECT * FROM articulos_educativos WHERE id = $1 AND estado = 'publicado'",
-      [articuloId]
-    );
+    const result = await query(`
+      SELECT a.*,
+        EXISTS(SELECT 1 FROM comunidad_articulo_likes l WHERE l.articulo_id = a.id AND l.usuario_id = $2) as has_liked
+      FROM articulos_educativos a
+      WHERE a.id = $1 AND a.estado = 'publicado'
+    `, [articuloId, userId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Artículo no encontrado" });
@@ -190,6 +198,32 @@ router.get("/articulos/:id", async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error("Error fetching articulo:", error);
     res.status(500).json({ error: "Error al obtener artículo" });
+  }
+});
+
+// Dar o quitar like a un artículo
+router.post("/articulos/:id/like", async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user.id;
+    const articuloId = req.params.id;
+
+    const checkRes = await query(
+      "SELECT 1 FROM comunidad_articulo_likes WHERE articulo_id = $1 AND usuario_id = $2",
+      [articuloId, userId]
+    );
+
+    if (checkRes.rows.length > 0) {
+      await query("DELETE FROM comunidad_articulo_likes WHERE articulo_id = $1 AND usuario_id = $2", [articuloId, userId]);
+      await query("UPDATE articulos_educativos SET likes = GREATEST(likes - 1, 0) WHERE id = $1", [articuloId]);
+      res.json({ liked: false });
+    } else {
+      await query("INSERT INTO comunidad_articulo_likes (articulo_id, usuario_id) VALUES ($1, $2)", [articuloId, userId]);
+      await query("UPDATE articulos_educativos SET likes = likes + 1 WHERE id = $1", [articuloId]);
+      res.json({ liked: true });
+    }
+  } catch (error) {
+    console.error("Error toggling like de artículo:", error);
+    res.status(500).json({ error: "Error al procesar el like" });
   }
 });
 

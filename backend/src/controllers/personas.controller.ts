@@ -8,44 +8,63 @@ export const buscarPersonas = async (req: Request, res: Response): Promise<void>
     const queryText = (q as string).toLowerCase().trim();
 
     if (!fuente) {
-      res.status(400).json({ error: 'Debe especificar una fuente (contactos o perfiles)' });
+      res.status(400).json({ error: 'Debe especificar una fuente (contactos, familia o todos)' });
       return;
     }
 
-    // Regla de minimización de datos: 
+    // Regla de minimización de datos:
     // No permitimos buscar libremente en toda la base de usuarios a menos que sea un correo exacto válido.
     const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(queryText);
-    let results: any[] = [];
 
-    if (fuente === 'perfiles') {
-      // Busca familiares que ya tengan acceso a *otros* perfiles del mismo usuario.
-      if (queryText.length > 0) {
-        const result = await query(
-          `SELECT DISTINCT u.id, u.nombre, u.apellidos, u.email 
-           FROM accesos_compartidos_bebe a
-           JOIN perfiles_bebes p ON a.id_perfil_bebe = p.id
-           JOIN usuarios u ON a.id_usuario_invitado = u.id
-           WHERE p.usuario_id = $1 AND u.id != $1
-           AND (LOWER(u.nombre) LIKE $2 OR LOWER(u.apellidos) LIKE $2 OR LOWER(u.email) = $3)
-           LIMIT 5`,
-          [userId, `%${queryText}%`, queryText]
-        );
-        results = result.rows;
-      }
-    } else if (fuente === 'contactos') {
+    const buscarEnFamilia = async (): Promise<any[]> => {
+      if (queryText.length === 0) return [];
+      const result = await query(
+        `SELECT DISTINCT u.id, u.nombre, u.apellidos, u.email 
+         FROM accesos_compartidos_bebe a
+         JOIN perfiles_bebes p ON a.id_perfil_bebe = p.id
+         JOIN usuarios u ON a.id_usuario_invitado = u.id
+         WHERE p.usuario_id = $1 AND u.id != $1
+         AND (LOWER(u.nombre) LIKE $2 OR LOWER(u.apellidos) LIKE $2 OR LOWER(u.email) = $3)
+         LIMIT 5`,
+        [userId, `%${queryText}%`, queryText]
+      );
+      return result.rows;
+    };
+
+    const buscarEnContactos = async (): Promise<any[]> => {
       // Busca entre los contactos ya sincronizados, o por correo exacto
       if (isEmail) {
         const result = await query(
           `SELECT id, nombre, apellidos, email FROM usuarios WHERE email = $1 AND id != $2`,
           [queryText, userId]
         );
-        results = result.rows;
-      } else {
-        // En una app real, aquí cruzaríamos contra una tabla de contactos_sincronizados.
-        // Dado que no la almacenamos, si busca por nombre y la fuente es "contactos",
-        // retorna vacío para no enumerar.
-        results = [];
+        return result.rows;
       }
+      // En una app real, aquí cruzaríamos contra una tabla de contactos_sincronizados.
+      // Dado que no la almacenamos, si busca por nombre y la fuente es "contactos",
+      // retorna vacío para no enumerar.
+      return [];
+    };
+
+    let results: any[] = [];
+    // Nota: el frontend usa "familia" para el tab "Otros perfiles" (antes el
+    // backend esperaba "perfiles", un nombre distinto — por eso ese tab
+    // nunca devolvía resultados). "todos" combina ambas fuentes.
+    if (fuente === 'familia') {
+      results = await buscarEnFamilia();
+    } else if (fuente === 'contactos') {
+      results = await buscarEnContactos();
+    } else if (fuente === 'todos') {
+      const [familia, contactos] = await Promise.all([buscarEnFamilia(), buscarEnContactos()]);
+      const vistos = new Set<string>();
+      results = [...familia, ...contactos].filter((p) => {
+        if (vistos.has(p.id)) return false;
+        vistos.add(p.id);
+        return true;
+      });
+    } else {
+      res.status(400).json({ error: 'Fuente inválida' });
+      return;
     }
 
     res.json(results);

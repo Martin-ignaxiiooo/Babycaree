@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Clock, FileText, Eye, Star } from "lucide-react";
+import { ArrowLeft, Clock, FileText, Eye, Star, ThumbsUp } from "lucide-react";
 import axios from "axios";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api/v1";
@@ -35,6 +35,21 @@ export default function ArticuloDetalle() {
     fetchDetalle();
   }, [id, token, navigate]);
 
+  const handleLike = async () => {
+    if (!articulo) return;
+    // Optimista: refleja el cambio de inmediato, sin esperar la respuesta
+    setArticulo({ ...articulo, has_liked: !articulo.has_liked, likes: (articulo.likes || 0) + (articulo.has_liked ? -1 : 1) });
+    try {
+      await axios.post(`${API_URL}/comunidad/articulos/${id}/like`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+    } catch (error) {
+      console.error("Error toggling like:", error);
+      // Revertir si falló
+      setArticulo((prev: any) => prev && ({ ...prev, has_liked: !prev.has_liked, likes: (prev.likes || 0) + (prev.has_liked ? -1 : 1) }));
+    }
+  };
+
   if (loading) return <div style={{ padding: "40px", textAlign: "center", fontFamily: "'Nunito', sans-serif" }}>Cargando artículo...</div>;
   if (!articulo) return <div style={{ padding: "40px", textAlign: "center", fontFamily: "'Nunito', sans-serif" }}>Artículo no encontrado.</div>;
 
@@ -44,7 +59,7 @@ export default function ArticuloDetalle() {
       {/* ── TOP NAV COMPACTA ── */}
       <nav style={{ width: "100%", background: "#fff", padding: "16px 40px", display: "flex", alignItems: "center", boxShadow: "0 2px 8px rgba(0,0,0,.05)" }}>
         <button 
-          onClick={() => navigate("/comunidad")} 
+          onClick={() => navigate("/comunidad?tab=articulos")} 
           style={{ background: "none", border: "none", color: "#6B7280", fontSize: "15px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
         >
           <ArrowLeft size={18} /> Volver a Artículos
@@ -84,15 +99,30 @@ export default function ArticuloDetalle() {
             {articulo.contenido_completo}
           </div>
 
-          <div style={{ marginTop: "40px", paddingTop: "24px", borderTop: "2px dashed #E5E7EB", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ marginTop: "40px", paddingTop: "24px", borderTop: "2px dashed #E5E7EB", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
             <div style={{ fontSize: "14px", color: "#9CA3AF" }}>
               <strong>Fuente:</strong> {articulo.fuente_citada}
             </div>
-            {articulo.calificacion_utilidad && (
-              <div style={{ display: "flex", alignItems: "center", gap: "4px", color: "#F59E0B", fontWeight: 700 }}>
-                <Star size={18} fill="#F59E0B" /> {articulo.calificacion_utilidad}/5
-              </div>
-            )}
+            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+              {articulo.calificacion_utilidad && (
+                <div style={{ display: "flex", alignItems: "center", gap: "4px", color: "#F59E0B", fontWeight: 700 }}>
+                  <Star size={18} fill="#F59E0B" /> {articulo.calificacion_utilidad}/5
+                </div>
+              )}
+              <button
+                onClick={handleLike}
+                style={{
+                  display: "flex", alignItems: "center", gap: "8px",
+                  background: articulo.has_liked ? "var(--theme-bg-light)" : "#F3F4F6",
+                  color: articulo.has_liked ? "var(--theme-primary)" : "#4B5563",
+                  border: "none", borderRadius: "14px", padding: "10px 18px",
+                  fontWeight: 800, fontSize: "14px", cursor: "pointer",
+                }}
+              >
+                <ThumbsUp size={18} fill={articulo.has_liked ? "var(--theme-primary)" : "none"} />
+                {articulo.likes || 0} {articulo.likes === 1 ? "me gusta" : "me gusta"}
+              </button>
+            </div>
           </div>
         </div>
 

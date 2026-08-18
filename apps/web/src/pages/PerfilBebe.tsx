@@ -417,8 +417,23 @@ export default function PerfilBebe() {
                 
                 <div style={{ display: "flex", gap: "16px", marginBottom: "16px" }}>
                   <div style={{ flex: 1 }}>
-                    <label style={labelStyle}>Peso al nacer (g)</label>
-                    {editMode ? <input type="number" name="peso_nacimiento_g" value={editData.peso_nacimiento_g || ""} onChange={handleChange} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.peso_nacimiento_g || "-"}</div>}
+                    <label style={labelStyle}>Peso al nacer (kg)</label>
+                    {editMode ? (
+                      <input
+                        type="number"
+                        step="0.01"
+                        placeholder="Ej. 3.5"
+                        name="peso_nacimiento_kg_display"
+                        value={editData.peso_nacimiento_g ? (Number(editData.peso_nacimiento_g) / 1000) : ""}
+                        onChange={(e) => {
+                          const kg = e.target.value;
+                          setEditData({ ...editData, peso_nacimiento_g: kg ? Math.round(parseFloat(kg) * 1000) : "" });
+                        }}
+                        style={inputStyle}
+                      />
+                    ) : (
+                      <div style={readOnlyStyle}>{perfil.peso_nacimiento_g ? `${(perfil.peso_nacimiento_g / 1000).toFixed(2)} kg` : "-"}</div>
+                    )}
                   </div>
                   <div style={{ flex: 1 }}>
                     <label style={labelStyle}>Talla al nacer (cm)</label>
@@ -578,9 +593,9 @@ export default function PerfilBebe() {
                 </h3>
                 
                 <div style={{ display: "flex", gap: "8px", marginBottom: "16px" }}>
-                  <button onClick={() => setSearchTab("todos")} style={{ flex: 1, padding: "10px", borderRadius: "12px", border: "none", background: searchTab === "todos" ? "var(--theme-primary)" : "#F3F4F6", color: searchTab === "todos" ? "#fff" : "#4B5563", fontWeight: 700, cursor: "pointer" }}>Todos</button>
-                  <button onClick={() => setSearchTab("contactos")} style={{ flex: 1, padding: "10px", borderRadius: "12px", border: "1px solid #E5E7EB", background: searchTab === "contactos" ? "var(--theme-primary)" : "#F9FAFB", color: searchTab === "contactos" ? "#fff" : "#4B5563", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>📱 Mis contactos</button>
-                  <button onClick={() => setSearchTab("familia")} style={{ flex: 1, padding: "10px", borderRadius: "12px", border: "1px solid #E5E7EB", background: searchTab === "familia" ? "var(--theme-primary)" : "#F9FAFB", color: searchTab === "familia" ? "#fff" : "#4B5563", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>👥 Otros perfiles</button>
+                  <button onClick={() => { setSearchTab("todos"); buscarPersonas(searchQuery, "todos"); }} style={{ flex: 1, padding: "10px", borderRadius: "12px", border: "none", background: searchTab === "todos" ? "var(--theme-primary)" : "#F3F4F6", color: searchTab === "todos" ? "#fff" : "#4B5563", fontWeight: 700, cursor: "pointer" }}>Todos</button>
+                  <button onClick={() => { setSearchTab("contactos"); buscarPersonas(searchQuery, "contactos"); }} style={{ flex: 1, padding: "10px", borderRadius: "12px", border: "1px solid #E5E7EB", background: searchTab === "contactos" ? "var(--theme-primary)" : "#F9FAFB", color: searchTab === "contactos" ? "#fff" : "#4B5563", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>📱 Mis contactos</button>
+                  <button onClick={() => { setSearchTab("familia"); buscarPersonas(searchQuery, "familia"); }} style={{ flex: 1, padding: "10px", borderRadius: "12px", border: "1px solid #E5E7EB", background: searchTab === "familia" ? "var(--theme-primary)" : "#F9FAFB", color: searchTab === "familia" ? "#fff" : "#4B5563", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>👥 Otros perfiles</button>
                 </div>
                 
                 <p style={{ fontSize: "13px", color: "#6B7280", marginBottom: "24px" }}>Busca entre tus contactos, familiares ya registrados en Iniciativa Baby, o escribe un correo para invitar a alguien nuevo.</p>
@@ -593,7 +608,14 @@ export default function PerfilBebe() {
                     value={searchQuery}
                     onChange={(e) => {
                       setSearchQuery(e.target.value);
-                      if (e.target.value.length > 2) buscarPersonas(e.target.value);
+                      if (e.target.value.trim().length > 2) buscarPersonas(e.target.value, searchTab);
+                      else if (e.target.value.trim().length === 0) setSearchResults([]);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        buscarPersonas(searchQuery, searchTab);
+                      }
                     }}
                     style={{ width: "100%", padding: "14px 16px 14px 48px", borderRadius: "12px", border: "1px solid #E5E7EB", fontSize: "15px", outline: "none", color: "var(--theme-darker)" }}
                   />

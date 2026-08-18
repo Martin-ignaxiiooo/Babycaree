@@ -223,7 +223,16 @@ CREATE TABLE IF NOT EXISTS articulos_educativos (
     fecha_publicacion TIMESTAMP WITH TIME ZONE,
     contador_lecturas INTEGER DEFAULT 0,
     calificacion_utilidad DECIMAL(3,2),
+    likes INTEGER NOT NULL DEFAULT 0,
     fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Likes de artículos educativos (comunidad_likes es solo para posts de foros)
+CREATE TABLE IF NOT EXISTS comunidad_articulo_likes (
+    articulo_id UUID NOT NULL REFERENCES articulos_educativos(id) ON DELETE CASCADE,
+    usuario_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+    fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (articulo_id, usuario_id)
 );
 
 CREATE TABLE IF NOT EXISTS comunidad_foros (

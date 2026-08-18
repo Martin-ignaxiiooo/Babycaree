@@ -38,7 +38,7 @@ export default function MiPerfil() {
     setMessage("");
 
     try {
-      const res = await fetch("https://babycare-backend-msyq.onrender.com/api/v1/profiles/me", {
+      const res = await fetch("https://babycare-backend-msyq.onrender.com/api/profiles/me", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -49,7 +49,7 @@ export default function MiPerfil() {
 
       let passwordChanged = false;
       if (passwordData.currentPassword && passwordData.newPassword) {
-        const passRes = await fetch("https://babycare-backend-msyq.onrender.com/api/v1/profiles/me/password", {
+        const passRes = await fetch("https://babycare-backend-msyq.onrender.com/api/profiles/me/password", {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",

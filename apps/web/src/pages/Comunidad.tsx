@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { 
   Bell, LogOut, MessageCircle, FileText, ChevronRight, ThumbsUp, MessageSquare, Clock, X
 } from "lucide-react";
@@ -10,10 +10,12 @@ const API_URL = "https://babycare-backend-msyq.onrender.com/api/v1";
 
 export default function Comunidad() {
   const navigate = useNavigate();
+  const location = useLocation();
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const token = localStorage.getItem("token");
-  
-  const [activeTab, setActiveTab] = useState<"foros" | "articulos">("foros");
+
+  const tabInicial = new URLSearchParams(location.search).get("tab") === "articulos" ? "articulos" : "foros";
+  const [activeTab, setActiveTab] = useState<"foros" | "articulos">(tabInicial);
   const [forosData, setForosData] = useState<any[]>([]);
   const [articulosData, setArticulosData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,6 +65,18 @@ export default function Comunidad() {
       fetchData();
     } catch (error) {
       console.error("Error toggling like:", error);
+    }
+  };
+
+  const handleLikeArticulo = async (e: React.MouseEvent, articuloId: string) => {
+    e.stopPropagation(); // Evita que se dispare la navegación al detalle del artículo
+    try {
+      await axios.post(`${API_URL}/comunidad/articulos/${articuloId}/like`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchData();
+    } catch (error) {
+      console.error("Error toggling like de artículo:", error);
     }
   };
 
@@ -213,7 +227,18 @@ export default function Comunidad() {
                     </span>
                   </div>
                   <h3 style={{ margin: "0 0 12px 0", fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)" }}>{art.titulo}</h3>
-                  <p style={{ margin: "0", fontSize: "14px", color: "#6B7280", lineHeight: "1.5", flex: 1 }}>{art.resumen}</p>
+                  <p style={{ margin: "0 0 16px 0", fontSize: "14px", color: "#6B7280", lineHeight: "1.5", flex: 1 }}>{art.resumen}</p>
+                  <button
+                    onClick={(e) => handleLikeArticulo(e, art.id)}
+                    style={{
+                      display: "flex", alignItems: "center", gap: "6px", alignSelf: "flex-start",
+                      background: "none", border: "none", cursor: "pointer", padding: "4px 0",
+                      color: art.has_liked ? "var(--theme-primary)" : "#6B7280",
+                    }}
+                  >
+                    <ThumbsUp size={16} fill={art.has_liked ? "var(--theme-primary)" : "none"} />
+                    <span style={{ fontWeight: 700, fontSize: "13px" }}>{art.likes || 0}</span>
+                  </button>
                 </div>
               </div>
             ))}

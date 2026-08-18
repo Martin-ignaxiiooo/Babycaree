@@ -230,26 +230,45 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
       }
     });
 
-    // C. Artículos Recomendados (Mock)
+    // C. Artículo recomendado (real, filtrado por edad del bebé)
     const exactAge = calculateExactAge(perfil.fecha_nacimiento);
     const monthsMatch = exactAge.match(/(\d+) meses/);
-    const ageMonths = monthsMatch ? monthsMatch[1] : '0';
+    const ageMonths = monthsMatch ? parseInt(monthsMatch[1], 10) : 0;
 
-    notificaciones.push({
-      tipo: "articulo",
-      prioridad: "baja",
-      titulo: `Artículo para los ${ageMonths} meses`,
-      mensaje: "Cómo iniciar la alimentación complementaria con BLW."
+    const articulosRes = await query(
+      `SELECT id, titulo, rango_edad_meses FROM articulos_educativos WHERE estado = 'publicado'`
+    );
+    // rango_edad_meses es texto libre tipo "0-6 meses"; lo parseamos acá
+    // porque no está normalizado en columnas numéricas en la base de datos.
+    const articuloIdeal = articulosRes.rows.find((a: any) => {
+      const match = (a.rango_edad_meses || "").match(/(\d+)\s*-\s*(\d+)/);
+      if (!match) return false;
+      const [, min, max] = match;
+      return ageMonths >= parseInt(min, 10) && ageMonths <= parseInt(max, 10);
     });
 
-    // Añadir Mocks visuales si la BD está vacía para que el usuario vea el diseño
+    if (articuloIdeal) {
+      notificaciones.push({
+        tipo: "articulo",
+        prioridad: "baja",
+        titulo: articuloIdeal.titulo,
+        articulo_id: articuloIdeal.id,
+        mensaje: "Artículo recomendado para esta edad.",
+      });
+    }
+
+    // Mocks visuales SOLO si la BD está vacía, para que el usuario vea el
+    // diseño del dashboard antes de registrar datos reales. Se marcan
+    // explícitamente como "(ejemplo)" para no confundirlos con vacunas o
+    // controles reales del bebé.
     if (vacunasRes.rows.length === 0) {
       notificaciones.push({
         tipo: "vacuna_atrasada",
         prioridad: "alta",
-        titulo: "Vacuna Hexavalente 2ª — Atrasada",
+        titulo: "Vacuna Hexavalente 2ª — Atrasada (ejemplo)",
         dias_atraso: 5,
-        mensaje: "Atrasada por 5 días. Agenda tu hora en el CESFAM."
+        es_ejemplo: true,
+        mensaje: "Así se ve una alerta de vacuna atrasada. Registra las vacunas reales en Salud → Vacunas."
       });
       total_alertas++;
     }
@@ -258,9 +277,10 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
       notificaciones.push({
         tipo: "control_proximo",
         prioridad: "media",
-        titulo: "Control 8 meses",
+        titulo: "Control 8 meses (ejemplo)",
         dias_restantes: 18,
-        mensaje: "En 18 días en CESFAM con Dra. Soto."
+        es_ejemplo: true,
+        mensaje: "Así se ve una alerta de control próximo. Agenda citas reales en Salud → Citas."
       });
       total_alertas++;
     }
@@ -376,6 +396,18 @@ export const addGrowthRecord = async (req: Request, res: Response) => {
 
     if (!peso || !talla) {
       return res.status(400).json({ error: "Peso y talla son requeridos" });
+    }
+
+    // Mismos límites que el frontend, para no depender solo de la
+    // validación del cliente y evitar que un valor como 3500 (confundiendo
+    // gramos con kilos) desborde la columna numérica en la base de datos.
+    const pesoNum = Number(peso);
+    const tallaNum = Number(talla);
+    if (isNaN(pesoNum) || pesoNum < 0.3 || pesoNum > 60) {
+      return res.status(400).json({ error: "El peso debe estar entre 0.3kg y 60kg" });
+    }
+    if (isNaN(tallaNum) || tallaNum < 20 || tallaNum > 180) {
+      return res.status(400).json({ error: "La talla debe estar entre 20cm y 180cm" });
     }
 
     const userId = (req as any).user?.id;
