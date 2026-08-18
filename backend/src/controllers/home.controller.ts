@@ -67,7 +67,6 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
 
     const perfil = profileRes.rows[0];
     const userId = (req as any).user?.id || (req as any).user?.userId; // Fallback just in case
-    console.log("home.controller: perfil.usuario_id =", perfil.usuario_id, "userId =", userId);
     let rol_acceso = "propietario";
 
     if (perfil.usuario_id !== userId) {
