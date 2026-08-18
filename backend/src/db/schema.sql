@@ -42,7 +42,10 @@ CREATE TABLE IF NOT EXISTS perfiles_bebes (
     alergias TEXT CHECK (char_length(alergias) <= 500),
     condiciones_cronicas TEXT CHECK (char_length(condiciones_cronicas) <= 500),
     pediatra_nombre VARCHAR(100),
-    centro_salud VARCHAR(150)
+    centro_salud VARCHAR(150),
+    rut VARCHAR(12),
+    contacto_emergencia_nombre VARCHAR(100),
+    contacto_emergencia_telefono VARCHAR(20)
 );
 
 -- Calendario de Vacunas PNI
@@ -145,7 +148,10 @@ CREATE TABLE IF NOT EXISTS citas_medicas (
     fecha_cita TIMESTAMP WITH TIME ZONE NOT NULL,
     notas TEXT,
     estado VARCHAR(20) DEFAULT 'programada', -- programada, completada, cancelada
-    fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    recordatorio_7d_enviado BOOLEAN NOT NULL DEFAULT FALSE,
+    recordatorio_1d_enviado BOOLEAN NOT NULL DEFAULT FALSE,
+    recordatorio_2h_enviado BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 -- ==========================================

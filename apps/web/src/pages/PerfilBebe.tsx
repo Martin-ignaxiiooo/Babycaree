@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import CryptoJS from "crypto-js";
 import { 
-  ArrowLeft, Camera, User, Search, Lock, Bell
+  ArrowLeft, Camera, User, Search, Lock, Bell, IdCard
 } from "lucide-react";
 import TopNav from "../components/TopNav";
 import DateSelect from "../components/DateSelect";
+import CarnetDigital from "../components/CarnetDigital";
 
 export default function PerfilBebe() {
   const { id } = useParams();
@@ -39,6 +40,7 @@ export default function PerfilBebe() {
   
   const [showConfirmGestation, setShowConfirmGestation] = useState(false);
   const [pendingSave, setPendingSave] = useState(false);
+  const [showCarnet, setShowCarnet] = useState(false);
   
   const [searchQuery, setSearchQuery] = useState("");
   const [searchTab, setSearchTab] = useState<"todos" | "contactos" | "familia">("todos");
@@ -475,6 +477,43 @@ export default function PerfilBebe() {
                   </div>
                 </div>
               </div>
+
+              {/* CARNET DIGITAL: RUT Y CONTACTO DE EMERGENCIA */}
+              <div style={{ ...cardStyle, gridColumn: "1 / -1" }}>
+                <h3 style={{ fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "6px", borderBottom: "1px solid #E5E7EB", paddingBottom: "12px" }}>Carnet Digital</h3>
+                <p style={{ fontSize: "13px", color: "#8A849C", margin: "10px 0 20px" }}>Estos datos aparecen en el carnet pediátrico digital que puedes mostrar en el consultorio.</p>
+
+                <div className="hero-stats-grid" style={{ marginBottom: "16px" }}>
+                  <div>
+                    <label style={labelStyle}>RUT del bebé (opcional)</label>
+                    {editMode ? <input type="text" name="rut" placeholder="12.345.678-9" value={editData.rut || ""} onChange={handleChange} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.rut || "-"}</div>}
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Contacto de emergencia — nombre</label>
+                    {editMode ? <input type="text" name="contacto_emergencia_nombre" value={editData.contacto_emergencia_nombre || ""} onChange={handleChange} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.contacto_emergencia_nombre || "-"}</div>}
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Contacto de emergencia — teléfono</label>
+                    {editMode ? <input type="tel" name="contacto_emergencia_telefono" placeholder="+56 9 1234 5678" value={editData.contacto_emergencia_telefono || ""} onChange={handleChange} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.contacto_emergencia_telefono || "-"}</div>}
+                  </div>
+                </div>
+
+                {!editMode && (
+                  <button
+                    type="button"
+                    onClick={() => setShowCarnet(true)}
+                    style={{
+                      display: "flex", alignItems: "center", gap: "8px",
+                      background: "var(--theme-bg-light)", color: "var(--theme-primary)",
+                      border: "none", borderRadius: "12px", padding: "12px 20px",
+                      fontWeight: 800, fontSize: "14px", cursor: "pointer",
+                    }}
+                  >
+                    <IdCard size={18} />
+                    Ver carnet digital
+                  </button>
+                )}
+              </div>
             </div>
 
             {editMode && (
@@ -649,6 +688,10 @@ export default function PerfilBebe() {
         )}
 
       </div>
+
+      {showCarnet && perfil && (
+        <CarnetDigital perfil={perfil} onClose={() => setShowCarnet(false)} />
+      )}
     </div>
   );
 }
