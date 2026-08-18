@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS perfiles_bebes (
     fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     apodo VARCHAR(30),
     prevision_salud VARCHAR(50),
-    foto_perfil VARCHAR(255),
+    foto_perfil TEXT, -- data URI base64 de la foto de perfil (subida por el usuario)
     peso_nacimiento_g INTEGER CHECK (peso_nacimiento_g BETWEEN 500 AND 6000),
     talla_nacimiento_cm DECIMAL(5,2) CHECK (talla_nacimiento_cm BETWEEN 25 AND 65),
     semanas_gestacion_nac INTEGER CHECK (semanas_gestacion_nac BETWEEN 22 AND 44),

@@ -1,8 +1,10 @@
 import { Router } from 'express';
 import { verifyToken } from '../middlewares/auth.middleware';
+import { uploadFotoMemoria } from '../middlewares/uploadMemoria.middleware';
 import {
   getPerfil,
   actualizarPerfil,
+  subirFotoPerfil,
   listarAccesos,
   invitarAcceso,
   modificarPermiso,
@@ -16,6 +18,7 @@ router.use(verifyToken);
 
 router.get('/:id', getPerfil);
 router.patch('/:id', actualizarPerfil);
+router.post('/:id/foto', uploadFotoMemoria.single('foto'), subirFotoPerfil);
 router.get('/:id/accesos', listarAccesos);
 router.post('/:id/accesos/invitar', invitarAcceso);
 router.patch('/:id/accesos/:idAcceso', modificarPermiso);
