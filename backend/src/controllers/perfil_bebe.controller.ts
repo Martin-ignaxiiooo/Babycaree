@@ -35,6 +35,7 @@ export const actualizarPerfil = async (req: Request, res: Response): Promise<voi
       nombre, apodo, sexo, fecha_nacimiento, prevision_salud,
       peso_nacimiento_g, talla_nacimiento_cm, semanas_gestacion_nac,
       tipo_sangre, alergias, condiciones_cronicas, pediatra_nombre, centro_salud,
+      foto_perfil,
       confirmado
     } = req.body;
 
@@ -84,13 +85,15 @@ export const actualizarPerfil = async (req: Request, res: Response): Promise<voi
         alergias = COALESCE($11, alergias),
         condiciones_cronicas = COALESCE($12, condiciones_cronicas),
         pediatra_nombre = COALESCE($13, pediatra_nombre),
-        centro_salud = COALESCE($14, centro_salud)
+        centro_salud = COALESCE($14, centro_salud),
+        foto_perfil = COALESCE($15, foto_perfil)
       WHERE id = $1 RETURNING *
     `;
     const updated = await query(updateQuery, [
       id, nombre, apodo, sexo, fecha_nacimiento, prevision_salud,
       peso_nacimiento_g, talla_nacimiento_cm, semanas_gestacion_nac,
-      tipo_sangre, alergias, condiciones_cronicas, pediatra_nombre, centro_salud
+      tipo_sangre, alergias, condiciones_cronicas, pediatra_nombre, centro_salud,
+      foto_perfil
     ]);
 
     // Audit

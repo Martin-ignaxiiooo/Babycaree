@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { 
-  Heart, Shield, TrendingUp, Bell, Plus, FileText, 
-  MessageCircle, Camera, Search, Users, Syringe, Stethoscope, LogOut, X
+import {
+  Heart, Shield, TrendingUp, Bell, Plus, FileText,
+  MessageCircle, Camera, Search, Users, Syringe, Stethoscope, LogOut, X,
+  Weight, Ruler, Star, CheckCircle2, Clock, Sparkles, Loader2
 } from "lucide-react";
 import TopNav from "../components/TopNav";
 import DashboardEmbarazo from "./DashboardEmbarazo";
@@ -22,6 +23,10 @@ export default function Dashboard() {
   const [pesoInput, setPesoInput] = useState("");
   const [tallaInput, setTallaInput] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+
+  // Foto de perfil del bebé
+  const [uploadingFoto, setUploadingFoto] = useState(false);
+  const [fotoError, setFotoError] = useState("");
 
   const fetchDashboard = (token: string, babyId: string) => {
     axios.get(`${API_URL}/v1/home/${babyId}`, { headers: { Authorization: `Bearer ${token}` } })
@@ -82,6 +87,52 @@ export default function Dashboard() {
       alert("Error al guardar las medidas");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleUploadFoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // permite volver a elegir el mismo archivo después
+    if (!file || !activeBabyId) return;
+
+    const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setFotoError("Formato no soportado. Usa JPG, PNG, WEBP o GIF.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setFotoError("La imagen no puede pesar más de 5MB.");
+      return;
+    }
+
+    setFotoError("");
+    setUploadingFoto(true);
+    try {
+      const token = localStorage.getItem("token");
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const uploadRes = await axios.post(`${API_URL}/media/upload`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      const fotoUrl = uploadRes.data.url;
+
+      await axios.patch(
+        `${API_URL}/v1/perfiles-bebe/${activeBabyId}`,
+        { foto_perfil: fotoUrl },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      // Refrescar el dashboard para traer la nueva foto
+      if (token) fetchDashboard(token, activeBabyId);
+    } catch (error) {
+      console.error(error);
+      setFotoError("No se pudo subir la foto. Intenta de nuevo.");
+    } finally {
+      setUploadingFoto(false);
     }
   };
 
@@ -162,51 +213,120 @@ export default function Dashboard() {
         
         {/* ── HOME HERO FULL WIDTH ── */}
         <div style={{
-          background: "linear-gradient(135deg, var(--theme-darker) 0%, var(--theme-primary) 100%)",
-          padding: "40px",
-          color: "#fff",
+          background: "var(--theme-bg-light)",
+          padding: "24px 32px",
           borderRadius: "24px",
-          boxShadow: "0 10px 30px var(--theme-shadow-bg)",
           marginBottom: "32px",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           flexWrap: "wrap",
-          gap: "24px"
+          gap: "20px"
         }}>
-          <div>
-            <div style={{ fontSize: "16px", opacity: 0.8, marginBottom: "12px" }}>Buenos días, {user.nombre} {user.apellidos || ""} 👋</div>
-            <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+            {/* Foto del bebé (subible por el usuario, blanco por defecto) */}
+            <label
+              htmlFor="foto-bebe-input"
+              style={{
+                position: "relative",
+                width: "84px",
+                height: "84px",
+                borderRadius: "20px",
+                background: "#fff",
+                border: "2px solid rgba(124,92,191,0.15)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "hidden",
+                cursor: "pointer",
+                flexShrink: 0,
+              }}
+              title="Cambiar foto del bebé"
+            >
+              {hero.foto_perfil ? (
+                <img
+                  src={hero.foto_perfil.startsWith("http") ? hero.foto_perfil : `${API_URL.replace(/\/api$/, "")}${hero.foto_perfil}`}
+                  alt={hero.nombre}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              ) : (
+                <Camera size={26} color="#C9BEE8" />
+              )}
+
+              {uploadingFoto && (
+                <div style={{
+                  position: "absolute", inset: 0, background: "rgba(255,255,255,0.85)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  <Loader2 size={22} color="var(--theme-primary)" className="spin-icon" />
+                </div>
+              )}
+
               <div style={{
-                width: "80px", height: "80px", borderRadius: "50%", 
-                background: "var(--theme-bg-light)", display: "flex", 
-                alignItems: "center", justifyContent: "center", 
-                fontSize: "40px", border: "4px solid rgba(255,255,255,.4)"
+                position: "absolute", bottom: 0, left: 0, right: 0,
+                background: "rgba(45,38,64,0.55)", color: "#fff",
+                fontSize: "9px", fontWeight: 700, textAlign: "center", padding: "2px 0",
               }}>
-                👶
+                {hero.foto_perfil ? "Cambiar" : "Subir foto"}
               </div>
-              <div>
-                <div style={{ fontSize: "28px", fontWeight: 800, marginBottom: "4px" }}>{hero.nombre}</div>
-                <div style={{ fontSize: "15px", opacity: 0.9 }}>{hero.edad_exacta} · {hero.prevision}</div>
-              </div>
+
+              <input
+                id="foto-bebe-input"
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                onChange={handleUploadFoto}
+                disabled={uploadingFoto}
+                style={{ display: "none" }}
+              />
+            </label>
+
+            <div>
+              <div style={{ fontSize: "26px", fontWeight: 900, color: "var(--theme-darker)", marginBottom: "4px" }}>{hero.nombre}</div>
+              <div style={{ fontSize: "14px", color: "var(--theme-dark)", opacity: 0.75 }}>{hero.edad_exacta}</div>
+              {fotoError && (
+                <div style={{ fontSize: "12px", color: "#DC2626", marginTop: "4px", fontWeight: 600 }}>{fotoError}</div>
+              )}
             </div>
           </div>
 
           <div className="hero-stats-grid">
-            <div style={{ background: "rgba(255,255,255,.15)", borderRadius: "16px", padding: "20px 30px", textAlign: "center", minWidth: "120px" }}>
-              <div style={{ fontSize: "24px", fontWeight: 800 }}>{hero.peso_kg !== "-" && hero.peso_kg !== 0 ? `${hero.peso_kg} kg` : "N/A"}</div>
-              <div style={{ fontSize: "13px", opacity: 0.8, marginTop: "4px" }}>Peso actual</div>
+            <div style={{ background: "#fff", borderRadius: "16px", padding: "14px 22px", textAlign: "center", minWidth: "100px", boxShadow: "0 4px 14px rgba(45,38,64,0.06)" }}>
+              <div style={{
+                width: "34px", height: "34px", borderRadius: "10px", background: "var(--theme-bg-light)",
+                display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 6px"
+              }}>
+                <Weight size={17} color="var(--theme-primary)" />
+              </div>
+              <div style={{ fontSize: "12px", color: "#8A849C", fontWeight: 600 }}>Peso</div>
+              <div style={{ fontSize: "16px", fontWeight: 800, color: "var(--theme-darker)" }}>{hero.peso_kg !== "-" && hero.peso_kg !== 0 ? `${hero.peso_kg}kg` : "N/A"}</div>
             </div>
-            <div style={{ background: "rgba(255,255,255,.15)", borderRadius: "16px", padding: "20px 30px", textAlign: "center", minWidth: "120px" }}>
-              <div style={{ fontSize: "24px", fontWeight: 800 }}>{hero.talla_cm !== "-" && hero.talla_cm !== 0 ? `${hero.talla_cm} cm` : "N/A"}</div>
-              <div style={{ fontSize: "13px", opacity: 0.8, marginTop: "4px" }}>Talla actual</div>
+            <div style={{ background: "#fff", borderRadius: "16px", padding: "14px 22px", textAlign: "center", minWidth: "100px", boxShadow: "0 4px 14px rgba(45,38,64,0.06)" }}>
+              <div style={{
+                width: "34px", height: "34px", borderRadius: "10px", background: "#FFF0F0",
+                display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 6px"
+              }}>
+                <Ruler size={17} color="#F4A0A0" />
+              </div>
+              <div style={{ fontSize: "12px", color: "#8A849C", fontWeight: 600 }}>Altura</div>
+              <div style={{ fontSize: "16px", fontWeight: 800, color: "var(--theme-darker)" }}>{hero.talla_cm !== "-" && hero.talla_cm !== 0 ? `${hero.talla_cm}cm` : "N/A"}</div>
             </div>
-            <div style={{ background: "rgba(255,255,255,.15)", borderRadius: "16px", padding: "20px 30px", textAlign: "center", minWidth: "120px" }}>
-              <div style={{ fontSize: "24px", fontWeight: 800 }}>P{hero.percentil}</div>
-              <div style={{ fontSize: "13px", opacity: 0.8, marginTop: "4px" }}>Percentil OMS</div>
+            <div style={{ background: "#fff", borderRadius: "16px", padding: "14px 22px", textAlign: "center", minWidth: "100px", boxShadow: "0 4px 14px rgba(45,38,64,0.06)" }}>
+              <div style={{
+                width: "34px", height: "34px", borderRadius: "10px", background: "#FEF9E7",
+                display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 6px"
+              }}>
+                <Star size={17} color="#E8C55A" />
+              </div>
+              <div style={{ fontSize: "12px", color: "#8A849C", fontWeight: 600 }}>Percentil</div>
+              <div style={{ fontSize: "16px", fontWeight: 800, color: "var(--theme-darker)" }}>P{hero.percentil}</div>
             </div>
           </div>
         </div>
+
+        <style>{`
+          @keyframes spin-icon-kf { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+          .spin-icon { animation: spin-icon-kf 0.9s linear infinite; }
+        `}</style>
 
         {/* ── GRID DESKTOP Y MOBILE ── */}
         <div className="responsive-grid">
@@ -216,32 +336,43 @@ export default function Dashboard() {
             {/* ── NOTIFICACIONES ── */}
             {notificaciones.length > 0 && (
               <div style={{ background: "#fff", borderRadius: "24px", padding: "28px", boxShadow: "0 4px 20px rgba(0,0,0,.04)" }}>
-                <h3 style={{ fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "20px", display: "flex", alignItems: "center", gap: "8px" }}>
-                  🔔 Alertas y Tareas
+                <h3 style={{ fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "18px" }}>
+                  Próximas Tareas
                 </h3>
-                
+
                 {notificaciones.map((n: any, idx: number) => {
-                  const bg = n.prioridad === 'alta' ? '#FEE2E2' : n.prioridad === 'media' ? '#FEF3C7' : 'var(--theme-bg-light)';
-                  const border = n.prioridad === 'alta' ? '#DC2626' : n.prioridad === 'media' ? '#D97706' : 'var(--theme-primary)';
-                  const icon = n.tipo.includes('vacuna') ? '💉' : n.tipo.includes('control') ? '🩺' : '📚';
+                  // Estilo tipo checklist: completado / pendiente / próximo
+                  const esUrgente = n.prioridad === 'alta';
+                  const esProxima = n.prioridad === 'media';
+                  const StatusIcon = esUrgente ? Clock : esProxima ? Clock : CheckCircle2;
+                  const statusColor = esUrgente ? "#D97706" : esProxima ? "#3B82F6" : "var(--theme-primary)";
+                  const statusBg = esUrgente ? "#FEF3C7" : esProxima ? "#EFF6FF" : "var(--theme-bg-light)";
+                  const statusLabel = esUrgente ? "Pendiente" : esProxima ? "Próximo" : "Al día";
 
                   return (
-                    <div key={idx} 
+                    <div key={idx}
                       onClick={() => navigate("/salud")}
-                      style={{ 
-                        borderRadius: "16px", padding: "16px", marginBottom: "16px", 
-                        display: "flex", alignItems: "flex-start", gap: "16px", cursor: "pointer",
-                        background: bg, borderLeft: `5px solid ${border}`,
+                      style={{
+                        borderRadius: "14px", padding: "14px 16px", marginBottom: "10px",
+                        display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", cursor: "pointer",
+                        background: statusBg,
                         transition: "transform 0.2s",
                       }}
-                      onMouseEnter={e => e.currentTarget.style.transform = "translateX(5px)"}
+                      onMouseEnter={e => e.currentTarget.style.transform = "translateX(4px)"}
                       onMouseLeave={e => e.currentTarget.style.transform = "translateX(0)"}
                     >
-                      <span style={{ fontSize: "24px" }}>{icon}</span>
-                      <div>
-                        <strong style={{ display: "block", fontSize: "15px", color: "var(--theme-darker)", marginBottom: "4px" }}>{n.titulo}</strong>
-                        <span style={{ fontSize: "14px", color: "#4B5563", lineHeight: 1.5 }}>{n.mensaje}</span>
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
+                        <StatusIcon size={18} color={statusColor} style={{ flexShrink: 0 }} />
+                        <span style={{
+                          fontSize: "14px", fontWeight: 700, color: "var(--theme-darker)",
+                          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"
+                        }}>
+                          {n.titulo}
+                        </span>
                       </div>
+                      <span style={{ fontSize: "12px", fontWeight: 700, color: statusColor, flexShrink: 0 }}>
+                        ({statusLabel})
+                      </span>
                     </div>
                   );
                 })}
@@ -312,55 +443,33 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* COLUMNA 2: Accesos Rápidos */}
+          {/* COLUMNA 2: Módulos */}
           <div style={{ background: "#fff", borderRadius: "24px", padding: "28px", boxShadow: "0 4px 20px rgba(0,0,0,.04)" }}>
             <h3 style={{ fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "20px" }}>
-              🗂️ Módulos de Acceso Rápido
+              Módulos
             </h3>
-            
+
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
-              
-              <div onClick={() => navigate(`/perfil/${hero.id}`)} style={{ background: "#F9FAFB", padding: "28px 16px", borderRadius: "20px", textAlign: "center", cursor: "pointer", border: "2px solid transparent", transition: "all 0.2s" }}
-                   onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--theme-primary)"; e.currentTarget.style.background = "var(--theme-bg-light)"; }}
-                   onMouseLeave={e => { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.background = "#F9FAFB"; }}>
-                <FileText size={36} color="var(--theme-primary)" style={{ margin: "0 auto 12px" }} />
-                <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--theme-darker)" }}>Perfil del bebé</div>
-                <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "6px" }}>Datos generales</div>
-              </div>
 
-              <div onClick={() => navigate("/salud")} style={{ background: "#F9FAFB", padding: "28px 16px", borderRadius: "20px", textAlign: "center", cursor: "pointer", border: "2px solid transparent", transition: "all 0.2s" }}
-                   onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--theme-primary)"; e.currentTarget.style.background = "var(--theme-bg-light)"; }}
-                   onMouseLeave={e => { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.background = "#F9FAFB"; }}>
-                <Syringe size={36} color="var(--theme-primary)" style={{ margin: "0 auto 12px" }} />
-                <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--theme-darker)" }}>Salud</div>
-                <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "6px" }}>Vacunas y controles</div>
-              </div>
-
-              <div onClick={() => navigate("/comunidad")} style={{ background: "#F9FAFB", padding: "28px 16px", borderRadius: "20px", textAlign: "center", cursor: "pointer", border: "2px solid transparent", transition: "all 0.2s" }}
-                   onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--theme-primary)"; e.currentTarget.style.background = "var(--theme-bg-light)"; }}
-                   onMouseLeave={e => { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.background = "#F9FAFB"; }}>
-                <MessageCircle size={36} color="var(--theme-primary)" style={{ margin: "0 auto 12px" }} />
-                <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--theme-darker)" }}>Comunidad</div>
-                <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "6px" }}>Foros y artículos</div>
-              </div>
-
-              <div onClick={() => navigate("/galeria")} style={{ background: "#F9FAFB", padding: "28px 16px", borderRadius: "20px", textAlign: "center", cursor: "pointer", border: "2px solid transparent", transition: "all 0.2s" }}
-                   onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--theme-primary)"; e.currentTarget.style.background = "var(--theme-bg-light)"; }}
-                   onMouseLeave={e => { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.background = "#F9FAFB"; }}>
-                <Camera size={36} color="var(--theme-primary)" style={{ margin: "0 auto 12px" }} />
-                <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--theme-darker)" }}>Galería</div>
-                <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "6px" }}>Fotos e hitos</div>
-              </div>
-
-              <div onClick={() => navigate("/directorio")} style={{ background: "#F9FAFB", padding: "28px 16px", borderRadius: "20px", textAlign: "center", cursor: "pointer", border: "2px solid transparent", transition: "all 0.2s" }}
-                   onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--theme-primary)"; e.currentTarget.style.background = "var(--theme-bg-light)"; }}
-                   onMouseLeave={e => { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.background = "#F9FAFB"; }}>
-                <Search size={36} color="var(--theme-primary)" style={{ margin: "0 auto 12px" }} />
-                <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--theme-darker)" }}>Directorio</div>
-                <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "6px" }}>Especialistas</div>
-              </div>
-
-
+              {[
+                { icon: FileText, label: "Perfil", bg: "var(--theme-bg-light)", color: "var(--theme-primary)", onClick: () => navigate(`/perfil/${hero.id}`) },
+                { icon: Heart, label: "Salud", bg: "#FFF0F0", color: "#F4A0A0", onClick: () => navigate("/salud") },
+                { icon: MessageCircle, label: "Comunidad", bg: "#FEF9E7", color: "#E8C55A", onClick: () => navigate("/comunidad") },
+                { icon: Camera, label: "Galería", bg: "#E8F0FE", color: "#6B9BF4", onClick: () => navigate("/galeria") },
+                { icon: Search, label: "Directorio", bg: "#E8F7F1", color: "#6DBE9E", onClick: () => navigate("/directorio") },
+              ].map(({ icon: Icon, label, bg, color, onClick }) => (
+                <div key={label} onClick={onClick} style={{ background: "#F9FAFB", padding: "26px 16px", borderRadius: "20px", textAlign: "center", cursor: "pointer", border: "2px solid transparent", transition: "all 0.2s" }}
+                     onMouseEnter={e => { e.currentTarget.style.borderColor = color; e.currentTarget.style.background = bg; }}
+                     onMouseLeave={e => { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.background = "#F9FAFB"; }}>
+                  <div style={{
+                    width: "56px", height: "56px", borderRadius: "16px", background: bg,
+                    display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px"
+                  }}>
+                    <Icon size={26} color={color} />
+                  </div>
+                  <div style={{ fontSize: "14px", fontWeight: 800, color: "var(--theme-darker)" }}>{label}</div>
+                </div>
+              ))}
 
             </div>
           </div>

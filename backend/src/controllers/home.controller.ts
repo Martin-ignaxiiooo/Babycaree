@@ -149,6 +149,7 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
     const hero = {
       id: perfil.id,
       nombre: perfil.nombre,
+      foto_perfil: perfil.foto_perfil || null,
       edad_exacta: perfil.fecha_nacimiento ? calculateExactAge(perfil.fecha_nacimiento) : "En gestación",
       prevision: perfil.nombre_prevision || perfil.prevision_salud || "Sin previsión", 
       peso_kg,
