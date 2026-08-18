@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
-import { Shield, Heart, TrendingUp, Lock, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import heroImg from "../assets/madre-bebe-hero.jpg";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api";
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined;
@@ -106,7 +107,7 @@ export default function Login() {
       window.google.accounts.id.renderButton(googleBtnRef.current, {
         theme: "outline",
         size: "large",
-        width: 396,
+        width: 380,
         shape: "pill",
         text: "continue_with",
       });
@@ -142,260 +143,111 @@ export default function Login() {
       )
     : 15;
 
-  const valueProps = [
-    {
-      icon: Shield,
-      color: "var(--theme-primary)",
-      bg: "var(--theme-bg-light)",
-      title: "Privacidad Absoluta",
-      desc: "Ley 19.628 y 21.719. Tus datos son solo tuyos.",
-    },
-    {
-      icon: Heart,
-      color: "#F4A0A0",
-      bg: "#FFF0F0",
-      title: "Control de Salud",
-      desc: "Vacunas del PNI y controles de pediatría siempre al día.",
-    },
-    {
-      icon: TrendingUp,
-      color: "#6DBE9E",
-      bg: "#E8F7F1",
-      title: "Hitos del Desarrollo",
-      desc: "Seguimiento preciso según su edad corregida y real.",
-    },
-  ];
-
   return (
     <div
       style={{
         minHeight: "100vh",
         display: "flex",
-        background: "#F8F7FC",
         fontFamily: "'Nunito', sans-serif",
       }}
     >
-      {/* ─── Panel Izquierdo ─── */}
+      {/* ─── Panel Izquierdo: foto ─── */}
       <div
+        id="left-panel"
         style={{
           display: "none",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          flexShrink: 0,
-          padding: "3rem 2.5rem",
           position: "relative",
-          overflow: "hidden",
-          background:
-            "linear-gradient(155deg, var(--theme-darker) 0%, var(--theme-dark) 55%, var(--theme-primary) 100%)",
-          width: "40%",
-          minWidth: "360px",
-          maxWidth: "500px",
+          flex: "1 1 55%",
+          minHeight: "100vh",
+          backgroundImage: `url(${heroImg})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
         }}
-        id="left-panel"
       >
         <div
           style={{
             position: "absolute",
-            top: "-80px",
-            right: "-80px",
-            width: "300px",
-            height: "300px",
-            borderRadius: "50%",
+            inset: 0,
             background:
-              "radial-gradient(circle, rgba(244,160,160,0.25), transparent)",
-            zIndex: 0,
+              "linear-gradient(180deg, rgba(45,38,64,0.15) 0%, rgba(45,38,64,0.05) 40%, rgba(45,38,64,0.55) 100%)",
           }}
         />
-        <div
-          style={{
-            position: "absolute",
-            bottom: "-100px",
-            left: "-60px",
-            width: "350px",
-            height: "350px",
-            borderRadius: "50%",
-            background:
-              "radial-gradient(circle, var(--theme-shadow-bg), transparent)",
-            zIndex: 0,
-          }}
-        />
-
-        <div style={{ position: "relative", zIndex: 1 }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              marginBottom: "3.5rem",
-            }}
-          >
-            <div
-              style={{
-                width: "42px",
-                height: "42px",
-                borderRadius: "14px",
-                background: "rgba(255,255,255,0.15)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Heart size={22} color="#F4A0A0" fill="#F4A0A0" />
-            </div>
-            <span
-              style={{
-                color: "white",
-                fontWeight: 900,
-                fontSize: "20px",
-                letterSpacing: "-0.01em",
-              }}
-            >
-              Iniciativa Baby
-            </span>
-          </div>
-          <h1
-            style={{
-              fontSize: "2.4rem",
-              fontWeight: 900,
-              color: "white",
-              lineHeight: 1.15,
-              marginBottom: "16px",
-            }}
-          >
-            Un abrazo digital para cada pequeño gran paso.
-          </h1>
-          <p
-            style={{
-              color: "rgba(255,255,255,0.6)",
-              fontSize: "16px",
-              lineHeight: 1.6,
-              marginBottom: "3.5rem",
-            }}
-          >
-            Tecnología con ternura. Rigor médico con calidez materna. Todo en un
-            solo lugar.
-          </p>
-          <div
-            style={{ display: "flex", flexDirection: "column", gap: "28px" }}
-          >
-            {valueProps.map(({ icon: Icon, color, bg, title, desc }) => (
-              <div
-                key={title}
-                style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: "16px",
-                }}
-              >
-                <div
-                  style={{
-                    flexShrink: 0,
-                    width: "46px",
-                    height: "46px",
-                    borderRadius: "16px",
-                    background: bg,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                  }}
-                >
-                  <Icon size={22} color={color} />
-                </div>
-                <div>
-                  <p
-                    style={{
-                      fontWeight: 800,
-                      color: "white",
-                      fontSize: "15px",
-                      marginBottom: "4px",
-                    }}
-                  >
-                    {title}
-                  </p>
-                  <p
-                    style={{
-                      color: "rgba(255,255,255,0.55)",
-                      fontSize: "13px",
-                      lineHeight: 1.5,
-                    }}
-                  >
-                    {desc}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
         <div
           style={{
             position: "relative",
             zIndex: 1,
+            height: "100%",
             display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            padding: "16px 20px",
-            borderRadius: "16px",
-            background: "rgba(255,255,255,0.08)",
-            border: "1px solid rgba(255,255,255,0.12)",
-            marginTop: "3rem",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            padding: "3rem",
           }}
         >
-          <Lock size={18} color="#F4A0A0" />
-          <div>
-            <p style={{ color: "white", fontSize: "13px", fontWeight: 800 }}>
-              Cifrado AES-256 de nivel bancario
-            </p>
-            <p style={{ color: "rgba(255,255,255,0.45)", fontSize: "12px" }}>
-              Tus datos en manos seguras, siempre.
-            </p>
-          </div>
+          <h2
+            style={{
+              color: "white",
+              fontSize: "2.2rem",
+              fontWeight: 900,
+              margin: 0,
+              lineHeight: 1.1,
+              textShadow: "0 2px 12px rgba(0,0,0,0.25)",
+            }}
+          >
+            Iniciativa
+            <br />
+            Baby
+          </h2>
+          <p
+            style={{
+              color: "white",
+              fontSize: "2.1rem",
+              fontWeight: 800,
+              lineHeight: 1.25,
+              margin: 0,
+              maxWidth: "620px",
+              textShadow: "0 2px 16px rgba(0,0,0,0.3)",
+            }}
+          >
+            Tu guía amorosa en cada pequeño gran paso
+          </p>
         </div>
       </div>
 
-      {/* ─── Panel Derecho ─── */}
+      {/* ─── Panel Derecho: formulario ─── */}
       <div
         className="auth-right-panel"
         style={{
-          flex: 1,
+          flex: "1 1 45%",
+          minHeight: "100vh",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           padding: "2.5rem",
+          background: "#EDE7F9",
           overflowY: "auto",
         }}
       >
-        <div style={{ width: "100%", maxWidth: "460px" }}>
+        <div style={{ width: "100%", maxWidth: "420px" }}>
           <div
             className="auth-box"
             style={{
               background: "white",
               borderRadius: "32px",
-              boxShadow: "0 12px 50px rgba(45,38,64,0.09)",
-              padding: "3.5rem",
+              boxShadow: "0 20px 60px rgba(45,38,64,0.14)",
+              padding: "2.75rem",
+              textAlign: "center",
             }}
           >
-            <h2
+            <div
               style={{
-                fontSize: "28px",
-                fontWeight: 900,
-                color: "var(--theme-darker)",
-                marginBottom: "6px",
+                fontSize: "48px",
+                marginBottom: "12px",
+                lineHeight: 1,
               }}
+              aria-hidden="true"
             >
-              Bienvenida de vuelta 👋
-            </h2>
-            <p
-              style={{
-                fontSize: "15px",
-                color: "#8A849C",
-                fontWeight: 500,
-                marginBottom: "32px",
-              }}
-            >
-              Ingresa para ver el seguimiento de tu bebé
-            </p>
+              🧸💗☁️
+            </div>
 
             {/* Bloqueo total */}
             {bloqueado && (
@@ -439,7 +291,8 @@ export default function Login() {
                     color: "#92400E",
                   }}
                 >
-                  Intenta nuevamente en <strong>{minutosBloqueo} min</strong> o{" "}
+                  Intenta nuevamente en <strong>{minutosBloqueo} min</strong>{" "}
+                  o{" "}
                   <Link
                     to="/recuperar-contrasena"
                     style={{ color: "#D97706", fontWeight: 800 }}
@@ -459,11 +312,12 @@ export default function Login() {
                   borderRadius: "12px",
                   padding: "14px 18px",
                   fontSize: "14px",
-                  marginBottom: "24px",
+                  marginBottom: "20px",
                   display: "flex",
                   gap: "12px",
                   alignItems: "flex-start",
                   color: "#7F1D1D",
+                  textAlign: "left",
                 }}
               >
                 <span style={{ fontSize: "16px" }}>⚠️</span>
@@ -473,28 +327,6 @@ export default function Login() {
                     <div style={{ marginTop: "6px", fontSize: "12px" }}>
                       Te quedan <strong>{intentosRestantes}</strong> intento
                       {intentosRestantes !== 1 ? "s" : ""} antes del bloqueo.
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: "6px",
-                          marginTop: "8px",
-                        }}
-                      >
-                        {[...Array(5)].map((_, i) => (
-                          <div
-                            key={i}
-                            style={{
-                              width: "8px",
-                              height: "8px",
-                              borderRadius: "50%",
-                              background:
-                                i < 5 - intentosRestantes
-                                  ? "#DC2626"
-                                  : "var(--theme-bg-light)",
-                            }}
-                          />
-                        ))}
-                      </div>
                     </div>
                   )}
                 </div>
@@ -502,37 +334,34 @@ export default function Login() {
             )}
 
             {!bloqueado && (
-              <form onSubmit={handleSubmit}>
-                <div style={{ marginBottom: "20px" }}>
-                  <label
+              <form onSubmit={handleSubmit} style={{ textAlign: "left" }}>
+                <div style={{ position: "relative", marginBottom: "16px" }}>
+                  <Mail
+                    size={19}
+                    color="#B39DDB"
                     style={{
-                      display: "block",
-                      fontSize: "13px",
-                      fontWeight: 700,
-                      color: "var(--theme-darker)",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.07em",
-                      marginBottom: "10px",
+                      position: "absolute",
+                      left: "18px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
                     }}
-                  >
-                    Correo electrónico
-                  </label>
+                  />
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="maria@correo.cl"
+                    placeholder="Correo electrónico"
                     autoComplete="email"
                     style={{
                       width: "100%",
-                      padding: "16px 20px",
-                      border: "2px solid var(--theme-bg-light)",
-                      borderRadius: "18px",
-                      fontSize: "17px",
+                      padding: "16px 20px 16px 50px",
+                      border: "1.5px solid #E4DBF7",
+                      borderRadius: "16px",
+                      fontSize: "15px",
                       fontFamily: "'Nunito', sans-serif",
                       fontWeight: 500,
                       color: "var(--theme-darker)",
-                      background: "#FDFCFF",
+                      background: "#FBFAFE",
                       outline: "none",
                       transition: "border-color 0.2s, box-shadow 0.2s",
                       boxSizing: "border-box",
@@ -540,79 +369,77 @@ export default function Login() {
                     onFocus={(e) => {
                       e.target.style.borderColor = "var(--theme-primary)";
                       e.target.style.boxShadow =
-                        "0 0 0 5px var(--theme-shadow-light)";
+                        "0 0 0 4px var(--theme-shadow-light)";
                     }}
                     onBlur={(e) => {
-                      e.target.style.borderColor = "var(--theme-bg-light)";
+                      e.target.style.borderColor = "#E4DBF7";
                       e.target.style.boxShadow = "none";
                     }}
                   />
                 </div>
 
-                <div style={{ marginBottom: "20px" }}>
-                  <label
+                <div style={{ position: "relative", marginBottom: "10px" }}>
+                  <Lock
+                    size={19}
+                    color="#B39DDB"
                     style={{
-                      display: "block",
-                      fontSize: "13px",
-                      fontWeight: 700,
+                      position: "absolute",
+                      left: "18px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                    }}
+                  />
+                  <input
+                    type={showPwd ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Contraseña"
+                    autoComplete="current-password"
+                    style={{
+                      width: "100%",
+                      padding: "16px 50px 16px 50px",
+                      border: "1.5px solid #E4DBF7",
+                      borderRadius: "16px",
+                      fontSize: "15px",
+                      fontFamily: "'Nunito', sans-serif",
+                      fontWeight: 500,
                       color: "var(--theme-darker)",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.07em",
-                      marginBottom: "10px",
+                      background: "#FBFAFE",
+                      outline: "none",
+                      transition: "border-color 0.2s, box-shadow 0.2s",
+                      boxSizing: "border-box",
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = "var(--theme-primary)";
+                      e.target.style.boxShadow =
+                        "0 0 0 4px var(--theme-shadow-light)";
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = "#E4DBF7";
+                      e.target.style.boxShadow = "none";
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPwd(!showPwd)}
+                    aria-label={
+                      showPwd ? "Ocultar contraseña" : "Mostrar contraseña"
+                    }
+                    style={{
+                      position: "absolute",
+                      right: "16px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: "#B39DDB",
+                      padding: "4px",
+                      display: "flex",
                     }}
                   >
-                    Contraseña
-                  </label>
-                  <div style={{ position: "relative" }}>
-                    <input
-                      type={showPwd ? "text" : "password"}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Tu contraseña"
-                      autoComplete="current-password"
-                      style={{
-                        width: "100%",
-                        padding: "16px 20px",
-                        paddingRight: "54px",
-                        border: "2px solid var(--theme-bg-light)",
-                        borderRadius: "18px",
-                        fontSize: "17px",
-                        fontFamily: "'Nunito', sans-serif",
-                        fontWeight: 500,
-                        color: "var(--theme-darker)",
-                        background: "#FDFCFF",
-                        outline: "none",
-                        transition: "border-color 0.2s, box-shadow 0.2s",
-                        boxSizing: "border-box",
-                      }}
-                      onFocus={(e) => {
-                        e.target.style.borderColor = "var(--theme-primary)";
-                        e.target.style.boxShadow =
-                          "0 0 0 5px var(--theme-shadow-light)";
-                      }}
-                      onBlur={(e) => {
-                        e.target.style.borderColor = "var(--theme-bg-light)";
-                        e.target.style.boxShadow = "none";
-                      }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPwd(!showPwd)}
-                      style={{
-                        position: "absolute",
-                        right: "16px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        color: "#9C94BC",
-                        padding: "4px",
-                      }}
-                    >
-                      {showPwd ? <EyeOff size={22} /> : <Eye size={22} />}
-                    </button>
-                  </div>
+                    {showPwd ? <EyeOff size={19} /> : <Eye size={19} />}
+                  </button>
                 </div>
 
                 <div
@@ -620,14 +447,14 @@ export default function Login() {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    marginBottom: "28px",
+                    margin: "6px 2px 22px",
                   }}
                 >
                   <label
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      fontSize: "14px",
+                      fontSize: "13px",
                       color: "#8A849C",
                       cursor: "pointer",
                       fontWeight: 600,
@@ -637,16 +464,19 @@ export default function Login() {
                       type="checkbox"
                       checked={recordar}
                       onChange={(e) => setRecordar(e.target.checked)}
-                      style={{ accentColor: "var(--theme-primary)", marginRight: "8px" }}
+                      style={{
+                        accentColor: "var(--theme-primary)",
+                        marginRight: "7px",
+                      }}
                     />
                     Recordar sesión
                   </label>
                   <Link
                     to="/recuperar-contrasena"
                     style={{
-                      fontSize: "14px",
+                      fontSize: "13px",
                       color: "var(--theme-primary)",
-                      fontWeight: 800,
+                      fontWeight: 700,
                       textDecoration: "none",
                     }}
                   >
@@ -662,15 +492,15 @@ export default function Login() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    padding: "18px",
-                    borderRadius: "20px",
+                    padding: "16px",
+                    borderRadius: "16px",
                     border: "none",
                     cursor: loading ? "not-allowed" : "pointer",
                     background: loading
                       ? "#E5E3EC"
                       : "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
                     color: loading ? "#B0ABC4" : "white",
-                    fontSize: "18px",
+                    fontSize: "16px",
                     fontWeight: 800,
                     fontFamily: "'Nunito', sans-serif",
                     boxShadow: loading
@@ -687,16 +517,16 @@ export default function Login() {
                     (e.currentTarget as HTMLElement).style.transform = "";
                   }}
                 >
-                  {loading ? "Ingresando..." : "Ingresar a mi cuenta"}
+                  {loading ? "Ingresando..." : "Iniciar sesión"}
                 </button>
 
                 <div
                   style={{
                     textAlign: "center",
-                    fontSize: "13px",
-                    color: "#9C94BC",
-                    margin: "24px 0",
-                    fontWeight: 600,
+                    fontSize: "12px",
+                    color: "#B0ABC4",
+                    margin: "22px 0",
+                    fontWeight: 700,
                     textTransform: "uppercase",
                     letterSpacing: "0.05em",
                   }}
@@ -714,7 +544,7 @@ export default function Login() {
                         fontSize: "13px",
                         color: "#B0ABC4",
                         padding: "14px",
-                        border: "2px dashed var(--theme-bg-light)",
+                        border: "2px dashed #E4DBF7",
                         borderRadius: "16px",
                       }}
                     >
@@ -723,12 +553,38 @@ export default function Login() {
                   )}
                   {GOOGLE_CLIENT_ID && !googleReady && !googleError && (
                     <div
-                      style={{ fontSize: "13px", color: "#B0ABC4", padding: "10px" }}
+                      style={{
+                        fontSize: "13px",
+                        color: "#B0ABC4",
+                        padding: "10px",
+                      }}
                     >
                       Cargando Google...
                     </div>
                   )}
                 </div>
+
+                <p
+                  style={{
+                    textAlign: "center",
+                    marginTop: "24px",
+                    marginBottom: 0,
+                    fontSize: "13px",
+                    color: "#8A849C",
+                  }}
+                >
+                  ¿Aún no tienes cuenta?{" "}
+                  <Link
+                    to="/registro"
+                    style={{
+                      fontWeight: 800,
+                      color: "var(--theme-primary)",
+                      textDecoration: "none",
+                    }}
+                  >
+                    Crear una cuenta
+                  </Link>
+                </p>
               </form>
             )}
 
@@ -740,13 +596,14 @@ export default function Login() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  padding: "18px",
-                  borderRadius: "20px",
+                  padding: "16px",
+                  borderRadius: "16px",
                   border: "none",
                   cursor: "pointer",
-                  background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
+                  background:
+                    "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
                   color: "white",
-                  fontSize: "18px",
+                  fontSize: "16px",
                   fontWeight: 800,
                   fontFamily: "'Nunito', sans-serif",
                   boxShadow: "0 8px 24px var(--theme-shadow)",
@@ -756,27 +613,6 @@ export default function Login() {
               </button>
             )}
           </div>
-
-          <p
-            style={{
-              textAlign: "center",
-              marginTop: "32px",
-              fontSize: "15px",
-              color: "#8A849C",
-            }}
-          >
-            ¿Aún no tienes cuenta?{" "}
-            <Link
-              to="/registro"
-              style={{
-                fontWeight: 800,
-                color: "var(--theme-primary)",
-                textDecoration: "none",
-              }}
-            >
-              Regístrate gratis
-            </Link>
-          </p>
         </div>
       </div>
 
