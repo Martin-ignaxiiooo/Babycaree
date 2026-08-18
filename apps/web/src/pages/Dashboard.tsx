@@ -273,6 +273,26 @@ export default function Dashboard() {
     }
   };
 
+  const handleEliminarFoto = async () => {
+    if (!activeBabyId || uploadingFoto) return;
+    if (!window.confirm("¿Quitar la foto de perfil? Puedes subir otra cuando quieras.")) return;
+
+    setFotoError("");
+    setUploadingFoto(true);
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`${API_URL}/v1/perfiles-bebe/${activeBabyId}/foto`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (token) fetchDashboard(token, activeBabyId);
+    } catch (error) {
+      console.error(error);
+      setFotoError("No se pudo quitar la foto. Intenta de nuevo.");
+    } finally {
+      setUploadingFoto(false);
+    }
+  };
+
   if (!user || loading) return <div style={{ padding: "40px", textAlign: "center", fontFamily: "Nunito", fontSize: "18px" }}>Cargando tu panel...</div>;
 
   // Early return for pregnancy dashboard
@@ -400,6 +420,28 @@ export default function Dashboard() {
                 />
               ) : (
                 <Camera size={38} color="#C9BEE8" strokeWidth={2} />
+              )}
+
+              {hero.foto_perfil && !uploadingFoto && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleEliminarFoto();
+                  }}
+                  title="Quitar foto"
+                  aria-label="Quitar foto del bebé"
+                  style={{
+                    position: "absolute", top: "6px", right: "6px",
+                    width: "24px", height: "24px", borderRadius: "50%",
+                    background: "rgba(45,38,64,0.6)", border: "none",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    cursor: "pointer", padding: 0,
+                  }}
+                >
+                  <X size={14} color="#fff" strokeWidth={2.5} />
+                </button>
               )}
 
               {uploadingFoto && (

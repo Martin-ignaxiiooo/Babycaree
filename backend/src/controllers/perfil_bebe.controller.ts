@@ -163,6 +163,39 @@ export const subirFotoPerfil = async (req: Request, res: Response): Promise<void
   }
 };
 
+export const eliminarFotoPerfil = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const userId = (req as any).user.id;
+
+    // Mismo chequeo de permisos que subirFotoPerfil (dueño o acceso ver_editar)
+    const accessCheck = await query(
+      `SELECT 1 FROM perfiles_bebes pb
+       LEFT JOIN accesos_compartidos_bebe acb ON acb.id_perfil_bebe = pb.id AND acb.id_usuario_invitado = $2 AND acb.estado = 'activo'
+       WHERE pb.id = $1 AND (pb.usuario_id = $2 OR acb.nivel_permiso = 'ver_editar')`,
+      [id, userId]
+    );
+
+    if (accessCheck.rows.length === 0) {
+      res.status(403).json({ error: 'No tienes permiso para editar este perfil' });
+      return;
+    }
+
+    await query(`UPDATE perfiles_bebes SET foto_perfil = NULL WHERE id = $1`, [id]);
+
+    await query(
+      `INSERT INTO auditoria_perfil_bebe (id_perfil_bebe, id_usuario_ejecutor, tipo_accion, campo_modificado, nivel_importancia)
+       VALUES ($1, $2, 'edicion_dato', 'foto_perfil', 'normal')`,
+      [id, userId]
+    );
+
+    res.json({ foto_perfil: null });
+  } catch (error) {
+    console.error("Error en eliminarFotoPerfil:", error);
+    res.status(500).json({ error: 'Error al eliminar la foto' });
+  }
+};
+
 export const listarAccesos = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;

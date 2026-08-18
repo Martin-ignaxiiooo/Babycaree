@@ -5,6 +5,7 @@ import {
   getPerfil,
   actualizarPerfil,
   subirFotoPerfil,
+  eliminarFotoPerfil,
   listarAccesos,
   invitarAcceso,
   modificarPermiso,
@@ -19,6 +20,7 @@ router.use(verifyToken);
 router.get('/:id', getPerfil);
 router.patch('/:id', actualizarPerfil);
 router.post('/:id/foto', uploadFotoMemoria.single('foto'), subirFotoPerfil);
+router.delete('/:id/foto', eliminarFotoPerfil);
 router.get('/:id/accesos', listarAccesos);
 router.post('/:id/accesos/invitar', invitarAcceso);
 router.patch('/:id/accesos/:idAcceso', modificarPermiso);
