@@ -25,7 +25,7 @@ router.post("/google", loginLimiter, googleAuth);
 router.post("/consentimiento", verifyToken, registrarConsentimiento);
 router.post("/forgot-password", forgotPasswordLimiter, forgotPassword);
 router.post("/verify-code", codeVerifyLimiter, verifyCode);
-router.post("/reset-password", resetPassword);
+router.post("/reset-password", codeVerifyLimiter, resetPassword);
 router.post("/resend-code", forgotPasswordLimiter, resendCode);
 
 export default router;

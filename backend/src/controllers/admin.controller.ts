@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
 import { query } from "../config/db";
 import { AdminAuthRequest } from "../middlewares/adminAuth.middleware";
+import { generarPasswordTemporal } from "../utils/password";
 
 const JWT_ADMIN_SECRET = process.env.JWT_ADMIN_SECRET;
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -152,7 +153,7 @@ export const verify2fa = async (req: Request, res: Response) => {
   try {
     const { tempToken, code } = req.body;
 
-    const decoded: any = jwt.verify(tempToken, JWT_ADMIN_SECRET);
+    const decoded: any = jwt.verify(tempToken, JWT_ADMIN_SECRET, { algorithms: ["HS256"] });
     if (!decoded.pending2FA) {
       return res.status(401).json({ error: "Token inválido" });
     }
@@ -257,7 +258,8 @@ export const createUsuario = async (req: AdminAuthRequest, res: Response) => {
        email = `user_${Date.now()}@temp.cl`; // fallback if email is not provided in form
     }
 
-    const hash = await bcrypt.hash("usuario2026", 10);
+    const passwordTemporal = generarPasswordTemporal();
+    const hash = await bcrypt.hash(passwordTemporal, 10);
     const result = await query(
       "INSERT INTO usuarios (nombre, apellidos, email, rol, password_hash) VALUES ($1, $2, $3, $4, $5) RETURNING id, nombre, apellidos, email, rol, 'activo' as estado_cuenta, fecha_registro",
       [nombre, apellidos, email, rol || 'user', hash]
@@ -274,7 +276,7 @@ export const createUsuario = async (req: AdminAuthRequest, res: Response) => {
       req.ip,
     );
 
-    res.status(201).json(result.rows[0]);
+    res.status(201).json({ ...result.rows[0], password_temporal: passwordTemporal });
   } catch (error: any) {
     if (error.code === '23505') {
       return res.status(400).json({ error: "El correo ya está en uso" });
@@ -319,8 +321,8 @@ export const createAdministrador = async (req: AdminAuthRequest, res: Response) 
   try {
     const { nombre_completo, correo_corporativo, rol, requiere_2fa, estado } = req.body;
     
-    // Default password for new admins: temporal2026
-    const hash = await bcrypt.hash("temporal2026", 10);
+    const passwordTemporal = generarPasswordTemporal();
+    const hash = await bcrypt.hash(passwordTemporal, 10);
 
     const result = await query(
       "INSERT INTO administradores (nombre_completo, correo_corporativo, rol, requiere_2fa, estado, hash_contrasena) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, nombre_completo, correo_corporativo, rol, requiere_2fa, estado",
@@ -338,7 +340,7 @@ export const createAdministrador = async (req: AdminAuthRequest, res: Response) 
       req.ip,
     );
 
-    res.status(201).json(result.rows[0]);
+    res.status(201).json({ ...result.rows[0], password_temporal: passwordTemporal });
   } catch (error: any) {
     if (error.code === '23505') { // unique violation
       return res.status(400).json({ error: "El correo ya está en uso" });
@@ -544,7 +546,7 @@ export const impersonateUser = async (req: AdminAuthRequest, res: Response) => {
     res.json({ user, token });
   } catch (error: any) {
     console.error("Error impersonando usuario:", error);
-    res.status(500).json({ error: "Error interno del servidor", details: error.message, stack: error.stack });
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 };
 

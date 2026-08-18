@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { query } from "../config/db";
 import { AuthRequest } from "../middlewares/auth.middleware";
 import bcrypt from "bcrypt";
+import { passwordCumpleRequisitos, PASSWORD_REQUISITOS_MSG } from "../utils/password";
 
 export const getMe = async (req: AuthRequest, res: Response) => {
   try {
@@ -50,6 +51,10 @@ export const updatePassword = async (req: AuthRequest, res: Response) => {
 
     if (!currentPassword || !newPassword) {
       return res.status(400).json({ error: "Faltan datos requeridos" });
+    }
+
+    if (!passwordCumpleRequisitos(newPassword)) {
+      return res.status(400).json({ error: PASSWORD_REQUISITOS_MSG });
     }
 
     const userRes = await query("SELECT password_hash FROM usuarios WHERE id = $1", [userId]);

@@ -10,6 +10,7 @@ import {
   sendPasswordChangedAlert,
   sendLoginBlockedAlert,
 } from "../config/mailer";
+import { passwordCumpleRequisitos, PASSWORD_REQUISITOS_MSG } from "../utils/password";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_RECOVERY_SECRET = process.env.JWT_RECOVERY_SECRET;
@@ -38,6 +39,10 @@ export const register = async (req: Request, res: Response) => {
 
     if (!email || !password || !nombre || !apellidos) {
       return res.status(400).json({ error: "Faltan campos obligatorios" });
+    }
+
+    if (!passwordCumpleRequisitos(password)) {
+      return res.status(400).json({ error: PASSWORD_REQUISITOS_MSG });
     }
 
     const userExists = await query(
@@ -327,19 +332,16 @@ export const forgotPassword = async (req: Request, res: Response) => {
       "SELECT id, nombre FROM usuarios WHERE LOWER(email) = LOWER($1)",
       [email],
     );
-    
-    let user;
+
+    // Si el correo no está registrado, respondemos genérico sin crear nada.
+    // (Antes esta rama creaba una cuenta nueva con contraseña hardcodeada
+    // "Test1234" para "facilitar las pruebas" — eso permitía que cualquiera
+    // tomara el control de una cuenta con solo saber un email, sin siquiera
+    // acceder al correo de recuperación. Se eliminó por completo.)
     if (result.rows.length === 0) {
-      // Para facilitar las pruebas, si el usuario no existe, lo creamos temporalmente
-      const hashedPassword = await bcrypt.hash("Test1234", 10);
-      const insertResult = await query(
-        "INSERT INTO usuarios (email, password_hash, nombre, apellidos, rol) VALUES ($1, $2, $3, $4, $5) RETURNING id, nombre",
-        [email, hashedPassword, "Usuario", "Prueba", "user"]
-      );
-      user = insertResult.rows[0];
-    } else {
-      user = result.rows[0];
+      return res.json(GENERIC_OK);
     }
+    const user = result.rows[0];
 
     const ip = getClientIp(req);
 
@@ -481,19 +483,13 @@ export const resetPassword = async (req: Request, res: Response) => {
     }
 
     // Verificar requisitos mínimos
-    const hasLen = nueva_contrasena.length >= 8;
-    const hasUpper = /[A-Z]/.test(nueva_contrasena);
-    const hasNum = /[0-9]/.test(nueva_contrasena);
-    if (!hasLen || !hasUpper || !hasNum) {
-      return res.status(400).json({
-        error:
-          "La contraseña debe tener al menos 8 caracteres, 1 mayúscula y 1 número.",
-      });
+    if (!passwordCumpleRequisitos(nueva_contrasena)) {
+      return res.status(400).json({ error: PASSWORD_REQUISITOS_MSG });
     }
 
     let decoded: any;
     try {
-      decoded = jwt.verify(recovery_token, JWT_RECOVERY_SECRET);
+      decoded = jwt.verify(recovery_token, JWT_RECOVERY_SECRET, { algorithms: ["HS256"] });
     } catch {
       return res
         .status(401)

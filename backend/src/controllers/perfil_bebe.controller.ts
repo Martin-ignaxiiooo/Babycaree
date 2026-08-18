@@ -43,7 +43,7 @@ export const actualizarPerfil = async (req: Request, res: Response): Promise<voi
     const accessCheck = await query(
       `SELECT 1 FROM perfiles_bebes pb 
        LEFT JOIN accesos_compartidos_bebe acb ON acb.id_perfil_bebe = pb.id AND acb.id_usuario_invitado = $2 AND acb.estado = 'activo'
-       WHERE pb.id = $1 AND (pb.usuario_id = $2 OR acb.nivel_permiso IN ('ver_editar', 'papa', 'abuela'))`,
+       WHERE pb.id = $1 AND (pb.usuario_id = $2 OR acb.nivel_permiso = 'ver_editar')`,
       [id, userId]
     );
 
@@ -115,6 +115,53 @@ export const actualizarPerfil = async (req: Request, res: Response): Promise<voi
   }
 };
 
+
+export const subirFotoPerfil = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const userId = (req as any).user.id;
+    const file = (req as any).file as Express.Multer.File | undefined;
+
+    if (!file) {
+      res.status(400).json({ error: "No se recibió ninguna imagen" });
+      return;
+    }
+
+    // Mismo chequeo de permisos que actualizarPerfil (dueño o acceso ver_editar/papa/abuela)
+    const accessCheck = await query(
+      `SELECT 1 FROM perfiles_bebes pb
+       LEFT JOIN accesos_compartidos_bebe acb ON acb.id_perfil_bebe = pb.id AND acb.id_usuario_invitado = $2 AND acb.estado = 'activo'
+       WHERE pb.id = $1 AND (pb.usuario_id = $2 OR acb.nivel_permiso = 'ver_editar')`,
+      [id, userId]
+    );
+
+    if (accessCheck.rows.length === 0) {
+      res.status(403).json({ error: 'No tienes permiso para editar este perfil' });
+      return;
+    }
+
+    // Guardamos la imagen como data URI base64 directo en la fila de la base
+    // de datos (no en disco): así sobrevive a los redeploys de Render, que
+    // borran el filesystem local en cada despliegue.
+    const dataUri = `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
+
+    const updated = await query(
+      `UPDATE perfiles_bebes SET foto_perfil = $2 WHERE id = $1 RETURNING foto_perfil`,
+      [id, dataUri]
+    );
+
+    await query(
+      `INSERT INTO auditoria_perfil_bebe (id_perfil_bebe, id_usuario_ejecutor, tipo_accion, campo_modificado, nivel_importancia)
+       VALUES ($1, $2, 'edicion_dato', 'foto_perfil', 'normal')`,
+      [id, userId]
+    );
+
+    res.json({ foto_perfil: updated.rows[0].foto_perfil });
+  } catch (error) {
+    console.error("Error en subirFotoPerfil:", error);
+    res.status(500).json({ error: 'Error al subir la foto' });
+  }
+};
 
 export const listarAccesos = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -239,6 +286,22 @@ export const listarAuditoria = async (req: Request, res: Response): Promise<void
   try {
     const { id } = req.params;
     const userId = (req as any).user.id;
+
+    // Antes este endpoint no verificaba nada: cualquier usuario autenticado
+    // podía leer el historial de auditoría (incluye datos de salud como
+    // tipo de sangre, alergias, condiciones crónicas) de CUALQUIER bebé
+    // solo conociendo su UUID. Ahora exige ser dueño o tener acceso activo.
+    const accessCheck = await query(
+      `SELECT 1 FROM perfiles_bebes pb
+       LEFT JOIN accesos_compartidos_bebe acb ON acb.id_perfil_bebe = pb.id AND acb.id_usuario_invitado = $2 AND acb.estado = 'activo'
+       WHERE pb.id = $1 AND (pb.usuario_id = $2 OR acb.id IS NOT NULL)`,
+      [id, userId]
+    );
+
+    if (accessCheck.rows.length === 0) {
+      res.status(403).json({ error: 'No tienes permiso para ver la auditoría de este perfil' });
+      return;
+    }
 
     const result = await query(
       `SELECT a.*, u.nombre, u.apellidos FROM auditoria_perfil_bebe a JOIN usuarios u ON a.id_usuario_ejecutor = u.id WHERE a.id_perfil_bebe = $1 ORDER BY a.fecha_hora_utc DESC`,

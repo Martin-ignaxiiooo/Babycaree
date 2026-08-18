@@ -26,7 +26,7 @@ export const verifyAdminToken = async (
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded: any = jwt.verify(token, JWT_ADMIN_SECRET);
+    const decoded: any = jwt.verify(token, JWT_ADMIN_SECRET, { algorithms: ["HS256"] });
 
     // Check if the session is still valid in DB
     const sessionRes = await query(
