@@ -1,10 +1,13 @@
+require('dotenv').config();
 const { Pool } = require('pg');
+
+if (!process.env.DATABASE_URL) {
+  console.error('ERROR: falta la variable de entorno DATABASE_URL (definila en un archivo .env local, nunca hardcodeada).');
+  process.exit(1);
+}
+
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'iniciativa_baby',
-  password: 'password',
-  port: 5433,
+  connectionString: process.env.DATABASE_URL,
 });
 
 async function run() {
