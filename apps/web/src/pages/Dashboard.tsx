@@ -126,6 +126,7 @@ export default function Dashboard() {
   // Foto de perfil del bebé
   const [uploadingFoto, setUploadingFoto] = useState(false);
   const [fotoError, setFotoError] = useState("");
+  const [confirmandoBorrarFoto, setConfirmandoBorrarFoto] = useState(false);
 
   const fetchDashboard = (token: string, babyId: string) => {
     axios.get(`${API_URL}/v1/home/${babyId}`, { headers: { Authorization: `Bearer ${token}` } })
@@ -275,10 +276,10 @@ export default function Dashboard() {
 
   const handleEliminarFoto = async () => {
     if (!activeBabyId || uploadingFoto) return;
-    if (!window.confirm("¿Quitar la foto de perfil? Puedes subir otra cuando quieras.")) return;
 
     setFotoError("");
     setUploadingFoto(true);
+    setConfirmandoBorrarFoto(false);
     try {
       const token = localStorage.getItem("token");
       await axios.delete(`${API_URL}/v1/perfiles-bebe/${activeBabyId}/foto`, {
@@ -422,13 +423,13 @@ export default function Dashboard() {
                 <Camera size={38} color="#C9BEE8" strokeWidth={2} />
               )}
 
-              {hero.foto_perfil && !uploadingFoto && (
+              {hero.foto_perfil && !uploadingFoto && !confirmandoBorrarFoto && (
                 <button
                   type="button"
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    handleEliminarFoto();
+                    setConfirmandoBorrarFoto(true);
                   }}
                   title="Quitar foto"
                   aria-label="Quitar foto del bebé"
@@ -442,6 +443,43 @@ export default function Dashboard() {
                 >
                   <X size={14} color="#fff" strokeWidth={2.5} />
                 </button>
+              )}
+
+              {confirmandoBorrarFoto && !uploadingFoto && (
+                <div
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                  style={{
+                    position: "absolute", inset: 0, background: "rgba(45,38,64,0.85)",
+                    display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                    gap: "8px", padding: "10px", textAlign: "center",
+                  }}
+                >
+                  <span style={{ color: "#fff", fontSize: "11px", fontWeight: 700, lineHeight: 1.3 }}>
+                    ¿Quitar foto?
+                  </span>
+                  <div style={{ display: "flex", gap: "6px" }}>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleEliminarFoto(); }}
+                      style={{
+                        background: "#fff", color: "#B91C1C", border: "none", borderRadius: "8px",
+                        padding: "5px 10px", fontSize: "11px", fontWeight: 800, cursor: "pointer",
+                      }}
+                    >
+                      Sí
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); setConfirmandoBorrarFoto(false); }}
+                      style={{
+                        background: "rgba(255,255,255,0.2)", color: "#fff", border: "1px solid rgba(255,255,255,0.5)",
+                        borderRadius: "8px", padding: "5px 10px", fontSize: "11px", fontWeight: 700, cursor: "pointer",
+                      }}
+                    >
+                      No
+                    </button>
+                  </div>
+                </div>
               )}
 
               {uploadingFoto && (
