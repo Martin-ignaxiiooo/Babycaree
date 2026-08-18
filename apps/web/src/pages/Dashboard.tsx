@@ -634,7 +634,7 @@ export default function Dashboard() {
 
             {/* ── GRÁFICO DINÁMICO ── */}
             <div style={{ background: "#fff", borderRadius: "24px", padding: "22px", boxShadow: "0 4px 20px rgba(0,0,0,.04)" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+              <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "10px", marginBottom: "20px" }}>
                 <h3 style={{ fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)", margin: 0 }}>
                   📈 Evolución de Crecimiento
                 </h3>

@@ -13,6 +13,11 @@ body,
   width: 100%;
   min-height: 100vh;
   box-sizing: border-box;
+  /* Evita que un hijo flex con texto largo (que no puede achicarse) empuje
+     el ancho de toda la página más allá de la pantalla en mobile. Sin esto,
+     un solo elemento sin flex-wrap puede hacer que TODO el layout se corte
+     en el borde derecho, aunque el resto del contenido esté bien armado. */
+  overflow-x: hidden;
 }
 
 body {
@@ -519,10 +524,12 @@ body {
    ================================================== */
 .page-container {
   flex: 1;
+  min-width: 0; /* deja que se achique dentro del flex-column padre en vez de forzar overflow horizontal */
   padding: 40px;
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .responsive-grid {
@@ -530,6 +537,16 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 18px;
   align-items: start;
+}
+
+/* Los ítems de grid, igual que los de flex, no se achican por debajo del
+   ancho mínimo de su contenido a menos que se indique explícitamente. Sin
+   esto, un solo texto/botón que no se puede partir (ej. el header de
+   "Evolución de Crecimiento") fuerza el ancho de toda la columna del grid
+   más allá de la pantalla en mobile, aunque esa columna esté definida
+   como 1fr. */
+.responsive-grid > * {
+  min-width: 0;
 }
 
 .hero-stats-grid {
@@ -600,16 +617,30 @@ body {
   .hero-stats-grid {
     justify-content: space-between;
     width: 100%;
+    flex-wrap: nowrap;
+    gap: 8px;
   }
   
   .hero-stats-grid > div {
-    flex: 1;
-    min-width: 30%;
-    padding: 12px 8px !important;
+    flex: 1 1 0;
+    min-width: 0 !important;
+    padding: 10px 6px !important;
   }
   
   .hero-stats-grid > div > div:first-child {
     font-size: 18px !important;
+  }
+
+  /* Textos de la tarjeta (label y valor) más chicos en mobile para que
+     "Percentil:" / "P100" quepan sin desbordar el ancho de la tarjeta
+     cuando las 3 comparten una sola fila. */
+  .hero-stats-grid > div > div:nth-child(2) {
+    font-size: 10px !important;
+    white-space: nowrap;
+  }
+  .hero-stats-grid > div > div:nth-child(3) {
+    font-size: 14px !important;
+    white-space: nowrap;
   }
 
   .module-icon-wrap {
