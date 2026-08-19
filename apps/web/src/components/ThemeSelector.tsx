@@ -11,7 +11,7 @@ type ThemeConfig = {
 const THEMES: ThemeConfig[] = [
   {
     id: "purple",
-    name: "Morado Iniciativa",
+    name: "Morado Baby Care",
     primary: "#7C5CBF",
     variables: {
       "--theme-primary": "#7C5CBF",

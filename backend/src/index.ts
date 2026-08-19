@@ -87,7 +87,7 @@ const startServer = async () => {
 
     // Rutas de prueba
     app.get("/api/health", (req, res) => {
-      res.json({ status: "ok", message: "Iniciativa Baby API is running" });
+      res.json({ status: "ok", message: "Baby Care API is running" });
     });
 
     app.get("/api/protected", verifyToken, (req, res) => {

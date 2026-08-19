@@ -1,8 +1,21 @@
-@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800;900&family=Baloo+2:wght@500;600;700;800&display=swap");
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Nunito", system-ui, -apple-system, sans-serif;
+  --font-display: "Baloo 2", "Nunito", system-ui, sans-serif;
+}
+
+:root {
+  /* Acento cálido (coral/durazno) — complementa al lavanda de
+     --theme-primary para que la app no se sienta monocromática. Se usa en
+     detalles, resaltados y toques decorativos, no como color base. */
+  --accent-coral: #FF8FA3;
+  --accent-coral-light: #FFE0E6;
+  --accent-gold: #F4C95D;
+  --accent-gold-light: #FFF4D9;
+  --accent-mint: #7FD9C4;
+  --accent-mint-light: #DCFAF3;
 }
 
 html,

@@ -11,7 +11,7 @@ export const generate2fa = async (req: AdminAuthRequest, res: Response) => {
 
     // Generar un nuevo secreto
     const secret = speakeasy.generateSecret({
-      name: `IniciativaBaby (${adminEmail})`
+      name: `BabyCare (${adminEmail})`
     });
 
     // Guardar el secreto (aún inactivo hasta verificar)

@@ -51,7 +51,7 @@ export default function AdminSidebar() {
   return (
     <aside className="admin-sidebar">
       <div className="admin-sidebar-header">
-        Iniciativa Baby
+        Baby Care
         <br />
         <span style={{ fontSize: "0.875rem", fontWeight: 400, opacity: 0.8 }}>
           Panel Interno

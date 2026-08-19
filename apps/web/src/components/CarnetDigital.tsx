@@ -73,7 +73,7 @@ export default function CarnetDigital({ perfil, onClose }: CarnetDigitalProps) {
       // Encabezado
       ctx.fillStyle = "#fff";
       ctx.font = "900 30px 'Nunito', sans-serif";
-      ctx.fillText("Iniciativa Baby", 48, 64);
+      ctx.fillText("Baby Care", 48, 64);
       ctx.font = "700 15px 'Nunito', sans-serif";
       ctx.fillStyle = "rgba(255,255,255,0.7)";
       ctx.fillText(volteado ? "Carnet Pediátrico Digital · Datos clínicos" : "Carnet Pediátrico Digital", 48, 88);
@@ -108,7 +108,7 @@ export default function CarnetDigital({ perfil, onClose }: CarnetDigitalProps) {
 
           ctx.font = "700 12px 'Nunito', sans-serif";
           ctx.fillStyle = "rgba(255,255,255,0.55)";
-          ctx.fillText("Generado en Iniciativa Baby · " + new Date().toLocaleDateString("es-CL"), 48, H - 32);
+          ctx.fillText("Generado en Baby Care · " + new Date().toLocaleDateString("es-CL"), 48, H - 32);
 
           const a = document.createElement("a");
           a.download = `carnet-${perfil.nombre.replace(/\s+/g, "-").toLowerCase()}.png`;
@@ -159,7 +159,7 @@ export default function CarnetDigital({ perfil, onClose }: CarnetDigitalProps) {
 
         ctx.font = "700 12px 'Nunito', sans-serif";
         ctx.fillStyle = "rgba(255,255,255,0.55)";
-        ctx.fillText("Generado en Iniciativa Baby · " + new Date().toLocaleDateString("es-CL"), 48, H - 32);
+        ctx.fillText("Generado en Baby Care · " + new Date().toLocaleDateString("es-CL"), 48, H - 32);
 
         const a = document.createElement("a");
         a.download = `carnet-${perfil.nombre.replace(/\s+/g, "-").toLowerCase()}-dorso.png`;
@@ -232,7 +232,7 @@ export default function CarnetDigital({ perfil, onClose }: CarnetDigitalProps) {
             }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                 <div>
-                  <div style={{ color: "#fff", fontWeight: 900, fontSize: "clamp(14px, 4vw, 20px)" }}>Iniciativa Baby</div>
+                  <div style={{ color: "#fff", fontWeight: 900, fontSize: "clamp(14px, 4vw, 20px)" }}>Baby Care</div>
                   <div style={{ color: "rgba(255,255,255,0.7)", fontWeight: 700, fontSize: "clamp(9px, 2.2vw, 11px)" }}>Carnet Pediátrico Digital</div>
                 </div>
                 {perfil.foto_perfil ? (

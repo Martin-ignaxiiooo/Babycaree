@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "Backend API para Iniciativa Baby",
+  "description": "Backend API para Baby Care",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
