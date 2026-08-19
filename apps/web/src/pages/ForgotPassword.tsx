@@ -238,7 +238,7 @@ export default function ForgotPassword() {
       style={{
         minHeight: "100vh",
         display: "flex",
-        background: "#F8F7FC",
+        background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)",
         fontFamily: "'Nunito', sans-serif",
       }}
     >
@@ -317,15 +317,16 @@ export default function ForgotPassword() {
                 letterSpacing: "-0.01em",
               }}
             >
-              Iniciativa Baby
+              Baby Care
             </span>
           </div>
           <h1
             style={{
-              fontSize: "2.4rem",
-              fontWeight: 900,
+              fontFamily: "'Baloo 2', sans-serif",
+              fontSize: "2.3rem",
+              fontWeight: 700,
               color: "white",
-              lineHeight: 1.15,
+              lineHeight: 1.2,
               marginBottom: "16px",
             }}
           >
@@ -466,8 +467,9 @@ export default function ForgotPassword() {
                 </button>
                 <h2
                   style={{
-                    fontSize: "28px",
-                    fontWeight: 900,
+                    fontFamily: "'Baloo 2', sans-serif",
+                    fontSize: "26px",
+                    fontWeight: 700,
                     color: "var(--theme-darker)",
                     marginBottom: "6px",
                   }}
@@ -651,8 +653,9 @@ export default function ForgotPassword() {
                 </button>
                 <h2
                   style={{
-                    fontSize: "28px",
-                    fontWeight: 900,
+                    fontFamily: "'Baloo 2', sans-serif",
+                    fontSize: "26px",
+                    fontWeight: 700,
                     color: "var(--theme-darker)",
                     marginBottom: "6px",
                   }}
@@ -857,8 +860,9 @@ export default function ForgotPassword() {
               <>
                 <h2
                   style={{
-                    fontSize: "28px",
-                    fontWeight: 900,
+                    fontFamily: "'Baloo 2', sans-serif",
+                    fontSize: "26px",
+                    fontWeight: 700,
                     color: "var(--theme-darker)",
                     marginBottom: "6px",
                   }}
@@ -1173,8 +1177,9 @@ export default function ForgotPassword() {
                 <div style={{ fontSize: "64px", marginBottom: "16px" }}>🎉</div>
                 <h2
                   style={{
-                    fontSize: "28px",
-                    fontWeight: 900,
+                    fontFamily: "'Baloo 2', sans-serif",
+                    fontSize: "26px",
+                    fontWeight: 700,
                     color: "var(--theme-darker)",
                     marginBottom: "12px",
                   }}

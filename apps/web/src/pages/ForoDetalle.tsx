@@ -76,10 +76,10 @@ export default function ForoDetalle() {
   if (!foro) return <div style={{ padding: "40px", textAlign: "center", fontFamily: "'Nunito', sans-serif" }}>Foro no encontrado.</div>;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F8F7FC", fontFamily: "'Nunito', sans-serif", display: "flex", flexDirection: "column" }}>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)", fontFamily: "'Nunito', sans-serif", display: "flex", flexDirection: "column" }}>
       
       {/* ── HEADER ── */}
-      <div style={{ background: "var(--theme-darker)", color: "#fff", padding: "32px 40px" }}>
+      <div style={{ background: "linear-gradient(120deg, var(--theme-darker) 0%, #3A2E5C 55%, var(--theme-dark) 100%)", color: "#fff", padding: "32px 40px" }}>
         <div style={{ maxWidth: "800px", margin: "0 auto", width: "100%" }}>
           <button 
             onClick={() => navigate("/comunidad")} 
@@ -89,12 +89,12 @@ export default function ForoDetalle() {
           </button>
           
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
-            <span style={{ fontSize: "12px", fontWeight: 800, color: "var(--theme-darker)", background: "var(--theme-light)", padding: "4px 12px", borderRadius: "12px" }}>
+            <span style={{ fontSize: "12px", fontWeight: 800, color: "var(--theme-darker)", background: "var(--accent-coral-light)", padding: "4px 12px", borderRadius: "12px" }}>
               {foro.categoria}
             </span>
             <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.7)" }}>Por {foro.autor_nombre} · {new Date(foro.fecha_creacion).toLocaleDateString('es-CL')}</span>
           </div>
-          <h1 style={{ fontSize: "32px", fontWeight: 900, margin: "0 0 16px 0", lineHeight: "1.2" }}>{foro.titulo}</h1>
+          <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "30px", fontWeight: 700, margin: "0 0 16px 0", lineHeight: "1.25" }}>{foro.titulo}</h1>
           <p style={{ fontSize: "16px", lineHeight: "1.6", margin: "0 0 24px 0", color: "rgba(255,255,255,0.9)", whiteSpace: "pre-wrap" }}>
             {foro.contenido}
           </p>

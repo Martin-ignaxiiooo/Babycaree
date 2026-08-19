@@ -149,7 +149,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
           }}>
             Semana {semanas} de 40
           </div>
-          <h1 style={{ fontSize: "32px", fontWeight: 800, color: "var(--theme-darker)", lineHeight: 1.15 }}>
+          <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "30px", fontWeight: 700, color: "var(--theme-darker)", lineHeight: 1.2 }}>
             Seguimiento - Mes {mes} ({etiquetaMes})
           </h1>
         </div>
@@ -159,7 +159,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
           {/* TARJETA 1: Tamaño del bebé */}
           <div style={{ ...cardStyle, flex: "1 1 320px", padding: "24px", display: "flex", flexDirection: "column" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "10px", marginBottom: "20px" }}>
-              <h2 style={{ fontSize: "19px", fontWeight: 800, color: "var(--theme-darker)", margin: 0 }}>
+              <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--theme-darker)", margin: 0 }}>
                 Tamaño del Bebé
               </h2>
               <div style={{

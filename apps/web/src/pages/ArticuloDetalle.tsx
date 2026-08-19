@@ -54,7 +54,7 @@ export default function ArticuloDetalle() {
   if (!articulo) return <div style={{ padding: "40px", textAlign: "center", fontFamily: "'Nunito', sans-serif" }}>Artículo no encontrado.</div>;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F8F7FC", fontFamily: "'Nunito', sans-serif", display: "flex", flexDirection: "column" }}>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)", fontFamily: "'Nunito', sans-serif", display: "flex", flexDirection: "column" }}>
       
       {/* ── TOP NAV COMPACTA ── */}
       <nav style={{ width: "100%", background: "#fff", padding: "16px 40px", display: "flex", alignItems: "center", boxShadow: "0 2px 8px rgba(0,0,0,.05)" }}>
@@ -70,7 +70,7 @@ export default function ArticuloDetalle() {
       <div style={{ flex: 1, padding: "40px", maxWidth: "800px", margin: "0 auto", width: "100%" }}>
         
         {/* Cabecera visual */}
-        <div style={{ background: "var(--theme-bg-light)", borderRadius: "24px", padding: "60px 40px", display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "32px", fontSize: "80px", boxShadow: "inset 0 2px 4px rgba(0,0,0,0.02)" }}>
+        <div style={{ background: "linear-gradient(135deg, var(--theme-bg-light), var(--accent-coral-light))", borderRadius: "26px", padding: "60px 40px", display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "32px", fontSize: "80px", boxShadow: "0 8px 30px rgba(124,92,191,0.1)" }}>
           {articulo.imagen_portada}
         </div>
 
@@ -79,18 +79,18 @@ export default function ArticuloDetalle() {
           <span style={{ fontSize: "14px", fontWeight: 800, color: "var(--theme-primary)", background: "var(--theme-bg-light)", padding: "6px 16px", borderRadius: "16px", display: "flex", alignItems: "center", gap: "6px" }}>
             <FileText size={16} /> {articulo.categoria}
           </span>
-          <div style={{ display: "flex", gap: "16px", color: "#6B7280", fontWeight: 600, fontSize: "14px" }}>
+          <div style={{ display: "flex", gap: "16px", color: "#8A849C", fontWeight: 600, fontSize: "14px" }}>
             <span style={{ display: "flex", alignItems: "center", gap: "6px" }}><Clock size={16} /> Lectura recomendada ({articulo.rango_edad_meses})</span>
             <span style={{ display: "flex", alignItems: "center", gap: "6px" }}><Eye size={16} /> {articulo.contador_lecturas} vistas</span>
           </div>
         </div>
 
         {/* Título */}
-        <h1 style={{ fontSize: "36px", fontWeight: 900, color: "var(--theme-darker)", margin: "0 0 24px 0", lineHeight: "1.2" }}>
+        <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "32px", fontWeight: 700, color: "var(--theme-darker)", margin: "0 0 24px 0", lineHeight: "1.25" }}>
           {articulo.titulo}
         </h1>
 
-        <div style={{ background: "#fff", padding: "32px", borderRadius: "24px", boxShadow: "0 4px 12px rgba(0,0,0,0.02)" }}>
+        <div style={{ background: "#fff", padding: "32px", borderRadius: "24px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
           <p style={{ margin: "0 0 32px 0", fontSize: "18px", color: "#4B5563", lineHeight: "1.6", fontWeight: 600 }}>
             {articulo.resumen}
           </p>

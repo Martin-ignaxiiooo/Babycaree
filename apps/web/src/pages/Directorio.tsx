@@ -76,7 +76,7 @@ export default function Directorio() {
   return (
     <div style={{
       minHeight: "100vh",
-      background: "#F8F7FC",
+      background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)",
       fontFamily: "'Nunito', sans-serif",
       display: "flex",
       flexDirection: "column",
@@ -88,22 +88,22 @@ export default function Directorio() {
       <div className="page-container">
         
         {/* Header & Search */}
-        <div style={{ marginBottom: "40px" }}>
-          <h1 style={{ fontSize: "32px", fontWeight: 800, color: "var(--theme-darker)", margin: "0 0 8px 0" }}>Directorio de Especialistas</h1>
-          <p style={{ fontSize: "16px", color: "#6B7280", margin: "0 0 24px 0" }}>Encuentra a los mejores médicos y especialistas para tu bebé.</p>
+        <div style={{ marginBottom: "36px" }}>
+          <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "30px", fontWeight: 700, color: "var(--theme-darker)", margin: "0 0 8px 0" }}>Directorio de Especialistas</h1>
+          <p style={{ fontSize: "15px", color: "#8A849C", margin: "0 0 24px 0", fontWeight: 600 }}>Encuentra a los mejores médicos y especialistas para tu bebé.</p>
           
-          <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
             <div style={{ flex: "1 1 300px", position: "relative" }}>
-              <Search size={20} style={{ position: "absolute", left: "16px", top: "14px", color: "#9CA3AF" }} />
+              <Search size={19} style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", color: "var(--theme-light)" }} />
               <input 
                 type="text" 
                 placeholder="Buscar por nombre o centro médico..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 style={{ 
-                  width: "100%", padding: "14px 16px 14px 48px", 
-                  borderRadius: "12px", border: "1px solid #E5E7EB", 
-                  fontSize: "15px", outline: "none", boxShadow: "0 2px 4px rgba(0,0,0,0.02)"
+                  width: "100%", padding: "14px 16px 14px 48px", boxSizing: "border-box",
+                  borderRadius: "14px", border: "2px solid #EDE9F8", 
+                  fontSize: "15px", outline: "none",
                 }}
               />
             </div>
@@ -113,7 +113,7 @@ export default function Directorio() {
               onChange={(e) => setSelectedEspecialidad(e.target.value)}
               style={{ 
                 flex: "0 1 250px", padding: "14px 16px", 
-                borderRadius: "12px", border: "1px solid #E5E7EB", 
+                borderRadius: "14px", border: "2px solid #EDE9F8", 
                 fontSize: "15px", outline: "none", background: "#fff", cursor: "pointer"
               }}>
               <option value="">Todas las especialidades</option>
@@ -126,74 +126,74 @@ export default function Directorio() {
 
         {/* Directory Grid */}
         {loading ? (
-          <div style={{ textAlign: "center", padding: "40px", color: "#6B7280" }}>Cargando directorio...</div>
+          <div style={{ textAlign: "center", padding: "40px", color: "#8A849C" }}>Cargando directorio...</div>
         ) : filteredMedicos.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "40px", color: "#6B7280", background: "#fff", borderRadius: "16px" }}>
+          <div style={{ textAlign: "center", padding: "40px", color: "#8A849C", background: "#fff", borderRadius: "22px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
             No se encontraron médicos con esos criterios.
           </div>
         ) : (
           <div className="responsive-grid">
             {filteredMedicos.map(medico => (
               <div key={medico.id} style={{ 
-                background: "#fff", borderRadius: "20px", padding: "24px",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                background: "#fff", borderRadius: "22px", padding: "24px",
+                boxShadow: "0 6px 24px rgba(124,92,191,0.08)",
                 display: "flex", flexDirection: "column", gap: "16px",
                 transition: "transform 0.2s, box-shadow 0.2s", cursor: "default"
-              }} onMouseEnter={e => { e.currentTarget.style.transform="translateY(-4px)"; e.currentTarget.style.boxShadow="0 12px 24px rgba(0,0,0,0.1)"; }} onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 4px 12px rgba(0,0,0,0.05)"; }}>
+              }} onMouseEnter={e => { e.currentTarget.style.transform="translateY(-4px)"; e.currentTarget.style.boxShadow="0 16px 32px rgba(124,92,191,0.16)"; }} onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 6px 24px rgba(124,92,191,0.08)"; }}>
                 
                 <div style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
                   <div style={{ 
                     width: "56px", height: "56px", borderRadius: "50%", 
-                    background: "var(--theme-bg-light)", color: "var(--theme-primary)",
-                    display: "flex", alignItems: "center", justifyContent: "center"
+                    background: "linear-gradient(135deg, var(--theme-bg-light), var(--accent-coral-light))", color: "var(--theme-primary)",
+                    display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
                   }}>
-                    <User size={32} />
+                    <User size={30} />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                      <h3 style={{ margin: "0 0 4px 0", fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "8px" }}>
+                      <h3 style={{ margin: "0 0 4px 0", fontFamily: "'Baloo 2', sans-serif", fontSize: "18px", fontWeight: 700, color: "var(--theme-darker)" }}>
                         {medico.nombre_completo}
                       </h3>
-                      <div style={{ display: "flex", alignItems: "center", gap: "4px", background: "#FEF3C7", color: "#D97706", padding: "4px 8px", borderRadius: "8px", fontSize: "13px", fontWeight: 700 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "4px", background: "var(--accent-gold-light)", color: "#8A6D1D", padding: "4px 8px", borderRadius: "8px", fontSize: "13px", fontWeight: 700, flexShrink: 0 }}>
                         <Star size={14} fill="currentColor" /> {medico.calificacion_promedio}
                       </div>
                     </div>
-                    <div style={{ color: "var(--theme-primary)", fontWeight: 600, fontSize: "14px", marginBottom: "4px" }}>
+                    <div style={{ color: "var(--theme-primary)", fontWeight: 700, fontSize: "14px", marginBottom: "4px" }}>
                       {medico.especialidad_nombre}
                     </div>
                   </div>
                 </div>
 
-                <div style={{ borderTop: "1px solid #F3F4F6", paddingTop: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px", color: "#6B7280", fontSize: "14px" }}>
-                    <MapPin size={18} style={{ color: "#9CA3AF" }} />
+                <div style={{ borderTop: "1px solid var(--theme-bg-light)", paddingTop: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", color: "#8A849C", fontSize: "14px" }}>
+                    <MapPin size={18} style={{ color: "var(--theme-light)" }} />
                     <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                       {medico.centro_icono && <span>{medico.centro_icono}</span>}
                       {medico.nombre_centro}
                     </span>
                   </div>
-                  <div style={{ display: "flex", alignItems: "flex-start", gap: "12px", color: "#6B7280", fontSize: "14px" }}>
-                    <ShieldCheck size={18} style={{ color: "#9CA3AF", marginTop: "2px" }} />
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: "12px", color: "#8A849C", fontSize: "14px" }}>
+                    <ShieldCheck size={18} style={{ color: "var(--theme-light)", marginTop: "2px" }} />
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
                       {medico.prevision_aceptada.map((prev, idx) => (
-                        <span key={idx} style={{ background: "#F3F4F6", padding: "2px 8px", borderRadius: "12px", fontSize: "12px" }}>
+                        <span key={idx} style={{ background: "var(--theme-bg-light)", color: "var(--theme-dark)", padding: "2px 10px", borderRadius: "12px", fontSize: "12px", fontWeight: 700 }}>
                           {prev}
                         </span>
                       ))}
                     </div>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px", color: "#6B7280", fontSize: "14px" }}>
-                    <Phone size={18} style={{ color: "#9CA3AF" }} />
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", color: "#8A849C", fontSize: "14px" }}>
+                    <Phone size={18} style={{ color: "var(--theme-light)" }} />
                     <span>{medico.telefono_contacto}</span>
                   </div>
                 </div>
 
                 <button style={{ 
-                  marginTop: "auto", width: "100%", background: "var(--theme-primary)", 
-                  color: "#fff", border: "none", padding: "12px", borderRadius: "12px", 
-                  fontWeight: 700, fontSize: "15px", cursor: "pointer",
-                  transition: "background 0.2s"
-                }} onMouseEnter={e => e.currentTarget.style.background="var(--theme-dark)"} onMouseLeave={e => e.currentTarget.style.background="var(--theme-primary)"}
+                  marginTop: "auto", width: "100%", background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))", 
+                  color: "#fff", border: "none", padding: "13px", borderRadius: "14px", 
+                  fontWeight: 800, fontSize: "15px", cursor: "pointer",
+                  boxShadow: "0 6px 16px var(--theme-shadow-light)",
+                }}
                 onClick={() => alert(`Llamando a ${medico.nombre_completo}: ${medico.telefono_contacto}`)}>
                   Agendar Cita
                 </button>

@@ -108,7 +108,7 @@ export default function Comunidad() {
   return (
     <div style={{
       minHeight: "100vh",
-      background: "#F8F7FC",
+      background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)",
       fontFamily: "'Nunito', sans-serif",
       display: "flex",
       flexDirection: "column",
@@ -121,15 +121,15 @@ export default function Comunidad() {
         
         <div style={{ marginBottom: "32px", display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "16px" }}>
           <div>
-            <h1 style={{ fontSize: "32px", fontWeight: 800, color: "var(--theme-darker)", margin: "0 0 8px 0" }}>Comunidad</h1>
-            <p style={{ fontSize: "16px", color: "#6B7280", margin: 0 }}>Comparte experiencias, resuelve dudas y aprende con otros padres y especialistas.</p>
+            <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "30px", fontWeight: 700, color: "var(--theme-darker)", margin: "0 0 8px 0" }}>Comunidad</h1>
+            <p style={{ fontSize: "15px", color: "#8A849C", margin: 0, fontWeight: 600 }}>Comparte experiencias, resuelve dudas y aprende con otros padres y especialistas.</p>
           </div>
           {activeTab === "foros" && (
             <button style={{ 
-              background: "var(--theme-primary)", color: "#fff", border: "none", 
-              padding: "12px 24px", borderRadius: "12px", fontWeight: 800, 
+              background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))", color: "#fff", border: "none", 
+              padding: "12px 24px", borderRadius: "14px", fontWeight: 800, 
               cursor: "pointer", display: "flex", alignItems: "center", gap: "8px",
-              boxShadow: "0 4px 12px rgba(124,92,191,0.3)"
+              boxShadow: "0 8px 20px var(--theme-shadow-light)"
             }} onClick={() => setShowModal(true)}>
               <MessageCircle size={20} />
               Crear nuevo tema
@@ -137,26 +137,28 @@ export default function Comunidad() {
           )}
         </div>
 
-        <div className="responsive-overflow" style={{ display: "flex", gap: "16px", marginBottom: "32px", borderBottom: "2px solid #E5E7EB", paddingBottom: "16px", whiteSpace: "nowrap" }}>
+        <div className="responsive-overflow" style={{ display: "flex", gap: "10px", marginBottom: "32px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "16px", whiteSpace: "nowrap" }}>
           <button 
             onClick={() => setActiveTab("foros")}
             style={{ 
-              background: activeTab === "foros" ? "var(--theme-primary)" : "transparent",
-              color: activeTab === "foros" ? "#fff" : "#6B7280",
-              border: "none", padding: "12px 24px", borderRadius: "12px", 
-              fontWeight: 800, cursor: "pointer", fontSize: "15px",
-              display: "flex", alignItems: "center", gap: "8px", transition: "all 0.2s"
+              background: activeTab === "foros" ? "linear-gradient(135deg, var(--theme-primary), var(--theme-light))" : "transparent",
+              color: activeTab === "foros" ? "#fff" : "#8A849C",
+              border: "none", padding: "12px 22px", borderRadius: "100px", 
+              fontWeight: 800, cursor: "pointer", fontSize: "14.5px",
+              display: "flex", alignItems: "center", gap: "8px", transition: "all 0.2s",
+              boxShadow: activeTab === "foros" ? "0 6px 16px var(--theme-shadow-light)" : "none",
             }}>
             <MessageSquare size={18} /> Foros de debate
           </button>
           <button 
             onClick={() => setActiveTab("articulos")}
             style={{ 
-              background: activeTab === "articulos" ? "var(--theme-primary)" : "transparent",
-              color: activeTab === "articulos" ? "#fff" : "#6B7280",
-              border: "none", padding: "12px 24px", borderRadius: "12px", 
-              fontWeight: 800, cursor: "pointer", fontSize: "15px",
-              display: "flex", alignItems: "center", gap: "8px", transition: "all 0.2s"
+              background: activeTab === "articulos" ? "linear-gradient(135deg, var(--theme-primary), var(--theme-light))" : "transparent",
+              color: activeTab === "articulos" ? "#fff" : "#8A849C",
+              border: "none", padding: "12px 22px", borderRadius: "100px", 
+              fontWeight: 800, cursor: "pointer", fontSize: "14.5px",
+              display: "flex", alignItems: "center", gap: "8px", transition: "all 0.2s",
+              boxShadow: activeTab === "articulos" ? "0 6px 16px var(--theme-shadow-light)" : "none",
             }}>
             <FileText size={18} /> Artículos educativos
           </button>
@@ -167,10 +169,10 @@ export default function Comunidad() {
           <div style={{ display: "grid", gap: "16px" }}>
             {loading ? <div style={{ padding: "40px", textAlign: "center", color: "#6B7280" }}>Cargando foros...</div> : forosData.map(foro => (
               <div key={foro.id} onClick={() => navigate(`/comunidad/foro/${foro.id}`)} style={{ 
-                background: "#fff", padding: "24px", borderRadius: "16px", 
-                boxShadow: "0 2px 8px rgba(0,0,0,0.05)", display: "flex", 
+                background: "#fff", padding: "24px", borderRadius: "20px", 
+                boxShadow: "0 6px 20px rgba(124,92,191,0.08)", display: "flex", 
                 alignItems: "center", cursor: "pointer", transition: "transform 0.2s",
-                borderLeft: "4px solid var(--theme-light)", flexWrap: "wrap", gap: "16px"
+                borderLeft: "4px solid var(--accent-coral)", flexWrap: "wrap", gap: "16px"
               }} onMouseEnter={e => e.currentTarget.style.transform="translateY(-2px)"} onMouseLeave={e => e.currentTarget.style.transform="translateY(0)"}>
                 <div style={{ flex: 1, minWidth: "300px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px" }}>
@@ -179,7 +181,7 @@ export default function Comunidad() {
                     </span>
                     <span style={{ fontSize: "13px", color: "#9CA3AF" }}>Por {foro.autor_nombre} · {foro.tiempo_publicacion}</span>
                   </div>
-                  <h3 style={{ margin: "0", fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)" }}>{foro.titulo}</h3>
+                  <h3 style={{ margin: "0", fontFamily: "'Baloo 2', sans-serif", fontSize: "18px", fontWeight: 700, color: "var(--theme-darker)" }}>{foro.titulo}</h3>
                 </div>
                 <div style={{ display: "flex", gap: "24px", color: "#6B7280" }}>
                   <div 
@@ -209,11 +211,11 @@ export default function Comunidad() {
           <div className="responsive-grid">
             {loading ? <div style={{ padding: "40px", color: "#6B7280", gridColumn: "1/-1", textAlign: "center" }}>Cargando artículos...</div> : articulosData.map(art => (
               <div key={art.id} onClick={() => navigate(`/comunidad/articulo/${art.id}`)} style={{ 
-                background: "#fff", borderRadius: "20px", overflow: "hidden",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.05)", cursor: "pointer",
+                background: "#fff", borderRadius: "22px", overflow: "hidden",
+                boxShadow: "0 6px 20px rgba(124,92,191,0.08)", cursor: "pointer",
                 transition: "transform 0.2s, box-shadow 0.2s",
                 display: "flex", flexDirection: "column"
-              }} onMouseEnter={e => { e.currentTarget.style.transform="translateY(-4px)"; e.currentTarget.style.boxShadow="0 12px 24px rgba(0,0,0,0.1)"; }} onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 4px 12px rgba(0,0,0,0.05)"; }}>
+              }} onMouseEnter={e => { e.currentTarget.style.transform="translateY(-4px)"; e.currentTarget.style.boxShadow="0 16px 32px rgba(124,92,191,0.16)"; }} onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 6px 20px rgba(124,92,191,0.08)"; }}>
                 <div style={{ height: "160px", background: "var(--theme-bg-light)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "64px" }}>
                   {art.imagen_portada}
                 </div>
