@@ -21,6 +21,11 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
   const switcherRef = useRef<HTMLDivElement>(null);
   const activeBabyId = typeof window !== "undefined" ? localStorage.getItem("selectedBabyId") : null;
 
+  // Para perfiles de embarazo, mostrar "Embarazo de X" en vez del nombre a
+  // secas, para no confundirlos con un bebé ya nacido en listas donde
+  // aparecen mezclados.
+  const nombreVisible = (baby: any) => baby.estado === "embarazo" ? `Embarazo de ${baby.nombre}` : baby.nombre;
+
   const fetchBabies = () => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -184,7 +189,10 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
                       ) : <Baby size={12} />;
                     })()}
                   </span>
-                  {babies.find((b) => b.id === activeBabyId)?.nombre || "Cambiar"}
+                  {(() => {
+                    const activeBaby = babies.find((b) => b.id === activeBabyId);
+                    return activeBaby ? nombreVisible(activeBaby) : "Cambiar";
+                  })()}
                   <ChevronDown size={13} style={{ transform: switcherOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }} />
                 </button>
 
@@ -223,7 +231,7 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
                           )}
                         </div>
                         <span style={{ flex: 1, fontSize: "14px", fontWeight: 700, color: "var(--theme-darker)" }}>
-                          {baby.nombre}
+                          {nombreVisible(baby)}
                         </span>
                         {baby.id === activeBabyId && <Check size={16} color="var(--theme-primary)" />}
                       </div>
@@ -337,7 +345,7 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
                           baby.nombre?.charAt(0).toUpperCase()
                         )}
                       </div>
-                      <span style={{ flex: 1, fontSize: "15px" }}>{baby.nombre}</span>
+                      <span style={{ flex: 1, fontSize: "15px" }}>{nombreVisible(baby)}</span>
                       {baby.id === activeBabyId && <Check size={16} />}
                     </div>
                   ))}

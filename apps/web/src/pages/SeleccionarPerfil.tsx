@@ -225,7 +225,9 @@ export default function SeleccionarPerfil() {
               )}
             </div>
             <div style={{ textAlign: "center" }}>
-              <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "1.15rem", fontWeight: 700, color: "var(--theme-darker)" }}>{baby.nombre}</h2>
+              <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "1.15rem", fontWeight: 700, color: "var(--theme-darker)" }}>
+                {baby.estado === "embarazo" ? `Embarazo de ${baby.nombre}` : baby.nombre}
+              </h2>
               <p style={{ fontSize: "0.85rem", color: "var(--theme-primary)", marginTop: "4px", fontWeight: 700 }}>Ver panel →</p>
             </div>
             <button

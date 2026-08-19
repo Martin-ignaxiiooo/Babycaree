@@ -74,17 +74,22 @@ interface BabyGrowthIconProps {
 export default function BabyGrowthIcon({ semanas, porcentaje, fill }: BabyGrowthIconProps) {
   const clamped = Math.max(0, Math.min(100, porcentaje));
   const t = clamped / 100;
-  const size = 135 + (185 - 135) * t;
+  // "fill" antes intentaba usar height:100% + aspect-ratio para estirarse
+  // dentro del alto disponible de la tarjeta, pero eso requiere que algún
+  // ancestro tenga una altura explícita definida — si ninguno la tiene
+  // (nuestro caso), el porcentaje se resuelve distinto según el navegador,
+  // causando que el contenedor colapse o crezca de forma impredecible y
+  // se superponga con el contenido de al lado. Un tamaño fijo en píxeles
+  // (que igual escala con el % de embarazo) es determinístico en todos
+  // los navegadores.
+  const size = fill ? 160 + (220 - 160) * t : 135 + (185 - 135) * t;
   const mes = mesDesdeSemanas(semanas);
 
   return (
     <div
       style={{
-        width: fill ? "auto" : `${size}px`,
-        height: fill ? "100%" : `${size}px`,
-        aspectRatio: "1 / 1",
-        minHeight: `${size}px`,
-        maxHeight: fill ? "260px" : undefined,
+        width: `${size}px`,
+        height: `${size}px`,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

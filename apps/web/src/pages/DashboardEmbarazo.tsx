@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Calendar, CalendarPlus, Plus, Sparkles } from "lucide-react";
+import { Calendar, CalendarPlus, Plus, Sparkles, Camera, X, Loader2 } from "lucide-react";
 import DateSelect from "../components/DateSelect";
 import TimeSelect from "../components/TimeSelect";
 import BabyGrowthIcon, { HITOS_POR_MES, ETIQUETA_POR_MES, SEMANA_RANGO_POR_MES, mesDesdeSemanas } from "../components/BabyGrowthIcon";
@@ -23,6 +23,18 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
   const [medico, setMedico] = useState("");
   const [notas, setNotas] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+
+  // Foto de perfil (embarazo). Se maneja local porque este componente
+  // recibe "perfil" como prop desde arriba y no controla su propio fetch;
+  // se actualiza sola de nuevo cuando el usuario cambia de bebé.
+  const [fotoPerfil, setFotoPerfil] = useState<string | null>(perfil?.foto_perfil || null);
+  const [uploadingFoto, setUploadingFoto] = useState(false);
+  const [fotoError, setFotoError] = useState("");
+  const [confirmandoBorrarFoto, setConfirmandoBorrarFoto] = useState(false);
+
+  useEffect(() => {
+    setFotoPerfil(perfil?.foto_perfil || null);
+  }, [activeBabyId, perfil?.foto_perfil]);
 
   useEffect(() => {
     fetchCitas();
@@ -72,6 +84,107 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
     }
   };
 
+  // Redimensiona/comprime la foto en el navegador antes de subirla (igual
+  // que en el dashboard del bebé ya nacido), para no guardar imágenes
+  // pesadas en la base de datos.
+  const resizeImageFile = (file: File, maxDim = 480, quality = 0.82): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > height && width > maxDim) {
+          height = Math.round(height * (maxDim / width));
+          width = maxDim;
+        } else if (height >= width && height > maxDim) {
+          width = Math.round(width * (maxDim / height));
+          height = maxDim;
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          URL.revokeObjectURL(objectUrl);
+          reject(new Error("No se pudo procesar la imagen"));
+          return;
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => {
+            URL.revokeObjectURL(objectUrl);
+            if (blob) resolve(blob);
+            else reject(new Error("No se pudo procesar la imagen"));
+          },
+          "image/jpeg",
+          quality,
+        );
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        reject(new Error("No se pudo leer la imagen"));
+      };
+      img.src = objectUrl;
+    });
+  };
+
+  const handleUploadFoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !activeBabyId) return;
+
+    const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setFotoError("Formato no soportado. Usa JPG, PNG, WEBP o GIF.");
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      setFotoError("La imagen no puede pesar más de 8MB.");
+      return;
+    }
+
+    setFotoError("");
+    setUploadingFoto(true);
+    try {
+      const resizedBlob = await resizeImageFile(file);
+      const token = localStorage.getItem("token");
+      const formData = new FormData();
+      formData.append("foto", resizedBlob, "foto.jpg");
+
+      const res = await axios.post(`${API_URL}/v1/perfiles-bebe/${activeBabyId}/foto`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      setFotoPerfil(res.data.foto_perfil);
+    } catch (error) {
+      console.error(error);
+      setFotoError("No se pudo subir la foto. Intenta de nuevo.");
+    } finally {
+      setUploadingFoto(false);
+    }
+  };
+
+  const handleEliminarFoto = async () => {
+    if (!activeBabyId || uploadingFoto) return;
+    setFotoError("");
+    setUploadingFoto(true);
+    setConfirmandoBorrarFoto(false);
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`${API_URL}/v1/perfiles-bebe/${activeBabyId}/foto`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setFotoPerfil(null);
+    } catch (error) {
+      console.error(error);
+      setFotoError("No se pudo quitar la foto. Intenta de nuevo.");
+    } finally {
+      setUploadingFoto(false);
+    }
+  };
+
   // Extraer datos del backend
   const semanas = perfil?.semanas_embarazo || 1;
   let porcentaje = 0;
@@ -89,17 +202,17 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
 
   const cardStyle: React.CSSProperties = {
     background: "white",
-    border: "2px solid var(--theme-bg-light)",
-    borderRadius: "20px",
+    borderRadius: "22px",
     overflow: "hidden",
-    boxShadow: "0 4px 16px rgba(124, 92, 191, 0.08)",
+    boxShadow: "0 6px 24px rgba(124,92,191,0.07)",
   };
 
   const cardHeaderBannerStyle: React.CSSProperties = {
     background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
     color: "white",
+    fontFamily: "'Baloo 2', sans-serif",
     fontSize: "16px",
-    fontWeight: 800,
+    fontWeight: 700,
     padding: "16px 22px",
     display: "flex",
     alignItems: "center",
@@ -131,28 +244,115 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
   };
 
   return (
-    <div style={{
-      padding: "40px clamp(12px, 4vw, 20px)",
-      background: "linear-gradient(135deg, var(--theme-primary) 0%, #F4A0A0 50%, var(--theme-light) 100%)",
-      minHeight: "100vh",
-      flex: 1,
-    }}>
-      <div style={{ maxWidth: "1020px", margin: "0 auto", fontFamily: "Nunito" }}>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)", fontFamily: "'Nunito', sans-serif", flex: 1 }}>
 
-        <div style={{ marginBottom: "32px" }}>
-          <div style={{
-            display: "inline-flex", alignItems: "center", gap: "8px",
-            background: "white", color: "var(--theme-primary)",
-            padding: "6px 14px", borderRadius: "100px", fontSize: "12px", fontWeight: 800,
-            textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "14px",
-            boxShadow: "0 2px 8px rgba(124,92,191,0.15)",
-          }}>
-            Semana {semanas} de 40
+      {/* ── HERO: degradado contenido arriba, igual que el resto de la app ── */}
+      <div style={{
+        background: "linear-gradient(120deg, var(--theme-darker) 0%, #B85C7E 55%, var(--theme-light) 100%)",
+        padding: "40px clamp(16px, 4vw, 40px) 44px",
+      }}>
+        <div style={{ maxWidth: "1020px", margin: "0 auto" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "22px", flexWrap: "wrap" }}>
+            <label
+              htmlFor="foto-embarazo-input"
+              style={{
+                position: "relative",
+                width: "88px", height: "88px", borderRadius: "22px",
+                background: "#fff", flexShrink: 0, overflow: "hidden", cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                boxShadow: "0 8px 22px rgba(45,38,64,0.2)",
+              }}
+              title="Cambiar foto"
+            >
+              {fotoPerfil ? (
+                <img src={fotoPerfil} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              ) : (
+                <Camera size={30} color="#E4C9D6" strokeWidth={2} />
+              )}
+
+              {uploadingFoto && (
+                <div style={{ position: "absolute", inset: 0, background: "rgba(255,255,255,0.85)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Loader2 size={22} color="var(--theme-primary)" className="spin-icon" />
+                </div>
+              )}
+
+              {fotoPerfil && !uploadingFoto && !confirmandoBorrarFoto && (
+                <button
+                  type="button"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setConfirmandoBorrarFoto(true); }}
+                  title="Quitar foto"
+                  aria-label="Quitar foto"
+                  style={{
+                    position: "absolute", top: "4px", right: "4px",
+                    width: "20px", height: "20px", borderRadius: "50%",
+                    background: "rgba(45,38,64,0.6)", border: "none",
+                    display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", padding: 0,
+                  }}
+                >
+                  <X size={12} color="#fff" strokeWidth={3} />
+                </button>
+              )}
+
+              {confirmandoBorrarFoto && !uploadingFoto && (
+                <div
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                  style={{ position: "absolute", inset: 0, background: "rgba(45,38,64,0.88)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "6px", padding: "6px" }}
+                >
+                  <span style={{ color: "#fff", fontSize: "9px", fontWeight: 700, textAlign: "center", lineHeight: 1.2 }}>¿Quitar foto?</span>
+                  <div style={{ display: "flex", gap: "4px" }}>
+                    <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleEliminarFoto(); }} style={{ background: "#fff", color: "#B91C1C", border: "none", borderRadius: "6px", padding: "3px 7px", fontSize: "10px", fontWeight: 800, cursor: "pointer" }}>Sí</button>
+                    <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setConfirmandoBorrarFoto(false); }} style={{ background: "rgba(255,255,255,0.2)", color: "#fff", border: "1px solid rgba(255,255,255,0.5)", borderRadius: "6px", padding: "3px 7px", fontSize: "10px", fontWeight: 700, cursor: "pointer" }}>No</button>
+                  </div>
+                </div>
+              )}
+
+              <input
+                id="foto-embarazo-input"
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                onChange={handleUploadFoto}
+                disabled={uploadingFoto}
+                style={{ display: "none" }}
+              />
+            </label>
+
+            <div style={{ flex: "1 1 260px", minWidth: 0 }}>
+              <div style={{
+                display: "inline-flex", alignItems: "center", gap: "8px",
+                background: "rgba(255,255,255,0.16)", color: "#fff",
+                padding: "6px 14px", borderRadius: "100px", fontSize: "12px", fontWeight: 800,
+                textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "12px",
+                border: "1px solid rgba(255,255,255,0.25)",
+              }}>
+                <Sparkles size={13} /> Semana {semanas} de 40
+              </div>
+              <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "clamp(24px, 4vw, 30px)", fontWeight: 700, color: "#fff", lineHeight: 1.2, margin: 0 }}>
+                Seguimiento de {perfil?.nombre || "tu embarazo"}
+              </h1>
+              <div style={{ fontSize: "14.5px", color: "rgba(255,255,255,0.8)", marginTop: "6px", fontWeight: 600 }}>
+                Mes {mes} · {etiquetaMes}
+              </div>
+              {fotoError && (
+                <div style={{ fontSize: "12px", color: "#fff", background: "rgba(185,28,28,0.85)", padding: "4px 10px", borderRadius: "8px", marginTop: "8px", fontWeight: 700, display: "inline-block" }}>{fotoError}</div>
+              )}
+            </div>
+
+            {/* Mini progreso, visible también en el hero para que se vea de un vistazo */}
+            <div style={{ flex: "0 0 auto", textAlign: "center", background: "rgba(255,255,255,0.14)", border: "1px solid rgba(255,255,255,0.25)", borderRadius: "18px", padding: "14px 22px" }}>
+              <div style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "26px", fontWeight: 700, color: "#fff" }}>{Math.min(porcentaje, 100)}%</div>
+              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.75)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em" }}>del camino</div>
+            </div>
           </div>
-          <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "30px", fontWeight: 700, color: "var(--theme-darker)", lineHeight: 1.2 }}>
-            Seguimiento - Mes {mes} ({etiquetaMes})
-          </h1>
         </div>
+      </div>
+
+      <style>{`
+        @keyframes spin-embarazo-kf { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .spin-icon { animation: spin-embarazo-kf 0.9s linear infinite; }
+      `}</style>
+
+      {/* ── CONTENIDO ── */}
+      <div style={{ maxWidth: "1020px", margin: "0 auto", padding: "32px clamp(12px, 4vw, 20px) 40px", fontFamily: "Nunito" }}>
 
         <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", alignItems: "stretch" }}>
 
@@ -171,8 +371,8 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
               </div>
             </div>
 
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: "22px" }}>
-              <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap", minHeight: 0 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
                 <BabyGrowthIcon semanas={semanas} porcentaje={porcentaje} fill />
                 <div style={{ flex: "1 1 140px" }}>
                   <div style={{ fontSize: "26px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "8px" }}>
