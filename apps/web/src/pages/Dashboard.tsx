@@ -589,18 +589,17 @@ export default function Dashboard() {
                 </h3>
 
                 {notificaciones.map((n: any, idx: number) => {
-                  // Estilo tipo checklist: completado (lavanda) / pendiente (naranja) / próximo (celeste)
-                  // Colores tomados directo del diseño de referencia (Stitch AI)
-                  const esUrgente = n.prioridad === 'alta';
-                  const esProxima = n.prioridad === 'media';
-                  const StatusIcon = esUrgente ? Clock : esProxima ? Lollipop : Check;
-                  const statusColor = esUrgente ? "#8A5212" : esProxima ? "#1E4E8C" : "#7C5CBF";
-                  const statusBg = esUrgente
-                    ? "linear-gradient(90deg, #FEAD53 0%, #FFE6CD 100%)"
-                    : esProxima
-                    ? "linear-gradient(90deg, #8CC9F0 0%, #D7EEFF 100%)"
-                    : "#E3D2FA";
-                  const statusLabel = esUrgente ? "Pendiente" : esProxima ? "Próximo" : "Completado";
+                  // Colores/íconos por tipo real de notificación (no por prioridad
+                  // genérica, para no rotular mal cosas como el artículo
+                  // recomendado, que no es una "tarea completada").
+                  const config: Record<string, { icon: any; color: string; bg: string; label: string }> = {
+                    control_proximo: { icon: Clock, color: "#1E4E8C", bg: "linear-gradient(90deg, #8CC9F0 0%, #D7EEFF 100%)", label: "Agendado" },
+                    vacuna_atrasada: { icon: Clock, color: "#8A5212", bg: "linear-gradient(90deg, #FEAD53 0%, #FFE6CD 100%)", label: "Pendiente" },
+                    vacuna_proxima: { icon: Lollipop, color: "#1E4E8C", bg: "linear-gradient(90deg, #8CC9F0 0%, #D7EEFF 100%)", label: "Próximo" },
+                    articulo: { icon: Check, color: "#7C5CBF", bg: "#E3D2FA", label: "Recomendado" },
+                  };
+                  const { icon: StatusIcon, color: statusColor, bg: statusBg, label: statusLabel } =
+                    config[n.tipo] || config.articulo;
 
                   return (
                     <div key={idx}

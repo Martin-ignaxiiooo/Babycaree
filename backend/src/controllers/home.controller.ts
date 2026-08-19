@@ -203,7 +203,10 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
       }
     });
 
-    // B. Citas Médicas
+    // B. Citas Médicas — estas son agendadas activamente por la madre (o
+    // quien tenga acceso), así que van con la prioridad más alta de todas:
+    // reflejan un compromiso que ya se tomó, no solo un recordatorio
+    // automático del calendario de vacunación.
     const citasRes = await query(
       `SELECT especialidad, fecha_cita, medico
        FROM citas_medicas
@@ -230,7 +233,8 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
       }
     });
 
-    // C. Artículo recomendado (real, filtrado por edad del bebé)
+    // C. Artículo recomendado (real, filtrado por edad del bebé) — es solo
+    // informativo, así que siempre va al final de la lista.
     const exactAge = calculateExactAge(perfil.fecha_nacimiento);
     const monthsMatch = exactAge.match(/(\d+) meses/);
     const ageMonths = monthsMatch ? parseInt(monthsMatch[1], 10) : 0;
@@ -257,37 +261,26 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
       });
     }
 
-    // Mocks visuales SOLO si la BD está vacía, para que el usuario vea el
-    // diseño del dashboard antes de registrar datos reales. Se marcan
-    // explícitamente como "(ejemplo)" para no confundirlos con vacunas o
-    // controles reales del bebé.
-    if (vacunasRes.rows.length === 0) {
-      notificaciones.push({
-        tipo: "vacuna_atrasada",
-        prioridad: "alta",
-        titulo: "Vacuna Hexavalente 2ª — Atrasada (ejemplo)",
-        dias_atraso: 5,
-        es_ejemplo: true,
-        mensaje: "Así se ve una alerta de vacuna atrasada. Registra las vacunas reales en Salud → Vacunas."
-      });
-      total_alertas++;
-    }
+    // Orden real de urgencia (no solo "alta/media/baja" genérico):
+    // 1º Citas médicas — las agendó la madre a propósito, van siempre primero.
+    // 2º Vacunas atrasadas — ordenadas por más días de atraso primero.
+    // 3º Vacunas próximas — ordenadas por la que vence antes.
+    // 4º Artículo educativo — informativo, siempre al final.
+    const ordenTipo: Record<string, number> = {
+      control_proximo: 0,
+      vacuna_atrasada: 1,
+      vacuna_proxima: 2,
+      articulo: 3,
+    };
 
-    if (citasRes.rows.length === 0) {
-      notificaciones.push({
-        tipo: "control_proximo",
-        prioridad: "media",
-        titulo: "Control 8 meses (ejemplo)",
-        dias_restantes: 18,
-        es_ejemplo: true,
-        mensaje: "Así se ve una alerta de control próximo. Agenda citas reales en Salud → Citas."
-      });
-      total_alertas++;
-    }
+    notificaciones.sort((a, b) => {
+      const pesoTipo = (ordenTipo[a.tipo] ?? 9) - (ordenTipo[b.tipo] ?? 9);
+      if (pesoTipo !== 0) return pesoTipo;
 
-    // Sort notifications by priority: alta > media > baja
-    const priorityWeight: any = { alta: 1, media: 2, baja: 3 };
-    notificaciones.sort((a, b) => priorityWeight[a.prioridad] - priorityWeight[b.prioridad]);
+      // Dentro del mismo tipo: lo más urgente primero
+      if (a.tipo === "vacuna_atrasada") return (b.dias_atraso ?? 0) - (a.dias_atraso ?? 0);
+      return (a.dias_restantes ?? 0) - (b.dias_restantes ?? 0);
+    });
 
     // 5. Growth Chart Series (Real data)
     const historyRes = await query(
