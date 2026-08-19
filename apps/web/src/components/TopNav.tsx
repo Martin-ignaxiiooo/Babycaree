@@ -21,13 +21,17 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
   const switcherRef = useRef<HTMLDivElement>(null);
   const activeBabyId = typeof window !== "undefined" ? localStorage.getItem("selectedBabyId") : null;
 
-  useEffect(() => {
+  const fetchBabies = () => {
     const token = localStorage.getItem("token");
     if (!token) return;
     axios
       .get(`${API_URL}/profiles/babies`, { headers: { Authorization: `Bearer ${token}` } })
       .then((res) => setBabies(res.data || []))
       .catch(() => {});
+  };
+
+  useEffect(() => {
+    fetchBabies();
   }, []);
 
   useEffect(() => {
@@ -118,7 +122,7 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <button 
             className="nav-hamburger-mobile" 
-            onClick={() => setMobileMenuOpen(true)}
+            onClick={() => { fetchBabies(); setMobileMenuOpen(true); }}
           >
             <Menu size={24} />
           </button>
@@ -138,7 +142,7 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
             {babies.length > 1 && (
               <div ref={switcherRef} style={{ position: "relative" }} className="nav-links-desktop">
                 <button
-                  onClick={() => setSwitcherOpen((v) => !v)}
+                  onClick={() => { setSwitcherOpen((v) => { if (!v) fetchBabies(); return !v; }); }}
                   style={{
                     display: "flex", alignItems: "center", gap: "6px",
                     background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)",
