@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Bell, LogOut, Menu, X, ChevronDown, Baby, Check, Plus } from "lucide-react";
+import { Bell, LogOut, Menu, X, ChevronDown, Baby, Check, Plus, Sparkles } from "lucide-react";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api";
 
@@ -65,105 +65,137 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
     }
   };
 
-  const NavLinks = () => (
-    <>
-      <span 
-        style={{ cursor: "pointer", color: activePath.includes("dashboard") ? "var(--theme-light)" : "white" }} 
-        onClick={() => { setMobileMenuOpen(false); navigate("/dashboard"); }}
-      >
-        Inicio
-      </span>
-      <span 
-        style={{ cursor: "pointer", color: activePath.includes("salud") ? "var(--theme-light)" : "white" }} 
-        onClick={() => { setMobileMenuOpen(false); navigate("/salud"); }}
-      >
-        Salud
-      </span>
-      <span 
-        style={{ cursor: "pointer", color: activePath.includes("comunidad") ? "var(--theme-light)" : "white" }} 
-        onClick={() => { setMobileMenuOpen(false); navigate("/comunidad"); }}
-      >
-        Comunidad
-      </span>
-      {perfilEstado !== "embarazo" && (
-        <>
-          <span 
-            style={{ cursor: "pointer", color: activePath.includes("directorio") ? "var(--theme-light)" : "white" }} 
-            onClick={() => { setMobileMenuOpen(false); navigate("/directorio"); }}
-          >
-            Directorio
-          </span>
-          <span 
-            style={{ cursor: "pointer", color: activePath.includes("galeria") ? "var(--theme-light)" : "white" }} 
-            onClick={() => { setMobileMenuOpen(false); navigate("/galeria"); }}
-          >
-            Galería
-          </span>
-        </>
-      )}
-    </>
-  );
+  const NavLinks = ({ pill = false }: { pill?: boolean }) => {
+    const items = [
+      { label: "Inicio", path: "/dashboard", match: "dashboard" },
+      { label: "Salud", path: "/salud", match: "salud" },
+      { label: "Comunidad", path: "/comunidad", match: "comunidad" },
+      ...(perfilEstado !== "embarazo" ? [
+        { label: "Directorio", path: "/directorio", match: "directorio" },
+        { label: "Galería", path: "/galeria", match: "galeria" },
+      ] : []),
+    ];
+    return (
+      <>
+        {items.map((item) => {
+          const active = activePath.includes(item.match);
+          return (
+            <span
+              key={item.path}
+              onClick={() => { setMobileMenuOpen(false); navigate(item.path); }}
+              style={pill ? {
+                cursor: "pointer",
+                padding: "9px 16px",
+                borderRadius: "100px",
+                background: active ? "rgba(255,255,255,0.16)" : "transparent",
+                color: active ? "#fff" : "rgba(255,255,255,0.72)",
+                transition: "background 0.18s, color 0.18s",
+              } : {
+                cursor: "pointer",
+                display: "flex", alignItems: "center", gap: "10px",
+                padding: "11px 12px", borderRadius: "12px",
+                background: active ? "rgba(255,255,255,0.1)" : "transparent",
+                color: active ? "#fff" : "rgba(255,255,255,0.75)",
+              }}
+              onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
+              onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = "transparent"; }}
+            >
+              {item.label}
+            </span>
+          );
+        })}
+      </>
+    );
+  };
 
   return (
     <>
       <nav style={{
         width: "100%",
-        background: "var(--theme-darker)",
+        background: "linear-gradient(100deg, var(--theme-darker) 0%, #3A2E5C 55%, var(--theme-dark) 100%)",
         color: "#fff",
-        padding: "16px 20px",
+        padding: "14px 24px",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
         position: "sticky",
         top: 0,
         zIndex: 100,
-        boxShadow: "0 4px 12px rgba(0,0,0,.15)"
+        boxShadow: "0 4px 20px rgba(45,38,64,0.25)",
+        fontFamily: "'Nunito', sans-serif",
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <button 
-            className="nav-hamburger-mobile" 
+        <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+          <button
+            className="nav-hamburger-mobile"
             onClick={() => { fetchBabies(); setMobileMenuOpen(true); }}
+            style={{ background: "rgba(255,255,255,0.08)", border: "none", borderRadius: "10px", width: "38px", height: "38px", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", cursor: "pointer" }}
           >
-            <Menu size={24} />
+            <Menu size={20} />
           </button>
-          <div style={{ fontSize: "22px", fontWeight: 800, cursor: "pointer" }} onClick={() => navigate("/dashboard")}>
-            Iniciativa<span style={{ color: "var(--theme-light)" }}>Baby</span>
+
+          <div
+            style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}
+            onClick={() => navigate("/dashboard")}
+          >
+            <div style={{
+              width: "34px", height: "34px", borderRadius: "10px",
+              background: "linear-gradient(135deg, var(--accent-coral), var(--theme-light))",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              boxShadow: "0 3px 10px rgba(255,143,163,0.35)", flexShrink: 0,
+            }}>
+              <Sparkles size={17} color="#fff" fill="#fff" />
+            </div>
+            <div style={{ fontFamily: "'Baloo 2', 'Nunito', sans-serif", fontSize: "21px", fontWeight: 700, letterSpacing: "-0.01em" }}>
+              Baby<span style={{ color: "var(--accent-coral)" }}>Care</span>
+            </div>
           </div>
         </div>
-        
-        <div style={{ display: "flex", gap: "24px", alignItems: "center" }}>
-          <div className="nav-links-desktop" style={{ fontWeight: 600, fontSize: "15px" }}>
-            <NavLinks />
+
+        <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
+          <div className="nav-links-desktop" style={{ fontWeight: 700, fontSize: "14.5px", display: "flex", gap: "2px" }}>
+            <NavLinks pill />
           </div>
-          
-          <div className="nav-links-desktop" style={{ width: "1px", height: "24px", background: "rgba(255,255,255,0.2)", margin: "0 8px" }}></div>
-          
-          <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+
+          <div className="nav-links-desktop" style={{ width: "1px", height: "26px", background: "rgba(255,255,255,0.15)", margin: "0 4px" }}></div>
+
+          <div style={{ display: "flex", gap: "14px", alignItems: "center" }}>
             {babies.length > 1 && (
               <div ref={switcherRef} style={{ position: "relative" }} className="nav-links-desktop">
                 <button
                   onClick={() => { setSwitcherOpen((v) => { if (!v) fetchBabies(); return !v; }); }}
                   style={{
-                    display: "flex", alignItems: "center", gap: "6px",
-                    background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)",
-                    borderRadius: "100px", padding: "7px 12px", cursor: "pointer",
+                    display: "flex", alignItems: "center", gap: "7px",
+                    background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.16)",
+                    borderRadius: "100px", padding: "7px 14px 7px 7px", cursor: "pointer",
                     color: "white", fontSize: "13px", fontWeight: 700,
                     fontFamily: "'Nunito', sans-serif",
                   }}
                   title="Cambiar de perfil"
                 >
-                  <Baby size={16} />
+                  <span style={{
+                    width: "22px", height: "22px", borderRadius: "50%", overflow: "hidden",
+                    background: "var(--accent-coral-light)", display: "flex", alignItems: "center", justifyContent: "center",
+                    color: "var(--theme-darker)", fontSize: "11px", fontWeight: 800, flexShrink: 0,
+                  }}>
+                    {(() => {
+                      const activeBaby = babies.find((b) => b.id === activeBabyId);
+                      return activeBaby?.foto_perfil ? (
+                        <img src={activeBaby.foto_perfil} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      ) : <Baby size={12} />;
+                    })()}
+                  </span>
                   {babies.find((b) => b.id === activeBabyId)?.nombre || "Cambiar"}
-                  <ChevronDown size={14} style={{ transform: switcherOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }} />
+                  <ChevronDown size={13} style={{ transform: switcherOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }} />
                 </button>
 
                 {switcherOpen && (
                   <div style={{
-                    position: "absolute", top: "calc(100% + 10px)", right: 0,
-                    background: "white", borderRadius: "16px", boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
-                    minWidth: "220px", overflow: "hidden", zIndex: 200,
+                    position: "absolute", top: "calc(100% + 12px)", right: 0,
+                    background: "white", borderRadius: "20px", boxShadow: "0 16px 40px rgba(45,38,64,0.22)",
+                    minWidth: "240px", overflow: "hidden", zIndex: 200,
+                    border: "1px solid rgba(124,92,191,0.08)",
                   }}>
-                    <div style={{ padding: "12px 16px 8px", fontSize: "11px", fontWeight: 800, color: "#8A849C", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                    <div style={{ padding: "14px 18px 8px", fontSize: "11px", fontWeight: 800, color: "#A399B5", textTransform: "uppercase", letterSpacing: "0.06em" }}>
                       Tus perfiles
                     </div>
                     {babies.map((baby) => (
@@ -171,15 +203,15 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
                         key={baby.id}
                         onClick={() => handleSwitchBaby(baby.id)}
                         style={{
-                          display: "flex", alignItems: "center", gap: "10px",
-                          padding: "10px 16px", cursor: "pointer",
+                          display: "flex", alignItems: "center", gap: "11px",
+                          padding: "10px 18px", cursor: "pointer",
                           background: baby.id === activeBabyId ? "var(--theme-bg-light)" : "white",
                         }}
-                        onMouseEnter={(e) => { if (baby.id !== activeBabyId) e.currentTarget.style.background = "#F8F7FC"; }}
+                        onMouseEnter={(e) => { if (baby.id !== activeBabyId) e.currentTarget.style.background = "#FAF9FD"; }}
                         onMouseLeave={(e) => { if (baby.id !== activeBabyId) e.currentTarget.style.background = "white"; }}
                       >
                         <div style={{
-                          width: "32px", height: "32px", borderRadius: "50%",
+                          width: "34px", height: "34px", borderRadius: "50%",
                           background: "var(--theme-bg-light)", color: "var(--theme-primary)",
                           display: "flex", alignItems: "center", justifyContent: "center",
                           fontWeight: 800, fontSize: "14px", flexShrink: 0, overflow: "hidden",
@@ -200,7 +232,7 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
                       onClick={() => { setSwitcherOpen(false); navigate("/seleccionar-perfil"); }}
                       style={{
                         display: "flex", alignItems: "center", gap: "10px",
-                        padding: "12px 16px", cursor: "pointer",
+                        padding: "13px 18px", cursor: "pointer",
                         borderTop: "1px solid var(--theme-bg-light)",
                         color: "var(--theme-primary)", fontSize: "14px", fontWeight: 700,
                       }}
@@ -211,22 +243,31 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
                 )}
               </div>
             )}
-            <div style={{ position: "relative", cursor: "pointer" }} onClick={() => alert("No tienes nuevas notificaciones")}>
-              <Bell size={22} />
-              {notificaciones.length > 0 && <span style={{ position: "absolute", top: -4, right: -4, background: "#EF4444", width: 10, height: 10, borderRadius: "50%" }}></span>}
+            <div
+              style={{ position: "relative", cursor: "pointer", width: "38px", height: "38px", borderRadius: "10px", background: "rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}
+              onClick={() => alert("No tienes nuevas notificaciones")}
+            >
+              <Bell size={19} />
+              {notificaciones.length > 0 && (
+                <span style={{
+                  position: "absolute", top: 6, right: 6, background: "var(--accent-coral)",
+                  width: 8, height: 8, borderRadius: "50%", border: "1.5px solid var(--theme-darker)",
+                }}></span>
+              )}
             </div>
-            <div 
+            <div
               onClick={() => navigate("/mi-perfil")}
-              style={{ 
-                width: "36px", height: "36px", borderRadius: "50%", 
-                background: "var(--theme-primary)", display: "flex", 
-                alignItems: "center", justifyContent: "center", fontWeight: "bold",
-                fontSize: "16px", cursor: "pointer", border: "2px solid rgba(255,255,255,0.2)"
+              style={{
+                width: "38px", height: "38px", borderRadius: "50%",
+                background: "linear-gradient(135deg, var(--theme-light), var(--accent-coral))",
+                display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800,
+                fontSize: "15px", cursor: "pointer", boxShadow: "0 0 0 2px rgba(255,255,255,0.25)",
+                fontFamily: "'Baloo 2', sans-serif",
               }}>
               {user?.nombre ? user.nombre.charAt(0).toUpperCase() : "U"}
             </div>
-            <button className="nav-links-desktop" onClick={handleLogout} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.7)", cursor: "pointer", display: "flex", alignItems: "center" }} title="Cerrar sesión">
-              <LogOut size={20} />
+            <button className="nav-links-desktop" onClick={handleLogout} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.65)", cursor: "pointer", display: "flex", alignItems: "center" }} title="Cerrar sesión">
+              <LogOut size={19} />
             </button>
           </div>
         </div>
@@ -235,29 +276,42 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
       {/* MOBILE MENU OVERLAY */}
       {mobileMenuOpen && (
         <div style={{
-          position: "fixed", top: 0, left: 0, width: "100%", height: "100%", 
-          background: "rgba(0,0,0,0.5)", zIndex: 999,
-          display: "flex"
+          position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
+          background: "rgba(45,38,64,0.55)", zIndex: 999,
+          display: "flex", backdropFilter: "blur(2px)",
         }}>
           <div style={{
-            width: "280px", height: "100%", background: "var(--theme-darker)",
-            padding: "20px", display: "flex", flexDirection: "column", gap: "24px",
-            color: "white", boxShadow: "4px 0 20px rgba(0,0,0,0.2)"
+            width: "290px", height: "100%",
+            background: "linear-gradient(165deg, var(--theme-darker) 0%, #3A2E5C 100%)",
+            padding: "22px", display: "flex", flexDirection: "column", gap: "22px",
+            color: "white", boxShadow: "4px 0 30px rgba(0,0,0,0.25)",
+            fontFamily: "'Nunito', sans-serif",
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div style={{ fontSize: "20px", fontWeight: 800 }}>Menú</div>
-              <button onClick={() => setMobileMenuOpen(false)} style={{ background: "none", border: "none", color: "white", cursor: "pointer" }}>
-                <X size={24} />
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <div style={{
+                  width: "30px", height: "30px", borderRadius: "9px",
+                  background: "linear-gradient(135deg, var(--accent-coral), var(--theme-light))",
+                  display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                }}>
+                  <Sparkles size={15} color="#fff" fill="#fff" />
+                </div>
+                <div style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700 }}>
+                  Baby<span style={{ color: "var(--accent-coral)" }}>Care</span>
+                </div>
+              </div>
+              <button onClick={() => setMobileMenuOpen(false)} style={{ background: "rgba(255,255,255,0.08)", border: "none", borderRadius: "8px", width: "32px", height: "32px", color: "white", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <X size={18} />
               </button>
             </div>
-            
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px", fontSize: "16px", fontWeight: 600 }}>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px", fontSize: "15.5px", fontWeight: 700 }}>
               <NavLinks />
             </div>
 
             {babies.length > 1 && (
-              <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "16px" }}>
-                <div style={{ fontSize: "12px", fontWeight: 800, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "10px" }}>
+              <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "18px" }}>
+                <div style={{ fontSize: "11px", fontWeight: 800, color: "rgba(255,255,255,0.45)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "10px" }}>
                   Tus perfiles
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
@@ -266,14 +320,14 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
                       key={baby.id}
                       onClick={() => { setMobileMenuOpen(false); handleSwitchBaby(baby.id); }}
                       style={{
-                        display: "flex", alignItems: "center", gap: "10px",
-                        padding: "10px 8px", borderRadius: "10px", cursor: "pointer",
+                        display: "flex", alignItems: "center", gap: "11px",
+                        padding: "10px 10px", borderRadius: "12px", cursor: "pointer",
                         background: baby.id === activeBabyId ? "rgba(255,255,255,0.1)" : "transparent",
                       }}
                     >
                       <div style={{
-                        width: "30px", height: "30px", borderRadius: "50%",
-                        background: "var(--theme-primary)", display: "flex",
+                        width: "32px", height: "32px", borderRadius: "50%",
+                        background: "linear-gradient(135deg, var(--theme-light), var(--accent-coral))", display: "flex",
                         alignItems: "center", justifyContent: "center",
                         fontWeight: 800, fontSize: "13px", flexShrink: 0, overflow: "hidden",
                       }}>
@@ -291,9 +345,9 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
               </div>
             )}
 
-            <div style={{ marginTop: "auto", borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "16px" }}>
-              <button onClick={handleLogout} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.7)", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontSize: "16px" }}>
-                <LogOut size={20} /> Cerrar Sesión
+            <div style={{ marginTop: "auto", borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "18px" }}>
+              <button onClick={handleLogout} style={{ background: "rgba(255,255,255,0.06)", border: "none", borderRadius: "12px", color: "rgba(255,255,255,0.8)", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontSize: "15px", fontWeight: 700, padding: "12px 14px", width: "100%" }}>
+                <LogOut size={18} /> Cerrar sesión
               </button>
             </div>
           </div>

@@ -403,7 +403,7 @@ export default function Dashboard() {
 
     <div style={{
       minHeight: "100vh",
-      background: "#F1ECFB",
+      background: "linear-gradient(165deg, #F3EEFC 0%, #F1ECFB 40%, #FDF2F5 100%)",
       fontFamily: "'Nunito', sans-serif",
       display: "flex",
       flexDirection: "column",
@@ -414,14 +414,15 @@ export default function Dashboard() {
         
         {/* ── HOME HERO FULL WIDTH ── */}
         <div style={{
-          background: "var(--theme-bg-light)",
-          borderRadius: "24px",
+          background: "linear-gradient(120deg, var(--theme-bg-light) 0%, #F3E4EC 100%)",
+          borderRadius: "26px",
           marginBottom: "22px",
           display: "flex",
           alignItems: "stretch",
           flexWrap: "wrap",
           gap: "20px",
           overflow: "hidden",
+          boxShadow: "0 4px 24px rgba(124,92,191,0.08)",
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: "24px", flex: 1, minWidth: "280px" }}>
             {/* Foto del bebé (subible por el usuario, blanco por defecto) */}
@@ -538,8 +539,8 @@ export default function Dashboard() {
             </label>
 
             <div>
-              <div style={{ fontSize: "26px", fontWeight: 900, color: "var(--theme-darker)", marginBottom: "4px" }}>{hero.nombre}</div>
-              <div style={{ fontSize: "14px", color: "var(--theme-dark)", opacity: 0.75 }}>{hero.edad_exacta}</div>
+              <div style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "27px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "4px" }}>{hero.nombre}</div>
+              <div style={{ fontSize: "14px", color: "var(--theme-dark)", opacity: 0.75, fontWeight: 600 }}>{hero.edad_exacta}</div>
               {fotoError && (
                 <div style={{ fontSize: "12px", color: "#DC2626", marginTop: "4px", fontWeight: 600 }}>{fotoError}</div>
               )}
@@ -583,8 +584,8 @@ export default function Dashboard() {
           <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
             {/* ── NOTIFICACIONES ── */}
             {notificaciones.length > 0 && (
-              <div style={{ background: "#fff", borderRadius: "24px", padding: "22px", boxShadow: "0 4px 20px rgba(0,0,0,.04)" }}>
-                <h3 style={{ fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "18px" }}>
+              <div style={{ background: "#fff", borderRadius: "26px", padding: "22px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
+                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "18px" }}>
                   Próximas Tareas
                 </h3>
 
@@ -632,19 +633,20 @@ export default function Dashboard() {
             )}
 
             {/* ── GRÁFICO DINÁMICO ── */}
-            <div style={{ background: "#fff", borderRadius: "24px", padding: "22px", boxShadow: "0 4px 20px rgba(0,0,0,.04)" }}>
+            <div style={{ background: "#fff", borderRadius: "26px", padding: "22px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
               <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "10px", marginBottom: "20px" }}>
-                <h3 style={{ fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)", margin: 0 }}>
+                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--theme-darker)", margin: 0 }}>
                   📈 Evolución de Crecimiento
                 </h3>
                 {(!homeData?.rol_acceso || !homeData.rol_acceso.startsWith('solo_lectura')) && (
                   <button 
                     onClick={() => { setIsModalOpen(true); setGrowthError(""); }}
                     style={{
-                      background: "var(--theme-primary)", color: "#fff",
-                      padding: "8px 16px", borderRadius: "12px", border: "none",
+                      background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))", color: "#fff",
+                      padding: "9px 17px", borderRadius: "12px", border: "none",
                       fontSize: "13px", fontWeight: 700, cursor: "pointer",
-                      display: "flex", alignItems: "center", gap: "6px"
+                      display: "flex", alignItems: "center", gap: "6px",
+                      boxShadow: "0 4px 14px var(--theme-shadow-light)",
                     }}
                   >
                     <Plus size={16} /> Registrar Medidas
@@ -702,8 +704,8 @@ export default function Dashboard() {
           </div>
 
           {/* COLUMNA 2: Módulos */}
-          <div style={{ background: "#fff", borderRadius: "24px", padding: "22px", boxShadow: "0 4px 20px rgba(0,0,0,.04)" }}>
-            <h3 style={{ fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "20px" }}>
+          <div style={{ background: "#fff", borderRadius: "26px", padding: "22px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
+            <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "20px" }}>
               Módulos
             </h3>
 
@@ -739,13 +741,13 @@ export default function Dashboard() {
           display: "flex", alignItems: "center", justifyContent: "center"
         }}>
           <div style={{
-            background: "#fff", padding: "32px", borderRadius: "24px", width: "100%", maxWidth: "400px",
-            boxShadow: "0 10px 40px rgba(0,0,0,0.2)"
+            background: "#fff", padding: "32px", borderRadius: "26px", width: "100%", maxWidth: "400px",
+            boxShadow: "0 20px 60px rgba(45,38,64,0.25)"
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
-              <h2 style={{ fontSize: "20px", fontWeight: 800, color: "var(--theme-darker)", margin: 0 }}>Registrar Medidas</h2>
-              <button onClick={() => { setIsModalOpen(false); setGrowthError(""); }} style={{ background: "none", border: "none", cursor: "pointer" }}>
-                <X size={24} color="#6B7280" />
+              <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "21px", fontWeight: 700, color: "var(--theme-darker)", margin: 0 }}>Registrar Medidas</h2>
+              <button onClick={() => { setIsModalOpen(false); setGrowthError(""); }} style={{ background: "#F3F1F9", border: "none", borderRadius: "50%", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                <X size={18} color="#6B7280" />
               </button>
             </div>
 
@@ -786,10 +788,12 @@ export default function Dashboard() {
               onClick={handleSaveGrowth}
               disabled={isSaving || !pesoInput || !tallaInput}
               style={{ 
-                width: "100%", background: "var(--theme-primary)", color: "#fff", 
-                padding: "16px", borderRadius: "14px", border: "none", 
+                width: "100%", 
+                background: (isSaving || !pesoInput || !tallaInput) ? "#D1D5DB" : "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
+                color: "#fff", 
+                padding: "16px", borderRadius: "16px", border: "none", 
                 fontSize: "16px", fontWeight: 800, cursor: isSaving ? "not-allowed" : "pointer",
-                opacity: (isSaving || !pesoInput || !tallaInput) ? 0.6 : 1
+                boxShadow: (isSaving || !pesoInput || !tallaInput) ? "none" : "0 10px 26px var(--theme-shadow)",
               }}
             >
               {isSaving ? "Guardando..." : "Guardar Registro"}

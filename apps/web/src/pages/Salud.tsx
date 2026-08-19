@@ -278,24 +278,24 @@ export default function Salud() {
   });
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F8F7FC", fontFamily: "'Nunito', sans-serif", display: "flex", flexDirection: "column" }}>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)", fontFamily: "'Nunito', sans-serif", display: "flex", flexDirection: "column" }}>
       
       {/* ── TOP NAV GLOBAL ── */}
       <TopNav user={user} activePath="/salud" perfilEstado={perfilEstado} />
 
       {/* ── HEADER ── */}
-      <div style={{ background: "linear-gradient(135deg, var(--theme-darker) 0%, var(--theme-dark) 100%)", color: "#fff", padding: "48px 40px 0" }}>
+      <div style={{ background: "linear-gradient(120deg, var(--theme-darker) 0%, #3A2E5C 55%, var(--theme-dark) 100%)", color: "#fff", padding: "48px 40px 0" }}>
         <button onClick={() => navigate("/dashboard")} style={{ background: "none", border: "none", color: "var(--theme-light)", fontSize: "14px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", marginBottom: "24px" }}>
           <ArrowLeft size={16} /> Volver al Dashboard
         </button>
         
         <div style={{ display: "flex", alignItems: "center", gap: "24px", paddingBottom: "32px" }}>
-          <div style={{ width: "80px", height: "80px", borderRadius: "24px", background: "var(--theme-primary)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>
-            <Syringe size={40} />
+          <div style={{ width: "80px", height: "80px", borderRadius: "22px", background: "linear-gradient(135deg, var(--accent-coral), var(--theme-light))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", boxShadow: "0 8px 24px rgba(255,143,163,0.3)" }}>
+            <Syringe size={38} />
           </div>
           <div>
-            <h1 style={{ fontSize: "36px", fontWeight: 900, margin: 0 }}>Salud y Crecimiento</h1>
-            <div style={{ fontSize: "16px", color: "var(--theme-bg-light)", marginTop: "4px" }}>Administra las vacunas y el progreso de tu bebé</div>
+            <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "32px", fontWeight: 700, margin: 0 }}>Salud y Crecimiento</h1>
+            <div style={{ fontSize: "15px", color: "rgba(255,255,255,0.75)", marginTop: "4px", fontWeight: 600 }}>Administra las vacunas y el progreso de tu bebé</div>
           </div>
         </div>
 
@@ -303,7 +303,7 @@ export default function Salud() {
         <div className="responsive-overflow" style={{ display: "flex", gap: "32px", borderBottom: "1px solid rgba(255,255,255,0.1)", whiteSpace: "nowrap" }}>
           {perfilEstado !== "embarazo" && (
             <button 
-              style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "vacunas" ? "3px solid #fff" : "3px solid transparent", color: activeTab === "vacunas" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "16px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+              style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "vacunas" ? "3px solid var(--accent-coral)" : "3px solid transparent", color: activeTab === "vacunas" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
               onClick={() => setActiveTab("vacunas")}
             >
               <Syringe size={18} /> Vacunas PNI
@@ -311,7 +311,7 @@ export default function Salud() {
           )}
           
           <button 
-            style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "controles" ? "3px solid #fff" : "3px solid transparent", color: activeTab === "controles" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "16px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+            style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "controles" ? "3px solid var(--accent-coral)" : "3px solid transparent", color: activeTab === "controles" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
             onClick={() => setActiveTab("controles")}
           >
             <Activity size={18} /> {perfilEstado === "embarazo" ? "Controles Prenatales" : "Controles Pediátricos"}
@@ -319,7 +319,7 @@ export default function Salud() {
 
           {perfilEstado !== "embarazo" && (
             <button 
-              style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "crecimiento" ? "3px solid #fff" : "3px solid transparent", color: activeTab === "crecimiento" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "16px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+              style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "crecimiento" ? "3px solid var(--accent-coral)" : "3px solid transparent", color: activeTab === "crecimiento" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
               onClick={() => setActiveTab("crecimiento")}
             >
               <Activity size={18} /> Crecimiento
@@ -332,8 +332,8 @@ export default function Salud() {
       <div className="page-container">
         
         {activeTab === "vacunas" && (
-          <div style={{ background: "#fff", borderRadius: "16px", padding: "32px", boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}>
-            <h2 style={{ fontSize: "20px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "24px" }}>Calendario de Vacunación</h2>
+          <div style={{ background: "#fff", borderRadius: "24px", padding: "32px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
+            <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "21px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "24px" }}>Calendario de Vacunación</h2>
             
             {vacunas.length === 0 ? (
               <p style={{ color: "#6B7280" }}>No hay vacunas registradas en el sistema.</p>
@@ -342,7 +342,7 @@ export default function Salud() {
                 {vacunas.map((vacuna) => {
                   const editando = editingVacunaId === vacuna.vacuna_id;
                   return (
-                  <div key={vacuna.vacuna_id} style={{ display: "flex", alignItems: "flex-start", gap: "20px", padding: "20px", border: "1px solid #E5E7EB", borderRadius: "12px", background: vacuna.aplicada ? "#F0FDF4" : "#fff" }}>
+                  <div key={vacuna.vacuna_id} style={{ display: "flex", alignItems: "flex-start", gap: "20px", padding: "22px", border: vacuna.aplicada ? "1px solid #DCFCE7" : "1px solid #F1EEFA", borderRadius: "18px", background: vacuna.aplicada ? "#F3FDF6" : "#fff", boxShadow: "0 4px 16px rgba(124,92,191,0.06)" }}>
                     
                     <button 
                       onClick={() => vacuna.aplicada ? desmarcarVacuna(vacuna) : (editando ? cancelarRegistroVacuna() : abrirRegistroVacuna(vacuna))}
@@ -408,7 +408,7 @@ export default function Salud() {
                               onClick={() => confirmarRegistroVacuna(vacuna.vacuna_id)}
                               disabled={!formVacuna.fecha_aplicacion || guardandoVacuna}
                               style={{
-                                background: !formVacuna.fecha_aplicacion || guardandoVacuna ? "#D1D5DB" : "var(--theme-primary)",
+                                background: !formVacuna.fecha_aplicacion || guardandoVacuna ? "#D1D5DB" : "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
                                 color: "#fff", border: "none", borderRadius: "10px", padding: "10px 20px",
                                 fontWeight: 800, fontSize: "14px", cursor: !formVacuna.fecha_aplicacion || guardandoVacuna ? "not-allowed" : "pointer",
                               }}
@@ -435,9 +435,9 @@ export default function Salud() {
         )}
 
         {activeTab === "controles" && (
-          <div style={{ background: "#fff", borderRadius: "16px", padding: "32px", boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}>
+          <div style={{ background: "#fff", borderRadius: "24px", padding: "32px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
-              <h2 style={{ fontSize: "20px", fontWeight: 800, color: "var(--theme-darker)", margin: 0 }}>
+              <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "21px", fontWeight: 700, color: "var(--theme-darker)", margin: 0 }}>
                 {perfilEstado === "embarazo" ? "Controles Prenatales" : "Controles Médicos"}
               </h2>
             </div>
@@ -561,16 +561,16 @@ export default function Salud() {
         )}
 
         {activeTab === "crecimiento" && (
-          <div style={{ background: "#fff", borderRadius: "16px", padding: "32px", boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}>
+          <div style={{ background: "#fff", borderRadius: "24px", padding: "32px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-              <h2 style={{ fontSize: "20px", fontWeight: 800, color: "var(--theme-darker)", margin: 0 }}>
+              <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "21px", fontWeight: 700, color: "var(--theme-darker)", margin: 0 }}>
                 Evolución de Crecimiento
               </h2>
               {!rolAcceso.startsWith('solo_lectura') && (
                 <button 
                   onClick={() => setIsModalOpen(true)}
                   style={{
-                    background: "var(--theme-primary)", color: "#fff",
+                    background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))", color: "#fff",
                     padding: "8px 16px", borderRadius: "12px", border: "none",
                     fontSize: "13px", fontWeight: 700, cursor: "pointer",
                     display: "flex", alignItems: "center", gap: "6px"
@@ -640,7 +640,7 @@ export default function Salud() {
             boxShadow: "0 10px 40px rgba(0,0,0,0.2)"
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
-              <h2 style={{ fontSize: "20px", fontWeight: 800, color: "var(--theme-darker)", margin: 0 }}>Registrar Medidas</h2>
+              <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "21px", fontWeight: 700, color: "var(--theme-darker)", margin: 0 }}>Registrar Medidas</h2>
               <button onClick={() => setIsModalOpen(false)} style={{ background: "none", border: "none", cursor: "pointer" }}>
                 <X size={24} color="#6B7280" />
               </button>
@@ -674,7 +674,7 @@ export default function Salud() {
               onClick={handleSaveGrowth}
               disabled={isSaving || !pesoInput || !tallaInput}
               style={{ 
-                width: "100%", background: "var(--theme-primary)", color: "#fff", 
+                width: "100%", background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))", color: "#fff", 
                 padding: "16px", borderRadius: "14px", border: "none", 
                 fontSize: "16px", fontWeight: 800, cursor: isSaving ? "not-allowed" : "pointer",
                 opacity: (isSaving || !pesoInput || !tallaInput) ? 0.6 : 1

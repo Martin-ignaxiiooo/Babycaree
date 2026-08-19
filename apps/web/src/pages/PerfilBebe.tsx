@@ -268,10 +268,10 @@ export default function PerfilBebe() {
     }
   };
 
-  const inputStyle = { width: "100%", padding: "12px", border: "1px solid #E5E7EB", borderRadius: "8px", fontSize: "14px", outline: "none", color: "var(--theme-darker)" };
-  const readOnlyStyle = { padding: "12px", background: "var(--theme-bg-light)", borderRadius: "8px", fontSize: "14px", color: "var(--theme-darker)", border: "1px dashed var(--theme-primary)" };
-  const cardStyle = { background: "#fff", padding: "24px", borderRadius: "16px", boxShadow: "0 2px 10px rgba(0,0,0,0.05)", marginBottom: "24px", width: "100%" };
-  const labelStyle = { display: "block", fontSize: "12px", fontWeight: 700, color: "#6B7280", marginBottom: "6px" };
+  const inputStyle = { width: "100%", padding: "12px 14px", border: "2px solid #EDE9F8", borderRadius: "12px", fontSize: "14px", outline: "none", color: "var(--theme-darker)", boxSizing: "border-box" as const };
+  const readOnlyStyle = { padding: "12px 14px", background: "var(--theme-bg-light)", borderRadius: "12px", fontSize: "14px", color: "var(--theme-darker)", border: "1px dashed var(--theme-light)" };
+  const cardStyle = { background: "#fff", padding: "26px", borderRadius: "22px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)", marginBottom: "24px", width: "100%" };
+  const labelStyle = { display: "block", fontSize: "12px", fontWeight: 700, color: "#8A849C", marginBottom: "6px" };
 
   if (errorPerfil) {
     return (
@@ -287,38 +287,38 @@ export default function PerfilBebe() {
   if (!perfil) return <div style={{ padding: "40px", textAlign: "center", color: "var(--theme-primary)" }}>Cargando perfil...</div>;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F8F7FC", fontFamily: "'Nunito', sans-serif", display: "flex", flexDirection: "column" }}>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)", fontFamily: "'Nunito', sans-serif", display: "flex", flexDirection: "column" }}>
       
       {/* ── TOP NAV GLOBAL ── */}
       <TopNav user={user} activePath="/dashboard" />
 
       {/* ── PERFIL HEADER (Full width) ── */}
-      <div style={{ background: "linear-gradient(135deg, var(--theme-darker) 0%, var(--theme-dark) 100%)", color: "#fff", padding: "48px 40px 0" }}>
+      <div style={{ background: "linear-gradient(120deg, var(--theme-darker) 0%, #3A2E5C 55%, var(--theme-dark) 100%)", color: "#fff", padding: "48px 40px 0" }}>
         <button onClick={() => navigate("/dashboard")} style={{ background: "none", border: "none", color: "var(--theme-light)", fontSize: "14px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", marginBottom: "24px" }}>
           <ArrowLeft size={16} /> Volver al Dashboard
         </button>
         
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", paddingBottom: "24px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", paddingBottom: "24px", flexWrap: "wrap", gap: "20px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
-            <div style={{ width: "96px", height: "96px", borderRadius: "50%", background: "var(--theme-light)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "40px", border: "4px solid var(--theme-primary)" }}>
+            <div style={{ width: "96px", height: "96px", borderRadius: "50%", background: "linear-gradient(135deg, var(--theme-light), var(--accent-coral))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "40px", boxShadow: "0 0 0 4px rgba(255,255,255,0.2)" }}>
               👶
             </div>
             <div>
-              <h1 style={{ fontSize: "36px", fontWeight: 900, margin: 0 }}>{perfil.nombre}</h1>
-              <div style={{ fontSize: "16px", color: "var(--theme-bg-light)", marginTop: "4px" }}>Apodo: {perfil.apodo || "No definido"}</div>
+              <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "34px", fontWeight: 700, margin: 0 }}>{perfil.nombre}</h1>
+              <div style={{ fontSize: "15px", color: "rgba(255,255,255,0.75)", marginTop: "4px", fontWeight: 600 }}>Apodo: {perfil.apodo || "No definido"}</div>
             </div>
           </div>
 
           {activeTab === "detalle" && (
             <div style={{ display: "flex", gap: "12px" }}>
               <button 
-                style={{ background: !editMode ? "#fff" : "transparent", color: !editMode ? "var(--theme-darker)" : "#fff", border: "2px solid #fff", padding: "10px 24px", borderRadius: "24px", fontSize: "15px", fontWeight: 800, cursor: "pointer", transition: "0.2s" }}
+                style={{ background: !editMode ? "#fff" : "rgba(255,255,255,0.08)", color: !editMode ? "var(--theme-darker)" : "#fff", border: "2px solid rgba(255,255,255,0.7)", padding: "10px 22px", borderRadius: "100px", fontSize: "14px", fontWeight: 800, cursor: "pointer", transition: "0.2s" }}
                 onClick={() => setEditMode(false)}
               >
                 👁️ Vista de lectura
               </button>
               <button 
-                style={{ background: editMode ? "#fff" : "transparent", color: editMode ? "var(--theme-darker)" : "#fff", border: "2px solid #fff", padding: "10px 24px", borderRadius: "24px", fontSize: "15px", fontWeight: 800, cursor: "pointer", transition: "0.2s" }}
+                style={{ background: editMode ? "#fff" : "rgba(255,255,255,0.08)", color: editMode ? "var(--theme-darker)" : "#fff", border: "2px solid rgba(255,255,255,0.7)", padding: "10px 22px", borderRadius: "100px", fontSize: "14px", fontWeight: 800, cursor: "pointer", transition: "0.2s" }}
                 onClick={() => setEditMode(true)}
               >
                 ✏️ Editar Perfil
@@ -330,13 +330,13 @@ export default function PerfilBebe() {
         {/* TABS CONTAINER */}
         <div style={{ display: "flex", gap: "32px", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
           <button 
-            style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "detalle" ? "3px solid #fff" : "3px solid transparent", color: activeTab === "detalle" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "16px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+            style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "detalle" ? "3px solid var(--accent-coral)" : "3px solid transparent", color: activeTab === "detalle" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
             onClick={() => { setActiveTab("detalle"); navigate(`/perfil/${id}?tab=detalle`, { replace: true }); }}
           >
             <User size={18} /> Datos del bebé
           </button>
           <button 
-            style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "compartir" ? "3px solid #fff" : "3px solid transparent", color: activeTab === "compartir" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "16px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+            style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "compartir" ? "3px solid var(--accent-coral)" : "3px solid transparent", color: activeTab === "compartir" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
             onClick={() => { setActiveTab("compartir"); navigate(`/perfil/${id}?tab=compartir`, { replace: true }); }}
           >
             <Lock size={18} /> Compartir acceso
@@ -363,7 +363,7 @@ export default function PerfilBebe() {
             <div className="responsive-grid">
               {/* DATOS GENERALES */}
               <div style={cardStyle}>
-                <h3 style={{ fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "20px", borderBottom: "1px solid #E5E7EB", paddingBottom: "12px" }}>Datos Generales</h3>
+                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "20px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "12px" }}>Datos Generales</h3>
                 
                 <div style={{ marginBottom: "16px" }}>
                   <label style={labelStyle}>Nombre completo</label>
@@ -413,7 +413,7 @@ export default function PerfilBebe() {
 
               {/* DATOS DE NACIMIENTO */}
               <div style={cardStyle}>
-                <h3 style={{ fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "20px", borderBottom: "1px solid #E5E7EB", paddingBottom: "12px" }}>Datos de Nacimiento</h3>
+                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "20px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "12px" }}>Datos de Nacimiento</h3>
                 
                 <div style={{ display: "flex", gap: "16px", marginBottom: "16px" }}>
                   <div style={{ flex: 1 }}>
@@ -449,7 +449,7 @@ export default function PerfilBebe() {
 
               {/* INFORMACIÓN DE SALUD */}
               <div style={{ ...cardStyle, gridColumn: "1 / -1" }}>
-                <h3 style={{ fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "20px", borderBottom: "1px solid #E5E7EB", paddingBottom: "12px" }}>Información Médica</h3>
+                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "20px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "12px" }}>Información Médica</h3>
                 
                 <div className="hero-stats-grid" style={{ marginBottom: "24px" }}>
                   <div>
@@ -495,7 +495,7 @@ export default function PerfilBebe() {
 
               {/* CARNET DIGITAL: RUT Y CONTACTO DE EMERGENCIA */}
               <div style={{ ...cardStyle, gridColumn: "1 / -1" }}>
-                <h3 style={{ fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "6px", borderBottom: "1px solid #E5E7EB", paddingBottom: "12px" }}>Carnet Digital</h3>
+                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "6px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "12px" }}>Carnet Digital</h3>
                 <p style={{ fontSize: "13px", color: "#8A849C", margin: "10px 0 20px" }}>Estos datos aparecen en el carnet pediátrico digital que puedes mostrar en el consultorio.</p>
 
                 <div className="hero-stats-grid" style={{ marginBottom: "16px" }}>
@@ -559,7 +559,7 @@ export default function PerfilBebe() {
 
               <div style={cardStyle}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-                  <h3 style={{ fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)", margin: 0 }}>Personas con acceso</h3>
+                  <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--theme-darker)", margin: 0 }}>Personas con acceso</h3>
                   <div style={{ fontSize: "12px", background: "var(--theme-bg-light)", color: "var(--theme-darker)", padding: "4px 12px", borderRadius: "12px", fontWeight: 800 }}>{accesos.length} activos</div>
                 </div>
 
@@ -588,7 +588,7 @@ export default function PerfilBebe() {
               </div>
 
               <div style={cardStyle}>
-                <h3 style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "20px" }}>
+                <h3 style={{ display: "flex", alignItems: "center", gap: "8px", fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "20px" }}>
                   <Search size={20} style={{ color: "var(--theme-primary)" }} /> Buscar a quién compartir
                 </h3>
                 
@@ -598,7 +598,7 @@ export default function PerfilBebe() {
                   <button onClick={() => { setSearchTab("familia"); buscarPersonas(searchQuery, "familia"); }} style={{ flex: 1, padding: "10px", borderRadius: "12px", border: "1px solid #E5E7EB", background: searchTab === "familia" ? "var(--theme-primary)" : "#F9FAFB", color: searchTab === "familia" ? "#fff" : "#4B5563", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>👥 Otros perfiles</button>
                 </div>
                 
-                <p style={{ fontSize: "13px", color: "#6B7280", marginBottom: "24px" }}>Busca entre tus contactos, familiares ya registrados en Iniciativa Baby, o escribe un correo para invitar a alguien nuevo.</p>
+                <p style={{ fontSize: "13px", color: "#6B7280", marginBottom: "24px" }}>Busca entre tus contactos, familiares ya registrados en Baby Care, o escribe un correo para invitar a alguien nuevo.</p>
 
                 <div style={{ position: "relative", marginBottom: "24px" }}>
                   <Search size={20} style={{ position: "absolute", left: "16px", top: "14px", color: "#9CA3AF" }} />
@@ -689,7 +689,7 @@ export default function PerfilBebe() {
             {/* RIGHT COLUMN: AUDIT */}
             <div>
               <div style={cardStyle}>
-                <h3 style={{ fontSize: "16px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "16px" }}>Historial de actividad</h3>
+                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "17px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "16px" }}>Historial de actividad</h3>
                 <div>
                   {auditoria.length === 0 ? (
                     <div style={{ fontSize: "13px", color: "#6B7280", textAlign: "center", padding: "20px" }}>Sin registros aún.</div>
