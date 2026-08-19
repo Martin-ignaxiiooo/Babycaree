@@ -178,9 +178,13 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
                           width: "32px", height: "32px", borderRadius: "50%",
                           background: "var(--theme-bg-light)", color: "var(--theme-primary)",
                           display: "flex", alignItems: "center", justifyContent: "center",
-                          fontWeight: 800, fontSize: "14px", flexShrink: 0,
+                          fontWeight: 800, fontSize: "14px", flexShrink: 0, overflow: "hidden",
                         }}>
-                          {baby.nombre?.charAt(0).toUpperCase()}
+                          {baby.foto_perfil ? (
+                            <img src={baby.foto_perfil} alt={baby.nombre} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          ) : (
+                            baby.nombre?.charAt(0).toUpperCase()
+                          )}
                         </div>
                         <span style={{ flex: 1, fontSize: "14px", fontWeight: 700, color: "var(--theme-darker)" }}>
                           {baby.nombre}
@@ -267,9 +271,13 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
                         width: "30px", height: "30px", borderRadius: "50%",
                         background: "var(--theme-primary)", display: "flex",
                         alignItems: "center", justifyContent: "center",
-                        fontWeight: 800, fontSize: "13px", flexShrink: 0,
+                        fontWeight: 800, fontSize: "13px", flexShrink: 0, overflow: "hidden",
                       }}>
-                        {baby.nombre?.charAt(0).toUpperCase()}
+                        {baby.foto_perfil ? (
+                          <img src={baby.foto_perfil} alt={baby.nombre} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        ) : (
+                          baby.nombre?.charAt(0).toUpperCase()
+                        )}
                       </div>
                       <span style={{ flex: 1, fontSize: "15px" }}>{baby.nombre}</span>
                       {baby.id === activeBabyId && <Check size={16} />}

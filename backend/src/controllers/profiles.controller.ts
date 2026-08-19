@@ -231,16 +231,35 @@ export const deleteBabyProfile = async (req: AuthRequest, res: Response) => {
     const userId = req.user.id;
     const { id } = req.params;
 
-    const result = await query(
+    // Si es el dueño real del perfil, se borra el perfil completo (y en
+    // cascada sus accesos compartidos, vacunas, controles, etc.)
+    const ownerResult = await query(
       "DELETE FROM perfiles_bebes WHERE id = $1 AND usuario_id = $2 RETURNING id",
       [id, userId]
     );
 
-    if (result.rowCount === 0) {
-      return res.status(404).json({ error: "Perfil de bebé no encontrado o no tienes permiso para eliminarlo" });
+    if (ownerResult.rowCount && ownerResult.rowCount > 0) {
+      return res.json({ message: "Perfil eliminado correctamente" });
     }
 
-    res.json({ message: "Perfil eliminado correctamente" });
+    // Si no es el dueño, puede tener el perfil en su lista solo por una
+    // invitación de un familiar. En ese caso "eliminar" NO debe borrar el
+    // perfil para todos — solo debe sacar al perfil de SU propia lista,
+    // revocando su propio acceso compartido. El resto de las personas con
+    // acceso (dueño, otros familiares) no se ven afectadas.
+    const accesoResult = await query(
+      `UPDATE accesos_compartidos_bebe
+       SET estado = 'revocado'
+       WHERE id_perfil_bebe = $1 AND id_usuario_invitado = $2 AND estado = 'activo'
+       RETURNING id`,
+      [id, userId]
+    );
+
+    if (accesoResult.rowCount && accesoResult.rowCount > 0) {
+      return res.json({ message: "Perfil quitado de tu lista. El perfil sigue existiendo para su dueño y otros familiares con acceso." });
+    }
+
+    return res.status(404).json({ error: "Perfil de bebé no encontrado o no tienes permiso para quitarlo" });
   } catch (error) {
     console.error("Error in deleteBabyProfile:", error);
     res.status(500).json({ error: "Error interno del servidor" });

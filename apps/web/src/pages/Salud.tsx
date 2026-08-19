@@ -15,6 +15,12 @@ export default function Salud() {
   const [loading, setLoading] = useState(true);
 
   const [vacunas, setVacunas] = useState<any[]>([]);
+  // Registro explícito de vacunas: no se guarda nada hasta presionar
+  // "Registrar". editingVacunaId marca cuál tarjeta tiene el formulario
+  // abierto; formVacuna guarda los valores en borrador (sin persistir).
+  const [editingVacunaId, setEditingVacunaId] = useState<number | null>(null);
+  const [formVacuna, setFormVacuna] = useState<{ fecha_aplicacion: string; notas: string }>({ fecha_aplicacion: "", notas: "" });
+  const [guardandoVacuna, setGuardandoVacuna] = useState(false);
 
   // Estado para Crecimiento
   const [crecimientoData, setCrecimientoData] = useState<any>(null);
@@ -165,9 +171,29 @@ export default function Salud() {
   };
 
 
-  const toggleVacuna = async (vacunaId: number, aplicadaActual: boolean) => {
+  // Abre el formulario de registro para una vacuna (no guarda nada todavía).
+  const abrirRegistroVacuna = (vacuna: any) => {
     if (rolAcceso.startsWith('solo_lectura')) return;
-    const vacuna = vacunas.find(v => v.vacuna_id === vacunaId);
+    setEditingVacunaId(vacuna.vacuna_id);
+    setFormVacuna({
+      fecha_aplicacion: vacuna.fecha_aplicacion
+        ? vacuna.fecha_aplicacion.split('T')[0]
+        : new Date().toISOString().split('T')[0],
+      notas: vacuna.notas || "",
+    });
+  };
+
+  const cancelarRegistroVacuna = () => {
+    setEditingVacunaId(null);
+    setFormVacuna({ fecha_aplicacion: "", notas: "" });
+  };
+
+  // Único punto donde de verdad se guarda algo — recién al presionar
+  // "Registrar". Antes cada cambio de fecha/notas se guardaba solo con
+  // tocar el campo, sin que el usuario confirmara nada.
+  const confirmarRegistroVacuna = async (vacunaId: number) => {
+    if (!formVacuna.fecha_aplicacion) return;
+    setGuardandoVacuna(true);
     try {
       const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/vacunas/${vacunaId}`, {
         method: "PATCH",
@@ -175,52 +201,42 @@ export default function Salud() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ 
-          aplicada: !aplicadaActual,
-          fecha_aplicacion: !aplicadaActual ? new Date().toISOString().split('T')[0] : null,
-          notas: vacuna?.notas ?? null,
-          lugar_aplicacion: vacuna?.lugar_aplicacion ?? null,
+        body: JSON.stringify({
+          aplicada: true,
+          fecha_aplicacion: formVacuna.fecha_aplicacion,
+          notas: formVacuna.notas || null,
         })
       });
-      
       if (res.ok) {
-        fetchVacunas();
+        setVacunas(prev => prev.map(v => v.vacuna_id === vacunaId
+          ? { ...v, aplicada: true, fecha_aplicacion: formVacuna.fecha_aplicacion, notas: formVacuna.notas }
+          : v));
+        cancelarRegistroVacuna();
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      setGuardandoVacuna(false);
     }
   };
 
-  const updateVacunaInfo = async (vacunaId: number, field: string, value: string) => {
-    // Busca el estado actual en la UI para no perder el resto de los campos.
-    // Antes se mandaba solo el campo que cambió (ej. { notas: "..." }), y el
-    // backend hace un upsert de TODOS los campos en cada llamada — eso
-    // pisaba con null cualquier campo que no viniera en esa petición puntual
-    // (por eso la fecha se borraba al editar las notas, y viceversa).
-    const vacuna = vacunas.find(v => v.vacuna_id === vacunaId);
-    if (!vacuna) return;
-
-    const payload = {
-      aplicada: vacuna.aplicada,
-      fecha_aplicacion: vacuna.fecha_aplicacion ? vacuna.fecha_aplicacion.split('T')[0] : null,
-      notas: vacuna.notas ?? null,
-      lugar_aplicacion: vacuna.lugar_aplicacion ?? null,
-      [field]: value,
-    };
-
-    // Actualiza el estado local de inmediato para que el campo no "salte"
-    // al valor anterior mientras se espera la respuesta del servidor.
-    setVacunas(prev => prev.map(v => v.vacuna_id === vacunaId ? { ...v, [field]: value } : v));
-
+  // Desmarcar una vacuna ya registrada sí es inmediato (no requiere llenar
+  // datos), pero pide confirmación porque borra la fecha/notas guardadas.
+  const desmarcarVacuna = async (vacuna: any) => {
+    if (rolAcceso.startsWith('solo_lectura')) return;
+    if (!window.confirm(`¿Quitar el registro de "${vacuna.nombre}"? Se borrará la fecha y las notas guardadas.`)) return;
     try {
-      await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/vacunas/${vacunaId}`, {
+      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/vacunas/${vacuna.vacuna_id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ aplicada: false, fecha_aplicacion: null, notas: null })
       });
+      if (res.ok) {
+        setVacunas(prev => prev.map(v => v.vacuna_id === vacuna.vacuna_id ? { ...v, aplicada: false, fecha_aplicacion: null, notas: null } : v));
+      }
     } catch (error) {
       console.error(error);
     }
@@ -323,14 +339,17 @@ export default function Salud() {
               <p style={{ color: "#6B7280" }}>No hay vacunas registradas en el sistema.</p>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                {vacunas.map((vacuna) => (
+                {vacunas.map((vacuna) => {
+                  const editando = editingVacunaId === vacuna.vacuna_id;
+                  return (
                   <div key={vacuna.vacuna_id} style={{ display: "flex", alignItems: "flex-start", gap: "20px", padding: "20px", border: "1px solid #E5E7EB", borderRadius: "12px", background: vacuna.aplicada ? "#F0FDF4" : "#fff" }}>
                     
                     <button 
-                      onClick={() => toggleVacuna(vacuna.vacuna_id, vacuna.aplicada)}
+                      onClick={() => vacuna.aplicada ? desmarcarVacuna(vacuna) : (editando ? cancelarRegistroVacuna() : abrirRegistroVacuna(vacuna))}
                       style={{ background: "none", border: "none", cursor: "pointer", padding: 0, marginTop: "4px" }}
+                      title={vacuna.aplicada ? "Quitar registro" : "Registrar aplicación"}
                     >
-                      {vacuna.aplicada ? <CheckCircle size={28} color="#16A34A" /> : <div style={{ width: "28px", height: "28px", borderRadius: "50%", border: "2px solid #D1D5DB" }}></div>}
+                      {vacuna.aplicada ? <CheckCircle size={28} color="#16A34A" /> : <div style={{ width: "28px", height: "28px", borderRadius: "50%", border: editando ? "2px solid var(--theme-primary)" : "2px solid #D1D5DB" }}></div>}
                     </button>
 
                     <div style={{ flex: 1 }}>
@@ -344,33 +363,72 @@ export default function Salud() {
                         </div>
                       </div>
 
-                      {vacuna.aplicada && (
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px", marginTop: "12px", padding: "16px", background: "#fff", borderRadius: "8px", border: "1px solid #DCFCE7" }}>
-                          <div>
-                            <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#166534", marginBottom: "4px" }}>Fecha de aplicación</label>
-                            <DateSelect
-                              value={vacuna.fecha_aplicacion ? vacuna.fecha_aplicacion.split('T')[0] : ""}
-                              onChange={(isoDate) => updateVacunaInfo(vacuna.vacuna_id, "fecha_aplicacion", isoDate)}
-                              max={new Date().toISOString().split('T')[0]}
-                              variant="light"
-                            />
+                      {/* Ya registrada: se muestra en modo lectura, con opción de editar */}
+                      {vacuna.aplicada && !editando && (
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "12px", padding: "16px", background: "#fff", borderRadius: "8px", border: "1px solid #DCFCE7" }}>
+                          <div style={{ fontSize: "13px", color: "#374151" }}>
+                            <strong>Aplicada:</strong> {vacuna.fecha_aplicacion ? new Date(vacuna.fecha_aplicacion).toLocaleDateString('es-CL') : "-"}
+                            {vacuna.notas && <div style={{ marginTop: "4px", color: "#6B7280" }}>{vacuna.notas}</div>}
                           </div>
-                          <div>
-                            <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#166534", marginBottom: "4px" }}>Notas / Reacciones</label>
-                            <input 
-                              type="text" 
-                              placeholder="Fiebre leve, etc."
-                              defaultValue={vacuna.notas || ""}
-                              onBlur={(e) => updateVacunaInfo(vacuna.vacuna_id, "notas", e.target.value)}
-                              style={{ width: "100%", padding: "8px", border: "1px solid #E5E7EB", borderRadius: "6px", fontSize: "14px", outline: "none" }}
-                            />
+                          <button
+                            onClick={() => abrirRegistroVacuna(vacuna)}
+                            style={{ background: "none", border: "none", color: "var(--theme-primary)", fontWeight: 700, fontSize: "13px", cursor: "pointer" }}
+                          >
+                            Editar
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Formulario de registro: no se guarda nada hasta presionar "Registrar" */}
+                      {editando && (
+                        <div style={{ marginTop: "12px", padding: "16px", background: "#F9FAFB", borderRadius: "8px", border: "1px solid #E5E7EB" }}>
+                          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px", marginBottom: "16px" }}>
+                            <div>
+                              <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#4B5563", marginBottom: "4px" }}>Fecha de aplicación *</label>
+                              <DateSelect
+                                value={formVacuna.fecha_aplicacion}
+                                onChange={(isoDate) => setFormVacuna(f => ({ ...f, fecha_aplicacion: isoDate }))}
+                                max={new Date().toISOString().split('T')[0]}
+                                variant="light"
+                              />
+                            </div>
+                            <div>
+                              <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#4B5563", marginBottom: "4px" }}>Notas / Reacciones</label>
+                              <input 
+                                type="text" 
+                                placeholder="Fiebre leve, etc."
+                                value={formVacuna.notas}
+                                onChange={(e) => setFormVacuna(f => ({ ...f, notas: e.target.value }))}
+                                style={{ width: "100%", padding: "8px", border: "1px solid #E5E7EB", borderRadius: "6px", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+                              />
+                            </div>
+                          </div>
+                          <div style={{ display: "flex", gap: "10px" }}>
+                            <button
+                              onClick={() => confirmarRegistroVacuna(vacuna.vacuna_id)}
+                              disabled={!formVacuna.fecha_aplicacion || guardandoVacuna}
+                              style={{
+                                background: !formVacuna.fecha_aplicacion || guardandoVacuna ? "#D1D5DB" : "var(--theme-primary)",
+                                color: "#fff", border: "none", borderRadius: "10px", padding: "10px 20px",
+                                fontWeight: 800, fontSize: "14px", cursor: !formVacuna.fecha_aplicacion || guardandoVacuna ? "not-allowed" : "pointer",
+                              }}
+                            >
+                              {guardandoVacuna ? "Guardando..." : "Registrar"}
+                            </button>
+                            <button
+                              onClick={cancelarRegistroVacuna}
+                              style={{ background: "none", border: "1px solid #E5E7EB", color: "#6B7280", borderRadius: "10px", padding: "10px 20px", fontWeight: 700, fontSize: "14px", cursor: "pointer" }}
+                            >
+                              Cancelar
+                            </button>
                           </div>
                         </div>
                       )}
                     </div>
 
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

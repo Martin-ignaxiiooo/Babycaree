@@ -114,14 +114,18 @@ export default function SeleccionarPerfil() {
     }
   };
 
-  const handleDeleteBaby = async (e: React.MouseEvent, babyId: string) => {
+  const handleDeleteBaby = async (e: React.MouseEvent, baby: any) => {
     e.stopPropagation();
-    if (!window.confirm("¿Estás seguro de que quieres eliminar este perfil? Esta acción no se puede deshacer.")) {
+    const esDueño = user && baby.usuario_id === user.id;
+    const mensaje = esDueño
+      ? "¿Estás seguro de que quieres eliminar este perfil? Esta acción no se puede deshacer y borra todos sus datos (vacunas, controles, fotos, etc.) para todas las personas con acceso."
+      : "Este perfil no es tuyo, lo tienes por invitación. Al quitarlo solo desaparece de TU lista — el dueño y otros familiares con acceso lo van a seguir viendo normalmente. ¿Quitarlo de tu lista?";
+    if (!window.confirm(mensaje)) {
       return;
     }
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`${API_URL}/profiles/babies/${babyId}`, {
+      await axios.delete(`${API_URL}/profiles/babies/${baby.id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchBabies();
@@ -171,15 +175,19 @@ export default function SeleccionarPerfil() {
               e.currentTarget.style.boxShadow = "0 10px 30px rgba(0,0,0,0.05)";
             }}
           >
-            <div style={{ width: "80px", height: "80px", borderRadius: "50%", background: "var(--theme-bg-light)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "2rem", color: "var(--theme-primary)" }}>
-              {baby.nombre.charAt(0).toUpperCase()}
+            <div style={{ width: "80px", height: "80px", borderRadius: "50%", background: "var(--theme-bg-light)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "2rem", color: "var(--theme-primary)", overflow: "hidden", flexShrink: 0 }}>
+              {baby.foto_perfil ? (
+                <img src={baby.foto_perfil} alt={baby.nombre} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              ) : (
+                baby.nombre.charAt(0).toUpperCase()
+              )}
             </div>
             <div style={{ textAlign: "center" }}>
               <h2 style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--theme-darker)" }}>{baby.nombre}</h2>
               <p style={{ fontSize: "0.9rem", color: "#8A849C", marginTop: "4px" }}>Ver panel</p>
             </div>
             <button 
-              onClick={(e) => handleDeleteBaby(e, baby.id)}
+              onClick={(e) => handleDeleteBaby(e, baby)}
               style={{
                 position: "absolute",
                 top: "12px",
