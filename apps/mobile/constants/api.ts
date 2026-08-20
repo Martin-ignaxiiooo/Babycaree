@@ -1,11 +1,9 @@
-import { Platform } from 'react-native';
+// Backend real (el mismo que usa la web, en Render). Es la misma base de
+// datos y los mismos endpoints — no hay nada separado para mobile.
+const PRODUCTION_API_URL = 'https://babycare-backend-msyq.onrender.com/api';
 
-// Para Android emulator, localhost es 10.0.2.2.
-// Para Expo Go en un teléfono físico, debes poner la IP local de tu computador en la red WiFi.
-// Por ejemplo: 'http://192.168.1.100:3000/api'
-// Aquí intentaremos deducir si es web o dispositivo
-const LOCAL_IP = '192.168.1.100'; // CAMBIAR A LA IP LOCAL DEL USUARIO SI ES NECESARIO
-
-export const API_URL = Platform.OS === 'web' 
-  ? 'http://localhost:3000/api' 
-  : `http://${LOCAL_IP}:3000/api`;
+// Para desarrollo local contra tu backend corriendo en tu compu, definí
+// EXPO_PUBLIC_API_URL en un archivo .env dentro de apps/mobile, por ejemplo:
+//   EXPO_PUBLIC_API_URL=http://192.168.1.100:3000/api   (tu IP local en la red WiFi)
+// Si no lo definís, se usa el backend real de producción por defecto.
+export const API_URL = process.env.EXPO_PUBLIC_API_URL || PRODUCTION_API_URL;
