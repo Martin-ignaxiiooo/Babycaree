@@ -591,27 +591,6 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
 
           </div>
         </div>
-
-        {/* TARJETA 4: Texto del hito de la semana (ancho completo) */}
-        {hito && (
-          <div style={{ ...cardStyle, marginTop: "24px" }}>
-            <div style={cardHeaderBannerStyle}>
-              <Sparkles size={18} />
-              Tu semana {semanas}
-            </div>
-            <div style={{ padding: "24px" }}>
-              <p style={{
-                fontSize: "15px",
-                color: "#6B647F",
-                lineHeight: 1.7,
-                margin: 0,
-                whiteSpace: "pre-line",
-              }}>
-                {hito}
-              </p>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
