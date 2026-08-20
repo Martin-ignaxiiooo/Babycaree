@@ -3,10 +3,9 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import axios from "axios";
 import { ArrowLeft, Sparkles, Loader2 } from "lucide-react";
 import TopNav from "../components/TopNav";
-import BabyGrowthIcon, {
+import {
   HITOS_POR_MES,
   ETIQUETA_POR_MES,
-  SEMANA_RANGO_POR_MES,
   mesDesdeSemanas,
 } from "../components/BabyGrowthIcon";
 
@@ -46,9 +45,7 @@ export default function InfoEmbarazoSemana() {
   const porcentaje = semanas > 0 ? Math.round((semanas / 40) * 100) : 0;
   const mes = perfil?.mes_embarazo || mesDesdeSemanas(semanas);
   const hito = perfil?.hito_embarazo || HITOS_POR_MES[mes];
-  const frutaActual = perfil?.fruta_embarazo || "Semillita";
   const etiquetaMes = perfil?.etiqueta_mes_embarazo || ETIQUETA_POR_MES[mes];
-  const rangoSemana = perfil?.rango_semana_mes_embarazo || SEMANA_RANGO_POR_MES[mes];
 
   const cardStyle: React.CSSProperties = {
     background: "white",
@@ -146,27 +143,6 @@ export default function InfoEmbarazoSemana() {
                 <div style={{ fontSize: "14px", color: "rgba(255,255,255,0.8)", marginTop: "6px", fontWeight: 600 }}>
                   Mes {mes} · {etiquetaMes} · {Math.min(porcentaje, 100)}% del camino
                 </div>
-              </div>
-            </div>
-
-            {/* Tarjeta: tamaño del bebé */}
-            <div style={{ ...cardStyle, marginBottom: "24px", padding: "24px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "10px", marginBottom: "20px" }}>
-                <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--theme-darker)", margin: 0 }}>
-                  Tamaño del Bebé
-                </h2>
-                <div style={{
-                  background: "var(--theme-bg-light)", color: "var(--theme-primary)",
-                  padding: "6px 12px", borderRadius: "100px", fontSize: "12px", fontWeight: 800, whiteSpace: "nowrap",
-                }}>
-                  Mes {mes} - {rangoSemana}
-                </div>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
-                <BabyGrowthIcon semanas={semanas} porcentaje={porcentaje} fill />
-                <p style={{ fontSize: "15px", color: "#6B647F", lineHeight: 1.5, margin: 0, flex: "1 1 160px" }}>
-                  Tiene el tamaño de un/a <strong style={{ color: "#E8607F" }}>{frutaActual}</strong>.
-                </p>
               </div>
             </div>
 
