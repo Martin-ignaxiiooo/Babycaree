@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Calendar, CalendarPlus, Plus, Sparkles, Camera, X, Loader2 } from "lucide-react";
 import DateSelect from "../components/DateSelect";
@@ -14,6 +15,7 @@ interface DashboardEmbarazoProps {
 }
 
 export default function DashboardEmbarazo({ user, perfil, activeBabyId }: DashboardEmbarazoProps) {
+  const navigate = useNavigate();
   const [citas, setCitas] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -342,6 +344,41 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
               <div style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "26px", fontWeight: 700, color: "#fff" }}>{Math.min(porcentaje, 100)}%</div>
               <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.75)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em" }}>del camino</div>
             </div>
+
+            {hito && (
+              <button
+                type="button"
+                onClick={() => navigate(`/embarazo/${activeBabyId}/info`, { state: { perfil } })}
+                title="Ver datos sobre tu embarazo"
+                style={{
+                  flex: "0 0 auto",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  background: "rgba(255,255,255,0.18)",
+                  border: "1px solid rgba(255,255,255,0.35)",
+                  color: "#fff",
+                  padding: "12px 20px",
+                  borderRadius: "100px",
+                  fontSize: "13px",
+                  fontWeight: 800,
+                  fontFamily: "'Nunito', sans-serif",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                  transition: "background 0.2s, transform 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.3)";
+                  (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.18)";
+                  (e.currentTarget as HTMLElement).style.transform = "";
+                }}
+              >
+                <Sparkles size={16} /> Datos sobre tu embarazo
+              </button>
+            )}
           </div>
         </div>
       </div>
