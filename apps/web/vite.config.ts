@@ -10,7 +10,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'pwa-icons/apple-touch-icon.png'],
+      includeAssets: ['favicon.png', 'pwa-icons/apple-touch-icon.png'],
       manifest: {
         name: 'Baby Care',
         short_name: 'Baby Care',
@@ -18,7 +18,7 @@ export default defineConfig({
         start_url: '/dashboard',
         scope: '/',
         display: 'standalone',
-        background_color: '#EDE9F8',
+        background_color: '#F4F2E5',
         theme_color: '#7C5CBF',
         lang: 'es-CL',
         icons: [
