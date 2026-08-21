@@ -208,7 +208,7 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
     // reflejan un compromiso que ya se tomó, no solo un recordatorio
     // automático del calendario de vacunación.
     const citasRes = await query(
-      `SELECT especialidad, fecha_cita, medico
+      `SELECT especialidad, fecha_cita, medico, tipo
        FROM citas_medicas
        WHERE bebe_id = $1 AND estado = 'programada' AND fecha_cita > NOW()
        ORDER BY fecha_cita ASC`,
@@ -222,12 +222,13 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
       if (diffDays <= 30) {
+        const esControl = c.tipo === "control";
         notificaciones.push({
-          tipo: "control_proximo",
+          tipo: esControl ? "control_proximo" : "cita_proxima",
           prioridad: "media",
-          titulo: `Control ${c.especialidad}`,
+          titulo: esControl ? `Control ${c.especialidad || "sano"}` : `Cita: ${c.especialidad || "consulta"}`,
           dias_restantes: diffDays,
-          mensaje: `En ${diffDays} días con ${c.medico}.`
+          mensaje: c.medico ? `En ${diffDays} días con ${c.medico}.` : `En ${diffDays} días.`
         });
         total_alertas++;
       }
@@ -268,6 +269,7 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
     // 4º Artículo educativo — informativo, siempre al final.
     const ordenTipo: Record<string, number> = {
       control_proximo: 0,
+      cita_proxima: 0,
       vacuna_atrasada: 1,
       vacuna_proxima: 2,
       articulo: 3,

@@ -242,7 +242,15 @@ export const registrarResultadoCita = async (req: AuthRequest, res: Response) =>
     const {
       asistio, resultado_notas, estado,
       peso_kg, talla_cm, diagnostico, indicaciones, receta_foto,
+      // Datos base de la cita: se editan acá para corregir lo que el
+      // dictado por voz haya interpretado mal (hora, médico, lugar…),
+      // sin tener que borrar y crear la cita de nuevo.
+      fecha_cita, medico, lugar, especialidad, tipo, notas,
     } = req.body;
+
+    if (tipo != null && !["control", "cita"].includes(tipo)) {
+      return res.status(400).json({ error: "Tipo inválido. Debe ser 'control' o 'cita'." });
+    }
 
     const accessCheck = await query(
       `SELECT b.id FROM perfiles_bebes b WHERE b.id = $1 AND b.usuario_id = $2
@@ -288,6 +296,12 @@ export const registrarResultadoCita = async (req: AuthRequest, res: Response) =>
       });
     }
 
+    // fecha_seguimiento marca "cuándo se respondió el seguimiento post-cita";
+    // solo se toca si de verdad vino algún dato de resultado, no cuando el
+    // usuario solo está corrigiendo la hora o el médico de una cita futura.
+    const esResultado = [asistio, resultado_notas, peso, talla, diagnostico, indicaciones, receta_foto]
+      .some((v) => v != null && v !== "");
+
     // Solo se tocan los campos que vinieron en el body: así la app puede
     // mandar únicamente "asistio" sin borrar notas escritas antes.
     const result = await query(`
@@ -300,7 +314,13 @@ export const registrarResultadoCita = async (req: AuthRequest, res: Response) =>
           diagnostico       = COALESCE($8, diagnostico),
           indicaciones      = COALESCE($9, indicaciones),
           receta_foto       = COALESCE($10, receta_foto),
-          fecha_seguimiento = NOW()
+          fecha_cita        = COALESCE($11, fecha_cita),
+          medico            = COALESCE($12, medico),
+          lugar             = COALESCE($13, lugar),
+          especialidad      = COALESCE($14, especialidad),
+          tipo              = COALESCE($15, tipo),
+          notas             = COALESCE($16, notas),
+          fecha_seguimiento = CASE WHEN $17 THEN NOW() ELSE fecha_seguimiento END
       WHERE id = $1 AND bebe_id = $2
       RETURNING id, especialidad, medico, lugar, fecha_cita, notas, estado, tipo,
                 asistio, resultado_notas, fecha_seguimiento, peso_kg, talla_cm,
@@ -309,6 +329,8 @@ export const registrarResultadoCita = async (req: AuthRequest, res: Response) =>
       citaId, bebeId,
       asistio ?? null, resultado_notas ?? null, estado ?? null,
       peso, talla, diagnostico ?? null, indicaciones ?? null, receta_foto || null,
+      fecha_cita || null, medico ?? null, lugar ?? null, especialidad ?? null,
+      tipo ?? null, notas ?? null, esResultado,
     ]);
 
     if (result.rows.length === 0) {

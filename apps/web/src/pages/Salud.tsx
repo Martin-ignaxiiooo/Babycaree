@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Syringe, Activity, Save, CheckCircle, Bell, Plus, X, FlaskConical, ClipboardCheck, Mic, MicOff } from "lucide-react";
+import { ArrowLeft, Syringe, Activity, Save, CheckCircle, Bell, Plus, X, FlaskConical, ClipboardCheck, Mic, MicOff, Pencil } from "lucide-react";
 import TopNav from "../components/TopNav";
 import DateSelect from "../components/DateSelect";
 import TimeSelect from "../components/TimeSelect";
 import ExamenesTab from "../components/ExamenesTab";
 import ResultadoConsultaModal from "../components/ResultadoConsultaModal";
+import EditarCitaModal from "../components/EditarCitaModal";
 import { useDictado } from "../hooks/useDictado";
 import { interpretarDictado } from "../utils/interpretarDictado";
 
@@ -39,12 +40,24 @@ export default function Salud() {
   const [citas, setCitas] = useState<any[]>([]);
   const [fechaCitaDate, setFechaCitaDate] = useState("");
   const [fechaCitaTime, setFechaCitaTime] = useState("");
+  // Se arma como Date y se envía en ISO (con "Z" explícito) para que
+  // Postgres no interprete la hora local como si fuera UTC — mismo fix
+  // que se aplica al guardado por voz, ver guardarDesdeVoz más abajo.
+  const fechaCitaISO = (): string | null => {
+    if (!fechaCitaDate || !fechaCitaTime) return null;
+    const [anio, mes, dia] = fechaCitaDate.split("-").map(Number);
+    const [hora, minuto] = fechaCitaTime.split(":").map(Number);
+    const d = new Date(anio, mes - 1, dia, hora, minuto);
+    return Number.isNaN(d.getTime()) ? null : d.toISOString();
+  };
   const fechaCita = fechaCitaDate && fechaCitaTime ? `${fechaCitaDate}T${fechaCitaTime}` : "";
   const [medico, setMedico] = useState("");
   const [notas, setNotas] = useState("");
   const [isSavingCita, setIsSavingCita] = useState(false);
   // Cita cuyo resultado se está registrando (modal "¿cómo te fue?").
   const [citaResultado, setCitaResultado] = useState<any | null>(null);
+  // Cita cuyos datos base (fecha, médico, lugar…) se están corrigiendo.
+  const [citaEditando, setCitaEditando] = useState<any | null>(null);
 
   // control sano vs consulta puntual
   const [tipoCita, setTipoCita] = useState<"control" | "cita">("control");
@@ -87,7 +100,11 @@ export default function Salud() {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({
-          fecha_cita: `${datos.fecha.getFullYear()}-${p(datos.fecha.getMonth() + 1)}-${p(datos.fecha.getDate())}T${p(datos.fecha.getHours())}:${p(datos.fecha.getMinutes())}`,
+          // toISOString() convierte la hora local (la que realmente se
+          // dictó/entendió) a UTC de forma explícita ("Z"). Mandar el string
+          // sin offset (como antes) hacía que Postgres lo interpretara en
+          // su propio timezone de sesión (UTC), corriendo la hora 3-4 horas.
+          fecha_cita: datos.fecha.toISOString(),
           medico: datos.medico || null,
           notas: textoOriginal,
           tipo: tipoFinal,
@@ -240,7 +257,7 @@ export default function Salud() {
       const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/citas`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ fecha_cita: fechaCita, medico, notas, tipo: tipoCita, especialidad: tipoCita === "control" ? "Control sano" : "Consulta" })
+        body: JSON.stringify({ fecha_cita: fechaCitaISO(), medico, notas, tipo: tipoCita, especialidad: tipoCita === "control" ? "Control sano" : "Consulta" })
       });
       if (res.ok) {
         setFechaCitaDate("");
@@ -556,9 +573,21 @@ export default function Salud() {
                       borderLeft: `4px solid ${isPast ? "#E5E7EB" : "#D4A5E3"}`
                     }}>
                       <div>
-                        <h4 style={{ margin: "0 0 6px 0", fontSize: "16px", color: isPast ? "#6B7280" : "var(--theme-darker)" }}>
-                          {cita.notas || "Control Médico"}
-                        </h4>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                          <h4 style={{ margin: 0, fontSize: "16px", color: isPast ? "#6B7280" : "var(--theme-darker)" }}>
+                            {cita.especialidad || cita.notas || "Control Médico"}
+                          </h4>
+                          <span
+                            style={{
+                              fontSize: "10.5px", fontWeight: 800, padding: "2px 9px",
+                              borderRadius: "100px", textTransform: "uppercase", letterSpacing: "0.3px",
+                              background: cita.tipo === "control" ? "#E8F7F1" : "var(--theme-bg-light)",
+                              color: cita.tipo === "control" ? "#3E8E6E" : "var(--theme-primary)",
+                            }}
+                          >
+                            {cita.tipo === "control" ? "Control" : "Cita"}
+                          </span>
+                        </div>
                         <div style={{ fontSize: "13px", color: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", gap: "10px" }}>
                           <span>{cita.medico || "Sin especificar doctor"}</span>
                           {cita.lugar && <span>• {cita.lugar}</span>}
@@ -571,23 +600,37 @@ export default function Salud() {
                         <div style={{ fontSize: "12px", color: "rgba(0,0,0,0.5)" }}>
                           {date.toLocaleTimeString("es-CL", { hour: '2-digit', minute:'2-digit' })}
                         </div>
-                        {/* Solo para citas ya pasadas: registrar lo que ocurrió. */}
-                        {isPast && (
+                        <div style={{ display: "flex", gap: "6px", marginTop: "8px", justifyContent: "flex-end", flexWrap: "wrap" }}>
                           <button
-                            onClick={() => setCitaResultado(cita)}
+                            onClick={() => setCitaEditando(cita)}
                             style={{
-                              marginTop: "8px", padding: "6px 12px", borderRadius: "100px",
-                              border: "none", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
+                              padding: "6px 10px", borderRadius: "100px",
+                              border: "1.5px solid #E4DBF7", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
                               fontWeight: 800, fontSize: "11.5px", display: "inline-flex",
-                              alignItems: "center", gap: "5px", whiteSpace: "nowrap",
-                              background: cita.diagnostico ? "#E8F7F1" : "var(--theme-primary)",
-                              color: cita.diagnostico ? "#3E8E6E" : "#fff",
+                              alignItems: "center", gap: "4px", whiteSpace: "nowrap",
+                              background: "#fff", color: "var(--theme-darker)",
                             }}
                           >
-                            <ClipboardCheck size={13} />
-                            {cita.diagnostico ? "Ver resultado" : "¿Cómo te fue?"}
+                            <Pencil size={12} /> Editar
                           </button>
-                        )}
+                          {/* Solo para citas ya pasadas: registrar lo que ocurrió. */}
+                          {isPast && (
+                            <button
+                              onClick={() => setCitaResultado(cita)}
+                              style={{
+                                padding: "6px 12px", borderRadius: "100px",
+                                border: "none", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
+                                fontWeight: 800, fontSize: "11.5px", display: "inline-flex",
+                                alignItems: "center", gap: "5px", whiteSpace: "nowrap",
+                                background: cita.diagnostico ? "#E8F7F1" : "var(--theme-primary)",
+                                color: cita.diagnostico ? "#3E8E6E" : "#fff",
+                              }}
+                            >
+                              <ClipboardCheck size={13} />
+                              {cita.diagnostico ? "Ver resultado" : "¿Cómo te fue?"}
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
@@ -880,6 +923,17 @@ export default function Salud() {
           cita={citaResultado}
           token={token!}
           onClose={() => setCitaResultado(null)}
+          onGuardado={fetchCitas}
+        />
+      )}
+
+      {/* Modal: corregir fecha, médico, lugar, tipo… de una cita ya creada. */}
+      {citaEditando && bebeId && (
+        <EditarCitaModal
+          bebeId={bebeId}
+          cita={citaEditando}
+          token={token!}
+          onClose={() => setCitaEditando(null)}
           onGuardado={fetchCitas}
         />
       )}

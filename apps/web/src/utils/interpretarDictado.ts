@@ -64,7 +64,7 @@ function capitalizar(s: string): string {
  * pudo haber absorbido ("pediatra mañana", "cesfam norte pasado mañana").
  */
 const CORTE_NOMBRE =
-  /\b(hoy|ma[ñn]ana|pasado|el|la|los|las|en|a|de|del|para|con|y|pr[óo]ximo|pr[óo]xima|lunes|martes|mi[ée]rcoles|jueves|viernes|s[áa]bado|domingo)\b.*$/;
+  /\b(hoy|ma[ñn]ana|pasado|el|la|los|las|en|a|de|del|para|con|y|pr[óo]ximo|pr[óo]xima|lunes|martes|mi[ée]rcoles|jueves|viernes|s[áa]bado|domingo|control|sano|sana|cita|consulta|urgencia|dijo|dijeron|dice|dicen|comentó|indic[óo]|recomend[óo]|que|debemos|tenemos|vamos|hay)\b.*$/;
 
 function recortarNombre(s: string): string {
   return s.replace(CORTE_NOMBRE, "").trim();
@@ -80,9 +80,9 @@ function extraerHora(texto: string): { hora: number; minuto: number } | null {
     if (h <= 23 && m <= 59) return { hora: h, minuto: m };
   }
 
-  // "a las diez y media", "a las 10 y cuarto", "a las 3"
+  // "a las diez y media", "a las diez treinta" (sin "y"), "a las 10 y cuarto"
   const m = texto.match(
-    /a\s+las?\s+(\d{1,2}|[a-záéíóúñ]+)(?:\s+y\s+(media|cuarto|treinta|quince|\d{1,2}))?/
+    /a\s+las?\s+(\d{1,2}|[a-záéíóúñ]+)(?:\s+(?:y\s+)?(media|cuarto|treinta|quince|\d{1,2}))?/
   );
   if (!m) return null;
 
