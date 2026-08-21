@@ -58,6 +58,7 @@ export const getExamenes = async (req: AuthRequest, res: Response) => {
       `SELECT e.id, e.cita_id, e.nombre, e.indicaciones, e.fecha_indicacion,
               e.fecha_sugerida, e.fecha_realizacion, e.estado, e.resultado_notas,
               (e.resultado_foto IS NOT NULL) AS tiene_resultado_foto,
+              (e.orden_foto IS NOT NULL) AS tiene_orden_foto,
               e.fecha_creacion,
               c.especialidad AS cita_especialidad, c.fecha_cita AS cita_fecha
        FROM examenes_medicos e
@@ -102,6 +103,30 @@ export const getExamenFoto = async (req: AuthRequest, res: Response) => {
   }
 };
 
+/** GET /:bebeId/examenes/:examenId/orden-foto — la foto de la orden/indicación, aparte del listado. */
+export const getExamenOrdenFoto = async (req: AuthRequest, res: Response) => {
+  try {
+    const { bebeId, examenId } = req.params;
+    if (!(await puedeVer(bebeId, req.user.id))) {
+      return res.status(403).json({ error: "No tienes permiso para ver este perfil" });
+    }
+
+    const result = await query(
+      `SELECT orden_foto FROM examenes_medicos WHERE id = $1 AND bebe_id = $2`,
+      [examenId, bebeId]
+    );
+
+    if (result.rows.length === 0 || !result.rows[0].orden_foto) {
+      return res.status(404).json({ error: "Este examen no tiene una foto de la orden guardada" });
+    }
+
+    res.json({ foto: result.rows[0].orden_foto });
+  } catch (error) {
+    console.error("Error en getExamenOrdenFoto:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
 // ─────────────────────────────────────────────────────────────────────────
 // POST /:bebeId/examenes
 // ─────────────────────────────────────────────────────────────────────────
@@ -112,7 +137,7 @@ export const createExamen = async (req: AuthRequest, res: Response) => {
       return res.status(403).json({ error: "No tienes permiso para modificar este perfil" });
     }
 
-    const { nombre, indicaciones, fecha_sugerida, cita_id } = req.body;
+    const { nombre, indicaciones, fecha_sugerida, cita_id, orden_foto } = req.body;
 
     if (!nombre || typeof nombre !== "string" || !nombre.trim()) {
       return res.status(400).json({ error: "Falta el nombre del examen" });
@@ -120,14 +145,20 @@ export const createExamen = async (req: AuthRequest, res: Response) => {
     if (nombre.length > 150) {
       return res.status(400).json({ error: "El nombre del examen es demasiado largo" });
     }
+    if (orden_foto != null && orden_foto !== "" && !fotoValida(orden_foto)) {
+      return res.status(400).json({
+        error: "La imagen no es válida o pesa demasiado. Usa una foto JPG o PNG.",
+      });
+    }
 
     const result = await query(
       `INSERT INTO examenes_medicos
-         (bebe_id, cita_id, nombre, indicaciones, fecha_sugerida, registrado_por)
-       VALUES ($1, $2, $3, $4, $5, $6)
+         (bebe_id, cita_id, nombre, indicaciones, fecha_sugerida, registrado_por, orden_foto)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING id, cita_id, nombre, indicaciones, fecha_indicacion,
                  fecha_sugerida, fecha_realizacion, estado, resultado_notas,
-                 FALSE AS tiene_resultado_foto, fecha_creacion`,
+                 FALSE AS tiene_resultado_foto, (orden_foto IS NOT NULL) AS tiene_orden_foto,
+                 fecha_creacion`,
       [
         bebeId,
         cita_id || null,
@@ -135,6 +166,7 @@ export const createExamen = async (req: AuthRequest, res: Response) => {
         indicaciones?.trim() || null,
         fecha_sugerida || null,
         req.user.id,
+        orden_foto || null,
       ]
     );
 

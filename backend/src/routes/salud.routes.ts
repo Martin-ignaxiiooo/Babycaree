@@ -14,6 +14,7 @@ import {
 import {
   getExamenes,
   getExamenFoto,
+  getExamenOrdenFoto,
   createExamen,
   updateExamen,
   deleteExamen
@@ -47,5 +48,6 @@ router.post("/:bebeId/examenes", createExamen);
 router.patch("/:bebeId/examenes/:examenId", updateExamen);
 router.delete("/:bebeId/examenes/:examenId", deleteExamen);
 router.get("/:bebeId/examenes/:examenId/foto", getExamenFoto);
+router.get("/:bebeId/examenes/:examenId/orden-foto", getExamenOrdenFoto);
 
 export default router;

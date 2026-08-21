@@ -105,15 +105,19 @@ function extraerHora(texto: string): { hora: number; minuto: number } | null {
 }
 
 /** Extrae la fecha, resolviendo expresiones relativas contra la fecha actual. */
-function extraerFecha(texto: string, ahora: Date): Date | null {
+export function extraerFecha(texto: string, ahora: Date): Date | null {
   const base = new Date(ahora);
   base.setSeconds(0, 0);
 
-  // "3 de octubre" / "tres de octubre" (con año opcional)
-  const conMes = texto.match(
-    /\b(\d{1,2}|[a-záéíóúñ]+)\s+de\s+([a-záéíóúñ]+)(?:\s+(?:de\s+)?(\d{4}))?/
-  );
-  if (conMes) {
+  // "3 de octubre" / "tres de octubre" (con año opcional).
+  // OJO: se prueban TODAS las coincidencias del patrón "palabra de palabra"
+  // en la frase, no solo la primera. Si el dictado dice algo como
+  // "ecografía de caderas el 20 de octubre", la primera coincidencia
+  // sintáctica es "ecografía de caderas" (no es una fecha real, "caderas"
+  // no es un mes), y quedarse con esa haría que nunca se llegara a
+  // encontrar "20 de octubre" más adelante en la frase.
+  const conMesRegex = /\b(\d{1,2}|[a-záéíóúñ]+)\s+de\s+([a-záéíóúñ]+)(?:\s+(?:de\s+)?(\d{4}))?/g;
+  for (const conMes of texto.matchAll(conMesRegex)) {
     const nombreMes = quitarTildes(conMes[2]);
     const mesIdx = MESES[nombreMes] ?? MESES[conMes[2]];
     if (mesIdx != null) {
@@ -149,10 +153,12 @@ function extraerFecha(texto: string, ahora: Date): Date | null {
     return d;
   }
   // "mañana" (día siguiente) es distinto de "de la mañana" / "por la
-  // mañana" (que solo indica AM, ej: "a las diez de la mañana"). Sin este
-  // cuidado, cualquier hora dicha con "de la mañana" hacía que la fecha
-  // saltara al día siguiente sin que nadie lo pidiera.
-  if (/\bmañana\b/.test(texto) && !/(?:de|por|en)\s+la\s+mañana\b/.test(texto)) {
+  // mañana" (que solo indica AM, ej: "a las diez de la mañana"). Se quitan
+  // primero esas frases de AM antes de buscar un "mañana" suelto, para que
+  // frases que mencionan ambas cosas ("mañana a las diez de la mañana")
+  // sigan reconociendo el "mañana" real.
+  const sinIndicadorAM = texto.replace(/(?:de|por|en)\s+la\s+mañana\b/gi, "");
+  if (/\bmañana\b/.test(sinIndicadorAM)) {
     const d = new Date(base);
     d.setDate(d.getDate() + 1);
     return d;
@@ -254,4 +260,58 @@ export function interpretarDictado(textoOriginal: string, ahora = new Date()): C
   if (!especialidad && tipo === "control") especialidad = "Control sano";
 
   return { fecha, tipo, medico, lugar, especialidad };
+}
+
+/**
+ * Interpreta el dictado de exámenes indicados: uno o varios nombres de
+ * examen, más una fecha sugerida opcional (comparte el mismo detector de
+ * fechas que las citas, incluyendo relativas: "el viernes", "en dos
+ * semanas", "el 15 de septiembre").
+ *
+ * Ejemplos que entiende:
+ *  - "hemograma y radiografía de tórax para el martes"
+ *  - "ecografía de caderas el 20 de octubre"
+ *  - "perfil tiroideo, orina completa y glicemia"  (sin fecha)
+ */
+export interface ExamenesDictados {
+  nombres: string[];
+  fecha: Date | null;
+}
+
+// Palabras que solo sirven para conectar la fecha con el resto de la
+// frase y no son parte del nombre de ningún examen.
+const CONECTORES_FECHA =
+  /\b(para|el|la|los|las|en|de|del|próximo|próxima|proximo|proxima)\s+/gi;
+
+export function interpretarExamenesDictados(
+  textoOriginal: string,
+  ahora = new Date()
+): ExamenesDictados {
+  const texto = textoOriginal.toLowerCase().trim();
+  const fecha = extraerFecha(texto, ahora);
+
+  // Le quitamos al texto el fragmento de fecha (si se encontró alguno) para
+  // que no termine colándose dentro del nombre de un examen. Como no
+  // guardamos el índice exacto del match, reconstruimos aproximando: se
+  // cortan las palabras-conector de fecha más lo que quede después de la
+  // última mención de fecha/día/mes reconocible.
+  let textoSinFecha = textoOriginal;
+  if (fecha) {
+    textoSinFecha = textoSinFecha.replace(
+      /\b(hoy|mañana|pasado\s+mañana|el\s+\d{1,2}\s+de\s+[a-záéíóúñ]+(?:\s+de\s+\d{4})?|\d{1,2}[/-]\d{1,2}(?:[/-]\d{2,4})?|en\s+(?:\d+|[a-záéíóúñ]+)\s+(?:d[ií]as?|semanas?|mes(?:es)?)|(?:el\s+)?(?:próximo\s+|proximo\s+)?(?:domingo|lunes|martes|mi[ée]rcoles|jueves|viernes|s[áa]bado))\b/gi,
+      ""
+    );
+  }
+  // También se quita cualquier mención de hora ("a las diez y media"),
+  // porque los exámenes no llevan hora, solo fecha.
+  textoSinFecha = textoSinFecha.replace(/\ba\s+las?\s+[a-záéíóúñ0-9]+(?:\s+(?:y\s+)?(?:media|cuarto|treinta|quince|\d{1,2}))?(?:\s+de\s+la\s+(?:mañana|tarde|noche))?/gi, "");
+
+  const nombres = textoSinFecha
+    // Varios exámenes se separan con "y", comas, o "también".
+    .split(/,|\by\b|\btambién\b/i)
+    .map((parte) => parte.replace(CONECTORES_FECHA, " ").replace(/\s+/g, " ").trim())
+    .map((parte) => capitalizar(parte))
+    .filter((parte) => parte.length >= 3);
+
+  return { nombres, fecha };
 }

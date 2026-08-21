@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { X, Camera, Loader2, Trash2 } from "lucide-react";
+import { X, Camera, Loader2, Trash2, Mic, MicOff, FileText } from "lucide-react";
+import { useDictado } from "../hooks/useDictado";
+import { interpretarExamenesDictados } from "../utils/interpretarDictado";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api";
 
@@ -54,6 +56,23 @@ export default function ResultadoConsultaModal({ bebeId, cita, token, onClose, o
   const [nuevoExamen, setNuevoExamen] = useState("");
   const [nuevoExamenFecha, setNuevoExamenFecha] = useState("");
 
+  // Foto de la orden/indicación de exámenes (el papel del médico), distinta
+  // de la receta y distinta de la foto del RESULTADO (que se sube después,
+  // cuando el examen ya se hizo, desde la pestaña de Exámenes).
+  const [ordenExamenFoto, setOrdenExamenFoto] = useState<string | null>(null);
+  const [subiendoFotoExamen, setSubiendoFotoExamen] = useState(false);
+
+  // Dictado por voz para agregar exámenes sin escribir: "hemograma y
+  // radiografía de tórax para el martes" agrega dos exámenes con esa fecha.
+  const dictadoExamenes = useDictado((texto) => {
+    const { nombres, fecha } = interpretarExamenesDictados(texto);
+    if (nombres.length === 0) return;
+    const fechaStr = fecha
+      ? `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, "0")}-${String(fecha.getDate()).padStart(2, "0")}`
+      : "";
+    setExamenes((prev) => [...prev, ...nombres.map((nombre) => ({ nombre, fecha_sugerida: fechaStr }))]);
+  });
+
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -72,6 +91,24 @@ export default function ResultadoConsultaModal({ bebeId, cita, token, onClose, o
       setError("No pudimos procesar esa imagen. Prueba con otra.");
     } finally {
       setSubiendoFoto(false);
+    }
+  };
+
+  const elegirFotoExamenes = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setError("La orden de exámenes debe ser una imagen JPG, PNG o WEBP.");
+      return;
+    }
+    setSubiendoFotoExamen(true);
+    setError(null);
+    try {
+      setOrdenExamenFoto(await comprimirImagen(file));
+    } catch {
+      setError("No pudimos procesar esa imagen. Prueba con otra.");
+    } finally {
+      setSubiendoFotoExamen(false);
     }
   };
 
@@ -107,7 +144,9 @@ export default function ResultadoConsultaModal({ bebeId, cita, token, onClose, o
       }
 
       // Los exámenes se crean después: si alguno falla, el resultado de la
-      // consulta ya quedó guardado y no se pierde lo escrito.
+      // consulta ya quedó guardado y no se pierde lo escrito. La foto de la
+      // orden (si se subió) se adjunta a todos, porque suele ser un mismo
+      // papel con varios exámenes indicados.
       for (const ex of examenes) {
         await fetch(`${API_URL}/v1/salud/${bebeId}/examenes`, {
           method: "POST",
@@ -116,6 +155,7 @@ export default function ResultadoConsultaModal({ bebeId, cita, token, onClose, o
             nombre: ex.nombre,
             fecha_sugerida: ex.fecha_sugerida || null,
             cita_id: cita.id,
+            orden_foto: ordenExamenFoto,
           }),
         }).catch(() => {});
       }
@@ -231,8 +271,65 @@ export default function ResultadoConsultaModal({ bebeId, cita, token, onClose, o
                 </label>
               )}
 
+              {/* Exámenes: foto de la orden, justo debajo de la receta */}
+              <label style={label}>Subir exámenes</label>
+              {ordenExamenFoto ? (
+                <div style={{ position: "relative", marginBottom: "16px" }}>
+                  <img src={ordenExamenFoto} alt="Orden de exámenes" style={preview} />
+                  <button
+                    type="button" onClick={() => setOrdenExamenFoto(null)}
+                    style={borrarFotoBtn} aria-label="Quitar foto"
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+              ) : (
+                <label style={uploadBox}>
+                  {subiendoFotoExamen ? (
+                    <Loader2 size={20} className="spin-icon" />
+                  ) : (
+                    <>
+                      <FileText size={20} color="var(--theme-primary)" />
+                      <span style={{ fontSize: "13.5px", fontWeight: 700, color: "var(--theme-primary)" }}>
+                        Subir foto de la orden de exámenes
+                      </span>
+                    </>
+                  )}
+                  <input
+                    type="file" accept="image/jpeg,image/png,image/webp"
+                    onChange={elegirFotoExamenes} style={{ display: "none" }}
+                  />
+                </label>
+              )}
+
               {/* Exámenes indicados */}
               <label style={label}>¿Te indicaron exámenes?</label>
+
+              {/* Dictado por voz: "hemograma y radiografía de tórax para el martes" */}
+              {dictadoExamenes.soportado && (
+                <button
+                  type="button"
+                  onClick={dictadoExamenes.escuchando ? dictadoExamenes.detener : dictadoExamenes.empezar}
+                  style={{
+                    display: "inline-flex", alignItems: "center", gap: "7px",
+                    padding: "9px 16px", borderRadius: "100px", border: "none",
+                    cursor: "pointer", fontFamily: "'Nunito', sans-serif",
+                    fontWeight: 800, fontSize: "12.5px", color: "#fff", marginBottom: "10px",
+                    background: dictadoExamenes.escuchando ? "#D97070" : "var(--theme-primary)",
+                  }}
+                >
+                  {dictadoExamenes.escuchando ? <MicOff size={14} /> : <Mic size={14} />}
+                  {dictadoExamenes.escuchando ? "Detener" : "Dictar exámenes"}
+                </button>
+              )}
+              {dictadoExamenes.texto && (
+                <div style={{ ...transcripcionPreview, marginBottom: "10px" }}>“{dictadoExamenes.texto}”</div>
+              )}
+              {dictadoExamenes.error && (
+                <div style={{ color: "#D97070", fontSize: "12px", fontWeight: 600, marginBottom: "10px" }}>
+                  {dictadoExamenes.error}
+                </div>
+              )}
               {examenes.map((ex, i) => (
                 <div key={i} style={examenRow}>
                   <div style={{ flex: 1 }}>
@@ -343,6 +440,10 @@ const toggleOff: React.CSSProperties = {
   flex: 1, padding: "11px", borderRadius: "12px", border: "2px solid #E4DBF7",
   background: "#fff", color: "#8A849C", fontWeight: 700,
   fontSize: "13.5px", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
+};
+const transcripcionPreview: React.CSSProperties = {
+  background: "var(--theme-bg-light)", borderRadius: "10px", padding: "10px 12px",
+  fontSize: "12.5px", color: "var(--theme-darker)", fontStyle: "italic",
 };
 const uploadBox: React.CSSProperties = {
   display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
