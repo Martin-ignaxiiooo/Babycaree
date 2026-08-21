@@ -1,5 +1,5 @@
 import { query } from "../config/db";
-import { sendAppointmentReminder, sendPostAppointmentFollowUp } from "../config/mailer";
+import { sendAppointmentReminder, sendPostAppointmentFollowUp, sendExamReminder } from "../config/mailer";
 
 // Cada "ventana" define cuándo se dispara un recordatorio, en base a cuánto
 // falta para la cita. Al no superponerse, un cron corriendo cada cierto
@@ -145,5 +145,72 @@ export async function revisarYEnviarSeguimientos(): Promise<void> {
     }
   } catch (error) {
     console.error("[seguimiento] Error revisando seguimientos post-cita:", error);
+  }
+}
+
+/**
+ * Recordatorio de exámenes pendientes.
+ *
+ * Se envía cuando pasó la fecha sugerida y el examen sigue en 'pendiente'.
+ * Se espera un día completo después de la fecha para no escribir el mismo
+ * día en que quizá se lo están haciendo, y se deja de insistir a los 30
+ * días: si no se hizo en un mes, un correo más no va a ayudar y solo molesta.
+ *
+ * Los exámenes sin fecha sugerida no generan recordatorio: no hay forma de
+ * saber cuándo correspondía hacerlo.
+ */
+export async function revisarYEnviarRecordatoriosExamenes(): Promise<void> {
+  try {
+    const examenesRes = await query(
+      `SELECT e.id, e.nombre, e.indicaciones, e.fecha_sugerida,
+              b.id AS bebe_id, b.nombre AS bebe_nombre, b.usuario_id
+       FROM examenes_medicos e
+       JOIN perfiles_bebes b ON b.id = e.bebe_id
+       WHERE e.estado = 'pendiente'
+         AND e.recordatorio_enviado = FALSE
+         AND e.fecha_sugerida IS NOT NULL
+         AND e.fecha_sugerida <  CURRENT_DATE
+         AND e.fecha_sugerida >= CURRENT_DATE - INTERVAL '30 days'`,
+    );
+
+    for (const examen of examenesRes.rows) {
+      const destinatariosRes = await query(
+        `SELECT u.email, u.nombre FROM usuarios u WHERE u.id = $1
+         UNION
+         SELECT u.email, u.nombre
+         FROM accesos_compartidos_bebe acb
+         JOIN usuarios u ON u.id = acb.id_usuario_invitado
+         WHERE acb.id_perfil_bebe = $2 AND acb.estado = 'activo' AND acb.recibir_notificaciones = TRUE`,
+        [examen.usuario_id, examen.bebe_id],
+      );
+
+      for (const destinatario of destinatariosRes.rows) {
+        try {
+          await sendExamReminder(
+            destinatario.email,
+            destinatario.nombre,
+            examen.bebe_nombre,
+            {
+              nombre: examen.nombre,
+              indicaciones: examen.indicaciones,
+              fecha_sugerida: examen.fecha_sugerida,
+            },
+          );
+        } catch (emailError) {
+          console.error(`[examenes] Error enviando a ${destinatario.email}:`, emailError);
+        }
+      }
+
+      await query(
+        `UPDATE examenes_medicos SET recordatorio_enviado = TRUE WHERE id = $1`,
+        [examen.id],
+      );
+    }
+
+    if (examenesRes.rows.length > 0) {
+      console.log(`[examenes] Enviados ${examenesRes.rows.length} recordatorio(s) de examen`);
+    }
+  } catch (error) {
+    console.error("[examenes] Error revisando recordatorios de exámenes:", error);
   }
 }

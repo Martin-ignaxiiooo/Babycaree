@@ -287,3 +287,58 @@ export const sendPostAppointmentFollowUp = async (
     `
   );
 };
+
+/**
+ * Recordatorio de examen pendiente: se envía cuando pasó la fecha sugerida
+ * y el examen sigue sin marcarse como realizado.
+ *
+ * El tono es deliberadamente suave: puede que ya se lo hayan hecho y solo
+ * falte registrarlo, o que haya razones para postergarlo. No corresponde
+ * culpar a nadie.
+ */
+export const sendExamReminder = async (
+  email: string,
+  nombreDestinatario: string,
+  nombreBebe: string,
+  examen: {
+    nombre: string;
+    indicaciones?: string | null;
+    fecha_sugerida?: string | Date | null;
+  },
+): Promise<void> => {
+  const fechaTexto = examen.fecha_sugerida
+    ? new Date(examen.fecha_sugerida).toLocaleDateString("es-CL", {
+        day: "numeric", month: "long",
+      })
+    : null;
+
+  await sendEmail(
+    email,
+    `¿Alcanzaste a hacer el examen de ${nombreBebe}? — Baby Care`,
+    `
+      <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 520px; margin: 0 auto; background: #f7f9fc; border-radius: 16px; overflow: hidden;">
+        <div style="background: #1B3A6B; padding: 32px 40px; text-align: center;">
+          <h1 style="color: #fff; font-size: 22px; margin: 0; font-weight: 900;">Baby<span style="color: #7FC8F8;">Care</span></h1>
+        </div>
+        <div style="padding: 40px;">
+          <div style="text-align: center; margin-bottom: 24px; font-size: 40px;">🧪</div>
+          <p style="color: #374151; font-size: 15px; margin-bottom: 8px;">Hola <strong>${nombreDestinatario}</strong>,</p>
+          <p style="color: #6B7280; font-size: 14px; line-height: 1.6; margin-bottom: 24px;">
+            Quedó anotado un examen pendiente para <strong>${nombreBebe}</strong>.
+            Si ya se lo hicieron, puedes marcarlo como realizado en la app y guardar
+            el resultado ahí para tenerlo a mano en el próximo control.
+          </p>
+          <div style="background: #EEF4FA; border-radius: 14px; padding: 24px; margin-bottom: 24px;">
+            <p style="color: #1B3A6B; font-size: 17px; font-weight: 800; margin: 0 0 6px;">${examen.nombre}</p>
+            ${fechaTexto ? `<p style="color: #374151; font-size: 14px; margin: 0;">🗓️ Sugerido para el ${fechaTexto}</p>` : ""}
+            ${examen.indicaciones ? `<p style="color: #6B7280; font-size: 13px; margin: 8px 0 0;">📋 ${examen.indicaciones}</p>` : ""}
+          </div>
+          <p style="color: #9CA3AF; font-size: 12px; line-height: 1.6;">
+            Si decidieron no hacerlo o ya no corresponde, puedes descartarlo desde
+            la sección de Salud y dejamos de recordártelo.
+          </p>
+        </div>
+      </div>
+    `
+  );
+};

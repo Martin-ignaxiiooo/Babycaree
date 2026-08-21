@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Syringe, Activity, Save, CheckCircle, Bell, Plus, X } from "lucide-react";
+import { ArrowLeft, Syringe, Activity, Save, CheckCircle, Bell, Plus, X, FlaskConical, ClipboardCheck, Mic, MicOff } from "lucide-react";
 import TopNav from "../components/TopNav";
 import DateSelect from "../components/DateSelect";
 import TimeSelect from "../components/TimeSelect";
+import ExamenesTab from "../components/ExamenesTab";
+import ResultadoConsultaModal from "../components/ResultadoConsultaModal";
+import { useDictado } from "../hooks/useDictado";
+import { interpretarDictado } from "../utils/interpretarDictado";
 
 export default function Salud() {
   const navigate = useNavigate();
@@ -11,7 +15,7 @@ export default function Salud() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   const [bebeId, setBebeId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"vacunas" | "controles" | "crecimiento">("vacunas");
+  const [activeTab, setActiveTab] = useState<"vacunas" | "controles" | "examenes" | "crecimiento">("vacunas");
   const [loading, setLoading] = useState(true);
 
   const [vacunas, setVacunas] = useState<any[]>([]);
@@ -39,6 +43,27 @@ export default function Salud() {
   const [medico, setMedico] = useState("");
   const [notas, setNotas] = useState("");
   const [isSavingCita, setIsSavingCita] = useState(false);
+  // Cita cuyo resultado se está registrando (modal "¿cómo te fue?").
+  const [citaResultado, setCitaResultado] = useState<any | null>(null);
+
+  // control sano vs consulta puntual
+  const [tipoCita, setTipoCita] = useState<"control" | "cita">("control");
+
+  // Dictado por voz para agendar. Usa la Web Speech API del navegador:
+  // es gratis y el audio no sale del dispositivo hacia nuestros servidores.
+  const dictado = useDictado((textoFinal) => {
+    const datos = interpretarDictado(textoFinal);
+    if (datos.fecha) {
+      const p = (n: number) => String(n).padStart(2, "0");
+      setFechaCitaDate(`${datos.fecha.getFullYear()}-${p(datos.fecha.getMonth() + 1)}-${p(datos.fecha.getDate())}`);
+      setFechaCitaTime(`${p(datos.fecha.getHours())}:${p(datos.fecha.getMinutes())}`);
+    }
+    // Solo se rellena lo que se entendió; lo demás queda como estaba.
+    if (datos.medico) setMedico(datos.medico);
+    if (datos.tipo) setTipoCita(datos.tipo);
+    if (!notas.trim()) setNotas(textoFinal);
+  });
+
 
   useEffect(() => {
     if (!token) {
@@ -153,7 +178,7 @@ export default function Salud() {
       const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/citas`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ fecha_cita: fechaCita, medico, notas, especialidad: "Control" })
+        body: JSON.stringify({ fecha_cita: fechaCita, medico, notas, tipo: tipoCita, especialidad: tipoCita === "control" ? "Control sano" : "Consulta" })
       });
       if (res.ok) {
         setFechaCitaDate("");
@@ -317,6 +342,13 @@ export default function Salud() {
             <Activity size={18} /> {perfilEstado === "embarazo" ? "Controles Prenatales" : "Controles Pediátricos"}
           </button>
 
+          <button 
+            style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "examenes" ? "3px solid var(--accent-coral)" : "3px solid transparent", color: activeTab === "examenes" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+            onClick={() => setActiveTab("examenes")}
+          >
+            <FlaskConical size={18} /> Exámenes
+          </button>
+
           {perfilEstado !== "embarazo" && (
             <button 
               style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "crecimiento" ? "3px solid var(--accent-coral)" : "3px solid transparent", color: activeTab === "crecimiento" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
@@ -477,6 +509,23 @@ export default function Salud() {
                         <div style={{ fontSize: "12px", color: "rgba(0,0,0,0.5)" }}>
                           {date.toLocaleTimeString("es-CL", { hour: '2-digit', minute:'2-digit' })}
                         </div>
+                        {/* Solo para citas ya pasadas: registrar lo que ocurrió. */}
+                        {isPast && (
+                          <button
+                            onClick={() => setCitaResultado(cita)}
+                            style={{
+                              marginTop: "8px", padding: "6px 12px", borderRadius: "100px",
+                              border: "none", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
+                              fontWeight: 800, fontSize: "11.5px", display: "inline-flex",
+                              alignItems: "center", gap: "5px", whiteSpace: "nowrap",
+                              background: cita.diagnostico ? "#E8F7F1" : "var(--theme-primary)",
+                              color: cita.diagnostico ? "#3E8E6E" : "#fff",
+                            }}
+                          >
+                            <ClipboardCheck size={13} />
+                            {cita.diagnostico ? "Ver resultado" : "¿Cómo te fue?"}
+                          </button>
+                        )}
                       </div>
                     </div>
                   );
@@ -487,6 +536,65 @@ export default function Salud() {
             {/* Formulario Nueva Cita */}
             <div style={{ borderTop: "1px solid #E5E7EB", paddingTop: "24px" }}>
               <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "16px", color: "var(--theme-darker)" }}>Agregar Nueva Cita</h3>
+
+              {/* Dictado por voz (Chrome/Edge). Se esconde si el navegador no lo soporta. */}
+              {dictado.soportado && (
+                <div style={{ background: "var(--theme-bg-light)", borderRadius: "16px", padding: "16px", marginBottom: "20px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+                    <button
+                      type="button"
+                      onClick={dictado.escuchando ? dictado.detener : dictado.empezar}
+                      style={{
+                        display: "inline-flex", alignItems: "center", gap: "8px",
+                        padding: "11px 20px", borderRadius: "100px", border: "none",
+                        cursor: "pointer", fontFamily: "'Nunito', sans-serif",
+                        fontWeight: 800, fontSize: "13.5px", color: "#fff",
+                        background: dictado.escuchando ? "#D97070" : "var(--theme-primary)",
+                      }}
+                    >
+                      {dictado.escuchando ? <MicOff size={16} /> : <Mic size={16} />}
+                      {dictado.escuchando ? "Detener" : "Dictar la cita"}
+                    </button>
+                    <span style={{ fontSize: "12.5px", color: "#6B647F", flex: "1 1 220px", lineHeight: 1.5 }}>
+                      Di algo como: “control sano el viernes 3 de octubre a las diez y media con la doctora Pérez”.
+                    </span>
+                  </div>
+                  {dictado.texto && (
+                    <div style={{ marginTop: "12px", background: "#fff", borderRadius: "12px", padding: "12px 14px", fontSize: "13.5px", color: "var(--theme-darker)", fontStyle: "italic" }}>
+                      “{dictado.texto}”
+                    </div>
+                  )}
+                  {dictado.error && (
+                    <div style={{ marginTop: "10px", color: "#D97070", fontSize: "12.5px", fontWeight: 600 }}>
+                      {dictado.error}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Tipo: control sano vs consulta puntual */}
+              <div style={{ display: "flex", gap: "10px", marginBottom: "18px", flexWrap: "wrap" }}>
+                {(["control", "cita"] as const).map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setTipoCita(t)}
+                    style={{
+                      flex: "1 1 160px", padding: "12px", borderRadius: "14px",
+                      cursor: "pointer", fontFamily: "'Nunito', sans-serif", fontWeight: 800,
+                      fontSize: "13.5px", textAlign: "left",
+                      border: tipoCita === t ? "2px solid var(--theme-primary)" : "2px solid #E4DBF7",
+                      background: tipoCita === t ? "var(--theme-primary)" : "#fff",
+                      color: tipoCita === t ? "#fff" : "var(--theme-darker)",
+                    }}
+                  >
+                    {t === "control" ? "Control sano" : "Cita médica"}
+                    <div style={{ fontSize: "11.5px", fontWeight: 600, opacity: 0.8, marginTop: "2px" }}>
+                      {t === "control" ? "Revisión periódica" : "Por un motivo puntual"}
+                    </div>
+                  </button>
+                ))}
+              </div>
               
               <form onSubmit={handleSaveCita} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                 <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
@@ -558,6 +666,10 @@ export default function Salud() {
               </form>
             </div>
           </div>
+        )}
+
+        {activeTab === "examenes" && bebeId && (
+          <ExamenesTab bebeId={bebeId} token={token!} />
         )}
 
         {activeTab === "crecimiento" && (
@@ -684,6 +796,17 @@ export default function Salud() {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Modal: resultado de la consulta */}
+      {citaResultado && bebeId && (
+        <ResultadoConsultaModal
+          bebeId={bebeId}
+          cita={citaResultado}
+          token={token!}
+          onClose={() => setCitaResultado(null)}
+          onGuardado={fetchCitas}
+        />
       )}
     </div>
   );

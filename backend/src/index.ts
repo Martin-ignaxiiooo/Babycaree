@@ -17,7 +17,7 @@ import personasRoutes from "./routes/personas.routes";
 import saludRoutes from "./routes/salud.routes";
 import directorioPublicoRoutes from "./routes/directorio_publico.routes";
 import comunidadRoutes from "./routes/comunidad.routes";
-import { revisarYEnviarRecordatorios, revisarYEnviarSeguimientos } from "./services/citaReminders.service";
+import { revisarYEnviarRecordatorios, revisarYEnviarSeguimientos, revisarYEnviarRecordatoriosExamenes } from "./services/citaReminders.service";
 import path from "path";
 import fs from "fs";
 
@@ -113,6 +113,9 @@ const startServer = async () => {
       );
       revisarYEnviarSeguimientos().catch((err) =>
         console.error("[seguimiento] Error inesperado en el job:", err),
+      );
+      revisarYEnviarRecordatoriosExamenes().catch((err) =>
+        console.error("[examenes] Error inesperado en el job:", err),
       );
     };
 

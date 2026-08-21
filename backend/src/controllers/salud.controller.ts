@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { query } from "../config/db";
 import { AuthRequest } from "../middlewares/auth.middleware";
-import { procesarNotaDeVoz, transcripcionDisponible } from "../services/transcripcionCita.service";
 
 // =======================
 // VACUNAS
@@ -175,7 +174,9 @@ export const getCitas = async (req: AuthRequest, res: Response) => {
 
     const result = await query(`
       SELECT id, especialidad, medico, lugar, fecha_cita, notas, estado, tipo,
-             asistio, resultado_notas, fecha_seguimiento, fecha_creacion
+             asistio, resultado_notas, fecha_seguimiento, fecha_creacion,
+             peso_kg, talla_cm, diagnostico, indicaciones,
+             (receta_foto IS NOT NULL) AS tiene_receta
       FROM citas_medicas
       WHERE bebe_id = $1
       ORDER BY fecha_cita ASC
@@ -232,12 +233,16 @@ export const createCita = async (req: AuthRequest, res: Response) => {
 
 /**
  * PATCH /:bebeId/citas/:citaId — registra cómo resultó la cita.
- * Es la contraparte del correo de seguimiento: la madre responde desde la app.
+ * Es la contraparte del correo de seguimiento: la madre responde desde la app
+ * con lo que le dijeron en la consulta (peso, talla, diagnóstico, receta).
  */
 export const registrarResultadoCita = async (req: AuthRequest, res: Response) => {
   try {
     const { bebeId, citaId } = req.params;
-    const { asistio, resultado_notas, estado } = req.body;
+    const {
+      asistio, resultado_notas, estado,
+      peso_kg, talla_cm, diagnostico, indicaciones, receta_foto,
+    } = req.body;
 
     const accessCheck = await query(
       `SELECT b.id FROM perfiles_bebes b WHERE b.id = $1 AND b.usuario_id = $2
@@ -256,6 +261,33 @@ export const registrarResultadoCita = async (req: AuthRequest, res: Response) =>
       return res.status(400).json({ error: "Estado inválido." });
     }
 
+    // Se validan los rangos acá para devolver un mensaje útil en vez de que
+    // reviente el CHECK de Postgres con un 500.
+    const peso = peso_kg == null || peso_kg === "" ? null : Number(peso_kg);
+    if (peso != null && (Number.isNaN(peso) || peso <= 0 || peso >= 60)) {
+      return res.status(400).json({ error: "El peso debe estar entre 0 y 60 kg." });
+    }
+
+    const talla = talla_cm == null || talla_cm === "" ? null : Number(talla_cm);
+    if (talla != null && (Number.isNaN(talla) || talla <= 0 || talla >= 200)) {
+      return res.status(400).json({ error: "La talla debe estar entre 0 y 200 cm." });
+    }
+
+    // La receta llega como data URI base64, igual que la foto de perfil: el
+    // disco de Render es efímero y un archivo se perdería en cada redeploy.
+    if (
+      receta_foto != null && receta_foto !== "" &&
+      !(
+        typeof receta_foto === "string" &&
+        /^data:image\/(jpeg|jpg|png|webp);base64,/.test(receta_foto) &&
+        receta_foto.length <= 2_800_000
+      )
+    ) {
+      return res.status(400).json({
+        error: "La foto de la receta no es válida o pesa demasiado. Usa JPG o PNG.",
+      });
+    }
+
     // Solo se tocan los campos que vinieron en el body: así la app puede
     // mandar únicamente "asistio" sin borrar notas escritas antes.
     const result = await query(`
@@ -263,13 +295,39 @@ export const registrarResultadoCita = async (req: AuthRequest, res: Response) =>
       SET asistio           = COALESCE($3, asistio),
           resultado_notas   = COALESCE($4, resultado_notas),
           estado            = COALESCE($5, estado),
+          peso_kg           = COALESCE($6, peso_kg),
+          talla_cm          = COALESCE($7, talla_cm),
+          diagnostico       = COALESCE($8, diagnostico),
+          indicaciones      = COALESCE($9, indicaciones),
+          receta_foto       = COALESCE($10, receta_foto),
           fecha_seguimiento = NOW()
       WHERE id = $1 AND bebe_id = $2
-      RETURNING *
-    `, [citaId, bebeId, asistio ?? null, resultado_notas ?? null, estado ?? null]);
+      RETURNING id, especialidad, medico, lugar, fecha_cita, notas, estado, tipo,
+                asistio, resultado_notas, fecha_seguimiento, peso_kg, talla_cm,
+                diagnostico, indicaciones, (receta_foto IS NOT NULL) AS tiene_receta
+    `, [
+      citaId, bebeId,
+      asistio ?? null, resultado_notas ?? null, estado ?? null,
+      peso, talla, diagnostico ?? null, indicaciones ?? null, receta_foto || null,
+    ]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Cita no encontrada" });
+    }
+
+    // Si informaron peso o talla, se registra también en la curva de
+    // crecimiento: es el mismo dato y no tiene sentido pedírselo dos veces.
+    if (peso != null || talla != null) {
+      try {
+        await query(
+          `INSERT INTO registros_crecimiento (bebe_id, fecha_registro, peso_kg, talla_cm, notas)
+           VALUES ($1, CURRENT_DATE, $2, $3, $4)`,
+          [bebeId, peso, talla, "Registrado desde el resultado de una consulta"]
+        );
+      } catch (errCrecimiento) {
+        // No es crítico: el resultado de la cita ya quedó guardado.
+        console.error("No se pudo replicar en crecimiento:", errCrecimiento);
+      }
     }
 
     res.json(result.rows[0]);
@@ -279,56 +337,35 @@ export const registrarResultadoCita = async (req: AuthRequest, res: Response) =>
   }
 };
 
-// =======================
-// AGENDAR POR VOZ
-// =======================
-
-/**
- * POST /:bebeId/citas/transcribir — recibe una nota de voz y devuelve los
- * campos de la cita ya extraídos, para que la app prellene el formulario.
- *
- * No crea la cita: el usuario siempre revisa y confirma antes de guardar.
- * Eso evita que un error de transcripción agende algo equivocado.
- */
-export const transcribirNotaDeVoz = async (req: AuthRequest, res: Response) => {
+/** GET /:bebeId/citas/:citaId/receta — la foto de la receta, aparte del listado. */
+export const getRecetaFoto = async (req: AuthRequest, res: Response) => {
   try {
-    const { bebeId } = req.params;
+    const { bebeId, citaId } = req.params;
 
     const accessCheck = await query(
       `SELECT b.id FROM perfiles_bebes b WHERE b.id = $1 AND b.usuario_id = $2
        UNION
        SELECT a.id_perfil_bebe FROM accesos_compartidos_bebe a
-       WHERE a.id_perfil_bebe = $1 AND a.id_usuario_invitado = $2 AND a.estado = 'activo'
-       AND a.nivel_permiso NOT IN ('solo_lectura', 'solo_lectura_galeria')`,
+       WHERE a.id_perfil_bebe = $1 AND a.id_usuario_invitado = $2 AND a.estado = 'activo'`,
       [bebeId, req.user.id]
     );
 
     if (accessCheck.rows.length === 0) {
-      return res.status(403).json({ error: "No tienes permiso para modificar este perfil" });
+      return res.status(403).json({ error: "No tienes permiso para ver este perfil" });
     }
 
-    if (!transcripcionDisponible()) {
-      return res.status(503).json({
-        error: "El registro por voz no está disponible en este momento.",
-      });
+    const result = await query(
+      `SELECT receta_foto FROM citas_medicas WHERE id = $1 AND bebe_id = $2`,
+      [citaId, bebeId]
+    );
+
+    if (result.rows.length === 0 || !result.rows[0].receta_foto) {
+      return res.status(404).json({ error: "Esta cita no tiene una receta guardada" });
     }
 
-    const archivo = (req as any).file;
-    if (!archivo?.buffer) {
-      return res.status(400).json({ error: "No se recibió ningún audio." });
-    }
-
-    const resultado = await procesarNotaDeVoz(archivo.buffer, archivo.mimetype);
-
-    if (!resultado.transcripcion) {
-      return res.status(422).json({
-        error: "No se entendió el audio. Intenta grabar de nuevo en un lugar más silencioso.",
-      });
-    }
-
-    res.json(resultado);
+    res.json({ foto: result.rows[0].receta_foto });
   } catch (error) {
-    console.error("Error en transcribirNotaDeVoz:", error);
-    res.status(500).json({ error: "No pudimos procesar el audio. Intenta de nuevo." });
+    console.error("Error en getRecetaFoto:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 };

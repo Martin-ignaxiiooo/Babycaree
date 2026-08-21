@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { verifyToken } from "../middlewares/auth.middleware";
-import { uploadAudioMemoria } from "../middlewares/uploadAudio.middleware";
 import {
   getVacunas,
   updateVacuna,
@@ -9,8 +8,15 @@ import {
   getCitas,
   createCita,
   registrarResultadoCita,
-  transcribirNotaDeVoz
+  getRecetaFoto
 } from "../controllers/salud.controller";
+import {
+  getExamenes,
+  getExamenFoto,
+  createExamen,
+  updateExamen,
+  deleteExamen
+} from "../controllers/examenes.controller";
 
 const router = Router();
 
@@ -28,10 +34,16 @@ router.post("/:bebeId/crecimiento", createControl);
 // Rutas de Citas Médicas / Controles Prenatales
 router.get("/:bebeId/citas", getCitas);
 router.post("/:bebeId/citas", createCita);
-// Agendar dictando una nota de voz: devuelve los campos extraídos para que
-// el usuario los revise; no crea la cita directamente.
-router.post("/:bebeId/citas/transcribir", uploadAudioMemoria.single("audio"), transcribirNotaDeVoz);
-// Registrar cómo resultó la cita (contraparte del correo de seguimiento).
+// Resultado de la consulta: peso, talla, diagnóstico, receta.
 router.patch("/:bebeId/citas/:citaId", registrarResultadoCita);
+// La foto de la receta va aparte del listado porque es pesada.
+router.get("/:bebeId/citas/:citaId/receta", getRecetaFoto);
+
+// Exámenes indicados en una consulta
+router.get("/:bebeId/examenes", getExamenes);
+router.post("/:bebeId/examenes", createExamen);
+router.patch("/:bebeId/examenes/:examenId", updateExamen);
+router.delete("/:bebeId/examenes/:examenId", deleteExamen);
+router.get("/:bebeId/examenes/:examenId/foto", getExamenFoto);
 
 export default router;
