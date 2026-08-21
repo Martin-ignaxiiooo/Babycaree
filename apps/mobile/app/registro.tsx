@@ -214,7 +214,7 @@ export default function OnboardingScreen() {
       </View>
       <Text style={styles.successTitle}>¡Bienvenida a la familia!</Text>
       <Text style={styles.successDesc}>El espacio seguro para {successBabyName} está listo.</Text>
-      <PrimaryButton label="Entrar a mi panel" onPress={() => router.replace('/dashboard')} />
+      <PrimaryButton label="Entrar a mi panel" onPress={() => router.replace('/(tabs)')} />
     </View>
   );
 

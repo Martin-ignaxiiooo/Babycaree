@@ -28,7 +28,7 @@ export default function LoginScreen() {
       const res = await axios.post(`${API_URL}/auth/login`, { email, password });
       await AsyncStorage.setItem('token', res.data.token);
       await AsyncStorage.setItem('user', JSON.stringify(res.data.user));
-      router.replace('/dashboard');
+      router.replace('/(tabs)');
     } catch (err: any) {
       setError(err.response?.data?.error || 'Correo o contraseña incorrectos.');
     } finally {
