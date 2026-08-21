@@ -553,93 +553,8 @@ export default function Salud() {
               </h2>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "30px" }}>
-              {loading ? (
-                <p style={{ color: "rgba(0,0,0,0.5)" }}>Cargando citas...</p>
-              ) : citas.length === 0 ? (
-                <p style={{ color: "rgba(0,0,0,0.5)", fontSize: "14px" }}>No tienes controles registrados aún.</p>
-              ) : (
-                citas.map(cita => {
-                  const date = new Date(cita.fecha_cita);
-                  const isPast = date < new Date();
-                  return (
-                    <div key={cita.id} style={{ 
-                      background: isPast ? "#F9FAFB" : "#FDF4FF", 
-                      borderRadius: "16px", 
-                      padding: "16px",
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      borderLeft: `4px solid ${isPast ? "#E5E7EB" : "#D4A5E3"}`
-                    }}>
-                      <div>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-                          <h4 style={{ margin: 0, fontSize: "16px", color: isPast ? "#6B7280" : "var(--theme-darker)" }}>
-                            {cita.especialidad || cita.notas || "Control Médico"}
-                          </h4>
-                          <span
-                            style={{
-                              fontSize: "10.5px", fontWeight: 800, padding: "2px 9px",
-                              borderRadius: "100px", textTransform: "uppercase", letterSpacing: "0.3px",
-                              background: cita.tipo === "control" ? "#E8F7F1" : "var(--theme-bg-light)",
-                              color: cita.tipo === "control" ? "#3E8E6E" : "var(--theme-primary)",
-                            }}
-                          >
-                            {cita.tipo === "control" ? "Control" : "Cita"}
-                          </span>
-                        </div>
-                        <div style={{ fontSize: "13px", color: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", gap: "10px" }}>
-                          <span>{cita.medico || "Sin especificar doctor"}</span>
-                          {cita.lugar && <span>• {cita.lugar}</span>}
-                        </div>
-                      </div>
-                      <div style={{ textAlign: "right" }}>
-                        <div style={{ fontWeight: 700, fontSize: "15px", color: isPast ? "#6B7280" : "#D4A5E3" }}>
-                          {date.toLocaleDateString("es-CL", { day: 'numeric', month: 'short' })}
-                        </div>
-                        <div style={{ fontSize: "12px", color: "rgba(0,0,0,0.5)" }}>
-                          {date.toLocaleTimeString("es-CL", { hour: '2-digit', minute:'2-digit' })}
-                        </div>
-                        <div style={{ display: "flex", gap: "6px", marginTop: "8px", justifyContent: "flex-end", flexWrap: "wrap" }}>
-                          <button
-                            onClick={() => setCitaEditando(cita)}
-                            style={{
-                              padding: "6px 10px", borderRadius: "100px",
-                              border: "1.5px solid #E4DBF7", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
-                              fontWeight: 800, fontSize: "11.5px", display: "inline-flex",
-                              alignItems: "center", gap: "4px", whiteSpace: "nowrap",
-                              background: "#fff", color: "var(--theme-darker)",
-                            }}
-                          >
-                            <Pencil size={12} /> Editar
-                          </button>
-                          {/* Solo para citas ya pasadas: registrar lo que ocurrió. */}
-                          {isPast && (
-                            <button
-                              onClick={() => setCitaResultado(cita)}
-                              style={{
-                                padding: "6px 12px", borderRadius: "100px",
-                                border: "none", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
-                                fontWeight: 800, fontSize: "11.5px", display: "inline-flex",
-                                alignItems: "center", gap: "5px", whiteSpace: "nowrap",
-                                background: cita.diagnostico ? "#E8F7F1" : "var(--theme-primary)",
-                                color: cita.diagnostico ? "#3E8E6E" : "#fff",
-                              }}
-                            >
-                              <ClipboardCheck size={13} />
-                              {cita.diagnostico ? "Ver resultado" : "¿Cómo te fue?"}
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-
             {/* Formulario Nueva Cita */}
-            <div style={{ borderTop: "1px solid #E5E7EB", paddingTop: "24px" }}>
+            <div>
               <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "16px", color: "var(--theme-darker)" }}>Agregar Nueva Cita</h3>
 
               {/* Dictado por voz (Chrome/Edge). Se esconde si el navegador no lo soporta. */}
@@ -782,6 +697,96 @@ export default function Salud() {
                   </button>
                 </div>
               </form>
+            </div>
+
+            <div style={{ borderTop: "1px solid #E5E7EB", marginTop: "28px", paddingTop: "24px" }}>
+              <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "16px", color: "var(--theme-darker)" }}>
+                {perfilEstado === "embarazo" ? "Controles Prenatales agendados" : "Controles agendados"}
+              </h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "8px" }}>
+                {loading ? (
+                  <p style={{ color: "rgba(0,0,0,0.5)" }}>Cargando citas...</p>
+                ) : citas.length === 0 ? (
+                  <p style={{ color: "rgba(0,0,0,0.5)", fontSize: "14px" }}>No tienes controles registrados aún.</p>
+                ) : (
+                  citas.map(cita => {
+                  const date = new Date(cita.fecha_cita);
+                  const isPast = date < new Date();
+                  return (
+                    <div key={cita.id} style={{ 
+                      background: isPast ? "#F9FAFB" : "#FDF4FF", 
+                      borderRadius: "16px", 
+                      padding: "16px",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      borderLeft: `4px solid ${isPast ? "#E5E7EB" : "#D4A5E3"}`
+                    }}>
+                      <div>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                          <h4 style={{ margin: 0, fontSize: "16px", color: isPast ? "#6B7280" : "var(--theme-darker)" }}>
+                            {cita.especialidad || cita.notas || "Control Médico"}
+                          </h4>
+                          <span
+                            style={{
+                              fontSize: "10.5px", fontWeight: 800, padding: "2px 9px",
+                              borderRadius: "100px", textTransform: "uppercase", letterSpacing: "0.3px",
+                              background: cita.tipo === "control" ? "#E8F7F1" : "var(--theme-bg-light)",
+                              color: cita.tipo === "control" ? "#3E8E6E" : "var(--theme-primary)",
+                            }}
+                          >
+                            {cita.tipo === "control" ? "Control" : "Cita"}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: "13px", color: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", gap: "10px" }}>
+                          <span>{cita.medico || "Sin especificar doctor"}</span>
+                          {cita.lugar && <span>• {cita.lugar}</span>}
+                        </div>
+                      </div>
+                      <div style={{ textAlign: "right" }}>
+                        <div style={{ fontWeight: 700, fontSize: "15px", color: isPast ? "#6B7280" : "#D4A5E3" }}>
+                          {date.toLocaleDateString("es-CL", { day: 'numeric', month: 'short' })}
+                        </div>
+                        <div style={{ fontSize: "12px", color: "rgba(0,0,0,0.5)" }}>
+                          {date.toLocaleTimeString("es-CL", { hour: '2-digit', minute:'2-digit' })}
+                        </div>
+                        <div style={{ display: "flex", gap: "6px", marginTop: "8px", justifyContent: "flex-end", flexWrap: "wrap" }}>
+                          <button
+                            onClick={() => setCitaEditando(cita)}
+                            style={{
+                              padding: "6px 10px", borderRadius: "100px",
+                              border: "1.5px solid #E4DBF7", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
+                              fontWeight: 800, fontSize: "11.5px", display: "inline-flex",
+                              alignItems: "center", gap: "4px", whiteSpace: "nowrap",
+                              background: "#fff", color: "var(--theme-darker)",
+                            }}
+                          >
+                            <Pencil size={12} /> Editar
+                          </button>
+                          {/* Solo para citas ya pasadas: registrar lo que ocurrió. */}
+                          {isPast && (
+                            <button
+                              onClick={() => setCitaResultado(cita)}
+                              style={{
+                                padding: "6px 12px", borderRadius: "100px",
+                                border: "none", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
+                                fontWeight: 800, fontSize: "11.5px", display: "inline-flex",
+                                alignItems: "center", gap: "5px", whiteSpace: "nowrap",
+                                background: cita.diagnostico ? "#E8F7F1" : "var(--theme-primary)",
+                                color: cita.diagnostico ? "#3E8E6E" : "#fff",
+                              }}
+                            >
+                              <ClipboardCheck size={13} />
+                              {cita.diagnostico ? "Ver resultado" : "¿Cómo te fue?"}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+              </div>
             </div>
           </div>
         )}
