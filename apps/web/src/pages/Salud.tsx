@@ -620,7 +620,7 @@ export default function Salud() {
                       {guardandoPorVoz ? "Guardando…" : dictado.escuchando ? "Detener" : "Dictar la cita"}
                     </button>
                     <span style={{ fontSize: "12.5px", color: "#6B647F", flex: "1 1 220px", lineHeight: 1.5 }}>
-                      Di algo como: “control sano el viernes 3 de octubre a las diez y media con la doctora Pérez”. Se guarda solo al terminar.
+                      Di algo como: “control sano el viernes 3 de octubre a las diez y media con la doctora Pérez”. Se detiene y guarda solo, apenas hagas una pausa.
                     </span>
                   </div>
                   {dictado.texto && (
