@@ -88,14 +88,16 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !email.endsWith("@iniciativababy.cl")) {
-      return res
-        .status(401)
-        .json({ error: "Solo se permiten correos corporativos" });
+    // Antes solo se aceptaban correos @iniciativababy.cl. Ahora se permite
+    // cualquier correo (Gmail incluido): quién puede entrar lo decide la
+    // tabla administradores, no el dominio del correo — un admin_general
+    // igual tiene que haber creado esa cuenta a propósito.
+    if (!email || !password) {
+      return res.status(401).json({ error: "Credenciales inválidas" });
     }
 
     const result = await query(
-      "SELECT * FROM administradores WHERE correo_corporativo = $1",
+      "SELECT * FROM administradores WHERE LOWER(correo_corporativo) = LOWER($1)",
       [email],
     );
 

@@ -122,7 +122,7 @@ export default function AdminLogin() {
                   onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Por favor completa este campo")}
                   onInput={(e) => (e.target as HTMLInputElement).setCustomValidity("")}
                   style={{ width: "100%", background: "#374151", border: "1px solid #4B5563", color: "#fff", padding: "12px 12px 12px 42px", borderRadius: "8px", outline: "none", fontSize: "15px" }}
-                  placeholder="usuario@iniciativababy.cl"
+                  placeholder="tu@correo.com"
                 />
               </div>
             </div>
