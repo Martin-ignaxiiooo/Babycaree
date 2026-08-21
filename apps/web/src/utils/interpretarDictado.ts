@@ -148,7 +148,11 @@ function extraerFecha(texto: string, ahora: Date): Date | null {
     d.setDate(d.getDate() + 2);
     return d;
   }
-  if (/\bmañana\b/.test(texto)) {
+  // "mañana" (día siguiente) es distinto de "de la mañana" / "por la
+  // mañana" (que solo indica AM, ej: "a las diez de la mañana"). Sin este
+  // cuidado, cualquier hora dicha con "de la mañana" hacía que la fecha
+  // saltara al día siguiente sin que nadie lo pidiera.
+  if (/\bmañana\b/.test(texto) && !/(?:de|por|en)\s+la\s+mañana\b/.test(texto)) {
     const d = new Date(base);
     d.setDate(d.getDate() + 1);
     return d;

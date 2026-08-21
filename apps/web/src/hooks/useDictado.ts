@@ -37,12 +37,20 @@ export function useDictado(onTextoFinal?: (texto: string) => void) {
     setSoportado(true);
     const recognition = new SR();
     recognition.lang = "es-CL";
-    recognition.continuous = true;
+    // En Android/Chrome, el modo "continuous" es conocido por comportarse
+    // mal: reinicia solo repetidamente y puede acumular texto basura en
+    // cada ciclo, lo que hacía que la fecha/hora salieran distintas (y
+    // mal) cada vez — un verdadero loop. En modo no-continuo, el propio
+    // navegador detecta el fin de una frase y corta una sola vez, que es
+    // mucho más predecible en mobile. En desktop igual queda cubierto por
+    // nuestro temporizador de silencio de abajo.
+    recognition.continuous = false;
     // Con interimResults vemos el texto mientras se habla, que da la
     // sensación de que está funcionando en vez de un silencio incómodo.
     recognition.interimResults = true;
 
     let acumulado = "";
+    let yaEnviado = false;
     let temporizadorSilencio: ReturnType<typeof setTimeout> | null = null;
 
     const limpiarTemporizador = () => {
@@ -92,11 +100,21 @@ export function useDictado(onTextoFinal?: (texto: string) => void) {
     recognition.onend = () => {
       limpiarTemporizador();
       setEscuchando(false);
+      // Blindaje: si por lo que sea onend se dispara más de una vez para el
+      // mismo ciclo (se ha visto en algunos Android), esto evita guardar la
+      // misma cita dos veces.
+      if (yaEnviado) return;
       const limpio = acumulado.trim();
-      if (limpio) callbackRef.current?.(limpio);
+      if (limpio) {
+        yaEnviado = true;
+        callbackRef.current?.(limpio);
+      }
     };
 
-    recognitionRef.current = { recognition, reset: () => { acumulado = ""; limpiarTemporizador(); } };
+    recognitionRef.current = {
+      recognition,
+      reset: () => { acumulado = ""; yaEnviado = false; limpiarTemporizador(); },
+    };
 
     return () => {
       limpiarTemporizador();
