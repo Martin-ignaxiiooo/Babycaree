@@ -7,7 +7,18 @@ import { query } from "../config/db";
 export const generate2fa = async (req: AdminAuthRequest, res: Response) => {
   try {
     const adminId = req.admin.id;
-    const adminEmail = req.admin.email || "admin@iniciativababy.cl";
+
+    // El JWT de admin solo trae { id, rol, jti } — no el email — así que se
+    // busca en la base para que el QR muestre la cuenta real en la app
+    // autenticadora, en vez de un placeholder genérico.
+    const adminRes = await query(
+      "SELECT correo_corporativo FROM administradores WHERE id = $1",
+      [adminId]
+    );
+    if (adminRes.rows.length === 0) {
+      return res.status(404).json({ error: "Administrador no encontrado" });
+    }
+    const adminEmail = adminRes.rows[0].correo_corporativo || "admin@iniciativababy.cl";
 
     // Generar un nuevo secreto
     const secret = speakeasy.generateSecret({
@@ -69,6 +80,24 @@ export const enable2fa = async (req: AdminAuthRequest, res: Response) => {
     }
   } catch (error) {
     console.error("Error enabling 2FA:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
+/** GET /v1/admin/auth/2fa/estado — si el admin logueado ya tiene 2FA activo. */
+export const estado2fa = async (req: AdminAuthRequest, res: Response) => {
+  try {
+    const adminId = req.admin.id;
+    const result = await query(
+      "SELECT dos_fa_activo FROM administradores WHERE id = $1",
+      [adminId]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Administrador no encontrado" });
+    }
+    res.json({ activo: !!result.rows[0].dos_fa_activo });
+  } catch (error) {
+    console.error("Error consultando estado 2FA:", error);
     res.status(500).json({ error: "Error interno del servidor" });
   }
 };
