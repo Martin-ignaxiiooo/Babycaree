@@ -44,6 +44,7 @@ export default function RootLayout() {
       <Stack.Screen name="index" />
       <Stack.Screen name="registro" />
       <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="agendar" />
     </Stack>
   );
 }

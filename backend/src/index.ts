@@ -17,7 +17,7 @@ import personasRoutes from "./routes/personas.routes";
 import saludRoutes from "./routes/salud.routes";
 import directorioPublicoRoutes from "./routes/directorio_publico.routes";
 import comunidadRoutes from "./routes/comunidad.routes";
-import { revisarYEnviarRecordatorios } from "./services/citaReminders.service";
+import { revisarYEnviarRecordatorios, revisarYEnviarSeguimientos } from "./services/citaReminders.service";
 import path from "path";
 import fs from "fs";
 
@@ -103,19 +103,23 @@ const startServer = async () => {
     });
 
     // Revisa cada 15 minutos si hay citas próximas (7 días, 1 día o 2 horas)
-    // que necesiten recordatorio por correo. Vive dentro del mismo proceso
-    // del servidor (no depende de un Cron Job separado en Render) — mientras
-    // el backend esté corriendo, los recordatorios se siguen enviando.
-    cron.schedule("*/15 * * * *", () => {
+    // que necesiten recordatorio por correo, y citas ya pasadas que necesiten
+    // el correo de seguimiento. Vive dentro del mismo proceso del servidor
+    // (no depende de un Cron Job separado en Render) — mientras el backend
+    // esté corriendo, los correos se siguen enviando.
+    const revisarCorreosDeCitas = () => {
       revisarYEnviarRecordatorios().catch((err) =>
         console.error("[recordatorios] Error inesperado en el job:", err),
       );
-    });
+      revisarYEnviarSeguimientos().catch((err) =>
+        console.error("[seguimiento] Error inesperado en el job:", err),
+      );
+    };
+
+    cron.schedule("*/15 * * * *", revisarCorreosDeCitas);
     // Corre una vez también al arrancar, para no esperar hasta el primer
     // múltiplo de 15 minutos tras un redeploy.
-    revisarYEnviarRecordatorios().catch((err) =>
-      console.error("[recordatorios] Error inesperado en la corrida inicial:", err),
-    );
+    revisarCorreosDeCitas();
   } catch (error) {
     console.error("Failed to start server:", error);
     process.exit(1);

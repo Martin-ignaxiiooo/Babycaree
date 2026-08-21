@@ -9,7 +9,10 @@
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.babycare.app"
+      "bundleIdentifier": "com.babycare.app",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Baby Care usa el micrófono para que puedas dictar los datos de una hora médica en vez de escribirlos. El audio se procesa para completar el formulario y no se guarda."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -19,7 +22,10 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.babycare.app"
+      "package": "com.babycare.app",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "output": "static",
@@ -35,7 +41,13 @@
           "imageWidth": 200
         }
       ],
-      "expo-asset"
+      "expo-asset",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Baby Care usa el micrófono para que puedas dictar los datos de una hora médica."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

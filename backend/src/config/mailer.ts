@@ -214,3 +214,76 @@ export const sendAppointmentReminder = async (
     `
   );
 };
+
+/**
+ * Seguimiento posterior a una cita: se envía unas horas después de la hora
+ * agendada para preguntar cómo resultó.
+ *
+ * El tono cambia según el tipo: un control sano es rutina y se pregunta por
+ * medidas y próximos pasos; una cita puntual suele venir de una preocupación,
+ * así que se pregunta primero por cómo está el bebé.
+ */
+export const sendPostAppointmentFollowUp = async (
+  email: string,
+  nombreDestinatario: string,
+  nombreBebe: string,
+  cita: {
+    especialidad?: string | null;
+    medico?: string | null;
+    lugar?: string | null;
+    fecha_cita: string | Date;
+    tipo?: string | null;
+  },
+): Promise<void> => {
+  const esControl = cita.tipo === "control";
+  const fecha = new Date(cita.fecha_cita);
+  const fechaFormateada = fecha.toLocaleDateString("es-CL", {
+    weekday: "long", day: "numeric", month: "long",
+  });
+  const tituloCita = cita.especialidad || (esControl ? "Control sano" : "Cita médica");
+
+  const introduccion = esControl
+    ? `Esperamos que el control de <strong>${nombreBebe}</strong> haya salido bien. Si te entregaron nuevas medidas de peso o talla, puedes registrarlas en la app para seguir su curva de crecimiento.`
+    : `Esperamos que <strong>${nombreBebe}</strong> se encuentre mejor. Si el médico dejó indicaciones o un tratamiento, puedes anotarlo en la app para no perderlo de vista.`;
+
+  const sugerencia = esControl
+    ? "Anota el peso y la talla del control"
+    : "Anota las indicaciones del médico";
+
+  await sendEmail(
+    email,
+    `¿Cómo le fue a ${nombreBebe} en su ${esControl ? "control" : "cita"}? — Baby Care`,
+    `
+      <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 520px; margin: 0 auto; background: #f7f9fc; border-radius: 16px; overflow: hidden;">
+        <div style="background: #1B3A6B; padding: 32px 40px; text-align: center;">
+          <h1 style="color: #fff; font-size: 22px; margin: 0; font-weight: 900;">Baby<span style="color: #7FC8F8;">Care</span></h1>
+        </div>
+        <div style="padding: 40px;">
+          <div style="text-align: center; margin-bottom: 24px; font-size: 40px;">${esControl ? "🩺" : "💙"}</div>
+          <p style="color: #374151; font-size: 15px; margin-bottom: 8px;">Hola <strong>${nombreDestinatario}</strong>,</p>
+          <p style="color: #6B7280; font-size: 14px; line-height: 1.6; margin-bottom: 24px;">
+            ${introduccion}
+          </p>
+          <div style="background: #EEF4FA; border-radius: 14px; padding: 24px; margin-bottom: 24px;">
+            <p style="color: #1B3A6B; font-size: 17px; font-weight: 800; margin: 0 0 6px;">${tituloCita}</p>
+            <p style="color: #374151; font-size: 14px; margin: 0 0 4px; text-transform: capitalize;">🗓️ ${fechaFormateada}</p>
+            ${cita.medico ? `<p style="color: #6B7280; font-size: 13px; margin: 4px 0 0;">👨‍⚕️ ${cita.medico}</p>` : ""}
+            ${cita.lugar ? `<p style="color: #6B7280; font-size: 13px; margin: 4px 0 0;">📍 ${cita.lugar}</p>` : ""}
+          </div>
+          <div style="background: #fff; border: 1px solid #E5EAF2; border-radius: 14px; padding: 20px; margin-bottom: 24px;">
+            <p style="color: #1B3A6B; font-size: 14px; font-weight: 700; margin: 0 0 10px;">Para no olvidar</p>
+            <p style="color: #6B7280; font-size: 13.5px; line-height: 1.6; margin: 0;">
+              ✔️ ${sugerencia}<br/>
+              ✔️ Agenda la próxima cita si te la indicaron<br/>
+              ✔️ Marca la cita como completada en la app
+            </p>
+          </div>
+          <p style="color: #9CA3AF; font-size: 12px; line-height: 1.6;">
+            Puedes registrar cómo te fue desde la sección de Salud en la app.
+            Si no asististe, también puedes reagendar desde ahí.
+          </p>
+        </div>
+      </div>
+    `
+  );
+};

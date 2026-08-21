@@ -1,5 +1,5 @@
 import { query } from "../config/db";
-import { sendAppointmentReminder } from "../config/mailer";
+import { sendAppointmentReminder, sendPostAppointmentFollowUp } from "../config/mailer";
 
 // Cada "ventana" define cuándo se dispara un recordatorio, en base a cuánto
 // falta para la cita. Al no superponerse, un cron corriendo cada cierto
@@ -72,5 +72,78 @@ export async function revisarYEnviarRecordatorios(): Promise<void> {
     } catch (error) {
       console.error(`[recordatorios] Error revisando ventana "${ventana.etiqueta}":`, error);
     }
+  }
+}
+
+/**
+ * Seguimiento post-cita: unas horas después de la hora agendada, pregunta
+ * cómo resultó.
+ *
+ * La ventana empieza a las 3 horas (para no escribir mientras la madre
+ * todavía está en la consulta) y termina a los 3 días (si el cron estuvo
+ * caído más tiempo que eso, ya no tiene sentido preguntar por algo tan
+ * viejo, y es preferible no enviar a enviar tarde).
+ *
+ * Solo se envía para citas que siguen en estado 'programada': si la madre
+ * ya la marcó como completada o cancelada, no hace falta preguntarle.
+ */
+export async function revisarYEnviarSeguimientos(): Promise<void> {
+  try {
+    const citasRes = await query(
+      `SELECT c.id, c.especialidad, c.medico, c.lugar, c.fecha_cita, c.tipo,
+              b.id as bebe_id, b.nombre as bebe_nombre, b.usuario_id
+       FROM citas_medicas c
+       JOIN perfiles_bebes b ON c.bebe_id = b.id
+       WHERE c.estado = 'programada'
+         AND c.seguimiento_enviado = FALSE
+         AND c.fecha_cita <= NOW() - INTERVAL '3 hours'
+         AND c.fecha_cita >  NOW() - INTERVAL '3 days'`,
+    );
+
+    for (const cita of citasRes.rows) {
+      // Mismos destinatarios que los recordatorios: quien administra la
+      // cuenta y los familiares que pidieron recibir notificaciones.
+      const destinatariosRes = await query(
+        `SELECT u.email, u.nombre FROM usuarios u WHERE u.id = $1
+         UNION
+         SELECT u.email, u.nombre
+         FROM accesos_compartidos_bebe acb
+         JOIN usuarios u ON u.id = acb.id_usuario_invitado
+         WHERE acb.id_perfil_bebe = $2 AND acb.estado = 'activo' AND acb.recibir_notificaciones = TRUE`,
+        [cita.usuario_id, cita.bebe_id],
+      );
+
+      for (const destinatario of destinatariosRes.rows) {
+        try {
+          await sendPostAppointmentFollowUp(
+            destinatario.email,
+            destinatario.nombre,
+            cita.bebe_nombre,
+            {
+              especialidad: cita.especialidad,
+              medico: cita.medico,
+              lugar: cita.lugar,
+              fecha_cita: cita.fecha_cita,
+              tipo: cita.tipo,
+            },
+          );
+        } catch (emailError) {
+          console.error(`[seguimiento] Error enviando a ${destinatario.email}:`, emailError);
+        }
+      }
+
+      // Se marca aunque algún correo haya fallado: reintentar en la próxima
+      // pasada spamearía a quienes sí lo recibieron.
+      await query(
+        `UPDATE citas_medicas SET seguimiento_enviado = TRUE WHERE id = $1`,
+        [cita.id],
+      );
+    }
+
+    if (citasRes.rows.length > 0) {
+      console.log(`[seguimiento] Enviados ${citasRes.rows.length} seguimiento(s) post-cita`);
+    }
+  } catch (error) {
+    console.error("[seguimiento] Error revisando seguimientos post-cita:", error);
   }
 }

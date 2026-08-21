@@ -1,6 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
-import { CheckCircle2, AlertTriangle, CalendarDays, Syringe } from 'lucide-react-native';
+import { useFocusEffect, useRouter } from 'expo-router';
+import {
+  CheckCircle2,
+  AlertTriangle,
+  CalendarDays,
+  Syringe,
+  CalendarCheck,
+  Stethoscope,
+  Plus,
+} from 'lucide-react-native';
 import { Colors } from '../../constants/colors';
 import { api, errorMessage } from '../../constants/client';
 import { useBaby } from '../../constants/BabyContext';
@@ -42,6 +51,7 @@ function formatearFecha(iso?: string | null) {
 }
 
 export default function SaludScreen() {
+  const router = useRouter();
   const { activeBabyId, activeBaby, loading: ctxLoading } = useBaby();
 
   const [vacunas, setVacunas] = useState<Vacuna[]>([]);
@@ -88,6 +98,14 @@ export default function SaludScreen() {
   useEffect(() => {
     cargar();
   }, [cargar]);
+
+  // Al volver de la pantalla de agendar, recargamos para que la cita recién
+  // creada aparezca sin que el usuario tenga que tirar para refrescar.
+  useFocusEffect(
+    useCallback(() => {
+      cargar(true);
+    }, [cargar])
+  );
 
   const meses = mesesDeVida(activeBaby?.fecha_nacimiento);
 
@@ -159,27 +177,55 @@ export default function SaludScreen() {
               <StatChip value={totales.retrasadas} label="Retrasada" tone="danger" />
             </View>
 
+            <TouchableOpacity
+              onPress={() => router.push('/agendar')}
+              activeOpacity={0.85}
+              style={styles.agendarBtn}
+            >
+              <Plus size={18} color="white" />
+              <Text style={styles.agendarText}>Agendar control o cita</Text>
+            </TouchableOpacity>
+
             {citas.length > 0 && (
               <View style={{ marginTop: 22 }}>
                 <Text style={styles.sectionTitle}>Próximas citas</Text>
-                {citas.slice(0, 3).map((c: any, i: number) => (
-                  <Card key={c.id ?? i} style={{ marginBottom: 10 }}>
-                    <View style={styles.row}>
-                      <View style={[styles.iconCircle, { backgroundColor: Colors.primaryLight }]}>
-                        <CalendarDays size={19} color={Colors.primary} />
+                {citas.slice(0, 5).map((c: any, i: number) => {
+                  const esControl = c.tipo === 'control';
+                  return (
+                    <Card key={c.id ?? i} style={{ marginBottom: 10 }}>
+                      <View style={styles.row}>
+                        <View
+                          style={[
+                            styles.iconCircle,
+                            { backgroundColor: esControl ? Colors.successLight : Colors.primaryLight },
+                          ]}
+                        >
+                          {esControl ? (
+                            <CalendarCheck size={19} color="#3E8E6E" />
+                          ) : (
+                            <Stethoscope size={19} color={Colors.primary} />
+                          )}
+                        </View>
+                        <View style={{ flex: 1, marginRight: 8 }}>
+                          <Text style={styles.itemTitle}>
+                            {c.especialidad ??
+                              c.motivo ??
+                              (esControl ? 'Control sano' : 'Cita médica')}
+                          </Text>
+                          <Text style={styles.itemSub}>
+                            {formatearFecha(c.fecha_cita ?? c.fecha)}
+                            {c.medico ? ` · ${c.medico}` : ''}
+                            {c.lugar ? ` · ${c.lugar}` : ''}
+                          </Text>
+                        </View>
+                        <Badge
+                          text={esControl ? 'Control' : 'Cita'}
+                          tone={esControl ? 'success' : 'primary'}
+                        />
                       </View>
-                      <View style={{ flex: 1 }}>
-                        <Text style={styles.itemTitle}>
-                          {c.motivo ?? c.titulo ?? 'Control pediátrico'}
-                        </Text>
-                        <Text style={styles.itemSub}>
-                          {formatearFecha(c.fecha_hora ?? c.fecha)}
-                          {c.lugar ? ` · ${c.lugar}` : ''}
-                        </Text>
-                      </View>
-                    </View>
-                  </Card>
-                ))}
+                    </Card>
+                  );
+                })}
               </View>
             )}
 
@@ -276,6 +322,17 @@ export default function SaludScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   chipsRow: { flexDirection: 'row', gap: 10 },
+  agendarBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: Colors.primary,
+    borderRadius: 100,
+    paddingVertical: 14,
+    marginTop: 18,
+  },
+  agendarText: { color: 'white', fontFamily: 'Nunito_800ExtraBold', fontSize: 14.5 },
   sectionTitle: {
     fontSize: 17,
     fontFamily: 'Nunito_800ExtraBold',
