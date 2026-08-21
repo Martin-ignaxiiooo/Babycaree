@@ -391,3 +391,43 @@ export const getRecetaFoto = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ error: "Error interno del servidor" });
   }
 };
+
+/**
+ * DELETE /:bebeId/citas/:citaId
+ */
+export const deleteCita = async (req: AuthRequest, res: Response) => {
+  try {
+    const { bebeId, citaId } = req.params;
+
+    const accessCheck = await query(
+      `SELECT b.id FROM perfiles_bebes b WHERE b.id = $1 AND b.usuario_id = $2
+       UNION
+       SELECT a.id_perfil_bebe FROM accesos_compartidos_bebe a
+       WHERE a.id_perfil_bebe = $1 AND a.id_usuario_invitado = $2 AND a.estado = 'activo'
+       AND a.nivel_permiso NOT IN ('solo_lectura', 'solo_lectura_galeria')`,
+      [bebeId, req.user.id]
+    );
+
+    if (accessCheck.rows.length === 0) {
+      return res.status(403).json({ error: "No tienes permiso para modificar este perfil" });
+    }
+
+    // Los exámenes ligados a esta cita no se borran: quedan igual, solo
+    // pierden la referencia (cita_id NULL vía ON DELETE SET NULL en el
+    // schema). El resultado de un examen sigue siendo válido aunque se
+    // borre la cita de la que salió.
+    const result = await query(
+      `DELETE FROM citas_medicas WHERE id = $1 AND bebe_id = $2 RETURNING id`,
+      [citaId, bebeId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Cita no encontrada" });
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error en deleteCita:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};

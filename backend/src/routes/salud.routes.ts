@@ -8,7 +8,8 @@ import {
   getCitas,
   createCita,
   registrarResultadoCita,
-  getRecetaFoto
+  getRecetaFoto,
+  deleteCita
 } from "../controllers/salud.controller";
 import {
   getExamenes,
@@ -38,6 +39,7 @@ router.post("/:bebeId/citas", createCita);
 router.patch("/:bebeId/citas/:citaId", registrarResultadoCita);
 // La foto de la receta va aparte del listado porque es pesada.
 router.get("/:bebeId/citas/:citaId/receta", getRecetaFoto);
+router.delete("/:bebeId/citas/:citaId", deleteCita);
 
 // Exámenes indicados en una consulta
 router.get("/:bebeId/examenes", getExamenes);

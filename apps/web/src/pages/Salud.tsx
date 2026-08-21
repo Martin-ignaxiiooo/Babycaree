@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Syringe, Activity, Save, CheckCircle, Bell, Plus, X, FlaskConical, ClipboardCheck, Mic, MicOff, Pencil } from "lucide-react";
+import { ArrowLeft, Syringe, Activity, Save, CheckCircle, Bell, Plus, X, FlaskConical, ClipboardCheck, Mic, MicOff, Pencil, Trash2 } from "lucide-react";
 import TopNav from "../components/TopNav";
 import DateSelect from "../components/DateSelect";
 import TimeSelect from "../components/TimeSelect";
@@ -64,7 +64,7 @@ export default function Salud() {
 
   // Feedback del guardado automático por voz: null = nada que mostrar.
   const [guardadoPorVoz, setGuardadoPorVoz] = useState<
-    { ok: true; cuando: string } | { ok: false; motivo: string } | null
+    { ok: true; cuando: string; duplicado?: string } | { ok: false; motivo: string } | null
   >(null);
   const [guardandoPorVoz, setGuardandoPorVoz] = useState(false);
 
@@ -96,6 +96,12 @@ export default function Salud() {
     setGuardadoPorVoz(null);
     try {
       const tipoFinal = datos.tipo ?? "cita";
+
+      // Como el guardado por voz es automático (sin confirmación manual),
+      // no bloqueamos con un diálogo: se guarda igual, pero se avisa si ya
+      // había otra cita el mismo día, por si fue un dictado duplicado.
+      const duplicado = buscarDuplicadoMismoDia(datos.fecha);
+
       const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/citas`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -128,6 +134,9 @@ export default function Salud() {
       setGuardadoPorVoz({
         ok: true,
         cuando: datos.fecha.toLocaleDateString("es-CL", { day: "numeric", month: "long" }),
+        duplicado: duplicado
+          ? `Ojo: ya tenías otra cita ese mismo día${duplicado.medico ? ` (${duplicado.medico})` : ""}. Revisa que no sea un duplicado.`
+          : undefined,
       });
     } catch (e: any) {
       setGuardadoPorVoz({ ok: false, motivo: e.message || "No se pudo guardar. Intenta con el formulario." });
@@ -226,6 +235,43 @@ export default function Salud() {
     }
   };
 
+  const eliminarCita = async (citaId: string) => {
+    if (!confirm("¿Eliminar esta cita? No se puede deshacer.")) return;
+    try {
+      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/citas/${citaId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        fetchCitas();
+      } else {
+        alert("No se pudo eliminar la cita.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("No se pudo eliminar la cita.");
+    }
+  };
+
+  /**
+   * ¿Ya hay otra cita el mismo día? Sirve para avisar de un posible
+   * duplicado (por ejemplo, dictar la misma cita dos veces por error).
+   * `excluirId` deja afuera a la propia cita al editarla.
+   */
+  const buscarDuplicadoMismoDia = (fecha: Date, excluirId?: string): any | null => {
+    return (
+      citas.find((c) => {
+        if (excluirId && c.id === excluirId) return false;
+        const f = new Date(c.fecha_cita);
+        return (
+          f.getFullYear() === fecha.getFullYear() &&
+          f.getMonth() === fecha.getMonth() &&
+          f.getDate() === fecha.getDate()
+        );
+      }) ?? null
+    );
+  };
+
   const handleSaveGrowth = async () => {
     if (!pesoInput || !tallaInput || !bebeId) return;
     setIsSaving(true);
@@ -252,12 +298,26 @@ export default function Salud() {
   const handleSaveCita = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fechaCita) return;
+
+    const iso = fechaCitaISO();
+    if (iso) {
+      const duplicado = buscarDuplicadoMismoDia(new Date(iso));
+      if (duplicado) {
+        const sigue = confirm(
+          `Ya tienes otra cita registrada el mismo día` +
+          (duplicado.medico ? ` (${duplicado.medico})` : "") +
+          `. ¿Quieres guardar igual esta nueva?`
+        );
+        if (!sigue) return;
+      }
+    }
+
     setIsSavingCita(true);
     try {
       const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/citas`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ fecha_cita: fechaCitaISO(), medico, notas, tipo: tipoCita, especialidad: tipoCita === "control" ? "Control sano" : "Consulta" })
+        body: JSON.stringify({ fecha_cita: iso, medico, notas, tipo: tipoCita, especialidad: tipoCita === "control" ? "Control sano" : "Consulta" })
       });
       if (res.ok) {
         setFechaCitaDate("");
@@ -592,10 +652,17 @@ export default function Salud() {
                     </div>
                   )}
                   {guardadoPorVoz?.ok === true && (
-                    <div style={{ marginTop: "10px", display: "flex", alignItems: "center", gap: "8px", color: "#3E8E6E", fontSize: "13px", fontWeight: 700 }}>
-                      <CheckCircle size={16} />
-                      Cita guardada para el {guardadoPorVoz.cuando}. Puedes corregir cualquier dato abajo.
-                    </div>
+                    <>
+                      <div style={{ marginTop: "10px", display: "flex", alignItems: "center", gap: "8px", color: "#3E8E6E", fontSize: "13px", fontWeight: 700 }}>
+                        <CheckCircle size={16} />
+                        Cita guardada para el {guardadoPorVoz.cuando}. Puedes corregir cualquier dato abajo.
+                      </div>
+                      {guardadoPorVoz.duplicado && (
+                        <div style={{ marginTop: "6px", color: "#B27B16", fontSize: "12.5px", fontWeight: 700 }}>
+                          ⚠️ {guardadoPorVoz.duplicado}
+                        </div>
+                      )}
+                    </>
                   )}
                   {guardadoPorVoz?.ok === false && (
                     <div style={{ marginTop: "10px", color: "#D97070", fontSize: "12.5px", fontWeight: 600 }}>
@@ -762,6 +829,19 @@ export default function Salud() {
                             }}
                           >
                             <Pencil size={12} /> Editar
+                          </button>
+                          <button
+                            onClick={() => eliminarCita(cita.id)}
+                            title="Eliminar esta cita"
+                            style={{
+                              padding: "6px 10px", borderRadius: "100px",
+                              border: "1.5px solid #FBDADA", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
+                              fontWeight: 800, fontSize: "11.5px", display: "inline-flex",
+                              alignItems: "center", gap: "4px", whiteSpace: "nowrap",
+                              background: "#fff", color: "#D97070",
+                            }}
+                          >
+                            <Trash2 size={12} /> Eliminar
                           </button>
                           {/* Solo para citas ya pasadas: registrar lo que ocurrió. */}
                           {isPast && (
