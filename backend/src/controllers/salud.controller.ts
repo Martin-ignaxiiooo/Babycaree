@@ -179,7 +179,7 @@ export const getCitas = async (req: AuthRequest, res: Response) => {
              (receta_foto IS NOT NULL) AS tiene_receta
       FROM citas_medicas
       WHERE bebe_id = $1
-      ORDER BY fecha_cita DESC
+      ORDER BY fecha_cita ASC
     `, [bebeId]);
 
     res.json(result.rows);
