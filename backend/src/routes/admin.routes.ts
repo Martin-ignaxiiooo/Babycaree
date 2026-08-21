@@ -41,10 +41,6 @@ router.post("/auth/verificar-2fa", adminTwoFaLimiter, verify2fa);
 // Protected routes
 router.use(verifyAdminToken);
 
-import { generate2fa, enable2fa, estado2fa } from "../controllers/admin_2fa.controller";
-router.post("/auth/2fa/generate", generate2fa);
-router.post("/auth/2fa/enable", enable2fa);
-router.get("/auth/2fa/estado", estado2fa);
 router.post("/auth/logout", logoutAdmin);
 router.post(
   "/administradores/:id/revocar-sesiones",

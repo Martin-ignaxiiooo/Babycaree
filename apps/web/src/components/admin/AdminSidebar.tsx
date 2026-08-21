@@ -11,7 +11,6 @@ import {
   FileText,
   LineChart,
   MessageSquare,
-  KeyRound,
 } from "lucide-react";
 import { useAdminAuth } from "../../hooks/useAdminAuth";
 
@@ -22,7 +21,6 @@ export default function AdminSidebar() {
 
   const allMenuItems = [
     { name: "Dashboard", path: "/admin/panel", icon: <HeartPulse size={20} /> },
-    { name: "Seguridad", path: "/admin/seguridad", icon: <KeyRound size={20} /> },
     { name: "Administradores", path: "/admin/administradores", icon: <Shield size={20} />, reqAuditorOrAdmin: true },
     { name: "Usuarios", path: "/admin/usuarios", icon: <Users size={20} />, reqAuditorOrUsers: true },
     { name: "Vacunas", path: "/admin/vacunas", icon: <Syringe size={20} />, reqAdmin: true },

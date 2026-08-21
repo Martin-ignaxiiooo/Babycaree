@@ -342,3 +342,46 @@ export const sendExamReminder = async (
     `
   );
 };
+
+/**
+ * Código de verificación en dos pasos para el login de administradores.
+ * Se envía cada vez que un admin ingresa correctamente su contraseña:
+ * el código llega a su correo corporativo y debe escribirlo para
+ * terminar de entrar. Mismo criterio que sendRecoveryCode, adaptado al
+ * contexto de un inicio de sesión en vez de un restablecimiento.
+ */
+export const sendAdminLoginCode = async (
+  email: string,
+  codigo: string,
+  nombre: string,
+): Promise<void> => {
+  await sendEmail(
+    email,
+    "Tu código de acceso — Panel Baby Care",
+    `
+      <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 520px; margin: 0 auto; background: #f7f9fc; border-radius: 16px; overflow: hidden;">
+        <div style="background: #1B3A6B; padding: 32px 40px; text-align: center;">
+          <h1 style="color: #fff; font-size: 22px; margin: 0; font-weight: 900; letter-spacing: -0.5px;">Baby<span style="color: #7FC8F8;">Care</span></h1>
+          <p style="color: rgba(255,255,255,0.65); font-size: 13px; margin: 6px 0 0;">Acceso al panel administrativo</p>
+        </div>
+        <div style="padding: 40px;">
+          <p style="color: #374151; font-size: 15px; margin-bottom: 8px;">Hola <strong>${nombre}</strong>,</p>
+          <p style="color: #6B7280; font-size: 14px; line-height: 1.6; margin-bottom: 28px;">
+            Alguien está intentando entrar al panel administrativo con tu cuenta. Si fuiste tú, usa este código para completar el inicio de sesión:
+          </p>
+          <div style="background: #EEF4FA; border-radius: 14px; padding: 28px; text-align: center; margin-bottom: 28px;">
+            <div style="font-size: 42px; font-weight: 900; letter-spacing: 12px; color: #1B3A6B; font-family: monospace;">${codigo}</div>
+            <p style="color: #6B7280; font-size: 12px; margin: 12px 0 0;">⏱️ Este código expira en <strong>10 minutos</strong></p>
+          </div>
+          <p style="color: #9CA3AF; font-size: 12px; line-height: 1.6;">
+            Si no fuiste tú quien intentó iniciar sesión, ignora este correo y considera cambiar tu contraseña — alguien más la conoce.<br><br>
+            Por seguridad, este código es de un solo uso y nunca te lo pediremos por teléfono.
+          </p>
+        </div>
+        <div style="background: #F3F4F6; padding: 16px 40px; text-align: center;">
+          <p style="color: #9CA3AF; font-size: 11px; margin: 0;">Baby Care · Cumple con Ley 19.628 y Ley 21.719</p>
+        </div>
+      </div>
+    `
+  );
+};

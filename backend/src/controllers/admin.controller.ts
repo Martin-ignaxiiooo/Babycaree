@@ -1,10 +1,20 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import { v4 as uuidv4 } from "uuid";
 import { query } from "../config/db";
 import { AdminAuthRequest } from "../middlewares/adminAuth.middleware";
 import { generarPasswordTemporal } from "../utils/password";
+import { sendAdminLoginCode } from "../config/mailer";
+
+const sha256 = (text: string): string =>
+  crypto.createHash("sha256").update(text).digest("hex");
+
+const getClientIp = (req: Request): string =>
+  (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+  req.socket.remoteAddress ||
+  "desconocida";
 
 const JWT_ADMIN_SECRET = process.env.JWT_ADMIN_SECRET;
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -104,17 +114,41 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ error: "Credenciales inválidas" });
     }
 
-    // Si tiene 2FA activo
-    if (admin.dos_fa_activo) {
+    // 2FA por correo: si la cuenta lo requiere, se genera un código de 6
+    // dígitos, se guarda su hash (nunca el código en claro) y se manda al
+    // correo corporativo. El admin debe escribirlo para terminar de entrar.
+    if (admin.requiere_2fa) {
+      const codigo = crypto.randomInt(100000, 999999).toString();
+      const hashCodigo = sha256(codigo);
+      const expiraEn = new Date(Date.now() + 10 * 60 * 1000); // 10 minutos
+
+      // Invalidar códigos anteriores sin usar, para que no queden varios
+      // códigos "válidos" al mismo tiempo si el admin pide reenviar.
+      await query(
+        "UPDATE codigos_2fa_admin SET usado = TRUE WHERE id_admin = $1 AND usado = FALSE",
+        [admin.id],
+      );
+      await query(
+        `INSERT INTO codigos_2fa_admin (id_admin, hash_codigo, expira_en, ip_solicitud)
+         VALUES ($1, $2, $3, $4)`,
+        [admin.id, hashCodigo, expiraEn, getClientIp(req)],
+      );
+
+      // No se espera el envío para responder rápido; si el correo falla,
+      // el admin puede pedir que se reenvíe el código.
+      sendAdminLoginCode(admin.correo_corporativo, codigo, admin.nombre_completo).catch((e) => {
+        console.error("[admin 2fa] Error enviando código por correo:", e);
+      });
+
       const tempToken = jwt.sign(
         { id: admin.id, pending2FA: true },
         JWT_ADMIN_SECRET,
-        { expiresIn: "5m" },
+        { expiresIn: "10m" },
       );
       return res.json({
         require2FA: true,
         tempToken,
-        message: "Introduce el código de tu aplicación autenticadora",
+        message: "Te enviamos un código a tu correo corporativo",
       });
     }
 
@@ -153,7 +187,16 @@ export const verify2fa = async (req: Request, res: Response) => {
   try {
     const { tempToken, code } = req.body;
 
-    const decoded: any = jwt.verify(tempToken, JWT_ADMIN_SECRET, { algorithms: ["HS256"] });
+    if (!code || !/^\d{6}$/.test(code)) {
+      return res.status(400).json({ error: "El código debe tener 6 dígitos" });
+    }
+
+    let decoded: any;
+    try {
+      decoded = jwt.verify(tempToken, JWT_ADMIN_SECRET, { algorithms: ["HS256"] });
+    } catch {
+      return res.status(401).json({ error: "El código expiró, vuelve a iniciar sesión" });
+    }
     if (!decoded.pending2FA) {
       return res.status(401).json({ error: "Token inválido" });
     }
@@ -161,19 +204,40 @@ export const verify2fa = async (req: Request, res: Response) => {
     const result = await query("SELECT * FROM administradores WHERE id = $1", [
       decoded.id,
     ]);
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: "Credenciales inválidas" });
+    }
     const admin = result.rows[0];
 
-    // Real speakeasy verify
-    const speakeasy = require("speakeasy");
-    const verified = speakeasy.totp.verify({
-      secret: admin.dos_fa_secret,
-      encoding: "base32",
-      token: code,
-    });
+    // Se busca el código vigente más reciente para este admin: sin usar,
+    // no vencido, con margen de intentos fallidos (evita fuerza bruta de
+    // los 6 dígitos aunque sea un token temporal de corta duración).
+    const codigoRes = await query(
+      `SELECT id, hash_codigo, intentos_fallidos FROM codigos_2fa_admin
+       WHERE id_admin = $1 AND usado = FALSE AND expira_en > NOW()
+       ORDER BY creado_en DESC LIMIT 1`,
+      [admin.id],
+    );
 
-    if (!verified) {
-      return res.status(401).json({ error: "Código 2FA incorrecto" });
+    if (codigoRes.rows.length === 0) {
+      return res.status(401).json({ error: "El código expiró. Vuelve a iniciar sesión para pedir uno nuevo." });
     }
+
+    const registro = codigoRes.rows[0];
+    if (registro.intentos_fallidos >= 5) {
+      return res.status(401).json({ error: "Demasiados intentos. Vuelve a iniciar sesión para pedir un código nuevo." });
+    }
+
+    const hashRecibido = sha256(code);
+    if (hashRecibido !== registro.hash_codigo) {
+      await query(
+        "UPDATE codigos_2fa_admin SET intentos_fallidos = intentos_fallidos + 1 WHERE id = $1",
+        [registro.id],
+      );
+      return res.status(401).json({ error: "Código incorrecto" });
+    }
+
+    await query("UPDATE codigos_2fa_admin SET usado = TRUE WHERE id = $1", [registro.id]);
 
     const jti = uuidv4();
     const token = jwt.sign(

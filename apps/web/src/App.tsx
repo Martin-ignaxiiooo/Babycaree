@@ -27,7 +27,6 @@ import AdminComunidad from "./pages/admin/AdminComunidad";
 import AdminPrevision from "./pages/admin/AdminPrevision";
 import AdminCentros from "./pages/admin/AdminCentros";
 import AdminEspecialidades from "./pages/admin/AdminEspecialidades";
-import AdminSeguridad from "./pages/admin/AdminSeguridad";
 import ThemeSelector from "./components/ThemeSelector";
 import "./index.css";
 
@@ -74,14 +73,6 @@ function App() {
           element={
             <AdminLayout>
               <AdminAdmins />
-            </AdminLayout>
-          }
-        />
-        <Route
-          path="/admin/seguridad"
-          element={
-            <AdminLayout>
-              <AdminSeguridad />
             </AdminLayout>
           }
         />

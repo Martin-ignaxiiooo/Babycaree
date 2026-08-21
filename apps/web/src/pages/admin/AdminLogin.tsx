@@ -16,6 +16,8 @@ export default function AdminLogin() {
   const [step, setStep] = useState<1 | 2>(1);
   const [twoFaCode, setTwoFaCode] = useState("");
   const [tempToken, setTempToken] = useState("");
+  const [reenviando, setReenviando] = useState(false);
+  const [reenviado, setReenviado] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,6 +65,29 @@ export default function AdminLogin() {
       setError(err.response?.data?.error || "Código incorrecto");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Reenviar: vuelve a mandar usuario/contraseña, que ya de por sí invalida
+  // el código anterior y genera + envía uno nuevo (ver login() en backend).
+  const handleReenviar = async () => {
+    setReenviando(true);
+    setError("");
+    setReenviado(false);
+    try {
+      const res = await axios.post(`${API_URL}/v1/admin/auth/login`, {
+        email: email.trim(),
+        password: password.trim(),
+      });
+      if (res.data.tempToken) {
+        setTempToken(res.data.tempToken);
+        setTwoFaCode("");
+        setReenviado(true);
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.error || "No se pudo reenviar el código.");
+    } finally {
+      setReenviando(false);
     }
   };
 
@@ -138,11 +163,11 @@ export default function AdminLogin() {
         ) : (
           <form onSubmit={handleVerify2FA} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
             <p style={{ color: "#D1D5DB", fontSize: "14px", textAlign: "center", marginBottom: "8px" }}>
-              Introduce el código de 6 dígitos de tu aplicación autenticadora (ej. Google Authenticator).
+              Te enviamos un código de 6 dígitos a tu correo corporativo. Revisa tu bandeja de entrada (y spam).
             </p>
             
             <div>
-              <label style={{ display: "block", color: "#9CA3AF", fontSize: "12px", fontWeight: 700, marginBottom: "8px" }}>CÓDIGO 2FA</label>
+              <label style={{ display: "block", color: "#9CA3AF", fontSize: "12px", fontWeight: 700, marginBottom: "8px" }}>CÓDIGO RECIBIDO POR CORREO</label>
               <div style={{ position: "relative" }}>
                 <KeyRound size={18} color="#6B7280" style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)" }} />
                 <input
@@ -166,10 +191,24 @@ export default function AdminLogin() {
             >
               {loading ? "Verificando..." : "Verificar Código"}
             </button>
+
+            <button
+              type="button"
+              onClick={handleReenviar}
+              disabled={reenviando}
+              style={{ background: "transparent", color: "#9CA3AF", border: "none", fontSize: "13px", cursor: reenviando ? "not-allowed" : "pointer", textDecoration: "underline" }}
+            >
+              {reenviando ? "Reenviando…" : "¿No te llegó? Reenviar código"}
+            </button>
+            {reenviado && (
+              <p style={{ color: "#86EFAC", fontSize: "12.5px", textAlign: "center", margin: "-8px 0 0" }}>
+                Te enviamos un código nuevo.
+              </p>
+            )}
             
             <button
               type="button"
-              onClick={() => { setStep(1); setTwoFaCode(""); }}
+              onClick={() => { setStep(1); setTwoFaCode(""); setReenviado(false); }}
               style={{ background: "transparent", color: "#9CA3AF", border: "none", fontSize: "13px", cursor: "pointer", marginTop: "8px", textDecoration: "underline" }}
             >
               Volver al inicio de sesión
