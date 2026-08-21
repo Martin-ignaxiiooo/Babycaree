@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { FlaskConical, Check, Clock, AlertTriangle, Camera, Loader2, Trash2 } from "lucide-react";
+import { FlaskConical, Check, Clock, AlertTriangle, Camera, Loader2, Trash2, FileText, Mic, MicOff } from "lucide-react";
+import { useDictado } from "../hooks/useDictado";
+import { interpretarExamenesDictados } from "../utils/interpretarDictado";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api";
 
@@ -56,6 +58,12 @@ export default function ExamenesTab({ bebeId, token }: Props) {
   const [fechaSugerida, setFechaSugerida] = useState("");
   const [creando, setCreando] = useState(false);
 
+  // Foto de la orden/indicación (el papel del médico), compartida por los
+  // exámenes que se agreguen mientras esté puesta — normalmente es un
+  // mismo papel con varios exámenes indicados.
+  const [ordenFoto, setOrdenFoto] = useState<string | null>(null);
+  const [subiendoOrdenFoto, setSubiendoOrdenFoto] = useState(false);
+
   // Examen que tiene el formulario de resultado abierto.
   const [abierto, setAbierto] = useState<string | null>(null);
   const [notas, setNotas] = useState("");
@@ -83,19 +91,19 @@ export default function ExamenesTab({ bebeId, token }: Props) {
     cargar();
   }, [cargar]);
 
-  const crear = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!nombre.trim()) return;
+  /** Crea uno o varios exámenes de una vez, todos con la misma fecha y foto de orden (si hay). */
+  const crearVarios = async (nombres: string[], fecha: string | null) => {
     setCreando(true);
+    setError(null);
     try {
-      const res = await fetch(`${API_URL}/v1/salud/${bebeId}/examenes`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ nombre: nombre.trim(), fecha_sugerida: fechaSugerida || null }),
-      });
-      if (!res.ok) throw new Error();
-      setNombre("");
-      setFechaSugerida("");
+      for (const n of nombres) {
+        const res = await fetch(`${API_URL}/v1/salud/${bebeId}/examenes`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ nombre: n, fecha_sugerida: fecha || null, orden_foto: ordenFoto }),
+        });
+        if (!res.ok) throw new Error();
+      }
       cargar();
     } catch {
       setError("No se pudo agregar el examen.");
@@ -103,6 +111,43 @@ export default function ExamenesTab({ bebeId, token }: Props) {
       setCreando(false);
     }
   };
+
+  const crear = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!nombre.trim()) return;
+    await crearVarios([nombre.trim()], fechaSugerida || null);
+    setNombre("");
+    setFechaSugerida("");
+  };
+
+  const elegirOrdenFoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setError("La orden de exámenes debe ser una imagen JPG, PNG o WEBP.");
+      return;
+    }
+    setSubiendoOrdenFoto(true);
+    setError(null);
+    try {
+      setOrdenFoto(await comprimirImagen(file));
+    } catch {
+      setError("No pudimos procesar esa imagen. Prueba con otra.");
+    } finally {
+      setSubiendoOrdenFoto(false);
+    }
+  };
+
+  // Dictado por voz: "hemograma y radiografía de tórax para el martes"
+  // agrega ambos exámenes de una vez, con esa misma fecha.
+  const dictado = useDictado((texto) => {
+    const { nombres, fecha } = interpretarExamenesDictados(texto);
+    if (nombres.length === 0) return;
+    const fechaStr = fecha
+      ? `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, "0")}-${String(fecha.getDate()).padStart(2, "0")}`
+      : null;
+    crearVarios(nombres, fechaStr);
+  });
 
   const actualizar = async (id: string, cambios: any) => {
     setGuardando(true);
@@ -172,6 +217,66 @@ export default function ExamenesTab({ bebeId, token }: Props) {
         <div style={{ fontWeight: 800, fontSize: "14px", color: "var(--theme-darker)", marginBottom: "10px" }}>
           Agregar un examen indicado
         </div>
+
+        {/* Dictado por voz: agrega uno o varios exámenes de una vez. */}
+        {dictado.soportado && (
+          <button
+            type="button"
+            onClick={dictado.escuchando ? dictado.detener : dictado.empezar}
+            style={{
+              display: "inline-flex", alignItems: "center", gap: "7px",
+              padding: "9px 16px", borderRadius: "100px", border: "none",
+              cursor: "pointer", fontFamily: "'Nunito', sans-serif",
+              fontWeight: 800, fontSize: "12.5px", color: "#fff", marginBottom: "10px",
+              background: dictado.escuchando ? "#D97070" : "var(--theme-primary)",
+            }}
+          >
+            {dictado.escuchando ? <MicOff size={14} /> : <Mic size={14} />}
+            {dictado.escuchando ? "Detener" : "Dictar exámenes"}
+          </button>
+        )}
+        {dictado.texto && (
+          <div style={{ background: "var(--theme-bg-light)", borderRadius: "10px", padding: "10px 12px", fontSize: "12.5px", color: "var(--theme-darker)", fontStyle: "italic", marginBottom: "10px" }}>
+            “{dictado.texto}”
+          </div>
+        )}
+        {dictado.error && (
+          <div style={{ color: "#D97070", fontSize: "12px", fontWeight: 600, marginBottom: "10px" }}>
+            {dictado.error}
+          </div>
+        )}
+
+        {/* Foto de la orden: se adjunta a los exámenes que se agreguen mientras esté puesta. */}
+        {ordenFoto ? (
+          <div style={{ position: "relative", marginBottom: "12px", maxWidth: "260px" }}>
+            <img src={ordenFoto} alt="Orden de exámenes" style={{ width: "100%", maxHeight: "160px", objectFit: "contain", borderRadius: "12px", border: "1.5px solid #E4DBF7", background: "#FBFAFE" }} />
+            <button
+              type="button" onClick={() => setOrdenFoto(null)}
+              style={{ position: "absolute", top: "8px", right: "8px", background: "rgba(45,38,64,0.75)", border: "none", borderRadius: "50%", width: "26px", height: "26px", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+              aria-label="Quitar foto"
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
+        ) : (
+          <label style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "10px 16px", border: "2px dashed #D9CDF2", borderRadius: "12px", background: "#FBFAFE", cursor: "pointer", marginBottom: "12px" }}>
+            {subiendoOrdenFoto ? (
+              <Loader2 size={18} className="spin-icon" />
+            ) : (
+              <>
+                <FileText size={18} color="var(--theme-primary)" />
+                <span style={{ fontSize: "13px", fontWeight: 700, color: "var(--theme-primary)" }}>
+                  Subir foto de la orden
+                </span>
+              </>
+            )}
+            <input
+              type="file" accept="image/jpeg,image/png,image/webp"
+              onChange={elegirOrdenFoto} style={{ display: "none" }}
+            />
+          </label>
+        )}
+
         <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
           <input
             value={nombre} onChange={(e) => setNombre(e.target.value)}
@@ -244,6 +349,7 @@ export default function ExamenesTab({ bebeId, token }: Props) {
                           ? `Sugerido para el ${formatearFecha(ex.fecha_sugerida)}`
                           : "Sin fecha definida"}
                     {ex.cita_especialidad ? ` · de ${ex.cita_especialidad}` : ""}
+                    {ex.tiene_orden_foto ? " · 📄 con orden" : ""}
                   </div>
                   {ex.resultado_notas && (
                     <div style={notasBox}>{ex.resultado_notas}</div>
