@@ -49,19 +49,81 @@ export default function Salud() {
   // control sano vs consulta puntual
   const [tipoCita, setTipoCita] = useState<"control" | "cita">("control");
 
+  // Feedback del guardado automático por voz: null = nada que mostrar.
+  const [guardadoPorVoz, setGuardadoPorVoz] = useState<
+    { ok: true; cuando: string } | { ok: false; motivo: string } | null
+  >(null);
+  const [guardandoPorVoz, setGuardandoPorVoz] = useState(false);
+
+  /**
+   * Guarda directo con los datos ya interpretados del audio, sin pasar por
+   * el estado de React (que todavía no se habría actualizado en este mismo
+   * tick). Rellena el formulario igual, por si el usuario quiere revisar o
+   * corregir algo después de guardado.
+   */
+  const guardarDesdeVoz = async (datos: ReturnType<typeof interpretarDictado>, textoOriginal: string) => {
+    const p = (n: number) => String(n).padStart(2, "0");
+
+    if (datos.fecha) {
+      setFechaCitaDate(`${datos.fecha.getFullYear()}-${p(datos.fecha.getMonth() + 1)}-${p(datos.fecha.getDate())}`);
+      setFechaCitaTime(`${p(datos.fecha.getHours())}:${p(datos.fecha.getMinutes())}`);
+    }
+    if (datos.medico) setMedico(datos.medico);
+    if (datos.tipo) setTipoCita(datos.tipo);
+    setNotas(textoOriginal);
+
+    // Sin fecha no hay nada que guardar: solo dejamos el formulario
+    // rellenado con lo que sí se entendió, para completar a mano.
+    if (!datos.fecha) {
+      setGuardadoPorVoz({ ok: false, motivo: "No logramos entender la fecha. Revisa el formulario y complétala." });
+      return;
+    }
+
+    setGuardandoPorVoz(true);
+    setGuardadoPorVoz(null);
+    try {
+      const tipoFinal = datos.tipo ?? "cita";
+      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/citas`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          fecha_cita: `${datos.fecha.getFullYear()}-${p(datos.fecha.getMonth() + 1)}-${p(datos.fecha.getDate())}T${p(datos.fecha.getHours())}:${p(datos.fecha.getMinutes())}`,
+          medico: datos.medico || null,
+          notas: textoOriginal,
+          tipo: tipoFinal,
+          especialidad: datos.especialidad || (tipoFinal === "control" ? "Control sano" : "Consulta"),
+          lugar: datos.lugar || null,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "No se pudo guardar la cita.");
+      }
+
+      // Se limpia el formulario, igual que hace el guardado manual.
+      setFechaCitaDate("");
+      setFechaCitaTime("");
+      setMedico("");
+      setNotas("");
+      fetchCitas();
+
+      setGuardadoPorVoz({
+        ok: true,
+        cuando: datos.fecha.toLocaleDateString("es-CL", { day: "numeric", month: "long" }),
+      });
+    } catch (e: any) {
+      setGuardadoPorVoz({ ok: false, motivo: e.message || "No se pudo guardar. Intenta con el formulario." });
+    } finally {
+      setGuardandoPorVoz(false);
+    }
+  };
+
   // Dictado por voz para agendar. Usa la Web Speech API del navegador:
   // es gratis y el audio no sale del dispositivo hacia nuestros servidores.
   const dictado = useDictado((textoFinal) => {
     const datos = interpretarDictado(textoFinal);
-    if (datos.fecha) {
-      const p = (n: number) => String(n).padStart(2, "0");
-      setFechaCitaDate(`${datos.fecha.getFullYear()}-${p(datos.fecha.getMonth() + 1)}-${p(datos.fecha.getDate())}`);
-      setFechaCitaTime(`${p(datos.fecha.getHours())}:${p(datos.fecha.getMinutes())}`);
-    }
-    // Solo se rellena lo que se entendió; lo demás queda como estaba.
-    if (datos.medico) setMedico(datos.medico);
-    if (datos.tipo) setTipoCita(datos.tipo);
-    if (!notas.trim()) setNotas(textoFinal);
+    guardarDesdeVoz(datos, textoFinal);
   });
 
 
@@ -544,19 +606,21 @@ export default function Salud() {
                     <button
                       type="button"
                       onClick={dictado.escuchando ? dictado.detener : dictado.empezar}
+                      disabled={guardandoPorVoz}
                       style={{
                         display: "inline-flex", alignItems: "center", gap: "8px",
                         padding: "11px 20px", borderRadius: "100px", border: "none",
-                        cursor: "pointer", fontFamily: "'Nunito', sans-serif",
+                        cursor: guardandoPorVoz ? "not-allowed" : "pointer", fontFamily: "'Nunito', sans-serif",
                         fontWeight: 800, fontSize: "13.5px", color: "#fff",
                         background: dictado.escuchando ? "#D97070" : "var(--theme-primary)",
+                        opacity: guardandoPorVoz ? 0.6 : 1,
                       }}
                     >
                       {dictado.escuchando ? <MicOff size={16} /> : <Mic size={16} />}
-                      {dictado.escuchando ? "Detener" : "Dictar la cita"}
+                      {guardandoPorVoz ? "Guardando…" : dictado.escuchando ? "Detener" : "Dictar la cita"}
                     </button>
                     <span style={{ fontSize: "12.5px", color: "#6B647F", flex: "1 1 220px", lineHeight: 1.5 }}>
-                      Di algo como: “control sano el viernes 3 de octubre a las diez y media con la doctora Pérez”.
+                      Di algo como: “control sano el viernes 3 de octubre a las diez y media con la doctora Pérez”. Se guarda solo al terminar.
                     </span>
                   </div>
                   {dictado.texto && (
@@ -567,6 +631,17 @@ export default function Salud() {
                   {dictado.error && (
                     <div style={{ marginTop: "10px", color: "#D97070", fontSize: "12.5px", fontWeight: 600 }}>
                       {dictado.error}
+                    </div>
+                  )}
+                  {guardadoPorVoz?.ok === true && (
+                    <div style={{ marginTop: "10px", display: "flex", alignItems: "center", gap: "8px", color: "#3E8E6E", fontSize: "13px", fontWeight: 700 }}>
+                      <CheckCircle size={16} />
+                      Cita guardada para el {guardadoPorVoz.cuando}. Puedes corregir cualquier dato abajo.
+                    </div>
+                  )}
+                  {guardadoPorVoz?.ok === false && (
+                    <div style={{ marginTop: "10px", color: "#D97070", fontSize: "12.5px", fontWeight: 600 }}>
+                      {guardadoPorVoz.motivo}
                     </div>
                   )}
                 </div>
