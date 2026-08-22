@@ -385,7 +385,7 @@ function StepOne({
 }
 
 // ─── Paso 2: Cuenta ────────────────────────────────────────────────────────────
-function StepTwo({ account, setAccount, error }: any) {
+function StepTwo({ account, setAccount, error, honeypot, setHoneypot }: any) {
   const [showPwd, setShowPwd] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -422,6 +422,31 @@ function StepTwo({ account, setAccount, error }: any) {
         onChange={(e) =>
           setAccount((prev: any) => ({ ...prev, email: e.target.value }))
         }
+      />
+
+      {/* Campo trampa anti-bot: invisible para una persona (no ocupa espacio
+          ni es alcanzable con el teclado), pero un bot que rellena todos los
+          campos del HTML sí lo completa. aria-hidden para que un lector de
+          pantalla tampoco se lo ofrezca a quien navega sin ver. */}
+      <input
+        type="text"
+        name="website"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        value={honeypot ?? ""}
+        onChange={(e) => setHoneypot?.(e.target.value)}
+        style={{
+          position: "absolute",
+          width: "1px",
+          height: "1px",
+          padding: 0,
+          margin: "-1px",
+          overflow: "hidden",
+          clip: "rect(0 0 0 0)",
+          whiteSpace: "nowrap",
+          border: 0,
+        }}
       />
       <div
         style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}
@@ -1016,6 +1041,12 @@ export default function Onboarding() {
     passwordConfirm: "",
   });
   const [accountError, setAccountError] = useState("");
+
+  // Anti-bot (ver backend/src/middlewares/antiBot.middleware.ts): un campo
+  // trampa que solo un bot rellena, y el momento en que se abrió el
+  // formulario para descartar envíos instantáneos. Invisibles para el usuario.
+  const [honeypot, setHoneypot] = useState("");
+  const [formAbiertoEn] = useState(() => Date.now());
   const [baby, setBaby] = useState({
     nombre: "",
     fecha_nacimiento: "",
@@ -1106,6 +1137,8 @@ export default function Onboarding() {
             apellidos: account.apellidos,
             consentimiento_ley_19628: true,
             consentimiento_ley_21719: true,
+            _hp: honeypot,
+            _ts: formAbiertoEn,
           });
           userToken = authRes.data.token;
 
@@ -1440,6 +1473,8 @@ export default function Onboarding() {
                 account={account}
                 setAccount={setAccount}
                 error={accountError}
+                honeypot={honeypot}
+                setHoneypot={setHoneypot}
               />
             )}
             {step === 3 && (
