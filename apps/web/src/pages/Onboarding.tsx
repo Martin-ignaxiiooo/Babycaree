@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import DateSelect from "../components/DateSelect";
+import heroImg from "../assets/madre-bebe-hero.jpg";
 import {
   Shield,
   Heart,
@@ -1244,8 +1245,13 @@ export default function Onboarding() {
           padding: "3rem 2.5rem",
           position: "relative",
           overflow: "hidden",
-          background:
-            "linear-gradient(155deg, var(--theme-darker) 0%, var(--theme-dark) 55%, var(--theme-primary) 100%)",
+          // Misma foto y mismo overlay que el Login: registro e inicio de
+          // sesión son la misma puerta de entrada y deben sentirse iguales.
+          // El overlay es un poco más opaco que en Login porque acá encima
+          // va más texto (los beneficios) y necesita contraste para leerse.
+          backgroundImage: `linear-gradient(170deg, rgba(45,38,64,0.82) 0%, rgba(74,55,112,0.78) 55%, rgba(124,92,191,0.72) 100%), url(${heroImg})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
           width: "40%",
           minWidth: "360px",
           maxWidth: "500px",
@@ -1263,7 +1269,7 @@ export default function Onboarding() {
             height: "300px",
             borderRadius: "50%",
             background:
-              "radial-gradient(circle, rgba(244,160,160,0.25), transparent)",
+              "radial-gradient(circle, rgba(244,160,160,0.10), transparent)",
             zIndex: 0,
           }}
         />
@@ -1276,7 +1282,7 @@ export default function Onboarding() {
             height: "350px",
             borderRadius: "50%",
             background:
-              "radial-gradient(circle, var(--theme-shadow-bg), transparent)",
+              "radial-gradient(circle, rgba(124,92,191,0.12), transparent)",
             zIndex: 0,
           }}
         />
@@ -1428,15 +1434,19 @@ export default function Onboarding() {
           overflowY: "auto",
         }}
       >
-        <div style={{ width: "100%", maxWidth: "720px" }}>
+        <div style={{ width: "100%", maxWidth: "560px" }}>
           {/* Card principal */}
           <div
             className="auth-box"
             style={{
               background: "white",
               borderRadius: "32px",
-              boxShadow: "0 12px 50px rgba(45,38,64,0.09)",
-              padding: "4rem 4.5rem",
+              // Misma sombra y padding que la caja del Login, para que las
+              // dos pantallas de entrada se sientan del mismo producto.
+              // El padding anterior (4rem 4.5rem) era desproporcionado y
+              // dejaba el formulario flotando en el medio.
+              boxShadow: "0 20px 60px rgba(45,38,64,0.14)",
+              padding: "3rem 3.25rem",
             }}
           >
             {step < 5 && (
