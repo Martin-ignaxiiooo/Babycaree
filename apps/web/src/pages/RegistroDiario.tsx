@@ -59,6 +59,9 @@ export default function RegistroDiario() {
   const token = localStorage.getItem("token");
   const [bebeId, setBebeId] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
+  // Un familiar invitado como solo lectura puede ver el diario pero no
+  // escribir en él: se le ocultan los botones en vez de dejar que fallen.
+  const [soloLectura, setSoloLectura] = useState(false);
 
   const [registros, setRegistros] = useState<any[]>([]);
   const [resumen, setResumen] = useState<any>(null);
@@ -90,13 +93,18 @@ export default function RegistroDiario() {
   const cargar = useCallback(async () => {
     if (!bebeId) return;
     try {
-      const [regRes, resRes] = await Promise.all([
+      const [regRes, resRes, homeRes] = await Promise.all([
         fetch(`${API_URL}/v1/diario/${bebeId}/registros?limite=50`, { headers: { Authorization: `Bearer ${token}` } }),
         fetch(`${API_URL}/v1/diario/${bebeId}/registros/resumen`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${API_URL}/v1/home/${bebeId}`, { headers: { Authorization: `Bearer ${token}` } }),
       ]);
       if (!regRes.ok || !resRes.ok) throw new Error();
       setRegistros(await regRes.json());
       setResumen(await resRes.json());
+      if (homeRes.ok) {
+        const home = await homeRes.json();
+        setSoloLectura(["solo_lectura", "solo_lectura_galeria"].includes(home.rol_acceso));
+      }
       setError(null);
     } catch {
       setError("No pudimos cargar los registros.");
@@ -218,16 +226,25 @@ export default function RegistroDiario() {
                 Desde las {hora(suenoEnCurso.sueno_inicio)} · {haceCuanto(suenoEnCurso.sueno_inicio)}
               </div>
             </div>
+            {!soloLectura && (
             <button
               onClick={() => despertar(suenoEnCurso.id)}
               style={{ background: "var(--surface)", color: "var(--theme-primary)", border: "none", borderRadius: "100px", padding: "11px 22px", fontWeight: 800, fontSize: "14px", cursor: "pointer", display: "flex", alignItems: "center", gap: "7px", fontFamily: "'Nunito', sans-serif" }}
             >
               <Sun size={16} /> Ya despertó
             </button>
+            )}
+          </div>
+        )}
+
+        {soloLectura && (
+          <div style={{ background: "var(--surface-2)", border: "1.5px solid var(--border)", borderRadius: "14px", padding: "13px 16px", marginBottom: "16px", fontSize: "13.5px", color: "var(--text-muted)", fontWeight: 600 }}>
+            Tienes acceso de solo lectura a este perfil: puedes ver el diario, pero no agregar ni borrar registros.
           </div>
         )}
 
         {/* Registro rápido */}
+        {!soloLectura && (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "12px", marginBottom: "16px" }}>
           <BotonRapido tipo="toma" activo={abierto === "toma"} onClick={() => setAbierto(abierto === "toma" ? null : "toma")} label="Registrar toma" />
           {!suenoEnCurso && (
@@ -235,6 +252,7 @@ export default function RegistroDiario() {
           )}
           <BotonRapido tipo="panal" activo={abierto === "panal"} onClick={() => setAbierto(abierto === "panal" ? null : "panal")} label="Cambio de pañal" />
         </div>
+        )}
 
         {/* Formulario de toma */}
         {abierto === "toma" && (
@@ -321,9 +339,11 @@ export default function RegistroDiario() {
                   </div>
                   {r.nota && <div style={{ color: "#6B647F", fontSize: "13px", marginTop: "5px", fontStyle: "italic" }}>{r.nota}</div>}
                 </div>
-                <button onClick={() => eliminar(r.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "#C4BFD4", padding: "6px" }} aria-label="Eliminar">
-                  <Trash2 size={15} />
-                </button>
+                {!soloLectura && (
+                  <button onClick={() => eliminar(r.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "#C4BFD4", padding: "6px" }} aria-label="Eliminar">
+                    <Trash2 size={15} />
+                  </button>
+                )}
               </div>
             );
           })

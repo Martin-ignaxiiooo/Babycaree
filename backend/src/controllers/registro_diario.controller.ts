@@ -6,12 +6,33 @@ import { AuthRequest } from "../middlewares/auth.middleware";
  * Verifica que el usuario sea dueño del bebé o tenga acceso compartido activo.
  * Devuelve true si puede acceder. Mismo criterio que usa salud.controller.
  */
+/** Puede VER el perfil: dueño, o invitado con acceso activo de cualquier nivel. */
 async function tieneAcceso(bebeId: string, usuarioId: string): Promise<boolean> {
   const accessCheck = await query(
     `SELECT b.id FROM perfiles_bebes b WHERE b.id = $1 AND b.usuario_id = $2
      UNION
      SELECT a.id_perfil_bebe FROM accesos_compartidos_bebe a
      WHERE a.id_perfil_bebe = $1 AND a.id_usuario_invitado = $2 AND a.estado = 'activo'`,
+    [bebeId, usuarioId]
+  );
+  return accessCheck.rows.length > 0;
+}
+
+/**
+ * Puede MODIFICAR: excluye a los invitados de solo lectura.
+ *
+ * Antes el diario usaba tieneAcceso() también para crear y borrar, así que
+ * un familiar invitado como 'solo_lectura' podía escribir en el diario. El
+ * resto de los controladores (salud, exámenes, momentos) sí distinguían;
+ * este quedó fuera.
+ */
+async function puedeEditar(bebeId: string, usuarioId: string): Promise<boolean> {
+  const accessCheck = await query(
+    `SELECT b.id FROM perfiles_bebes b WHERE b.id = $1 AND b.usuario_id = $2
+     UNION
+     SELECT a.id_perfil_bebe FROM accesos_compartidos_bebe a
+     WHERE a.id_perfil_bebe = $1 AND a.id_usuario_invitado = $2 AND a.estado = 'activo'
+       AND a.nivel_permiso NOT IN ('solo_lectura', 'solo_lectura_galeria')`,
     [bebeId, usuarioId]
   );
   return accessCheck.rows.length > 0;
@@ -134,7 +155,7 @@ export const createRegistro = async (req: AuthRequest, res: Response) => {
   try {
     const { bebeId } = req.params;
 
-    if (!(await tieneAcceso(bebeId, req.user.id))) {
+    if (!(await puedeEditar(bebeId, req.user.id))) {
       return res.status(403).json({ error: "No tienes permiso para modificar este perfil" });
     }
 
@@ -226,7 +247,7 @@ export const cerrarSueno = async (req: AuthRequest, res: Response) => {
   try {
     const { bebeId, registroId } = req.params;
 
-    if (!(await tieneAcceso(bebeId, req.user.id))) {
+    if (!(await puedeEditar(bebeId, req.user.id))) {
       return res.status(403).json({ error: "No tienes permiso para modificar este perfil" });
     }
 
@@ -264,7 +285,7 @@ export const deleteRegistro = async (req: AuthRequest, res: Response) => {
   try {
     const { bebeId, registroId } = req.params;
 
-    if (!(await tieneAcceso(bebeId, req.user.id))) {
+    if (!(await puedeEditar(bebeId, req.user.id))) {
       return res.status(403).json({ error: "No tienes permiso para modificar este perfil" });
     }
 
