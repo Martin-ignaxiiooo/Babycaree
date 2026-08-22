@@ -23,6 +23,18 @@ export default function MiPerfil() {
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  // Las cuentas creadas con Google no tienen contraseña propia todavía: a
+  // esas no se les pide la "actual" (no existe una que puedan conocer).
+  const [tienePassword, setTienePassword] = useState(true);
+
+  React.useEffect(() => {
+    fetch("https://babycare-backend-msyq.onrender.com/api/profiles/me/password-estado", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (d) setTienePassword(d.definida !== false); })
+      .catch(() => {});
+  }, [token]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -47,39 +59,66 @@ export default function MiPerfil() {
         body: JSON.stringify({ nombre: formData.nombre, apellidos: formData.apellidos })
       });
 
-      let passwordChanged = false;
-      if (passwordData.currentPassword && passwordData.newPassword) {
-        const passRes = await fetch("https://babycare-backend-msyq.onrender.com/api/profiles/me/password", {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify(passwordData)
-        });
-        
-        if (!passRes.ok) {
-          const err = await passRes.json();
-          setMessage(err.error || "Error al actualizar la contraseña.");
-          setLoading(false);
-          return;
-        }
-        passwordChanged = true;
-      }
-
+      // Los datos del perfil se reflejan siempre que el servidor los haya
+      // guardado. Antes, si además fallaba el cambio de contraseña, se salía
+      // de la función antes de llegar acá: el nombre/apellido sí quedaba
+      // guardado en la base pero la pantalla seguía mostrando el valor viejo,
+      // dando la impresión de que "solo cambió la contraseña".
+      let perfilGuardado = false;
       if (res.ok) {
         const updatedUser = await res.json();
         localStorage.setItem("user", JSON.stringify(updatedUser));
-        
-        // Emit a custom event so other components can update their state
         window.dispatchEvent(new Event('storage'));
-        
-        setMessage(`Perfil actualizado exitosamente.${passwordChanged ? " Contraseña actualizada." : ""}`);
-        setTimeout(() => navigate("/dashboard"), 1500);
-      } else {
-        const err = await res.json();
-        setMessage(err.error || "Error al actualizar el perfil.");
+        perfilGuardado = true;
       }
+
+      let passwordChanged = false;
+      let errorPassword = "";
+
+      // Si el usuario escribió una contraseña nueva, se intenta cambiarla
+      // siempre. Antes, si además tenía contraseña propia y dejaba vacía la
+      // "actual", esta condición daba falso y el cambio se saltaba EN
+      // SILENCIO: la pantalla decía "Perfil actualizado exitosamente" y el
+      // usuario creía haber cambiado su contraseña, pero al cerrar sesión ya
+      // no podía entrar con la nueva (nunca se guardó).
+      if (passwordData.newPassword) {
+        if (tienePassword && !passwordData.currentPassword) {
+          errorPassword = "Debes ingresar tu contraseña actual para poder cambiarla.";
+        } else {
+          const passRes = await fetch("https://babycare-backend-msyq.onrender.com/api/profiles/me/password", {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify(passwordData)
+          });
+
+          if (passRes.ok) {
+            passwordChanged = true;
+            setTienePassword(true);
+            setPasswordData({ currentPassword: "", newPassword: "" });
+          } else {
+            const err = await passRes.json().catch(() => ({}));
+            errorPassword = err.error || "No se pudo actualizar la contraseña.";
+          }
+        }
+      }
+
+      if (!perfilGuardado) {
+        const err = await res.json().catch(() => ({}));
+        setMessage(err.error || "Error al actualizar el perfil.");
+        return;
+      }
+
+      if (errorPassword) {
+        // El perfil sí se guardó; se avisa solo de lo que falló.
+        setMessage(`Datos guardados, pero la contraseña no: ${errorPassword}`);
+        return;
+      }
+
+      setMessage(`Perfil actualizado exitosamente.${passwordChanged ? " Contraseña actualizada." : ""}`);
+      setTimeout(() => navigate("/dashboard"), 1500);
     } catch (error) {
       console.error(error);
       setMessage("Error al actualizar el perfil.");
@@ -129,13 +168,23 @@ export default function MiPerfil() {
             </div>
           </div>
 
-          <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "17px", fontWeight: 700, color: "var(--theme-darker)", marginTop: "12px", marginBottom: "4px" }}>Cambiar Contraseña (Opcional)</h3>
-          <div>
-            <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "8px" }}>Contraseña Actual</label>
-            <div style={{ position: "relative" }}>
-              <input type="password" name="currentPassword" value={passwordData.currentPassword} onChange={handlePasswordChange} placeholder="Ingresa tu contraseña actual" style={{ width: "100%", padding: "12px 14px", border: "2px solid #EDE9F8", borderRadius: "14px", outline: "none", boxSizing: "border-box", fontSize: "15px" }} />
+          <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "17px", fontWeight: 700, color: "var(--theme-darker)", marginTop: "12px", marginBottom: "4px" }}>
+            {tienePassword ? "Cambiar Contraseña (Opcional)" : "Crear una Contraseña (Opcional)"}
+          </h3>
+          {!tienePassword && (
+            <p style={{ color: "#8A849C", fontSize: "13px", marginTop: 0, marginBottom: "4px", lineHeight: 1.5 }}>
+              Entraste con Google, así que todavía no tienes una contraseña propia.
+              Si defines una, vas a poder entrar también con tu correo.
+            </p>
+          )}
+          {tienePassword && (
+            <div>
+              <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "8px" }}>Contraseña Actual</label>
+              <div style={{ position: "relative" }}>
+                <input type="password" name="currentPassword" value={passwordData.currentPassword} onChange={handlePasswordChange} placeholder="Ingresa tu contraseña actual" style={{ width: "100%", padding: "12px 14px", border: "2px solid #EDE9F8", borderRadius: "14px", outline: "none", boxSizing: "border-box", fontSize: "15px" }} />
+              </div>
             </div>
-          </div>
+          )}
           <div>
             <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "8px" }}>Nueva Contraseña</label>
             <div style={{ position: "relative" }}>
