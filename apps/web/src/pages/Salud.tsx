@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Syringe, Activity, Save, CheckCircle, Bell, Plus, X, FlaskConical, ClipboardCheck, Mic, MicOff, Pencil, Trash2 } from "lucide-react";
+import { ArrowLeft, Syringe, Activity, Save, CheckCircle, Bell, Plus, X, FlaskConical, ClipboardCheck, Mic, MicOff, Pencil, Trash2, FileDown } from "lucide-react";
 import TopNav from "../components/TopNav";
 import DateSelect from "../components/DateSelect";
 import TimeSelect from "../components/TimeSelect";
 import ExamenesTab from "../components/ExamenesTab";
 import ResultadoConsultaModal from "../components/ResultadoConsultaModal";
 import EditarCitaModal from "../components/EditarCitaModal";
+import InformeMedico from "../components/InformeMedico";
 import { useDictado } from "../hooks/useDictado";
 import { interpretarDictado } from "../utils/interpretarDictado";
 
@@ -35,6 +36,8 @@ export default function Salud() {
   const [isSaving, setIsSaving] = useState(false);
   const [rolAcceso, setRolAcceso] = useState<string>("propietario");
   const [perfilEstado, setPerfilEstado] = useState<string>("nacido");
+  const [perfil, setPerfil] = useState<any>(null);
+  const [showInforme, setShowInforme] = useState(false);
 
   // Estado para Citas / Controles
   const [citas, setCitas] = useState<any[]>([]);
@@ -182,6 +185,9 @@ export default function Salud() {
       .then(res => res.json())
       .then(data => {
         if (data.rol_acceso) setRolAcceso(data.rol_acceso);
+        // El informe médico necesita el perfil completo (nombre, fecha de
+        // nacimiento, previsión), no solo el estado.
+        if (data.perfil) setPerfil({ ...data.perfil, nombre: data.hero?.nombre ?? data.perfil.nombre });
         if (data.perfil?.estado) {
           setPerfilEstado(data.perfil.estado);
           if (data.perfil.estado === "embarazo") {
@@ -463,10 +469,24 @@ export default function Salud() {
           <div style={{ width: "80px", height: "80px", borderRadius: "22px", background: "linear-gradient(135deg, var(--accent-coral), var(--theme-light))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", boxShadow: "0 8px 24px rgba(255,143,163,0.3)" }}>
             <Syringe size={38} />
           </div>
-          <div>
+          <div style={{ flex: 1 }}>
             <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "32px", fontWeight: 700, margin: 0 }}>Salud y Crecimiento</h1>
             <div style={{ fontSize: "15px", color: "rgba(255,255,255,0.75)", marginTop: "4px", fontWeight: 600 }}>Administra las vacunas y el progreso de tu bebé</div>
           </div>
+
+          {/* Informe para llevar al pediatra */}
+          <button
+            onClick={() => setShowInforme(true)}
+            style={{
+              display: "flex", alignItems: "center", gap: "8px",
+              background: "rgba(255,255,255,0.15)", border: "1.5px solid rgba(255,255,255,0.3)",
+              color: "#fff", borderRadius: "100px", padding: "11px 20px",
+              fontWeight: 800, fontSize: "13.5px", cursor: "pointer",
+              fontFamily: "'Nunito', sans-serif", whiteSpace: "nowrap",
+            }}
+          >
+            <FileDown size={16} /> Informe médico
+          </button>
         </div>
 
         {/* TABS */}
@@ -1016,6 +1036,15 @@ export default function Salud() {
           token={token!}
           onClose={() => setCitaResultado(null)}
           onGuardado={fetchCitas}
+        />
+      )}
+
+      {showInforme && bebeId && (
+        <InformeMedico
+          bebeId={bebeId}
+          perfil={perfil}
+          token={token!}
+          onClose={() => setShowInforme(false)}
         />
       )}
 
