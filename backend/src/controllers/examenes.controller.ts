@@ -1,6 +1,7 @@
 import { Response } from "express";
 import { query } from "../config/db";
 import { AuthRequest } from "../middlewares/auth.middleware";
+import { cifrar, descifrar, descifrarCampos, descifrarFilas } from "../utils/cifrado";
 
 /** Puede ver el perfil (dueño o acceso compartido activo). */
 async function puedeVer(bebeId: string, usuarioId: string): Promise<boolean> {
@@ -70,7 +71,8 @@ export const getExamenes = async (req: AuthRequest, res: Response) => {
       [bebeId]
     );
 
-    res.json(result.rows);
+    // Los campos clínicos vienen cifrados de la base (ver utils/cifrado.ts).
+    res.json(descifrarFilas(result.rows, ["indicaciones", "resultado_notas"]));
   } catch (error) {
     console.error("Error en getExamenes:", error);
     res.status(500).json({ error: "Error interno del servidor" });
@@ -96,7 +98,7 @@ export const getExamenFoto = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ error: "Este examen no tiene una foto guardada" });
     }
 
-    res.json({ foto: result.rows[0].resultado_foto });
+    res.json({ foto: descifrar(result.rows[0].resultado_foto) });
   } catch (error) {
     console.error("Error en getExamenFoto:", error);
     res.status(500).json({ error: "Error interno del servidor" });
@@ -120,7 +122,7 @@ export const getExamenOrdenFoto = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ error: "Este examen no tiene una foto de la orden guardada" });
     }
 
-    res.json({ foto: result.rows[0].orden_foto });
+    res.json({ foto: descifrar(result.rows[0].orden_foto) });
   } catch (error) {
     console.error("Error en getExamenOrdenFoto:", error);
     res.status(500).json({ error: "Error interno del servidor" });
@@ -163,10 +165,10 @@ export const createExamen = async (req: AuthRequest, res: Response) => {
         bebeId,
         cita_id || null,
         nombre.trim(),
-        indicaciones?.trim() || null,
+        cifrar(indicaciones?.trim() || null),
         fecha_sugerida || null,
         req.user.id,
-        orden_foto || null,
+        cifrar(orden_foto || null),
       ]
     );
 
@@ -220,8 +222,8 @@ export const updateExamen = async (req: AuthRequest, res: Response) => {
         bebeId,
         estado ?? null,
         fechaFinal,
-        resultado_notas ?? null,
-        resultado_foto || null,
+        cifrar(resultado_notas ?? null),
+        cifrar(resultado_foto || null),
         fecha_sugerida ?? null,
       ]
     );
@@ -230,7 +232,7 @@ export const updateExamen = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ error: "Examen no encontrado" });
     }
 
-    res.json(result.rows[0]);
+    res.json(descifrarCampos(result.rows[0], ["indicaciones", "resultado_notas"]));
   } catch (error) {
     console.error("Error en updateExamen:", error);
     res.status(500).json({ error: "Error interno del servidor" });

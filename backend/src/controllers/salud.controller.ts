@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { query } from "../config/db";
 import { AuthRequest } from "../middlewares/auth.middleware";
+import { cifrar, descifrar, descifrarCampos, descifrarFilas } from "../utils/cifrado";
 
 // =======================
 // VACUNAS
@@ -182,7 +183,10 @@ export const getCitas = async (req: AuthRequest, res: Response) => {
       ORDER BY fecha_cita ASC
     `, [bebeId]);
 
-    res.json(result.rows);
+    // Los campos clínicos vienen cifrados de la base; se descifran acá para
+    // que el frontend los reciba como siempre. Las fotos no van en el
+    // listado (solo el flag tiene_receta), así que no hace falta tocarlas.
+    res.json(descifrarFilas(result.rows, ["diagnostico", "indicaciones", "resultado_notas"]));
   } catch (error) {
     console.error("Error en getCitas:", error);
     res.status(500).json({ error: "Error interno del servidor" });
@@ -327,8 +331,12 @@ export const registrarResultadoCita = async (req: AuthRequest, res: Response) =>
                 diagnostico, indicaciones, (receta_foto IS NOT NULL) AS tiene_receta
     `, [
       citaId, bebeId,
-      asistio ?? null, resultado_notas ?? null, estado ?? null,
-      peso, talla, diagnostico ?? null, indicaciones ?? null, receta_foto || null,
+      // Los campos clínicos van cifrados a la base (ver utils/cifrado.ts).
+      // El peso y la talla NO: son números, se usan para la curva de
+      // crecimiento y no identifican una condición médica por sí solos.
+      asistio ?? null, cifrar(resultado_notas ?? null), estado ?? null,
+      peso, talla, cifrar(diagnostico ?? null), cifrar(indicaciones ?? null),
+      cifrar(receta_foto || null),
       fecha_cita || null, medico ?? null, lugar ?? null, especialidad ?? null,
       tipo ?? null, notas ?? null, esResultado,
     ]);
@@ -352,7 +360,7 @@ export const registrarResultadoCita = async (req: AuthRequest, res: Response) =>
       }
     }
 
-    res.json(result.rows[0]);
+    res.json(descifrarCampos(result.rows[0], ["diagnostico", "indicaciones", "resultado_notas"]));
   } catch (error) {
     console.error("Error en registrarResultadoCita:", error);
     res.status(500).json({ error: "Error interno del servidor" });
@@ -385,7 +393,7 @@ export const getRecetaFoto = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ error: "Esta cita no tiene una receta guardada" });
     }
 
-    res.json({ foto: result.rows[0].receta_foto });
+    res.json({ foto: descifrar(result.rows[0].receta_foto) });
   } catch (error) {
     console.error("Error en getRecetaFoto:", error);
     res.status(500).json({ error: "Error interno del servidor" });
