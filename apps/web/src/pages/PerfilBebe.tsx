@@ -293,7 +293,11 @@ export default function PerfilBebe() {
       <TopNav user={user} activePath="/dashboard" />
 
       {/* ── PERFIL HEADER (Full width) ── */}
-      <div style={{ background: "linear-gradient(120deg, var(--theme-darker) 0%, #3A2E5C 55%, var(--theme-dark) 100%)", color: "#fff", padding: "48px 40px 0" }}>
+      {/* El fondo ocupa todo el ancho, pero el contenido se limita al mismo
+          max-width que .page-container (1400px) para que quede alineado con
+          el contenido de abajo, igual que en la pantalla de Inicio. */}
+      <div style={{ background: "linear-gradient(120deg, var(--theme-darker) 0%, #3A2E5C 55%, var(--theme-dark) 100%)", color: "#fff" }}>
+        <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "48px 40px 0" }}>
         <button onClick={() => navigate("/dashboard")} style={{ background: "none", border: "none", color: "var(--theme-light)", fontSize: "14px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", marginBottom: "24px" }}>
           <ArrowLeft size={16} /> Volver al Dashboard
         </button>
@@ -341,6 +345,7 @@ export default function PerfilBebe() {
           >
             <Lock size={18} /> Compartir acceso
           </button>
+        </div>
         </div>
       </div>
 

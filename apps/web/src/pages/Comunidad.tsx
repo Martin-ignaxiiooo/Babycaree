@@ -148,7 +148,7 @@ export default function Comunidad() {
               display: "flex", alignItems: "center", gap: "8px", transition: "all 0.2s",
               boxShadow: activeTab === "foros" ? "0 6px 16px var(--theme-shadow-light)" : "none",
             }}>
-            <MessageSquare size={18} /> Foros de debate
+            <MessageSquare size={18} /> Temas a compartir
           </button>
           <button 
             onClick={() => setActiveTab("articulos")}

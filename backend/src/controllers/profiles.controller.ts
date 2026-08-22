@@ -49,7 +49,7 @@ export const updatePassword = async (req: AuthRequest, res: Response) => {
     const userId = req.user.id;
     const { currentPassword, newPassword } = req.body;
 
-    if (!currentPassword || !newPassword) {
+    if (!newPassword) {
       return res.status(400).json({ error: "Faltan datos requeridos" });
     }
 
@@ -57,22 +57,62 @@ export const updatePassword = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: PASSWORD_REQUISITOS_MSG });
     }
 
-    const userRes = await query("SELECT password_hash FROM usuarios WHERE id = $1", [userId]);
+    const userRes = await query(
+      "SELECT password_hash, password_definida FROM usuarios WHERE id = $1",
+      [userId]
+    );
     if (userRes.rows.length === 0) {
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
 
-    const validPassword = await bcrypt.compare(currentPassword, userRes.rows[0].password_hash);
-    if (!validPassword) {
-      return res.status(400).json({ error: "La contraseña actual es incorrecta" });
+    // Las cuentas creadas con Google llevan un password_hash aleatorio que el
+    // usuario nunca vio. Pedirles la "contraseña actual" las dejaba sin forma
+    // de establecer una: por eso, si todavía no definieron ninguna, se les
+    // permite hacerlo directamente. Ya están autenticadas con su token.
+    const yaTienePassword = userRes.rows[0].password_definida !== false;
+
+    if (yaTienePassword) {
+      if (!currentPassword) {
+        return res.status(400).json({ error: "Debes ingresar tu contraseña actual" });
+      }
+      const validPassword = await bcrypt.compare(currentPassword, userRes.rows[0].password_hash);
+      if (!validPassword) {
+        return res.status(400).json({ error: "La contraseña actual es incorrecta" });
+      }
     }
 
     const passwordHash = await bcrypt.hash(newPassword, 12);
-    await query("UPDATE usuarios SET password_hash = $1 WHERE id = $2", [passwordHash, userId]);
+    // Se limpian los intentos fallidos y el bloqueo, igual que hace el flujo
+    // de recuperación: si el usuario acaba de elegir contraseña, no tiene
+    // sentido dejarlo bloqueado por intentos viejos.
+    await query(
+      `UPDATE usuarios
+       SET password_hash = $1, password_definida = TRUE,
+           intentos_login_fallidos = 0, bloqueado_hasta = NULL
+       WHERE id = $2`,
+      [passwordHash, userId]
+    );
 
     res.json({ message: "Contraseña actualizada exitosamente" });
   } catch (error) {
     console.error("Error in updatePassword:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
+/** GET /me/password-estado — si la cuenta ya tiene contraseña propia definida. */
+export const getPasswordEstado = async (req: AuthRequest, res: Response) => {
+  try {
+    const result = await query(
+      "SELECT password_definida FROM usuarios WHERE id = $1",
+      [req.user.id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+    res.json({ definida: result.rows[0].password_definida !== false });
+  } catch (error) {
+    console.error("Error in getPasswordEstado:", error);
     res.status(500).json({ error: "Error interno del servidor" });
   }
 };

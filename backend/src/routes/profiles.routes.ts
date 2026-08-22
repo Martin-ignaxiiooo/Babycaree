@@ -4,6 +4,7 @@ import {
   getMe,
   updateMe,
   updatePassword,
+  getPasswordEstado,
   createBabyProfile,
   getMyBabies,
   deleteBabyProfile,
@@ -28,6 +29,7 @@ router.use(verifyToken);
 router.get("/me", getMe);
 router.patch("/me", updateMe);
 router.patch("/me/password", updatePassword);
+router.get("/me/password-estado", getPasswordEstado);
 router.post("/babies", createBabyProfile);
 router.get("/babies", getMyBabies);
 router.delete("/babies/:id", deleteBabyProfile);

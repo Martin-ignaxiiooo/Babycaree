@@ -83,7 +83,7 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
 
     // 2. Fetch Latest Growth Record
     const growthRes = await query(
-      `SELECT peso_kg, talla_cm 
+      `SELECT peso_kg, talla_cm, fecha_registro
        FROM registros_crecimiento 
        WHERE bebe_id = $1 
        ORDER BY fecha_registro DESC LIMIT 1`,
@@ -97,6 +97,14 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
     const talla_cm = growthRes.rows.length > 0 
       ? parseFloat(growthRes.rows[0].talla_cm) 
       : (perfil.talla_nacimiento_cm ? parseFloat(perfil.talla_nacimiento_cm) : 0);
+
+    // Fecha del último registro, para mostrarla bajo peso/talla/percentil.
+    // Si nunca se registró un control, los valores vienen de los datos de
+    // nacimiento: en ese caso se informa esa fecha.
+    const fecha_medicion = growthRes.rows.length > 0
+      ? growthRes.rows[0].fecha_registro
+      : (perfil.fecha_nacimiento || null);
+    const medicion_es_nacimiento = growthRes.rows.length === 0;
 
     let fruta_embarazo = null;
     let semanas_embarazo = null;
@@ -153,6 +161,8 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
       prevision: perfil.nombre_prevision || perfil.prevision_salud || "Sin previsión", 
       peso_kg,
       talla_cm,
+      fecha_medicion,
+      medicion_es_nacimiento,
       percentil: perfil.fecha_nacimiento ? calculateApproxPercentile(peso_kg, perfil.fecha_nacimiento) : 0,
       semanas_embarazo,
       fruta_embarazo,
@@ -168,7 +178,8 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
 
     // A. Vacunas atrasadas/proximas
     const vacunasRes = await query(
-      `SELECT v.nombre, rv.fecha_aplicacion
+      `SELECT v.nombre, v.enfermedades_previene, v.meses_edad_recomendada,
+              rv.fecha_aplicacion
        FROM registro_vacunas rv
        JOIN vacunas_pni v ON rv.vacuna_id = v.id
        WHERE rv.bebe_id = $1 AND rv.aplicada = FALSE
@@ -188,7 +199,14 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
           prioridad: "alta",
           titulo: v.nombre + " — Atrasada",
           dias_atraso: Math.abs(diffDays),
-          mensaje: `Atrasada por ${Math.abs(diffDays)} días. Agenda tu hora.`
+          mensaje: `Atrasada por ${Math.abs(diffDays)} días. Agenda tu hora.`,
+          detalle: {
+            es_vacuna: true,
+            nombre: v.nombre,
+            previene: v.enfermedades_previene,
+            meses_edad_recomendada: v.meses_edad_recomendada,
+            fecha_programada: v.fecha_aplicacion,
+          },
         });
         total_alertas++;
       } else if (diffDays <= 7) {
@@ -197,7 +215,14 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
           prioridad: "media",
           titulo: v.nombre + " — Próxima",
           dias_restantes: diffDays,
-          mensaje: `Programada para los próximos ${diffDays} días.`
+          mensaje: `Programada para los próximos ${diffDays} días.`,
+          detalle: {
+            es_vacuna: true,
+            nombre: v.nombre,
+            previene: v.enfermedades_previene,
+            meses_edad_recomendada: v.meses_edad_recomendada,
+            fecha_programada: v.fecha_aplicacion,
+          },
         });
         total_alertas++;
       }
@@ -208,7 +233,7 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
     // reflejan un compromiso que ya se tomó, no solo un recordatorio
     // automático del calendario de vacunación.
     const citasRes = await query(
-      `SELECT especialidad, fecha_cita, medico, tipo
+      `SELECT especialidad, fecha_cita, medico, lugar, notas, tipo
        FROM citas_medicas
        WHERE bebe_id = $1 AND estado = 'programada' AND fecha_cita > NOW()
        ORDER BY fecha_cita ASC`,
@@ -228,7 +253,16 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
           prioridad: "media",
           titulo: esControl ? `Control ${c.especialidad || "sano"}` : `Cita: ${c.especialidad || "consulta"}`,
           dias_restantes: diffDays,
-          mensaje: c.medico ? `En ${diffDays} días con ${c.medico}.` : `En ${diffDays} días.`
+          mensaje: c.medico ? `En ${diffDays} días con ${c.medico}.` : `En ${diffDays} días.`,
+          // Detalle para el popup de "Lo que se viene".
+          detalle: {
+            fecha_cita: c.fecha_cita,
+            medico: c.medico,
+            lugar: c.lugar,
+            especialidad: c.especialidad,
+            notas: c.notas,
+            es_control: esControl,
+          },
         });
         total_alertas++;
       }

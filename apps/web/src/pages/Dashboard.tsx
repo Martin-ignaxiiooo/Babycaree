@@ -119,6 +119,8 @@ export default function Dashboard() {
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
+  // Notificación cuyo detalle se está viendo en el popup de "Lo que se viene".
+  const [notifDetalle, setNotifDetalle] = useState<any | null>(null);
   const [pesoInput, setPesoInput] = useState("");
   const [tallaInput, setTallaInput] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -570,6 +572,18 @@ export default function Dashboard() {
               <div style={{ fontSize: "16px", fontWeight: 800, color: "var(--theme-darker)" }}>P{hero.percentil}</div>
             </div>
           </div>
+
+          {/* Fecha del último registro: deja claro a qué momento corresponden
+              las medidas de arriba, en vez de parecer siempre "de hoy". */}
+          {hero.fecha_medicion && (
+            <div style={{
+              gridColumn: "1 / -1", textAlign: "center", fontSize: "12px",
+              color: "#8A849C", fontWeight: 600, marginTop: "-4px", paddingBottom: "4px",
+            }}>
+              {hero.medicion_es_nacimiento ? "Medidas de nacimiento · " : "Último registro · "}
+              {new Date(hero.fecha_medicion).toLocaleDateString("es-CL", { day: "numeric", month: "long", year: "numeric" })}
+            </div>
+          )}
         </div>
 
         <style>{`
@@ -586,7 +600,7 @@ export default function Dashboard() {
             {notificaciones.length > 0 && (
               <div style={{ background: "#fff", borderRadius: "26px", padding: "22px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
                 <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "18px" }}>
-                  Próximas Tareas
+                  Lo que se viene
                 </h3>
 
                 {notificaciones.map((n: any, idx: number) => {
@@ -602,9 +616,32 @@ export default function Dashboard() {
                   const { icon: StatusIcon, color: statusColor, bg: statusBg, label: statusLabel } =
                     config[n.tipo] || config.articulo;
 
+                  const d = n.detalle;
+                  // En una cita interesa el "cuándo" exacto; en una vacuna,
+                  // a qué edad corresponde (en semanas), que es como lo
+                  // maneja el calendario del PNI.
+                  let resumen = "";
+                  if (d?.fecha_cita) {
+                    const f = new Date(d.fecha_cita);
+                    resumen = `${f.toLocaleDateString("es-CL", { day: "numeric", month: "short" })} · ${f.toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" })}`;
+                  } else if (d?.es_vacuna && d.meses_edad_recomendada != null) {
+                    const semanas = Math.round(d.meses_edad_recomendada * 4.345);
+                    resumen = d.meses_edad_recomendada === 0
+                      ? "Al nacer"
+                      : `${semanas} semanas`;
+                  }
+
                   return (
                     <div key={idx}
-                      onClick={() => n.tipo === "articulo" && n.articulo_id ? navigate(`/comunidad/articulo/${n.articulo_id}`) : navigate("/salud")}
+                      onClick={() => {
+                        // El artículo recomendado sí lleva a otra pantalla;
+                        // citas y vacunas abren el detalle sin sacarte del inicio.
+                        if (n.tipo === "articulo" && n.articulo_id) {
+                          navigate(`/comunidad/articulo/${n.articulo_id}`);
+                        } else {
+                          setNotifDetalle(n);
+                        }
+                      }}
                       style={{
                         borderRadius: "999px", padding: "12px 18px", marginBottom: "10px",
                         display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", cursor: "pointer",
@@ -623,8 +660,8 @@ export default function Dashboard() {
                           {n.titulo}
                         </span>
                       </div>
-                      <span style={{ fontSize: "12px", fontWeight: 700, color: statusColor, flexShrink: 0 }}>
-                        ({statusLabel})
+                      <span style={{ fontSize: "12px", fontWeight: 700, color: statusColor, flexShrink: 0, whiteSpace: "nowrap" }}>
+                        {resumen || `(${statusLabel})`}
                       </span>
                     </div>
                   );
@@ -798,6 +835,120 @@ export default function Dashboard() {
             >
               {isSaving ? "Guardando..." : "Guardar Registro"}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Popup de detalle de "Lo que se viene" */}
+      {notifDetalle && (
+        <div
+          onClick={() => setNotifDetalle(null)}
+          style={{
+            position: "fixed", inset: 0, background: "rgba(45,38,64,0.55)", zIndex: 1000,
+            display: "flex", alignItems: "center", justifyContent: "center", padding: "20px",
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "#fff", borderRadius: "24px", width: "100%", maxWidth: "420px",
+              overflow: "hidden", fontFamily: "'Nunito', sans-serif",
+            }}
+          >
+            <div style={{
+              background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
+              padding: "20px 24px", display: "flex", justifyContent: "space-between", alignItems: "center",
+            }}>
+              <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", color: "#fff", margin: 0 }}>
+                {notifDetalle.titulo}
+              </h3>
+              <button
+                onClick={() => setNotifDetalle(null)}
+                aria-label="Cerrar"
+                style={{
+                  background: "rgba(255,255,255,0.22)", border: "none", borderRadius: "50%",
+                  width: "28px", height: "28px", display: "flex", alignItems: "center",
+                  justifyContent: "center", cursor: "pointer", color: "#fff", flexShrink: 0,
+                }}
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div style={{ padding: "22px 24px" }}>
+              {(() => {
+                const d = notifDetalle.detalle;
+
+                if (d?.fecha_cita) {
+                  const f = new Date(d.fecha_cita);
+                  const filas: [string, string][] = [
+                    ["Fecha", f.toLocaleDateString("es-CL", { weekday: "long", day: "numeric", month: "long" })],
+                    ["Hora", f.toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" })],
+                    ["Tipo", d.es_control ? "Control sano" : "Cita médica"],
+                  ];
+                  if (d.especialidad) filas.push(["Especialidad", d.especialidad]);
+                  if (d.medico) filas.push(["Médico", d.medico]);
+                  if (d.lugar) filas.push(["Lugar", d.lugar]);
+                  if (d.notas) filas.push(["Notas", d.notas]);
+                  return (
+                    <>
+                      {filas.map(([k, v]) => (
+                        <div key={k} style={{ display: "flex", gap: "12px", padding: "9px 0", borderBottom: "1px solid #F5F2FC" }}>
+                          <span style={{ fontSize: "12.5px", fontWeight: 800, color: "#8A849C", minWidth: "92px", textTransform: "uppercase", letterSpacing: "0.3px" }}>{k}</span>
+                          <span style={{ fontSize: "14px", color: "var(--theme-darker)", fontWeight: 600, textTransform: k === "Fecha" ? "capitalize" : "none" }}>{v}</span>
+                        </div>
+                      ))}
+                    </>
+                  );
+                }
+
+                if (d?.es_vacuna) {
+                  const semanas = d.meses_edad_recomendada != null
+                    ? Math.round(d.meses_edad_recomendada * 4.345)
+                    : null;
+                  const filas: [string, string][] = [["Vacuna", d.nombre]];
+                  if (d.meses_edad_recomendada != null) {
+                    filas.push([
+                      "Edad",
+                      d.meses_edad_recomendada === 0
+                        ? "Al nacer"
+                        : `${semanas} semanas (${d.meses_edad_recomendada} ${d.meses_edad_recomendada === 1 ? "mes" : "meses"})`,
+                    ]);
+                  }
+                  if (d.previene) filas.push(["Previene", d.previene]);
+                  if (d.fecha_programada) {
+                    filas.push(["Programada", new Date(d.fecha_programada).toLocaleDateString("es-CL", { day: "numeric", month: "long", year: "numeric" })]);
+                  }
+                  return (
+                    <>
+                      {filas.map(([k, v]) => (
+                        <div key={k} style={{ display: "flex", gap: "12px", padding: "9px 0", borderBottom: "1px solid #F5F2FC" }}>
+                          <span style={{ fontSize: "12.5px", fontWeight: 800, color: "#8A849C", minWidth: "92px", textTransform: "uppercase", letterSpacing: "0.3px" }}>{k}</span>
+                          <span style={{ fontSize: "14px", color: "var(--theme-darker)", fontWeight: 600 }}>{v}</span>
+                        </div>
+                      ))}
+                    </>
+                  );
+                }
+
+                return (
+                  <p style={{ fontSize: "14px", color: "#6B647F", lineHeight: 1.6, margin: 0 }}>
+                    {notifDetalle.mensaje}
+                  </p>
+                );
+              })()}
+
+              <button
+                onClick={() => { setNotifDetalle(null); navigate("/salud"); }}
+                style={{
+                  width: "100%", marginTop: "20px", padding: "13px", borderRadius: "100px",
+                  border: "none", background: "var(--theme-primary)", color: "#fff",
+                  fontWeight: 800, fontSize: "14px", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
+                }}
+              >
+                Ir a Salud
+              </button>
+            </div>
           </div>
         </div>
       )}

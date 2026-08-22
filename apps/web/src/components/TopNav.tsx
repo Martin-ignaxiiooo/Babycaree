@@ -18,8 +18,15 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [babies, setBabies] = useState<any[]>([]);
   const [switcherOpen, setSwitcherOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  // Solo el Dashboard le pasaba notificaciones al TopNav; en el resto de las
+  // pantallas la campana salía siempre vacía aunque hubiera citas próximas.
+  // Si no vienen por props, se cargan acá para que funcione en toda la app.
+  const [notifPropias, setNotifPropias] = useState<any[]>([]);
   const switcherRef = useRef<HTMLDivElement>(null);
   const activeBabyId = typeof window !== "undefined" ? localStorage.getItem("selectedBabyId") : null;
+
+  const notifs = notificaciones.length > 0 ? notificaciones : notifPropias;
 
   // Para perfiles de embarazo, mostrar "Embarazo de X" en vez del nombre a
   // secas, para no confundirlos con un bebé ya nacido en listas donde
@@ -38,6 +45,17 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
   useEffect(() => {
     fetchBabies();
   }, []);
+
+  useEffect(() => {
+    // Si la página ya nos pasó notificaciones (Dashboard), no se pide de nuevo.
+    if (notificaciones.length > 0) return;
+    const token = localStorage.getItem("token");
+    if (!token || !activeBabyId) return;
+    axios
+      .get(`${API_URL}/v1/home/${activeBabyId}`, { headers: { Authorization: `Bearer ${token}` } })
+      .then((res) => setNotifPropias(res.data?.notificaciones ?? []))
+      .catch(() => {});
+  }, [activeBabyId, notificaciones.length]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -251,16 +269,62 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
                 )}
               </div>
             )}
-            <div
-              style={{ position: "relative", cursor: "pointer", width: "38px", height: "38px", borderRadius: "10px", background: "rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}
-              onClick={() => alert("No tienes nuevas notificaciones")}
-            >
-              <Bell size={19} />
-              {notificaciones.length > 0 && (
-                <span style={{
-                  position: "absolute", top: 6, right: 6, background: "var(--accent-coral)",
-                  width: 8, height: 8, borderRadius: "50%", border: "1.5px solid var(--theme-darker)",
-                }}></span>
+            <div style={{ position: "relative" }}>
+              <div
+                style={{ position: "relative", cursor: "pointer", width: "38px", height: "38px", borderRadius: "10px", background: "rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}
+                onClick={() => setNotifOpen((v) => !v)}
+                title={notifs.length > 0 ? `${notifs.length} pendiente(s)` : "Sin notificaciones"}
+              >
+                <Bell size={19} />
+                {notifs.length > 0 && (
+                  <span style={{
+                    position: "absolute", top: -4, right: -4, background: "var(--accent-coral)",
+                    minWidth: 18, height: 18, borderRadius: 9, border: "2px solid var(--theme-darker)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: "10.5px", fontWeight: 900, color: "#fff", padding: "0 4px",
+                  }}>
+                    {notifs.length > 9 ? "9+" : notifs.length}
+                  </span>
+                )}
+              </div>
+
+              {notifOpen && (
+                <>
+                  {/* Capa para cerrar al hacer click afuera */}
+                  <div
+                    onClick={() => setNotifOpen(false)}
+                    style={{ position: "fixed", inset: 0, zIndex: 40 }}
+                  />
+                  <div style={{
+                    position: "absolute", top: "46px", right: 0, width: "300px", zIndex: 50,
+                    background: "#fff", borderRadius: "16px", overflow: "hidden",
+                    boxShadow: "0 12px 32px rgba(45,38,64,0.22)", color: "var(--theme-darker)",
+                  }}>
+                    <div style={{ padding: "13px 16px", borderBottom: "1px solid #EDE9F8", fontWeight: 800, fontSize: "14px" }}>
+                      Notificaciones
+                    </div>
+                    {notifs.length === 0 ? (
+                      <div style={{ padding: "22px 16px", fontSize: "13.5px", color: "#8A849C", textAlign: "center" }}>
+                        No tienes pendientes por ahora.
+                      </div>
+                    ) : (
+                      <div style={{ maxHeight: "320px", overflowY: "auto" }}>
+                        {notifs.map((n, i) => (
+                          <div key={i} style={{ padding: "12px 16px", borderBottom: i < notifs.length - 1 ? "1px solid #F5F2FC" : "none" }}>
+                            <div style={{ fontWeight: 700, fontSize: "13.5px" }}>
+                              {n.titulo ?? n.tipo ?? "Recordatorio"}
+                            </div>
+                            {n.mensaje && (
+                              <div style={{ fontSize: "12.5px", color: "#8A849C", marginTop: "2px", lineHeight: 1.45 }}>
+                                {n.mensaje}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </>
               )}
             </div>
             <div
