@@ -3,6 +3,7 @@ import { verifyToken } from "../middlewares/auth.middleware";
 import {
   getRegistros,
   getResumenDia,
+  getEstadisticas,
   createRegistro,
   cerrarSueno,
   deleteRegistro,
@@ -15,6 +16,7 @@ router.use(verifyToken);
 
 router.get("/:bebeId/registros", getRegistros);
 router.get("/:bebeId/registros/resumen", getResumenDia);
+router.get("/:bebeId/registros/estadisticas", getEstadisticas);
 router.post("/:bebeId/registros", createRegistro);
 router.patch("/:bebeId/registros/:registroId/despertar", cerrarSueno);
 router.delete("/:bebeId/registros/:registroId", deleteRegistro);

@@ -5,6 +5,7 @@ import {
   Droplets, Loader2, Sun,
 } from "lucide-react";
 import TopNav from "../components/TopNav";
+import EstadisticasDiario from "../components/EstadisticasDiario";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api";
 
@@ -66,6 +67,7 @@ export default function RegistroDiario() {
 
   // Formulario abierto (null = ninguno). Se abre uno a la vez para que la
   // pantalla no se llene de campos cuando se registra con una sola mano.
+  const [vista, setVista] = useState<"registro" | "patrones">("registro");
   const [abierto, setAbierto] = useState<Tipo | null>(null);
   const [guardando, setGuardando] = useState(false);
 
@@ -168,10 +170,34 @@ export default function RegistroDiario() {
           <p style={{ color: "rgba(255,255,255,0.7)", marginTop: "6px", fontSize: "15px" }}>
             Tomas, sueño y pañales. Lo del día a día, a mano.
           </p>
+
+          <div style={{ display: "flex", gap: "26px", marginTop: "22px" }}>
+            {([["registro", "Registro"], ["patrones", "Patrones"]] as const).map(([v, l]) => (
+              <button
+                key={v}
+                onClick={() => setVista(v)}
+                style={{
+                  background: "none", border: "none", cursor: "pointer",
+                  padding: "0 0 10px", fontFamily: "'Nunito', sans-serif",
+                  fontSize: "15px", fontWeight: 800,
+                  color: vista === v ? "#fff" : "rgba(255,255,255,0.55)",
+                  borderBottom: vista === v ? "3px solid var(--accent-coral, #F4A0A0)" : "3px solid transparent",
+                }}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
       <div className="page-container" style={{ padding: "28px 40px 60px" }}>
+        {vista === "patrones" && bebeId && (
+          <EstadisticasDiario bebeId={bebeId} token={token!} />
+        )}
+
+        {vista === "registro" && (
+        <>
         {/* Resumen de hoy */}
         {resumen && (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "14px", marginBottom: "26px" }}>
@@ -301,6 +327,8 @@ export default function RegistroDiario() {
               </div>
             );
           })
+        )}
+        </>
         )}
       </div>
     </div>

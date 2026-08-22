@@ -283,3 +283,160 @@ export const deleteRegistro = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ error: "Error interno del servidor" });
   }
 };
+
+// ─────────────────────────────────────────────────────────────────────────
+// GET /:bebeId/registros/estadisticas?dias=14
+// ─────────────────────────────────────────────────────────────────────────
+/**
+ * Patrones del diario: lo que el papel no puede decirte.
+ *
+ * No devuelve datos crudos sino respuestas a lo que un padre realmente se
+ * pregunta: ¿cuánto duerme?, ¿cada cuánto come?, ¿esto está cambiando?
+ *
+ * Todo se calcula en SQL para no traer semanas de registros y sumarlos en
+ * JS. La ventana por defecto es de 14 días: suficiente para ver una
+ * tendencia, corto para que refleje cómo está el bebé *ahora* y no hace
+ * un mes (a esta edad cambian rápido).
+ */
+export const getEstadisticas = async (req: AuthRequest, res: Response) => {
+  try {
+    const { bebeId } = req.params;
+
+    if (!(await tieneAcceso(bebeId, req.user.id))) {
+      return res.status(403).json({ error: "No tienes permiso para ver este perfil" });
+    }
+
+    const dias = Math.min(Math.max(Number(req.query.dias) || 14, 3), 90);
+
+    // ── Serie por día: alimenta los gráficos ────────────────────────────
+    const porDiaRes = await query(
+      `SELECT
+         to_char(d.dia, 'YYYY-MM-DD')                                   AS dia,
+         COUNT(r.id) FILTER (WHERE r.tipo = 'toma')                     AS tomas,
+         COALESCE(SUM(r.cantidad_ml) FILTER (WHERE r.tipo = 'toma'), 0) AS ml,
+         COUNT(r.id) FILTER (WHERE r.tipo = 'panal')                    AS panales,
+         COALESCE(ROUND(SUM(
+           EXTRACT(EPOCH FROM (r.sueno_fin - r.sueno_inicio)) / 60
+         ) FILTER (WHERE r.tipo = 'sueno' AND r.sueno_fin IS NOT NULL)), 0) AS sueno_min
+       FROM generate_series(
+              date_trunc('day', NOW()) - ($2::int - 1) * INTERVAL '1 day',
+              date_trunc('day', NOW()),
+              INTERVAL '1 day'
+            ) AS d(dia)
+       LEFT JOIN registros_diarios r
+         ON r.bebe_id = $1
+        AND r.fecha_hora >= d.dia
+        AND r.fecha_hora <  d.dia + INTERVAL '1 day'
+       GROUP BY d.dia
+       ORDER BY d.dia ASC`,
+      [bebeId, dias]
+    );
+
+    // ── Intervalo entre tomas ───────────────────────────────────────────
+    // Se mide con LAG (diferencia con la toma anterior). Se descartan
+    // intervalos de más de 12 h: casi siempre significan que alguien se
+    // olvidó de registrar, no que el bebé pasó medio día sin comer.
+    const intervaloRes = await query(
+      `SELECT ROUND(AVG(gap))::int AS promedio_min
+       FROM (
+         SELECT EXTRACT(EPOCH FROM (
+                  fecha_hora - LAG(fecha_hora) OVER (ORDER BY fecha_hora)
+                )) / 60 AS gap
+         FROM registros_diarios
+         WHERE bebe_id = $1 AND tipo = 'toma'
+           AND fecha_hora >= NOW() - ($2::int || ' days')::interval
+       ) t
+       WHERE gap IS NOT NULL AND gap > 0 AND gap <= 720`,
+      [bebeId, dias]
+    );
+
+    // ── Sueño: noche vs día ─────────────────────────────────────────────
+    // Se considera nocturno lo que empieza entre las 19:00 y las 06:00.
+    // Interesa el tramo más largo: "¿ya duerme corrido?" es la pregunta.
+    const suenoRes = await query(
+      `SELECT
+         COALESCE(ROUND(AVG(dur) FILTER (WHERE es_noche)), 0)      AS promedio_noche_min,
+         COALESCE(ROUND(AVG(dur) FILTER (WHERE NOT es_noche)), 0)  AS promedio_siesta_min,
+         COALESCE(ROUND(MAX(dur)), 0)                              AS tramo_mas_largo_min,
+         COUNT(*) FILTER (WHERE NOT es_noche)                      AS total_siestas
+       FROM (
+         SELECT
+           EXTRACT(EPOCH FROM (sueno_fin - sueno_inicio)) / 60 AS dur,
+           (EXTRACT(HOUR FROM sueno_inicio) >= 19
+            OR EXTRACT(HOUR FROM sueno_inicio) < 6)            AS es_noche
+         FROM registros_diarios
+         WHERE bebe_id = $1 AND tipo = 'sueno' AND sueno_fin IS NOT NULL
+           AND sueno_inicio >= NOW() - ($2::int || ' days')::interval
+       ) s
+       WHERE dur > 0`,
+      [bebeId, dias]
+    );
+
+    // ── Tendencia: primera mitad del período vs segunda ─────────────────
+    // Responde "¿esto está cambiando?" comparando ambas mitades, en vez de
+    // mostrar un número suelto sin contexto.
+    const tendenciaRes = await query(
+      `SELECT
+         COALESCE(AVG(tomas) FILTER (WHERE mitad = 'vieja'), 0)  AS tomas_antes,
+         COALESCE(AVG(tomas) FILTER (WHERE mitad = 'nueva'), 0)  AS tomas_ahora,
+         COALESCE(AVG(sueno) FILTER (WHERE mitad = 'vieja'), 0)  AS sueno_antes,
+         COALESCE(AVG(sueno) FILTER (WHERE mitad = 'nueva'), 0)  AS sueno_ahora
+       FROM (
+         SELECT
+           date_trunc('day', fecha_hora) AS dia,
+           CASE WHEN fecha_hora >= NOW() - ($2::int / 2 || ' days')::interval
+                THEN 'nueva' ELSE 'vieja' END AS mitad,
+           COUNT(*) FILTER (WHERE tipo = 'toma') AS tomas,
+           COALESCE(SUM(
+             EXTRACT(EPOCH FROM (sueno_fin - sueno_inicio)) / 60
+           ) FILTER (WHERE tipo = 'sueno' AND sueno_fin IS NOT NULL), 0) AS sueno
+         FROM registros_diarios
+         WHERE bebe_id = $1
+           AND fecha_hora >= NOW() - ($2::int || ' days')::interval
+         GROUP BY 1, 2
+       ) d`,
+      [bebeId, dias]
+    );
+
+    const s = suenoRes.rows[0] ?? {};
+    const t = tendenciaRes.rows[0] ?? {};
+    const porDia = porDiaRes.rows.map((r: any) => ({
+      dia: r.dia,
+      tomas: Number(r.tomas),
+      ml: Number(r.ml),
+      panales: Number(r.panales),
+      sueno_min: Number(r.sueno_min),
+    }));
+
+    // Con muy pocos datos cualquier promedio engaña. Se avisa para que la
+    // interfaz muestre "sigue registrando" en vez de conclusiones falsas.
+    const diasConDatos = porDia.filter((d) => d.tomas > 0 || d.sueno_min > 0 || d.panales > 0).length;
+
+    res.json({
+      dias,
+      dias_con_datos: diasConDatos,
+      datos_suficientes: diasConDatos >= 3,
+      por_dia: porDia,
+      tomas: {
+        intervalo_promedio_min: intervaloRes.rows[0]?.promedio_min ?? null,
+      },
+      sueno: {
+        promedio_noche_min: Number(s.promedio_noche_min ?? 0),
+        promedio_siesta_min: Number(s.promedio_siesta_min ?? 0),
+        tramo_mas_largo_min: Number(s.tramo_mas_largo_min ?? 0),
+        siestas_por_dia: diasConDatos > 0
+          ? Number((Number(s.total_siestas ?? 0) / diasConDatos).toFixed(1))
+          : 0,
+      },
+      tendencia: {
+        tomas_antes: Number(Number(t.tomas_antes ?? 0).toFixed(1)),
+        tomas_ahora: Number(Number(t.tomas_ahora ?? 0).toFixed(1)),
+        sueno_antes_min: Math.round(Number(t.sueno_antes ?? 0)),
+        sueno_ahora_min: Math.round(Number(t.sueno_ahora ?? 0)),
+      },
+    });
+  } catch (error) {
+    console.error("Error en getEstadisticas:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
