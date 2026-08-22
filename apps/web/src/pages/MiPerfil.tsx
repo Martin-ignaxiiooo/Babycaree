@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, User, Mail, Save } from "lucide-react";
 import TopNav from "../components/TopNav";
+import { useNotificaciones } from "../hooks/useNotificaciones";
 
 export default function MiPerfil() {
+  const notif = useNotificaciones();
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   
@@ -197,7 +199,82 @@ export default function MiPerfil() {
             {loading ? "Guardando..." : "Guardar cambios"}
           </button>
         </form>
+
+        {/* Notificaciones push */}
+        <div style={{ borderTop: "1px solid var(--border-soft)", marginTop: "32px", paddingTop: "26px" }}>
+          <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", color: "var(--text)", margin: "0 0 6px" }}>
+            Avisos en el teléfono
+          </h2>
+          <p style={{ fontSize: "14px", color: "var(--text-muted)", lineHeight: 1.6, margin: "0 0 16px" }}>
+            Recibe las vacunas, controles y exámenes pendientes como notificación,
+            además del correo.
+          </p>
+
+          {notif.estado === "cargando" && (
+            <p style={{ fontSize: "13.5px", color: "var(--text-muted)" }}>Revisando…</p>
+          )}
+
+          {notif.estado === "activo" && (
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+              <span style={{ background: "#E8F7F1", color: "#3E8E6E", padding: "8px 14px", borderRadius: "100px", fontWeight: 800, fontSize: "13px" }}>
+                ✓ Activadas en este dispositivo
+              </span>
+              <button
+                onClick={notif.desactivar}
+                disabled={notif.procesando}
+                style={{ background: "none", border: "none", color: "var(--text-muted)", textDecoration: "underline", cursor: "pointer", fontSize: "13px", fontWeight: 700, fontFamily: "'Nunito', sans-serif" }}
+              >
+                Desactivar
+              </button>
+            </div>
+          )}
+
+          {notif.estado === "inactivo" && (
+            <button
+              onClick={notif.activar}
+              disabled={notif.procesando}
+              style={{ background: "var(--theme-primary)", color: "#fff", border: "none", borderRadius: "100px", padding: "13px 24px", fontWeight: 800, fontSize: "14px", cursor: notif.procesando ? "not-allowed" : "pointer", opacity: notif.procesando ? 0.6 : 1, fontFamily: "'Nunito', sans-serif" }}
+            >
+              {notif.procesando ? "Activando…" : "Activar notificaciones"}
+            </button>
+          )}
+
+          {notif.estado === "bloqueado" && (
+            <Aviso>
+              Bloqueaste las notificaciones para este sitio. Para activarlas,
+              entra a los ajustes del navegador para esta página y permite las
+              notificaciones.
+            </Aviso>
+          )}
+
+          {notif.estado === "requiere_instalar" && (
+            <Aviso>
+              En iPhone y iPad las notificaciones solo funcionan si instalas la
+              app: toca “Compartir” y luego “Agregar a pantalla de inicio”.
+            </Aviso>
+          )}
+
+          {notif.estado === "no_soportado" && (
+            <Aviso>Este navegador no admite notificaciones. Los avisos te seguirán llegando por correo.</Aviso>
+          )}
+
+          {notif.estado === "no_disponible" && (
+            <Aviso>Las notificaciones no están disponibles por ahora. Los avisos te seguirán llegando por correo.</Aviso>
+          )}
+
+          {notif.error && (
+            <p style={{ color: "#D97070", fontSize: "13px", fontWeight: 600, marginTop: "10px" }}>{notif.error}</p>
+          )}
+        </div>
       </div>
+    </div>
+  );
+}
+
+function Aviso({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ background: "var(--surface-2)", border: "1.5px solid var(--border)", borderRadius: "14px", padding: "14px 16px", fontSize: "13.5px", color: "var(--text-muted)", lineHeight: 1.6 }}>
+      {children}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { query } from "../config/db";
 import { sendAppointmentReminder, sendPostAppointmentFollowUp, sendExamReminder } from "../config/mailer";
+import { enviarPush } from "./push.service";
 
 // Cada "ventana" define cuándo se dispara un recordatorio, en base a cuánto
 // falta para la cita. Al no superponerse, un cron corriendo cada cierto
@@ -37,9 +38,9 @@ export async function revisarYEnviarRecordatorios(): Promise<void> {
         // Destinatarios: el dueño de la cuenta + familiares con acceso
         // compartido que hayan activado "recibir_notificaciones"
         const destinatariosRes = await query(
-          `SELECT u.email, u.nombre FROM usuarios u WHERE u.id = $1
+          `SELECT u.id, u.email, u.nombre FROM usuarios u WHERE u.id = $1
            UNION
-           SELECT u.email, u.nombre
+           SELECT u.id, u.email, u.nombre
            FROM accesos_compartidos_bebe acb
            JOIN usuarios u ON u.id = acb.id_usuario_invitado
            WHERE acb.id_perfil_bebe = $2 AND acb.estado = 'activo' AND acb.recibir_notificaciones = TRUE`,
@@ -58,6 +59,16 @@ export async function revisarYEnviarRecordatorios(): Promise<void> {
           } catch (emailError) {
             console.error(`[recordatorios] Error enviando a ${destinatario.email}:`, emailError);
           }
+
+          // El push va además del correo, no en su lugar: no todos aceptan
+          // el permiso, y en iOS solo llega si instalaron la PWA. Si falla,
+          // el correo ya salió.
+          enviarPush(destinatario.id, {
+            titulo: `${cita.bebe_nombre}: ${cita.especialidad || "control médico"}`,
+            cuerpo: `Es ${ventana.etiqueta}${cita.medico ? ` con ${cita.medico}` : ""}.`,
+            url: "/salud",
+            tag: `cita-${cita.id}`,
+          }).catch(() => {});
         }
 
         await query(
@@ -104,9 +115,9 @@ export async function revisarYEnviarSeguimientos(): Promise<void> {
       // Mismos destinatarios que los recordatorios: quien administra la
       // cuenta y los familiares que pidieron recibir notificaciones.
       const destinatariosRes = await query(
-        `SELECT u.email, u.nombre FROM usuarios u WHERE u.id = $1
+        `SELECT u.id, u.email, u.nombre FROM usuarios u WHERE u.id = $1
          UNION
-         SELECT u.email, u.nombre
+         SELECT u.id, u.email, u.nombre
          FROM accesos_compartidos_bebe acb
          JOIN usuarios u ON u.id = acb.id_usuario_invitado
          WHERE acb.id_perfil_bebe = $2 AND acb.estado = 'activo' AND acb.recibir_notificaciones = TRUE`,
@@ -130,6 +141,13 @@ export async function revisarYEnviarSeguimientos(): Promise<void> {
         } catch (emailError) {
           console.error(`[seguimiento] Error enviando a ${destinatario.email}:`, emailError);
         }
+
+        enviarPush(destinatario.id, {
+          titulo: `¿Cómo le fue a ${cita.bebe_nombre}?`,
+          cuerpo: "Registra el peso, el diagnóstico y la receta de la consulta.",
+          url: "/salud",
+          tag: `seguimiento-${cita.id}`,
+        }).catch(() => {});
       }
 
       // Se marca aunque algún correo haya fallado: reintentar en la próxima
@@ -175,9 +193,9 @@ export async function revisarYEnviarRecordatoriosExamenes(): Promise<void> {
 
     for (const examen of examenesRes.rows) {
       const destinatariosRes = await query(
-        `SELECT u.email, u.nombre FROM usuarios u WHERE u.id = $1
+        `SELECT u.id, u.email, u.nombre FROM usuarios u WHERE u.id = $1
          UNION
-         SELECT u.email, u.nombre
+         SELECT u.id, u.email, u.nombre
          FROM accesos_compartidos_bebe acb
          JOIN usuarios u ON u.id = acb.id_usuario_invitado
          WHERE acb.id_perfil_bebe = $2 AND acb.estado = 'activo' AND acb.recibir_notificaciones = TRUE`,
@@ -199,6 +217,13 @@ export async function revisarYEnviarRecordatoriosExamenes(): Promise<void> {
         } catch (emailError) {
           console.error(`[examenes] Error enviando a ${destinatario.email}:`, emailError);
         }
+
+        enviarPush(destinatario.id, {
+          titulo: `Examen pendiente de ${examen.bebe_nombre}`,
+          cuerpo: `${examen.nombre}: si ya se lo hicieron, márcalo como realizado.`,
+          url: "/salud",
+          tag: `examen-${examen.id}`,
+        }).catch(() => {});
       }
 
       await query(

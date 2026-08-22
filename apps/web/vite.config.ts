@@ -10,6 +10,16 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
+      // injectManifest en vez de generateSW: hace falta código propio en el
+      // service worker para manejar los eventos push, que un SW generado
+      // automáticamente no incluye. Ver src/sw.ts.
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
+      injectManifest: {
+        // El bundle principal supera el límite por defecto de 2 MB.
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
+      },
       includeAssets: ['favicon.png', 'pwa-icons/apple-touch-icon.png'],
       manifest: {
         name: 'Baby Care',
@@ -37,17 +47,6 @@ export default defineConfig({
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',
-          },
-        ],
-      },
-      workbox: {
-        // No cachear llamadas a la API del backend: los datos del bebé
-        // siempre deben venir frescos del servidor, no de una copia offline.
-        navigateFallbackDenylist: [/^\/api/],
-        runtimeCaching: [
-          {
-            urlPattern: ({ url }) => url.origin.includes('babycare-backend'),
-            handler: 'NetworkOnly',
           },
         ],
       },

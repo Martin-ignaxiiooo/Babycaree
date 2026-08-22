@@ -16,6 +16,7 @@ import perfilBebeRoutes from "./routes/perfil_bebe.routes";
 import personasRoutes from "./routes/personas.routes";
 import saludRoutes from "./routes/salud.routes";
 import registroDiarioRoutes from "./routes/registro_diario.routes";
+import pushRoutes from "./routes/push.routes";
 import directorioPublicoRoutes from "./routes/directorio_publico.routes";
 import comunidadRoutes from "./routes/comunidad.routes";
 import { revisarYEnviarRecordatorios, revisarYEnviarSeguimientos, revisarYEnviarRecordatoriosExamenes } from "./services/citaReminders.service";
@@ -79,6 +80,7 @@ app.use("/api/v1/perfiles-bebe", perfilBebeRoutes);
 app.use("/api/v1/personas", personasRoutes);
 app.use("/api/v1/salud", saludRoutes);
 app.use("/api/v1/diario", registroDiarioRoutes);
+app.use("/api/v1/push", pushRoutes);
 app.use("/api/v1/directorio", directorioPublicoRoutes);
 app.use("/api/v1/comunidad", comunidadRoutes);
 
