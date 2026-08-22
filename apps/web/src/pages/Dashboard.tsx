@@ -11,6 +11,29 @@ import DashboardEmbarazo from "./DashboardEmbarazo";
 const API_URL = "https://babycare-backend-msyq.onrender.com/api";
 
 // Iconos que no existen en lucide-react, dibujados a mano para calzar con el diseño de referencia
+function DiarioIcon({ size = 28 }: { size?: number }) {
+  const stroke = "#4A3770";
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
+      {/* Cuaderno */}
+      <rect x="10" y="7" width="26" height="34" rx="4" fill="#DCEBFF" stroke={stroke} strokeWidth="1.8" />
+      {/* Lomo con anillas */}
+      <path d="M16 7v34" stroke={stroke} strokeWidth="1.4" opacity="0.5" />
+      <circle cx="13" cy="14" r="1.1" fill={stroke} opacity="0.6" />
+      <circle cx="13" cy="24" r="1.1" fill={stroke} opacity="0.6" />
+      <circle cx="13" cy="34" r="1.1" fill={stroke} opacity="0.6" />
+      {/* Renglones anotados */}
+      <path d="M20 16h11" stroke={stroke} strokeWidth="1.6" strokeLinecap="round" opacity="0.75" />
+      <path d="M20 22h11" stroke={stroke} strokeWidth="1.6" strokeLinecap="round" opacity="0.75" />
+      <path d="M20 28h7" stroke={stroke} strokeWidth="1.6" strokeLinecap="round" opacity="0.75" />
+      {/* Biberón: lo que se anota acá */}
+      <rect x="28" y="27" width="10" height="14" rx="3" fill="#FBD8B8" stroke={stroke} strokeWidth="1.6" />
+      <path d="M30.5 27v-2.5h5V27" stroke={stroke} strokeWidth="1.6" fill="#F4A0A0" />
+      <path d="M29.5 34h7" stroke={stroke} strokeWidth="1.3" strokeLinecap="round" opacity="0.55" />
+    </svg>
+  );
+}
+
 function BabyFaceIcon({ size = 28 }: { size?: number }) {
   const stroke = "#4A3770";
   return (
@@ -749,6 +772,7 @@ export default function Dashboard() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
 
               {[
+                { icon: DiarioIcon, label: "Diario", hoverBg: "#E3F2FD", hoverBorder: "#1976D2", onClick: () => navigate("/diario") },
                 { icon: BabyFaceIcon, label: "Perfil", hoverBg: "var(--theme-bg-light)", hoverBorder: "var(--theme-primary)", onClick: () => navigate(`/perfil/${hero.id}`) },
                 { icon: HeartPlusIcon, label: "Salud", hoverBg: "#FFF0F0", hoverBorder: "#F4A0A0", onClick: () => navigate("/salud") },
                 { icon: ComunidadIcon, label: "Comunidad", hoverBg: "#F3EEFD", hoverBorder: "#B39DDB", onClick: () => navigate("/comunidad") },

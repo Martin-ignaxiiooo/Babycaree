@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import PerfilBebe from "./pages/PerfilBebe";
 import InfoEmbarazoSemana from "./pages/InfoEmbarazoSemana";
 import Galeria from "./pages/Galeria";
+import RegistroDiario from "./pages/RegistroDiario";
 import Salud from "./pages/Salud";
 import Comunidad from "./pages/Comunidad";
 import ForoDetalle from "./pages/ForoDetalle";
@@ -43,6 +44,7 @@ function App() {
         <Route path="/perfil/:id" element={<PerfilBebe />} />
         <Route path="/embarazo/:id/info" element={<InfoEmbarazoSemana />} />
         <Route path="/galeria" element={<Galeria />} />
+        <Route path="/diario" element={<RegistroDiario />} />
         <Route path="/salud" element={<Salud />} />
         <Route path="/comunidad" element={<Comunidad />} />
         <Route path="/comunidad/foro/:id" element={<ForoDetalle />} />
