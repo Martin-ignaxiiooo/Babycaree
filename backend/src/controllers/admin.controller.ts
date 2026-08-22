@@ -111,10 +111,57 @@ export const login = async (req: Request, res: Response) => {
       return res.status(403).json({ error: "Cuenta no activa" });
     }
 
+    // Bloqueo por intentos fallidos. El rate limit por IP no alcanza para
+    // una cuenta de admin: se evade rotando IPs. Esto bloquea la CUENTA,
+    // igual que ya hacían los usuarios normales.
+    if (admin.bloqueado_hasta && new Date(admin.bloqueado_hasta) > new Date()) {
+      const minutos = Math.ceil(
+        (new Date(admin.bloqueado_hasta).getTime() - Date.now()) / 60000,
+      );
+      return res.status(429).json({
+        error: `Cuenta bloqueada. Intenta nuevamente en ${minutos} minuto${minutos !== 1 ? "s" : ""}.`,
+        bloqueado: true,
+      });
+    }
+
     const match = await bcrypt.compare(password, admin.hash_contrasena);
     if (!match) {
-      return res.status(401).json({ error: "Credenciales inválidas" });
+      const intentos = (admin.intentos_login_fallidos || 0) + 1;
+
+      // 5 intentos y 15 minutos: mismos números que en el login de
+      // usuarios, para que la política sea una sola y predecible.
+      if (intentos >= 5) {
+        const bloqueadoHasta = new Date(Date.now() + 15 * 60 * 1000);
+        await query(
+          "UPDATE administradores SET intentos_login_fallidos = $1, bloqueado_hasta = $2 WHERE id = $3",
+          [intentos, bloqueadoHasta, admin.id],
+        );
+        return res.status(429).json({
+          error: "Cuenta bloqueada por 15 minutos por múltiples intentos fallidos.",
+          bloqueado: true,
+        });
+      }
+
+      await query(
+        "UPDATE administradores SET intentos_login_fallidos = $1 WHERE id = $2",
+        [intentos, admin.id],
+      );
+      // Se informa cuántos quedan, igual que a los usuarios: ayuda a quien
+      // de verdad olvidó su clave sin regalar información útil a un atacante
+      // (que de todos modos puede contar sus propios intentos).
+      return res.status(401).json({
+        error: "Credenciales inválidas",
+        intentos_restantes: 5 - intentos,
+      });
     }
+
+    // Contraseña correcta: se limpian los contadores. Se hace acá y no
+    // después del 2FA, porque la contraseña ya se validó — el 2FA es otra
+    // barrera, con su propio límite de intentos.
+    await query(
+      "UPDATE administradores SET intentos_login_fallidos = 0, bloqueado_hasta = NULL WHERE id = $1",
+      [admin.id],
+    );
 
     // 2FA por correo: si la cuenta lo requiere, se genera un código de 6
     // dígitos, se guarda su hash (nunca el código en claro) y se manda al
@@ -462,7 +509,12 @@ export const updateAdministradorPassword = async (
     const hash = await bcrypt.hash(nueva_contrasena, 10);
 
     const result = await query(
-      "UPDATE administradores SET hash_contrasena=$1 WHERE id=$2 RETURNING id, nombre_completo, correo_corporativo",
+      // Se limpia también el bloqueo: si un admin quedó bloqueado por
+      // intentos fallidos, cambiarle la contraseña debe devolverle el
+      // acceso de inmediato, sin esperar los 15 minutos.
+      `UPDATE administradores
+       SET hash_contrasena=$1, intentos_login_fallidos = 0, bloqueado_hasta = NULL
+       WHERE id=$2 RETURNING id, nombre_completo, correo_corporativo`,
       [hash, id],
     );
     
