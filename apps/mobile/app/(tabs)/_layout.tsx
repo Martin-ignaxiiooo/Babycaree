@@ -1,7 +1,7 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { View, StyleSheet } from 'react-native';
-import { LayoutDashboard, HeartPulse, Lightbulb, Stethoscope, User } from 'lucide-react-native';
+import { LayoutDashboard, HeartPulse, Lightbulb, NotebookPen, User } from 'lucide-react-native';
 import { Colors } from '../../constants/colors';
 import { BabyProvider } from '../../constants/BabyContext';
 
@@ -49,12 +49,16 @@ export default function TabsLayout() {
           }}
         />
         <Tabs.Screen
-          name="directorio"
+          name="diario"
           options={{
-            title: 'Médicos',
-            tabBarIcon: ({ focused }) => <TabIcon Icon={Stethoscope} focused={focused} />,
+            title: 'Diario',
+            tabBarIcon: ({ focused }) => <TabIcon Icon={NotebookPen} focused={focused} />,
           }}
         />
+        {/* El directorio médico sigue existiendo pero fuera de la barra:
+            se consulta de vez en cuando, no vale un lugar permanente
+            frente al diario, que se usa varias veces al día. */}
+        <Tabs.Screen name="directorio" options={{ href: null }} />
         <Tabs.Screen
           name="perfil"
           options={{

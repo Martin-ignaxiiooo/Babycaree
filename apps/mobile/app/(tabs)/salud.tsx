@@ -186,6 +186,18 @@ export default function SaludScreen() {
               <Text style={styles.agendarText}>Agendar control o cita</Text>
             </TouchableOpacity>
 
+            {/* El directorio salió de la barra de pestañas para dejarle el
+                lugar al diario; se llega desde acá, que es donde tiene
+                sentido buscarlo. */}
+            <TouchableOpacity
+              onPress={() => router.push('/(tabs)/directorio')}
+              activeOpacity={0.85}
+              style={styles.directorioBtn}
+            >
+              <Stethoscope size={17} color={Colors.primary} />
+              <Text style={styles.directorioText}>Buscar un médico</Text>
+            </TouchableOpacity>
+
             {citas.length > 0 && (
               <View style={{ marginTop: 22 }}>
                 <Text style={styles.sectionTitle}>Próximas citas</Text>
@@ -332,6 +344,19 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     marginTop: 18,
   },
+  directorioBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: Colors.card,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    borderRadius: 100,
+    paddingVertical: 13,
+    marginTop: 10,
+  },
+  directorioText: { color: Colors.primary, fontFamily: 'Nunito_800ExtraBold', fontSize: 14 },
   agendarText: { color: 'white', fontFamily: 'Nunito_800ExtraBold', fontSize: 14.5 },
   sectionTitle: {
     fontSize: 17,
