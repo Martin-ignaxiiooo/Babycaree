@@ -59,6 +59,53 @@ body {
 /* ==================================================
    ADMIN PANEL STYLES
    ================================================== */
+
+/* ─── Superficies y texto: la base del modo claro/oscuro ──────────────────
+   Antes los componentes escribían "#fff" y "#2D2640" directo. Con estas
+   variables el mismo componente sirve para los dos modos y no hay que
+   duplicar estilos.
+
+   Ojo: --text-inverso NO cambia entre modos. Es el texto que va sobre las
+   cabeceras de gradiente morado, que son oscuras en ambos temas. */
+:root {
+  --surface: #ffffff;          /* tarjetas, modales, barras */
+  --surface-2: #F9FAFB;        /* fondos sutiles dentro de una tarjeta */
+  --surface-3: #FBFAFE;        /* campos de formulario */
+  --page-bg: #FAF9FD;          /* fondo de página */
+  --text: #2D2640;             /* texto principal */
+  --text-muted: #8A849C;       /* texto secundario */
+  --text-inverso: #ffffff;     /* sobre gradientes oscuros: no cambia */
+  --border: #E4DBF7;
+  --border-soft: #EDE9F8;
+}
+
+[data-tema="oscuro"] {
+  /* No se usa negro puro: en pantallas OLED el contraste puro cansa la
+     vista, y de madrugada esta app se mira con el bebé en brazos. */
+  --surface: #221E2E;
+  --surface-2: #2A2539;
+  --surface-3: #2F2A3E;
+  --page-bg: #191622;
+  --text: #EDEAF5;
+  --text-muted: #A49DB8;
+  --border: #3A3350;
+  --border-soft: #332D47;
+
+  /* El lavanda de marca se aclara: el tono original sobre fondo oscuro
+     queda por debajo del contraste mínimo legible. */
+  --theme-primary: #A78BE0;
+  --theme-light: #C0A9EE;
+  --theme-bg-light: #2F2A44;
+  --theme-bg-hover: #383150;
+}
+
+/* El fondo de página se aplica acá para que el modo oscuro alcance también
+   a las zonas que no cubre ningún componente. */
+body {
+  background: var(--page-bg);
+  color: var(--text);
+}
+
 :root {
   /* Dynamic Theme Variables (Default: Purple) */
   --theme-primary: #7C5CBF;

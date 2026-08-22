@@ -220,7 +220,7 @@ export default function RegistroDiario() {
             </div>
             <button
               onClick={() => despertar(suenoEnCurso.id)}
-              style={{ background: "#fff", color: "var(--theme-primary)", border: "none", borderRadius: "100px", padding: "11px 22px", fontWeight: 800, fontSize: "14px", cursor: "pointer", display: "flex", alignItems: "center", gap: "7px", fontFamily: "'Nunito', sans-serif" }}
+              style={{ background: "var(--surface)", color: "var(--theme-primary)", border: "none", borderRadius: "100px", padding: "11px 22px", fontWeight: 800, fontSize: "14px", cursor: "pointer", display: "flex", alignItems: "center", gap: "7px", fontFamily: "'Nunito', sans-serif" }}
             >
               <Sun size={16} /> Ya despertó
             </button>
@@ -291,17 +291,17 @@ export default function RegistroDiario() {
         )}
 
         {/* Línea de tiempo */}
-        <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "20px", color: "var(--theme-darker)", margin: "26px 0 14px" }}>
+        <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "20px", color: "var(--text)", margin: "26px 0 14px" }}>
           Últimos registros
         </h2>
 
         {cargando ? (
-          <div style={{ textAlign: "center", padding: "50px", color: "#8A849C" }}><Loader2 size={26} className="spin-icon" /></div>
+          <div style={{ textAlign: "center", padding: "50px", color: "var(--text-muted)" }}><Loader2 size={26} className="spin-icon" /></div>
         ) : registros.length === 0 ? (
-          <div style={{ background: "#fff", borderRadius: "20px", padding: "50px 24px", textAlign: "center", boxShadow: "0 4px 18px rgba(124,92,191,0.06)" }}>
+          <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "50px 24px", textAlign: "center", boxShadow: "0 4px 18px rgba(124,92,191,0.06)" }}>
             <Clock size={38} color="var(--theme-primary)" style={{ opacity: 0.45 }} />
-            <div style={{ fontWeight: 800, color: "var(--theme-darker)", marginTop: "12px", fontSize: "16px" }}>Todavía no hay registros</div>
-            <div style={{ color: "#8A849C", fontSize: "14px", marginTop: "5px" }}>
+            <div style={{ fontWeight: 800, color: "var(--text)", marginTop: "12px", fontSize: "16px" }}>Todavía no hay registros</div>
+            <div style={{ color: "var(--text-muted)", fontSize: "14px", marginTop: "5px" }}>
               Usa los botones de arriba para anotar la primera toma o cambio de pañal.
             </div>
           </div>
@@ -309,13 +309,13 @@ export default function RegistroDiario() {
           registros.map((r) => {
             const est = ESTILO_TIPO[r.tipo as Tipo];
             return (
-              <div key={r.id} style={{ background: "#fff", borderRadius: "16px", padding: "14px 18px", marginBottom: "10px", display: "flex", alignItems: "center", gap: "14px", boxShadow: "0 3px 14px rgba(124,92,191,0.05)" }}>
+              <div key={r.id} style={{ background: "var(--surface)", borderRadius: "16px", padding: "14px 18px", marginBottom: "10px", display: "flex", alignItems: "center", gap: "14px", boxShadow: "0 3px 14px rgba(124,92,191,0.05)" }}>
                 <div style={{ width: "42px", height: "42px", borderRadius: "12px", background: est.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   <est.Icon size={20} color={est.fg} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 700, color: "var(--theme-darker)", fontSize: "15px" }}>{describir(r)}</div>
-                  <div style={{ color: "#8A849C", fontSize: "12.5px", marginTop: "2px" }}>
+                  <div style={{ fontWeight: 700, color: "var(--text)", fontSize: "15px" }}>{describir(r)}</div>
+                  <div style={{ color: "var(--text-muted)", fontSize: "12.5px", marginTop: "2px" }}>
                     {hora(r.fecha_hora)} · {haceCuanto(r.fecha_hora)}
                     {r.registrado_por_nombre ? ` · ${r.registrado_por_nombre}` : ""}
                   </div>
@@ -339,12 +339,12 @@ export default function RegistroDiario() {
 
 function Tarjeta({ icono, bg, valor, etiqueta }: any) {
   return (
-    <div style={{ background: "#fff", borderRadius: "18px", padding: "16px 18px", boxShadow: "0 4px 18px rgba(124,92,191,0.06)" }}>
+    <div style={{ background: "var(--surface)", borderRadius: "18px", padding: "16px 18px", boxShadow: "0 4px 18px rgba(124,92,191,0.06)" }}>
       <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: bg, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "10px" }}>
         {icono}
       </div>
-      <div style={{ fontSize: "22px", fontWeight: 900, color: "var(--theme-darker)", fontFamily: "'Baloo 2', sans-serif" }}>{valor}</div>
-      <div style={{ fontSize: "12.5px", color: "#8A849C", fontWeight: 600 }}>{etiqueta}</div>
+      <div style={{ fontSize: "22px", fontWeight: 900, color: "var(--text)", fontFamily: "'Baloo 2', sans-serif" }}>{valor}</div>
+      <div style={{ fontSize: "12.5px", color: "var(--text-muted)", fontWeight: 600 }}>{etiqueta}</div>
     </div>
   );
 }
@@ -370,14 +370,14 @@ function BotonRapido({ tipo, activo, onClick, label }: any) {
 
 function Panel({ children }: any) {
   return (
-    <div style={{ background: "#fff", borderRadius: "20px", padding: "22px 24px", marginBottom: "16px", boxShadow: "0 4px 18px rgba(124,92,191,0.07)" }}>
+    <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "22px 24px", marginBottom: "16px", boxShadow: "0 4px 18px rgba(124,92,191,0.07)" }}>
       {children}
     </div>
   );
 }
 
 function Etiqueta({ children }: any) {
-  return <div style={{ fontSize: "13px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "9px" }}>{children}</div>;
+  return <div style={{ fontSize: "13px", fontWeight: 800, color: "var(--text)", marginBottom: "9px" }}>{children}</div>;
 }
 
 function Opcion({ activo, onClick, children }: any) {
@@ -406,13 +406,13 @@ function Contador({ valor, setValor, paso, min, max, unidad, atajos }: any) {
         <button onClick={() => ajustar(-paso)} style={botonCirculo}>−</button>
         <div style={{ textAlign: "center", minWidth: "110px" }}>
           <div style={{ fontSize: "34px", fontWeight: 900, color: "var(--theme-primary)", fontFamily: "'Baloo 2', sans-serif", lineHeight: 1 }}>{valor}</div>
-          <div style={{ fontSize: "12.5px", color: "#8A849C", fontWeight: 600 }}>{unidad}</div>
+          <div style={{ fontSize: "12.5px", color: "var(--text-muted)", fontWeight: 600 }}>{unidad}</div>
         </div>
         <button onClick={() => ajustar(paso)} style={{ ...botonCirculo, background: "var(--theme-primary)", color: "#fff", borderColor: "var(--theme-primary)" }}>+</button>
       </div>
       <div style={{ display: "flex", gap: "8px", justifyContent: "center", flexWrap: "wrap" }}>
         {atajos.map((a: number) => (
-          <button key={a} onClick={() => setValor(a)} style={{ padding: "7px 16px", borderRadius: "100px", border: "1.5px solid #E4DBF7", background: "#fff", color: "var(--theme-primary)", fontWeight: 800, fontSize: "12.5px", cursor: "pointer", fontFamily: "'Nunito', sans-serif" }}>
+          <button key={a} onClick={() => setValor(a)} style={{ padding: "7px 16px", borderRadius: "100px", border: "1.5px solid var(--border)", background: "var(--surface)", color: "var(--theme-primary)", fontWeight: 800, fontSize: "12.5px", cursor: "pointer", fontFamily: "'Nunito', sans-serif" }}>
             {a} {unidad}
           </button>
         ))}
@@ -428,7 +428,7 @@ function CampoNota({ nota, setNota }: any) {
       <input
         value={nota} onChange={(e) => setNota(e.target.value)} maxLength={300}
         placeholder="Algo que quieras recordar…"
-        style={{ width: "100%", padding: "12px 14px", borderRadius: "12px", border: "1.5px solid #E4DBF7", background: "#FBFAFE", fontSize: "14px", fontFamily: "'Nunito', sans-serif", color: "var(--theme-darker)", marginBottom: "18px", outline: "none", boxSizing: "border-box" }}
+        style={{ width: "100%", padding: "12px 14px", borderRadius: "12px", border: "1.5px solid var(--border)", background: "var(--surface-3)", fontSize: "14px", fontFamily: "'Nunito', sans-serif", color: "var(--text)", marginBottom: "18px", outline: "none", boxSizing: "border-box" }}
       />
     </>
   );
@@ -446,8 +446,8 @@ function Guardar({ disabled, onClick }: any) {
 }
 
 const botonCirculo: React.CSSProperties = {
-  width: "48px", height: "48px", borderRadius: "50%", border: "2px solid #E4DBF7",
-  background: "#fff", color: "var(--theme-primary)", fontSize: "24px", fontWeight: 800,
+  width: "48px", height: "48px", borderRadius: "50%", border: "2px solid var(--border)",
+  background: "var(--surface)", color: "var(--theme-primary)", fontSize: "24px", fontWeight: 800,
   cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
   fontFamily: "'Nunito', sans-serif",
 };

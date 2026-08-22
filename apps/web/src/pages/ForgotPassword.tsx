@@ -470,7 +470,7 @@ export default function ForgotPassword() {
                     fontFamily: "'Baloo 2', sans-serif",
                     fontSize: "26px",
                     fontWeight: 700,
-                    color: "var(--theme-darker)",
+                    color: "var(--text)",
                     marginBottom: "6px",
                   }}
                 >
@@ -479,7 +479,7 @@ export default function ForgotPassword() {
                 <p
                   style={{
                     fontSize: "15px",
-                    color: "#8A849C",
+                    color: "var(--text-muted)",
                     fontWeight: 500,
                     marginBottom: "24px",
                   }}
@@ -531,7 +531,7 @@ export default function ForgotPassword() {
                         display: "block",
                         fontSize: "13px",
                         fontWeight: 700,
-                        color: "var(--theme-darker)",
+                        color: "var(--text)",
                         textTransform: "uppercase",
                         letterSpacing: "0.07em",
                         marginBottom: "10px",
@@ -553,7 +553,7 @@ export default function ForgotPassword() {
                         fontSize: "17px",
                         fontFamily: "'Nunito', sans-serif",
                         fontWeight: 500,
-                        color: "var(--theme-darker)",
+                        color: "var(--text)",
                         background: "#FDFCFF",
                         outline: "none",
                         transition: "border-color 0.2s, box-shadow 0.2s",
@@ -656,7 +656,7 @@ export default function ForgotPassword() {
                     fontFamily: "'Baloo 2', sans-serif",
                     fontSize: "26px",
                     fontWeight: 700,
-                    color: "var(--theme-darker)",
+                    color: "var(--text)",
                     marginBottom: "6px",
                   }}
                 >
@@ -665,7 +665,7 @@ export default function ForgotPassword() {
                 <p
                   style={{
                     fontSize: "15px",
-                    color: "#8A849C",
+                    color: "var(--text-muted)",
                     fontWeight: 500,
                     marginBottom: "24px",
                   }}
@@ -738,7 +738,7 @@ export default function ForgotPassword() {
                             : digit
                               ? "#fff"
                               : "#FDFCFF",
-                          color: "var(--theme-darker)",
+                          color: "var(--text)",
                           outline: "none",
                           fontFamily: "'Nunito', sans-serif",
                           transition: "border-color 0.2s",
@@ -782,7 +782,7 @@ export default function ForgotPassword() {
                     style={{
                       textAlign: "center",
                       fontSize: "14px",
-                      color: "#8A849C",
+                      color: "var(--text-muted)",
                       marginBottom: "24px",
                     }}
                   >
@@ -863,7 +863,7 @@ export default function ForgotPassword() {
                     fontFamily: "'Baloo 2', sans-serif",
                     fontSize: "26px",
                     fontWeight: 700,
-                    color: "var(--theme-darker)",
+                    color: "var(--text)",
                     marginBottom: "6px",
                   }}
                 >
@@ -872,7 +872,7 @@ export default function ForgotPassword() {
                 <p
                   style={{
                     fontSize: "15px",
-                    color: "#8A849C",
+                    color: "var(--text-muted)",
                     fontWeight: 500,
                     marginBottom: "24px",
                   }}
@@ -923,7 +923,7 @@ export default function ForgotPassword() {
                         display: "block",
                         fontSize: "13px",
                         fontWeight: 700,
-                        color: "var(--theme-darker)",
+                        color: "var(--text)",
                         textTransform: "uppercase",
                         letterSpacing: "0.07em",
                         marginBottom: "10px",
@@ -949,7 +949,7 @@ export default function ForgotPassword() {
                           fontSize: "17px",
                           fontFamily: "'Nunito', sans-serif",
                           fontWeight: 500,
-                          color: "var(--theme-darker)",
+                          color: "var(--text)",
                           background: "#FDFCFF",
                           outline: "none",
                           transition: "border-color 0.2s, box-shadow 0.2s",
@@ -1067,7 +1067,7 @@ export default function ForgotPassword() {
                         display: "block",
                         fontSize: "13px",
                         fontWeight: 700,
-                        color: "var(--theme-darker)",
+                        color: "var(--text)",
                         textTransform: "uppercase",
                         letterSpacing: "0.07em",
                         marginBottom: "10px",
@@ -1090,7 +1090,7 @@ export default function ForgotPassword() {
                           fontSize: "17px",
                           fontFamily: "'Nunito', sans-serif",
                           fontWeight: 500,
-                          color: "var(--theme-darker)",
+                          color: "var(--text)",
                           background: "#FDFCFF",
                           outline: "none",
                           transition: "border-color 0.2s, box-shadow 0.2s",
@@ -1180,7 +1180,7 @@ export default function ForgotPassword() {
                     fontFamily: "'Baloo 2', sans-serif",
                     fontSize: "26px",
                     fontWeight: 700,
-                    color: "var(--theme-darker)",
+                    color: "var(--text)",
                     marginBottom: "12px",
                   }}
                 >
@@ -1189,7 +1189,7 @@ export default function ForgotPassword() {
                 <p
                   style={{
                     fontSize: "15px",
-                    color: "#8A849C",
+                    color: "var(--text-muted)",
                     lineHeight: 1.6,
                     marginBottom: "32px",
                   }}

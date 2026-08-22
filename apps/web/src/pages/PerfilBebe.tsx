@@ -268,10 +268,10 @@ export default function PerfilBebe() {
     }
   };
 
-  const inputStyle = { width: "100%", padding: "12px 14px", border: "2px solid #EDE9F8", borderRadius: "12px", fontSize: "14px", outline: "none", color: "var(--theme-darker)", boxSizing: "border-box" as const };
-  const readOnlyStyle = { padding: "12px 14px", background: "var(--theme-bg-light)", borderRadius: "12px", fontSize: "14px", color: "var(--theme-darker)", border: "1px dashed var(--theme-light)" };
-  const cardStyle = { background: "#fff", padding: "26px", borderRadius: "22px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)", marginBottom: "24px", width: "100%" };
-  const labelStyle = { display: "block", fontSize: "12px", fontWeight: 700, color: "#8A849C", marginBottom: "6px" };
+  const inputStyle = { width: "100%", padding: "12px 14px", border: "2px solid #EDE9F8", borderRadius: "12px", fontSize: "14px", outline: "none", color: "var(--text)", boxSizing: "border-box" as const };
+  const readOnlyStyle = { padding: "12px 14px", background: "var(--theme-bg-light)", borderRadius: "12px", fontSize: "14px", color: "var(--text)", border: "1px dashed var(--theme-light)" };
+  const cardStyle = { background: "var(--surface)", padding: "26px", borderRadius: "22px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)", marginBottom: "24px", width: "100%" };
+  const labelStyle = { display: "block", fontSize: "12px", fontWeight: 700, color: "var(--text-muted)", marginBottom: "6px" };
 
   if (errorPerfil) {
     return (
@@ -359,7 +359,7 @@ export default function PerfilBebe() {
               <div style={{ background: "var(--theme-bg-light)", borderLeft: "4px solid var(--theme-primary)", padding: "16px 20px", borderRadius: "0 12px 12px 0", marginBottom: "32px", display: "flex", gap: "16px" }}>
                 <div style={{ fontSize: "24px" }}>✏️</div>
                 <div>
-                  <h4 style={{ fontSize: "16px", color: "var(--theme-darker)", margin: "0 0 4px", fontWeight: 800 }}>Modo edición activo</h4>
+                  <h4 style={{ fontSize: "16px", color: "var(--text)", margin: "0 0 4px", fontWeight: 800 }}>Modo edición activo</h4>
                   <p style={{ fontSize: "14px", color: "#6B7280", margin: 0 }}>Modifica los datos y recuerda presionar "Guardar cambios" al final de la página.</p>
                 </div>
               </div>
@@ -368,7 +368,7 @@ export default function PerfilBebe() {
             <div className="responsive-grid">
               {/* DATOS GENERALES */}
               <div style={cardStyle}>
-                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "20px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "12px" }}>Datos Generales</h3>
+                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--text)", marginBottom: "20px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "12px" }}>Datos Generales</h3>
                 
                 <div style={{ marginBottom: "16px" }}>
                   <label style={labelStyle}>Nombre completo</label>
@@ -418,7 +418,7 @@ export default function PerfilBebe() {
 
               {/* DATOS DE NACIMIENTO */}
               <div style={cardStyle}>
-                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "20px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "12px" }}>Datos de Nacimiento</h3>
+                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--text)", marginBottom: "20px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "12px" }}>Datos de Nacimiento</h3>
                 
                 <div style={{ display: "flex", gap: "16px", marginBottom: "16px" }}>
                   <div style={{ flex: 1 }}>
@@ -454,7 +454,7 @@ export default function PerfilBebe() {
 
               {/* INFORMACIÓN DE SALUD */}
               <div style={{ ...cardStyle, gridColumn: "1 / -1" }}>
-                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "20px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "12px" }}>Información Médica</h3>
+                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--text)", marginBottom: "20px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "12px" }}>Información Médica</h3>
                 
                 <div className="hero-stats-grid" style={{ marginBottom: "24px" }}>
                   <div>
@@ -500,8 +500,8 @@ export default function PerfilBebe() {
 
               {/* CARNET DIGITAL: RUT Y CONTACTO DE EMERGENCIA */}
               <div style={{ ...cardStyle, gridColumn: "1 / -1" }}>
-                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "6px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "12px" }}>Carnet Digital</h3>
-                <p style={{ fontSize: "13px", color: "#8A849C", margin: "10px 0 20px" }}>Estos datos aparecen en el carnet pediátrico digital que puedes mostrar en el consultorio.</p>
+                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--text)", marginBottom: "6px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "12px" }}>Carnet Digital</h3>
+                <p style={{ fontSize: "13px", color: "var(--text-muted)", margin: "10px 0 20px" }}>Estos datos aparecen en el carnet pediátrico digital que puedes mostrar en el consultorio.</p>
 
                 <div className="hero-stats-grid" style={{ marginBottom: "16px" }}>
                   <div>
@@ -564,8 +564,8 @@ export default function PerfilBebe() {
 
               <div style={cardStyle}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-                  <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--theme-darker)", margin: 0 }}>Personas con acceso</h3>
-                  <div style={{ fontSize: "12px", background: "var(--theme-bg-light)", color: "var(--theme-darker)", padding: "4px 12px", borderRadius: "12px", fontWeight: 800 }}>{accesos.length} activos</div>
+                  <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--text)", margin: 0 }}>Personas con acceso</h3>
+                  <div style={{ fontSize: "12px", background: "var(--theme-bg-light)", color: "var(--text)", padding: "4px 12px", borderRadius: "12px", fontWeight: 800 }}>{accesos.length} activos</div>
                 </div>
 
                 {accesos.length === 0 ? (
@@ -577,10 +577,10 @@ export default function PerfilBebe() {
                     <div key={acceso.id} style={{ display: "flex", alignItems: "center", padding: "16px", border: "1px solid #E5E7EB", borderRadius: "12px", marginBottom: "12px" }}>
                       <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "var(--theme-bg-light)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "24px", marginRight: "16px" }}>🧑‍.</div>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--theme-darker)" }}>{acceso.usuario_invitado?.nombre || "Usuario"}</div>
+                        <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--text)" }}>{acceso.usuario_invitado?.nombre || "Usuario"}</div>
                         <div style={{ fontSize: "13px", color: "#6B7280" }}>{acceso.usuario_invitado?.email}</div>
                       </div>
-                      <select value={acceso.nivel_permiso} onChange={(e) => modificarPermiso(acceso.id, e.target.value)} style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #E5E7EB", background: "#F9FAFB", color: "var(--theme-darker)", fontWeight: 700, marginRight: "16px" }}>
+                      <select value={acceso.nivel_permiso} onChange={(e) => modificarPermiso(acceso.id, e.target.value)} style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #E5E7EB", background: "var(--surface-2)", color: "var(--text)", fontWeight: 700, marginRight: "16px" }}>
                         <option value="solo_lectura">Solo lectura</option>
                         <option value="papa">Papá (Acceso a todo)</option>
                         <option value="abuela">Abuela (Acceso a todo)</option>
@@ -593,7 +593,7 @@ export default function PerfilBebe() {
               </div>
 
               <div style={cardStyle}>
-                <h3 style={{ display: "flex", alignItems: "center", gap: "8px", fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "20px" }}>
+                <h3 style={{ display: "flex", alignItems: "center", gap: "8px", fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--text)", marginBottom: "20px" }}>
                   <Search size={20} style={{ color: "var(--theme-primary)" }} /> Buscar a quién compartir
                 </h3>
                 
@@ -622,7 +622,7 @@ export default function PerfilBebe() {
                         buscarPersonas(searchQuery, searchTab);
                       }
                     }}
-                    style={{ width: "100%", padding: "14px 16px 14px 48px", borderRadius: "12px", border: "1px solid #E5E7EB", fontSize: "15px", outline: "none", color: "var(--theme-darker)" }}
+                    style={{ width: "100%", padding: "14px 16px 14px 48px", borderRadius: "12px", border: "1px solid #E5E7EB", fontSize: "15px", outline: "none", color: "var(--text)" }}
                   />
                 </div>
 
@@ -632,7 +632,7 @@ export default function PerfilBebe() {
                       <div key={res.email} style={{ display: "flex", alignItems: "center", padding: "12px", borderBottom: "1px solid #F3F4F6" }}>
                         <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "var(--theme-bg-light)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", marginRight: "12px" }}>🧑</div>
                         <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--theme-darker)" }}>
+                          <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>
                             {res.nombre || "Usuario"} 
                             {res.en_app && <span style={{ marginLeft: "8px", fontSize: "10px", background: "#D1FAE5", color: "#065F46", padding: "2px 8px", borderRadius: "12px" }}>En la app</span>}
                           </div>
@@ -641,7 +641,7 @@ export default function PerfilBebe() {
                         <select 
                           value={invitePerm} 
                           onChange={e => setInvitePerm(e.target.value)} 
-                          style={{ padding: "6px 10px", borderRadius: "8px", border: "1px solid #E5E7EB", background: "#F9FAFB", color: "var(--theme-darker)", fontWeight: 700, marginRight: "12px", fontSize: "12px" }}
+                          style={{ padding: "6px 10px", borderRadius: "8px", border: "1px solid #E5E7EB", background: "var(--surface-2)", color: "var(--text)", fontWeight: 700, marginRight: "12px", fontSize: "12px" }}
                         >
                           <option value="solo_lectura">Solo lectura</option>
                           <option value="papa">Papá (Acceso a todo)</option>
@@ -664,7 +664,7 @@ export default function PerfilBebe() {
                   <div style={{ display: "flex", alignItems: "center", padding: "12px", borderBottom: "1px solid #F3F4F6" }}>
                     <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "var(--theme-bg-light)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", marginRight: "12px" }}>✉️</div>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--theme-darker)" }}>
+                      <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>
                         Invitar por correo electrónico
                       </div>
                       <div style={{ fontSize: "13px", color: "#6B7280" }}>{searchQuery.trim()}</div>
@@ -672,7 +672,7 @@ export default function PerfilBebe() {
                     <select 
                       value={invitePerm} 
                       onChange={e => setInvitePerm(e.target.value)} 
-                      style={{ padding: "6px 10px", borderRadius: "8px", border: "1px solid #E5E7EB", background: "#F9FAFB", color: "var(--theme-darker)", fontWeight: 700, marginRight: "12px", fontSize: "12px" }}
+                      style={{ padding: "6px 10px", borderRadius: "8px", border: "1px solid #E5E7EB", background: "var(--surface-2)", color: "var(--text)", fontWeight: 700, marginRight: "12px", fontSize: "12px" }}
                     >
                       <option value="solo_lectura">Solo lectura</option>
                       <option value="papa">Papá (Acceso a todo)</option>
@@ -694,7 +694,7 @@ export default function PerfilBebe() {
             {/* RIGHT COLUMN: AUDIT */}
             <div>
               <div style={cardStyle}>
-                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "17px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "16px" }}>Historial de actividad</h3>
+                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "17px", fontWeight: 700, color: "var(--text)", marginBottom: "16px" }}>Historial de actividad</h3>
                 <div>
                   {auditoria.length === 0 ? (
                     <div style={{ fontSize: "13px", color: "#6B7280", textAlign: "center", padding: "20px" }}>Sin registros aún.</div>
@@ -702,7 +702,7 @@ export default function PerfilBebe() {
                     auditoria.map(log => (
                       <div key={log.id} style={{ marginBottom: "16px", paddingLeft: "16px", borderLeft: "2px solid var(--theme-light)", position: "relative" }}>
                         <div style={{ position: "absolute", left: "-5px", top: "6px", width: "8px", height: "8px", borderRadius: "50%", background: "var(--theme-primary)" }}></div>
-                        <div style={{ fontSize: "13px", color: "var(--theme-darker)", fontWeight: 500 }}>{log.descripcion}</div>
+                        <div style={{ fontSize: "13px", color: "var(--text)", fontWeight: 500 }}>{log.descripcion}</div>
                         <div style={{ fontSize: "11px", color: "#9CA3AF", marginTop: "4px" }}>{new Date(log.fecha_hora_utc).toLocaleString('es-CL')}</div>
                       </div>
                     ))

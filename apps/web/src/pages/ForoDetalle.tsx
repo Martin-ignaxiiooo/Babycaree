@@ -89,7 +89,7 @@ export default function ForoDetalle() {
           </button>
           
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
-            <span style={{ fontSize: "12px", fontWeight: 800, color: "var(--theme-darker)", background: "var(--accent-coral-light)", padding: "4px 12px", borderRadius: "12px" }}>
+            <span style={{ fontSize: "12px", fontWeight: 800, color: "var(--text)", background: "var(--accent-coral-light)", padding: "4px 12px", borderRadius: "12px" }}>
               {foro.categoria}
             </span>
             <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.7)" }}>Por {foro.autor_nombre} · {new Date(foro.fecha_creacion).toLocaleDateString('es-CL')}</span>
@@ -127,21 +127,21 @@ export default function ForoDetalle() {
       {/* ── RESPUESTAS ── */}
       <div style={{ flex: 1, padding: "40px", maxWidth: "800px", margin: "0 auto", width: "100%" }}>
         
-        <h2 style={{ fontSize: "20px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "24px" }}>Comentarios</h2>
+        <h2 style={{ fontSize: "20px", fontWeight: 800, color: "var(--text)", marginBottom: "24px" }}>Comentarios</h2>
         
         <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "32px" }}>
           {respuestas.length === 0 ? (
-            <div style={{ padding: "32px", textAlign: "center", color: "#6B7280", background: "#fff", borderRadius: "16px", border: "1px dashed #D1D5DB" }}>
+            <div style={{ padding: "32px", textAlign: "center", color: "#6B7280", background: "var(--surface)", borderRadius: "16px", border: "1px dashed #D1D5DB" }}>
               Sé el primero en comentar.
             </div>
           ) : respuestas.map(res => (
-            <div key={res.id} style={{ background: "#fff", padding: "24px", borderRadius: "16px", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+            <div key={res.id} style={{ background: "var(--surface)", padding: "24px", borderRadius: "16px", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
                 <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "var(--theme-primary)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold", fontSize: "14px" }}>
                   {res.autor_nombre.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <div style={{ fontWeight: 700, color: "var(--theme-darker)", fontSize: "15px" }}>{res.autor_nombre}</div>
+                  <div style={{ fontWeight: 700, color: "var(--text)", fontSize: "15px" }}>{res.autor_nombre}</div>
                   <div style={{ fontSize: "12px", color: "#9CA3AF" }}>{new Date(res.fecha_creacion).toLocaleString('es-CL')}</div>
                 </div>
               </div>
@@ -153,8 +153,8 @@ export default function ForoDetalle() {
         </div>
 
         {/* ── AGREGAR COMENTARIO ── */}
-        <div style={{ background: "#fff", padding: "24px", borderRadius: "16px", boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}>
-          <h3 style={{ margin: "0 0 16px 0", fontSize: "16px", fontWeight: 800, color: "var(--theme-darker)" }}>Agregar un comentario</h3>
+        <div style={{ background: "var(--surface)", padding: "24px", borderRadius: "16px", boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}>
+          <h3 style={{ margin: "0 0 16px 0", fontSize: "16px", fontWeight: 800, color: "var(--text)" }}>Agregar un comentario</h3>
           <form onSubmit={handleComentar} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
             <textarea 
               required value={nuevoComentario} onChange={e => setNuevoComentario(e.target.value)}

@@ -214,7 +214,7 @@ export default function ExamenesTab({ bebeId, token }: Props) {
 
       {/* Alta rápida */}
       <form onSubmit={crear} style={formCard}>
-        <div style={{ fontWeight: 800, fontSize: "14px", color: "var(--theme-darker)", marginBottom: "10px" }}>
+        <div style={{ fontWeight: 800, fontSize: "14px", color: "var(--text)", marginBottom: "10px" }}>
           Agregar un examen indicado
         </div>
 
@@ -236,7 +236,7 @@ export default function ExamenesTab({ bebeId, token }: Props) {
           </button>
         )}
         {dictado.texto && (
-          <div style={{ background: "var(--theme-bg-light)", borderRadius: "10px", padding: "10px 12px", fontSize: "12.5px", color: "var(--theme-darker)", fontStyle: "italic", marginBottom: "10px" }}>
+          <div style={{ background: "var(--theme-bg-light)", borderRadius: "10px", padding: "10px 12px", fontSize: "12.5px", color: "var(--text)", fontStyle: "italic", marginBottom: "10px" }}>
             “{dictado.texto}”
           </div>
         )}
@@ -249,7 +249,7 @@ export default function ExamenesTab({ bebeId, token }: Props) {
         {/* Foto de la orden: se adjunta a los exámenes que se agreguen mientras esté puesta. */}
         {ordenFoto ? (
           <div style={{ position: "relative", marginBottom: "12px", maxWidth: "260px" }}>
-            <img src={ordenFoto} alt="Orden de exámenes" style={{ width: "100%", maxHeight: "160px", objectFit: "contain", borderRadius: "12px", border: "1.5px solid #E4DBF7", background: "#FBFAFE" }} />
+            <img src={ordenFoto} alt="Orden de exámenes" style={{ width: "100%", maxHeight: "160px", objectFit: "contain", borderRadius: "12px", border: "1.5px solid var(--border)", background: "var(--surface-3)" }} />
             <button
               type="button" onClick={() => setOrdenFoto(null)}
               style={{ position: "absolute", top: "8px", right: "8px", background: "rgba(45,38,64,0.75)", border: "none", borderRadius: "50%", width: "26px", height: "26px", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
@@ -259,7 +259,7 @@ export default function ExamenesTab({ bebeId, token }: Props) {
             </button>
           </div>
         ) : (
-          <label style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "10px 16px", border: "2px dashed #D9CDF2", borderRadius: "12px", background: "#FBFAFE", cursor: "pointer", marginBottom: "12px" }}>
+          <label style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "10px 16px", border: "2px dashed #D9CDF2", borderRadius: "12px", background: "var(--surface-3)", cursor: "pointer", marginBottom: "12px" }}>
             {subiendoOrdenFoto ? (
               <Loader2 size={18} className="spin-icon" />
             ) : (
@@ -292,7 +292,7 @@ export default function ExamenesTab({ bebeId, token }: Props) {
             {creando ? "Agregando…" : "Agregar"}
           </button>
         </div>
-        <p style={{ fontSize: "12px", color: "#8A849C", margin: "10px 0 0" }}>
+        <p style={{ fontSize: "12px", color: "var(--text-muted)", margin: "10px 0 0" }}>
           Si pones fecha, te avisamos por correo cuando pase y no lo hayas marcado como hecho.
         </p>
       </form>
@@ -300,16 +300,16 @@ export default function ExamenesTab({ bebeId, token }: Props) {
       {error && <div style={errorBox}>{error}</div>}
 
       {cargando ? (
-        <div style={{ textAlign: "center", padding: "40px", color: "#8A849C" }}>
+        <div style={{ textAlign: "center", padding: "40px", color: "var(--text-muted)" }}>
           <Loader2 size={24} className="spin-icon" />
         </div>
       ) : examenes.length === 0 ? (
         <div style={vacio}>
           <FlaskConical size={38} color="var(--theme-primary)" style={{ opacity: 0.5 }} />
-          <div style={{ fontWeight: 800, color: "var(--theme-darker)", marginTop: "10px" }}>
+          <div style={{ fontWeight: 800, color: "var(--text)", marginTop: "10px" }}>
             Sin exámenes registrados
           </div>
-          <div style={{ fontSize: "13.5px", color: "#8A849C", marginTop: "4px" }}>
+          <div style={{ fontSize: "13.5px", color: "var(--text-muted)", marginTop: "4px" }}>
             Cuando el pediatra indique uno, anótalo acá para no olvidarlo.
           </div>
         </div>
@@ -337,10 +337,10 @@ export default function ExamenesTab({ bebeId, token }: Props) {
                 </div>
 
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 800, fontSize: "15px", color: "var(--theme-darker)" }}>
+                  <div style={{ fontWeight: 800, fontSize: "15px", color: "var(--text)" }}>
                     {ex.nombre}
                   </div>
-                  <div style={{ fontSize: "12.5px", color: "#8A849C", marginTop: "2px" }}>
+                  <div style={{ fontSize: "12.5px", color: "var(--text-muted)", marginTop: "2px" }}>
                     {realizado
                       ? `Realizado ${formatearFecha(ex.fecha_realizacion)}`
                       : omitido
@@ -389,7 +389,7 @@ export default function ExamenesTab({ bebeId, token }: Props) {
 
               {/* Formulario de resultado */}
               {abierto === ex.id && (
-                <div style={{ marginTop: "14px", borderTop: "1px solid #EDE9F8", paddingTop: "14px" }}>
+                <div style={{ marginTop: "14px", borderTop: "1px solid var(--border-soft)", paddingTop: "14px" }}>
                   <textarea
                     value={notas} onChange={(e) => setNotas(e.target.value)}
                     placeholder="¿Qué dijo el resultado? (opcional)"
@@ -456,13 +456,13 @@ const chip: React.CSSProperties = {
 };
 const chipNum: React.CSSProperties = { fontSize: "17px", fontWeight: 900, marginRight: "4px" };
 const formCard: React.CSSProperties = {
-  background: "#fff", borderRadius: "18px", padding: "18px",
+  background: "var(--surface)", borderRadius: "18px", padding: "18px",
   boxShadow: "0 4px 18px rgba(124,92,191,0.07)", marginBottom: "18px",
 };
 const input: React.CSSProperties = {
   width: "100%", padding: "11px 14px", borderRadius: "12px",
-  border: "1.5px solid #E4DBF7", background: "#FBFAFE", fontSize: "14px",
-  fontFamily: "'Nunito', sans-serif", color: "var(--theme-darker)",
+  border: "1.5px solid var(--border)", background: "var(--surface-3)", fontSize: "14px",
+  fontFamily: "'Nunito', sans-serif", color: "var(--text)",
   marginBottom: "12px", outline: "none", boxSizing: "border-box",
 };
 const btnPrimary: React.CSSProperties = {
@@ -477,12 +477,12 @@ const btnSmallPrimary: React.CSSProperties = {
   fontSize: "12.5px", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
 };
 const btnSmallGhost: React.CSSProperties = {
-  padding: "9px 16px", borderRadius: "100px", border: "1.5px solid #E4DBF7",
-  background: "#fff", color: "#8A849C", fontWeight: 700,
+  padding: "9px 16px", borderRadius: "100px", border: "1.5px solid var(--border)",
+  background: "var(--surface)", color: "var(--text-muted)", fontWeight: 700,
   fontSize: "12.5px", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
 };
 const card: React.CSSProperties = {
-  background: "#fff", borderRadius: "18px", padding: "16px",
+  background: "var(--surface)", borderRadius: "18px", padding: "16px",
   boxShadow: "0 4px 18px rgba(124,92,191,0.06)", marginBottom: "12px",
 };
 const iconCircle: React.CSSProperties = {
@@ -499,17 +499,17 @@ const iconBtn: React.CSSProperties = {
   display: "flex", alignItems: "center", padding: "4px",
 };
 const notasBox: React.CSSProperties = {
-  marginTop: "8px", background: "#FBFAFE", borderRadius: "10px",
+  marginTop: "8px", background: "var(--surface-3)", borderRadius: "10px",
   padding: "10px 12px", fontSize: "13px", color: "#6B647F", lineHeight: 1.5,
 };
 const uploadBox: React.CSSProperties = {
   display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
   padding: "16px", border: "2px dashed #D9CDF2", borderRadius: "12px",
-  background: "#FBFAFE", cursor: "pointer", marginBottom: "12px",
+  background: "var(--surface-3)", cursor: "pointer", marginBottom: "12px",
 };
 const preview: React.CSSProperties = {
   width: "100%", maxHeight: "200px", objectFit: "contain",
-  borderRadius: "12px", border: "1.5px solid #E4DBF7", background: "#FBFAFE",
+  borderRadius: "12px", border: "1.5px solid var(--border)", background: "var(--surface-3)",
 };
 const borrarFotoBtn: React.CSSProperties = {
   position: "absolute", top: "8px", right: "8px", background: "rgba(45,38,64,0.75)",
@@ -521,6 +521,6 @@ const errorBox: React.CSSProperties = {
   padding: "12px 14px", fontSize: "13px", fontWeight: 600, marginBottom: "14px",
 };
 const vacio: React.CSSProperties = {
-  textAlign: "center", padding: "48px 20px", background: "#fff",
+  textAlign: "center", padding: "48px 20px", background: "var(--surface)",
   borderRadius: "18px", boxShadow: "0 4px 18px rgba(124,92,191,0.06)",
 };

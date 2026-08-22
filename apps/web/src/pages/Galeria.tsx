@@ -28,7 +28,7 @@ export default function Galeria() {
       </div>
 
       <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px" }}>
-        <div style={{ background: "#fff", padding: "52px 44px", borderRadius: "28px", textAlign: "center", boxShadow: "0 10px 40px rgba(124,92,191,0.1)", maxWidth: "500px" }}>
+        <div style={{ background: "var(--surface)", padding: "52px 44px", borderRadius: "28px", textAlign: "center", boxShadow: "0 10px 40px rgba(124,92,191,0.1)", maxWidth: "500px" }}>
           <div style={{ width: "84px", height: "84px", background: "linear-gradient(135deg, var(--theme-bg-light), var(--accent-coral-light))", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" }}>
             <ImageIcon size={38} color="var(--theme-primary)" />
           </div>
@@ -40,8 +40,8 @@ export default function Galeria() {
           }}>
             <Sparkles size={12} /> Próximamente
           </div>
-          <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "23px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "12px" }}>Módulo en desarrollo</h2>
-          <p style={{ fontSize: "15px", color: "#8A849C", lineHeight: 1.6, marginBottom: "32px" }}>
+          <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "23px", fontWeight: 700, color: "var(--text)", marginBottom: "12px" }}>Módulo en desarrollo</h2>
+          <p style={{ fontSize: "15px", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "32px" }}>
             Estamos construyendo un espacio seguro y encriptado para que puedas guardar y compartir las fotos más hermosas del crecimiento de tu bebé. ¡Estará disponible muy pronto!
           </p>
           <button 

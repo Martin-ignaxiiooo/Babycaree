@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Palette } from "lucide-react";
+import { Palette, Moon, Sun } from "lucide-react";
 
 type ThemeConfig = {
   id: string;
@@ -94,27 +94,59 @@ const THEMES: ThemeConfig[] = [
 export default function ThemeSelector() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTheme, setActiveTheme] = useState<string>("purple");
+  const [oscuro, setOscuro] = useState(false);
 
   useEffect(() => {
-    // Restaurar tema guardado
+    // Si nunca eligió, se respeta la preferencia del sistema operativo.
+    const guardado = localStorage.getItem("app_modo_oscuro");
+    const inicial = guardado !== null
+      ? guardado === "1"
+      : window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
+
+    setOscuro(inicial);
+    document.documentElement.setAttribute("data-tema", inicial ? "oscuro" : "claro");
+
     const saved = localStorage.getItem("app_theme");
-    if (saved) {
-      applyTheme(saved);
-    }
+    applyTheme(saved || "purple", inicial);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const applyTheme = (themeId: string) => {
+  /**
+   * Aplica el tema de color. Las variables van inline en :root, y como
+   * los estilos inline ganan sobre cualquier regla CSS, el modo oscuro no
+   * puede corregir el color de acento desde la hoja de estilos — hay que
+   * resolverlo acá.
+   *
+   * En oscuro se usa el tono claro del propio tema como color principal:
+   * el tono base queda por debajo del contraste legible sobre un fondo
+   * oscuro. Cada tema ya trae su variante clara, así que no hay que
+   * inventar colores nuevos.
+   */
+  const applyTheme = (themeId: string, esOscuro = oscuro) => {
     const theme = THEMES.find((t) => t.id === themeId);
     if (!theme) return;
-    
-    // Aplicar variables al :root (documentElement)
+
     Object.entries(theme.variables).forEach(([key, val]) => {
       document.documentElement.style.setProperty(key, val);
     });
-    
+
+    if (esOscuro) {
+      document.documentElement.style.setProperty("--theme-primary", theme.variables["--theme-light"]);
+      document.documentElement.style.removeProperty("--theme-bg-light");
+      document.documentElement.style.removeProperty("--theme-bg-hover");
+    }
+
     setActiveTheme(themeId);
     localStorage.setItem("app_theme", themeId);
-    setIsOpen(false);
+  };
+
+  const alternarOscuro = () => {
+    const nuevo = !oscuro;
+    setOscuro(nuevo);
+    localStorage.setItem("app_modo_oscuro", nuevo ? "1" : "0");
+    document.documentElement.setAttribute("data-tema", nuevo ? "oscuro" : "claro");
+    // Se reaplica el tema de color para ajustar el acento al nuevo fondo.
+    applyTheme(activeTheme, nuevo);
   };
 
   return (
@@ -125,7 +157,7 @@ export default function ThemeSelector() {
             position: "absolute",
             bottom: "60px",
             right: "0",
-            background: "white",
+            background: "var(--surface)",
             padding: "16px",
             borderRadius: "16px",
             boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
@@ -136,7 +168,23 @@ export default function ThemeSelector() {
             fontFamily: "'Nunito', sans-serif"
           }}
         >
-          <div style={{ fontSize: "12px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>
+          <button
+            onClick={alternarOscuro}
+            style={{
+              display: "flex", alignItems: "center", gap: "10px",
+              padding: "10px 12px", borderRadius: "12px", cursor: "pointer",
+              border: "1.5px solid var(--border)", background: "var(--surface-2)",
+              color: "var(--text)", fontWeight: 800, fontSize: "13px",
+              fontFamily: "'Nunito', sans-serif", width: "100%", textAlign: "left",
+            }}
+          >
+            {oscuro ? <Sun size={16} /> : <Moon size={16} />}
+            {oscuro ? "Modo claro" : "Modo oscuro"}
+          </button>
+
+          <div style={{ height: "1px", background: "var(--border-soft)" }} />
+
+          <div style={{ fontSize: "12px", fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>
             Elige tu tema
           </div>
           {THEMES.map((t) => (

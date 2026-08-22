@@ -121,8 +121,8 @@ export default function Comunidad() {
         
         <div style={{ marginBottom: "32px", display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "16px" }}>
           <div>
-            <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "30px", fontWeight: 700, color: "var(--theme-darker)", margin: "0 0 8px 0" }}>Comunidad</h1>
-            <p style={{ fontSize: "15px", color: "#8A849C", margin: 0, fontWeight: 600 }}>Comparte experiencias, resuelve dudas y aprende con otros padres y especialistas.</p>
+            <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "30px", fontWeight: 700, color: "var(--text)", margin: "0 0 8px 0" }}>Comunidad</h1>
+            <p style={{ fontSize: "15px", color: "var(--text-muted)", margin: 0, fontWeight: 600 }}>Comparte experiencias, resuelve dudas y aprende con otros padres y especialistas.</p>
           </div>
           {activeTab === "foros" && (
             <button style={{ 
@@ -169,7 +169,7 @@ export default function Comunidad() {
           <div style={{ display: "grid", gap: "16px" }}>
             {loading ? <div style={{ padding: "40px", textAlign: "center", color: "#6B7280" }}>Cargando foros...</div> : forosData.map(foro => (
               <div key={foro.id} onClick={() => navigate(`/comunidad/foro/${foro.id}`)} style={{ 
-                background: "#fff", padding: "24px", borderRadius: "20px", 
+                background: "var(--surface)", padding: "24px", borderRadius: "20px", 
                 boxShadow: "0 6px 20px rgba(124,92,191,0.08)", display: "flex", 
                 alignItems: "center", cursor: "pointer", transition: "transform 0.2s",
                 borderLeft: "4px solid var(--accent-coral)", flexWrap: "wrap", gap: "16px"
@@ -181,7 +181,7 @@ export default function Comunidad() {
                     </span>
                     <span style={{ fontSize: "13px", color: "#9CA3AF" }}>Por {foro.autor_nombre} · {foro.tiempo_publicacion}</span>
                   </div>
-                  <h3 style={{ margin: "0", fontFamily: "'Baloo 2', sans-serif", fontSize: "18px", fontWeight: 700, color: "var(--theme-darker)" }}>{foro.titulo}</h3>
+                  <h3 style={{ margin: "0", fontFamily: "'Baloo 2', sans-serif", fontSize: "18px", fontWeight: 700, color: "var(--text)" }}>{foro.titulo}</h3>
                 </div>
                 <div style={{ display: "flex", gap: "24px", color: "#6B7280" }}>
                   <div 
@@ -211,7 +211,7 @@ export default function Comunidad() {
           <div className="responsive-grid">
             {loading ? <div style={{ padding: "40px", color: "#6B7280", gridColumn: "1/-1", textAlign: "center" }}>Cargando artículos...</div> : articulosData.map(art => (
               <div key={art.id} onClick={() => navigate(`/comunidad/articulo/${art.id}`)} style={{ 
-                background: "#fff", borderRadius: "22px", overflow: "hidden",
+                background: "var(--surface)", borderRadius: "22px", overflow: "hidden",
                 boxShadow: "0 6px 20px rgba(124,92,191,0.08)", cursor: "pointer",
                 transition: "transform 0.2s, box-shadow 0.2s",
                 display: "flex", flexDirection: "column"
@@ -228,7 +228,7 @@ export default function Comunidad() {
                       <Clock size={14} /> 5 min
                     </span>
                   </div>
-                  <h3 style={{ margin: "0 0 12px 0", fontSize: "18px", fontWeight: 800, color: "var(--theme-darker)" }}>{art.titulo}</h3>
+                  <h3 style={{ margin: "0 0 12px 0", fontSize: "18px", fontWeight: 800, color: "var(--text)" }}>{art.titulo}</h3>
                   <p style={{ margin: "0 0 16px 0", fontSize: "14px", color: "#6B7280", lineHeight: "1.5", flex: 1 }}>{art.resumen}</p>
                   <button
                     onClick={(e) => handleLikeArticulo(e, art.id)}
@@ -256,9 +256,9 @@ export default function Comunidad() {
           background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", 
           justifyContent: "center", zIndex: 1000, padding: "20px"
         }}>
-          <div style={{ background: "#fff", borderRadius: "24px", width: "100%", maxWidth: "600px", padding: "32px", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
+          <div style={{ background: "var(--surface)", borderRadius: "24px", width: "100%", maxWidth: "600px", padding: "32px", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
-              <h2 style={{ margin: 0, fontSize: "24px", fontWeight: 800, color: "var(--theme-darker)" }}>Crear nuevo tema</h2>
+              <h2 style={{ margin: 0, fontSize: "24px", fontWeight: 800, color: "var(--text)" }}>Crear nuevo tema</h2>
               <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "#9CA3AF" }}>
                 <X size={24} />
               </button>
@@ -278,7 +278,7 @@ export default function Comunidad() {
                 <label style={{ display: "block", fontSize: "14px", fontWeight: 700, color: "#4B5563", marginBottom: "8px" }}>Categoría</label>
                 <select 
                   value={nuevaCategoria} onChange={e => setNuevaCategoria(e.target.value)}
-                  style={{ width: "100%", padding: "12px 16px", border: "1px solid #D1D5DB", borderRadius: "12px", fontSize: "15px", outline: "none", background: "#fff" }}
+                  style={{ width: "100%", padding: "12px 16px", border: "1px solid #D1D5DB", borderRadius: "12px", fontSize: "15px", outline: "none", background: "var(--surface)" }}
                 >
                   <option value="Desarrollo">Desarrollo</option>
                   <option value="Salud">Salud</option>

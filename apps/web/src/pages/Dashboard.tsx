@@ -458,7 +458,7 @@ export default function Dashboard() {
                 width: "150px",
                 minHeight: "140px",
                 alignSelf: "stretch",
-                background: "#fff",
+                background: "var(--surface)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -516,7 +516,7 @@ export default function Dashboard() {
                       type="button"
                       onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleEliminarFoto(); }}
                       style={{
-                        background: "#fff", color: "#B91C1C", border: "none", borderRadius: "8px",
+                        background: "var(--surface)", color: "#B91C1C", border: "none", borderRadius: "8px",
                         padding: "5px 10px", fontSize: "11px", fontWeight: 800, cursor: "pointer",
                       }}
                     >
@@ -564,7 +564,7 @@ export default function Dashboard() {
             </label>
 
             <div>
-              <div style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "27px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "4px" }}>{hero.nombre}</div>
+              <div style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "27px", fontWeight: 700, color: "var(--text)", marginBottom: "4px" }}>{hero.nombre}</div>
               <div style={{ fontSize: "14px", color: "var(--theme-dark)", opacity: 0.75, fontWeight: 600 }}>{hero.edad_exacta}</div>
               {fotoError && (
                 <div style={{ fontSize: "12px", color: "#DC2626", marginTop: "4px", fontWeight: 600 }}>{fotoError}</div>
@@ -573,26 +573,26 @@ export default function Dashboard() {
           </div>
 
           <div className="hero-stats-grid" style={{ alignItems: "center", padding: "14px 24px 14px 0" }}>
-            <div style={{ background: "#fff", borderRadius: "20px", padding: "10px 16px", textAlign: "center", minWidth: "100px", boxShadow: "0 4px 14px rgba(45,38,64,0.06)" }}>
+            <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "10px 16px", textAlign: "center", minWidth: "100px", boxShadow: "0 4px 14px rgba(45,38,64,0.06)" }}>
               <div className="stat-icon-circle" style={{ background: "#DED0F7" }}>
                 <ScaleIcon size={42} color="#7C5CBF" />
               </div>
-              <div style={{ fontSize: "12px", color: "#8A849C", fontWeight: 600 }}>Peso:</div>
-              <div style={{ fontSize: "16px", fontWeight: 800, color: "var(--theme-darker)" }}>{hero.peso_kg !== "-" && hero.peso_kg !== 0 ? `${hero.peso_kg}kg` : "N/A"}</div>
+              <div style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: 600 }}>Peso:</div>
+              <div style={{ fontSize: "16px", fontWeight: 800, color: "var(--text)" }}>{hero.peso_kg !== "-" && hero.peso_kg !== 0 ? `${hero.peso_kg}kg` : "N/A"}</div>
             </div>
-            <div style={{ background: "#fff", borderRadius: "20px", padding: "10px 16px", textAlign: "center", minWidth: "100px", boxShadow: "0 4px 14px rgba(45,38,64,0.06)" }}>
+            <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "10px 16px", textAlign: "center", minWidth: "100px", boxShadow: "0 4px 14px rgba(45,38,64,0.06)" }}>
               <div className="stat-icon-circle" style={{ background: "#F7B8C4" }}>
                 <Ruler size={42} color="#7A3B45" strokeWidth={2.2} />
               </div>
-              <div style={{ fontSize: "12px", color: "#8A849C", fontWeight: 600 }}>Altura:</div>
-              <div style={{ fontSize: "16px", fontWeight: 800, color: "var(--theme-darker)" }}>{hero.talla_cm !== "-" && hero.talla_cm !== 0 ? `${hero.talla_cm}cm` : "N/A"}</div>
+              <div style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: 600 }}>Altura:</div>
+              <div style={{ fontSize: "16px", fontWeight: 800, color: "var(--text)" }}>{hero.talla_cm !== "-" && hero.talla_cm !== 0 ? `${hero.talla_cm}cm` : "N/A"}</div>
             </div>
-            <div style={{ background: "#fff", borderRadius: "20px", padding: "10px 16px", textAlign: "center", minWidth: "100px", boxShadow: "0 4px 14px rgba(45,38,64,0.06)" }}>
+            <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "10px 16px", textAlign: "center", minWidth: "100px", boxShadow: "0 4px 14px rgba(45,38,64,0.06)" }}>
               <div className="stat-icon-circle" style={{ background: "#F7DE8B" }}>
                 <Star size={42} color="#8A6D1D" strokeWidth={2.2} />
               </div>
-              <div style={{ fontSize: "12px", color: "#8A849C", fontWeight: 600 }}>Percentil:</div>
-              <div style={{ fontSize: "16px", fontWeight: 800, color: "var(--theme-darker)" }}>P{hero.percentil}</div>
+              <div style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: 600 }}>Percentil:</div>
+              <div style={{ fontSize: "16px", fontWeight: 800, color: "var(--text)" }}>P{hero.percentil}</div>
             </div>
           </div>
 
@@ -601,7 +601,7 @@ export default function Dashboard() {
           {hero.fecha_medicion && (
             <div style={{
               gridColumn: "1 / -1", textAlign: "center", fontSize: "12px",
-              color: "#8A849C", fontWeight: 600, marginTop: "-4px", paddingBottom: "4px",
+              color: "var(--text-muted)", fontWeight: 600, marginTop: "-4px", paddingBottom: "4px",
             }}>
               {hero.medicion_es_nacimiento ? "Medidas de nacimiento · " : "Último registro · "}
               {new Date(hero.fecha_medicion).toLocaleDateString("es-CL", { day: "numeric", month: "long", year: "numeric" })}
@@ -621,8 +621,8 @@ export default function Dashboard() {
           <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
             {/* ── NOTIFICACIONES ── */}
             {notificaciones.length > 0 && (
-              <div style={{ background: "#fff", borderRadius: "26px", padding: "22px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
-                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "18px" }}>
+              <div style={{ background: "var(--surface)", borderRadius: "26px", padding: "22px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
+                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--text)", marginBottom: "18px" }}>
                   Lo que se viene
                 </h3>
 
@@ -677,7 +677,7 @@ export default function Dashboard() {
                       <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
                         <StatusIcon size={26} color={statusColor} strokeWidth={2.6} style={{ flexShrink: 0 }} />
                         <span style={{
-                          fontSize: "14px", fontWeight: 700, color: "var(--theme-darker)",
+                          fontSize: "14px", fontWeight: 700, color: "var(--text)",
                           overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"
                         }}>
                           {n.titulo}
@@ -693,9 +693,9 @@ export default function Dashboard() {
             )}
 
             {/* ── GRÁFICO DINÁMICO ── */}
-            <div style={{ background: "#fff", borderRadius: "26px", padding: "22px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
+            <div style={{ background: "var(--surface)", borderRadius: "26px", padding: "22px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
               <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "10px", marginBottom: "20px" }}>
-                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--theme-darker)", margin: 0 }}>
+                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--text)", margin: 0 }}>
                   📈 Evolución de Crecimiento
                 </h3>
                 {(!homeData?.rol_acceso || !homeData.rol_acceso.startsWith('solo_lectura')) && (
@@ -764,8 +764,8 @@ export default function Dashboard() {
           </div>
 
           {/* COLUMNA 2: Módulos */}
-          <div style={{ background: "#fff", borderRadius: "26px", padding: "22px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
-            <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "20px" }}>
+          <div style={{ background: "var(--surface)", borderRadius: "26px", padding: "22px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
+            <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--text)", marginBottom: "20px" }}>
               Módulos
             </h3>
 
@@ -778,13 +778,13 @@ export default function Dashboard() {
                 { icon: ComunidadIcon, label: "Comunidad", hoverBg: "#F3EEFD", hoverBorder: "#B39DDB", onClick: () => navigate("/comunidad") },
                 { icon: GaleriaIcon, label: "Galería", hoverBg: "#E8F0FE", hoverBorder: "#6B9BF4", onClick: () => navigate("/galeria") },
               ].map(({ icon: Icon, label, hoverBg, hoverBorder, onClick }) => (
-                <div key={label} onClick={onClick} style={{ background: "#F9FAFB", padding: "10px 8px", borderRadius: "20px", textAlign: "center", cursor: "pointer", border: "2px solid transparent", transition: "all 0.2s" }}
+                <div key={label} onClick={onClick} style={{ background: "var(--surface-2)", padding: "10px 8px", borderRadius: "20px", textAlign: "center", cursor: "pointer", border: "2px solid transparent", transition: "all 0.2s" }}
                      onMouseEnter={e => { e.currentTarget.style.borderColor = hoverBorder; e.currentTarget.style.background = hoverBg; }}
                      onMouseLeave={e => { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.background = "#F9FAFB"; }}>
                   <div className="module-icon-wrap">
                     <Icon size={96} />
                   </div>
-                  <div style={{ fontSize: "14px", fontWeight: 800, color: "var(--theme-darker)" }}>{label}</div>
+                  <div style={{ fontSize: "14px", fontWeight: 800, color: "var(--text)" }}>{label}</div>
                 </div>
               ))}
 
@@ -802,11 +802,11 @@ export default function Dashboard() {
           display: "flex", alignItems: "center", justifyContent: "center"
         }}>
           <div style={{
-            background: "#fff", padding: "32px", borderRadius: "26px", width: "100%", maxWidth: "400px",
+            background: "var(--surface)", padding: "32px", borderRadius: "26px", width: "100%", maxWidth: "400px",
             boxShadow: "0 20px 60px rgba(45,38,64,0.25)"
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
-              <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "21px", fontWeight: 700, color: "var(--theme-darker)", margin: 0 }}>Registrar Medidas</h2>
+              <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "21px", fontWeight: 700, color: "var(--text)", margin: 0 }}>Registrar Medidas</h2>
               <button onClick={() => { setIsModalOpen(false); setGrowthError(""); }} style={{ background: "#F3F1F9", border: "none", borderRadius: "50%", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
                 <X size={18} color="#6B7280" />
               </button>
@@ -875,7 +875,7 @@ export default function Dashboard() {
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              background: "#fff", borderRadius: "24px", width: "100%", maxWidth: "420px",
+              background: "var(--surface)", borderRadius: "24px", width: "100%", maxWidth: "420px",
               overflow: "hidden", fontFamily: "'Nunito', sans-serif",
             }}
           >
@@ -918,8 +918,8 @@ export default function Dashboard() {
                     <>
                       {filas.map(([k, v]) => (
                         <div key={k} style={{ display: "flex", gap: "12px", padding: "9px 0", borderBottom: "1px solid #F5F2FC" }}>
-                          <span style={{ fontSize: "12.5px", fontWeight: 800, color: "#8A849C", minWidth: "92px", textTransform: "uppercase", letterSpacing: "0.3px" }}>{k}</span>
-                          <span style={{ fontSize: "14px", color: "var(--theme-darker)", fontWeight: 600, textTransform: k === "Fecha" ? "capitalize" : "none" }}>{v}</span>
+                          <span style={{ fontSize: "12.5px", fontWeight: 800, color: "var(--text-muted)", minWidth: "92px", textTransform: "uppercase", letterSpacing: "0.3px" }}>{k}</span>
+                          <span style={{ fontSize: "14px", color: "var(--text)", fontWeight: 600, textTransform: k === "Fecha" ? "capitalize" : "none" }}>{v}</span>
                         </div>
                       ))}
                     </>
@@ -947,8 +947,8 @@ export default function Dashboard() {
                     <>
                       {filas.map(([k, v]) => (
                         <div key={k} style={{ display: "flex", gap: "12px", padding: "9px 0", borderBottom: "1px solid #F5F2FC" }}>
-                          <span style={{ fontSize: "12.5px", fontWeight: 800, color: "#8A849C", minWidth: "92px", textTransform: "uppercase", letterSpacing: "0.3px" }}>{k}</span>
-                          <span style={{ fontSize: "14px", color: "var(--theme-darker)", fontWeight: 600 }}>{v}</span>
+                          <span style={{ fontSize: "12.5px", fontWeight: 800, color: "var(--text-muted)", minWidth: "92px", textTransform: "uppercase", letterSpacing: "0.3px" }}>{k}</span>
+                          <span style={{ fontSize: "14px", color: "var(--text)", fontWeight: 600 }}>{v}</span>
                         </div>
                       ))}
                     </>

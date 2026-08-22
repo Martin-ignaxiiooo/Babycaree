@@ -154,7 +154,7 @@ export default function AdminOMS() {
         <div
           style={{
             flex: "1",
-            background: "#fff",
+            background: "var(--surface)",
             padding: "20px",
             borderRadius: "12px",
             boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
@@ -184,7 +184,7 @@ export default function AdminOMS() {
         <div
           style={{
             flex: "1",
-            background: "#fff",
+            background: "var(--surface)",
             padding: "20px",
             borderRadius: "12px",
             boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
@@ -214,7 +214,7 @@ export default function AdminOMS() {
         <div
           style={{
             flex: "1",
-            background: "#fff",
+            background: "var(--surface)",
             padding: "20px",
             borderRadius: "12px",
             boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
@@ -244,7 +244,7 @@ export default function AdminOMS() {
         <div
           style={{
             flex: "1",
-            background: "#fff",
+            background: "var(--surface)",
             padding: "20px",
             borderRadius: "12px",
             boxShadow: "0 1px 3px rgba(0,0,0,0.05)",

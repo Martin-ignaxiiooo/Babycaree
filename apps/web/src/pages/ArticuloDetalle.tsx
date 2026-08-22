@@ -57,7 +57,7 @@ export default function ArticuloDetalle() {
     <div style={{ minHeight: "100vh", background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)", fontFamily: "'Nunito', sans-serif", display: "flex", flexDirection: "column" }}>
       
       {/* ── TOP NAV COMPACTA ── */}
-      <nav style={{ width: "100%", background: "#fff", padding: "16px 40px", display: "flex", alignItems: "center", boxShadow: "0 2px 8px rgba(0,0,0,.05)" }}>
+      <nav style={{ width: "100%", background: "var(--surface)", padding: "16px 40px", display: "flex", alignItems: "center", boxShadow: "0 2px 8px rgba(0,0,0,.05)" }}>
         <button 
           onClick={() => navigate("/comunidad?tab=articulos")} 
           style={{ background: "none", border: "none", color: "#6B7280", fontSize: "15px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
@@ -79,18 +79,18 @@ export default function ArticuloDetalle() {
           <span style={{ fontSize: "14px", fontWeight: 800, color: "var(--theme-primary)", background: "var(--theme-bg-light)", padding: "6px 16px", borderRadius: "16px", display: "flex", alignItems: "center", gap: "6px" }}>
             <FileText size={16} /> {articulo.categoria}
           </span>
-          <div style={{ display: "flex", gap: "16px", color: "#8A849C", fontWeight: 600, fontSize: "14px" }}>
+          <div style={{ display: "flex", gap: "16px", color: "var(--text-muted)", fontWeight: 600, fontSize: "14px" }}>
             <span style={{ display: "flex", alignItems: "center", gap: "6px" }}><Clock size={16} /> Lectura recomendada ({articulo.rango_edad_meses})</span>
             <span style={{ display: "flex", alignItems: "center", gap: "6px" }}><Eye size={16} /> {articulo.contador_lecturas} vistas</span>
           </div>
         </div>
 
         {/* Título */}
-        <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "32px", fontWeight: 700, color: "var(--theme-darker)", margin: "0 0 24px 0", lineHeight: "1.25" }}>
+        <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "32px", fontWeight: 700, color: "var(--text)", margin: "0 0 24px 0", lineHeight: "1.25" }}>
           {articulo.titulo}
         </h1>
 
-        <div style={{ background: "#fff", padding: "32px", borderRadius: "24px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
+        <div style={{ background: "var(--surface)", padding: "32px", borderRadius: "24px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
           <p style={{ margin: "0 0 32px 0", fontSize: "18px", color: "#4B5563", lineHeight: "1.6", fontWeight: 600 }}>
             {articulo.resumen}
           </p>

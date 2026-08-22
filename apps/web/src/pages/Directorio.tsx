@@ -89,8 +89,8 @@ export default function Directorio() {
         
         {/* Header & Search */}
         <div style={{ marginBottom: "36px" }}>
-          <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "30px", fontWeight: 700, color: "var(--theme-darker)", margin: "0 0 8px 0" }}>Directorio de Especialistas</h1>
-          <p style={{ fontSize: "15px", color: "#8A849C", margin: "0 0 24px 0", fontWeight: 600 }}>Encuentra a los mejores médicos y especialistas para tu bebé.</p>
+          <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "30px", fontWeight: 700, color: "var(--text)", margin: "0 0 8px 0" }}>Directorio de Especialistas</h1>
+          <p style={{ fontSize: "15px", color: "var(--text-muted)", margin: "0 0 24px 0", fontWeight: 600 }}>Encuentra a los mejores médicos y especialistas para tu bebé.</p>
           
           <div style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
             <div style={{ flex: "1 1 300px", position: "relative" }}>
@@ -114,7 +114,7 @@ export default function Directorio() {
               style={{ 
                 flex: "0 1 250px", padding: "14px 16px", 
                 borderRadius: "14px", border: "2px solid #EDE9F8", 
-                fontSize: "15px", outline: "none", background: "#fff", cursor: "pointer"
+                fontSize: "15px", outline: "none", background: "var(--surface)", cursor: "pointer"
               }}>
               <option value="">Todas las especialidades</option>
               {especialidades.map(e => (
@@ -126,16 +126,16 @@ export default function Directorio() {
 
         {/* Directory Grid */}
         {loading ? (
-          <div style={{ textAlign: "center", padding: "40px", color: "#8A849C" }}>Cargando directorio...</div>
+          <div style={{ textAlign: "center", padding: "40px", color: "var(--text-muted)" }}>Cargando directorio...</div>
         ) : filteredMedicos.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "40px", color: "#8A849C", background: "#fff", borderRadius: "22px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
+          <div style={{ textAlign: "center", padding: "40px", color: "var(--text-muted)", background: "var(--surface)", borderRadius: "22px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
             No se encontraron médicos con esos criterios.
           </div>
         ) : (
           <div className="responsive-grid">
             {filteredMedicos.map(medico => (
               <div key={medico.id} style={{ 
-                background: "#fff", borderRadius: "22px", padding: "24px",
+                background: "var(--surface)", borderRadius: "22px", padding: "24px",
                 boxShadow: "0 6px 24px rgba(124,92,191,0.08)",
                 display: "flex", flexDirection: "column", gap: "16px",
                 transition: "transform 0.2s, box-shadow 0.2s", cursor: "default"
@@ -151,7 +151,7 @@ export default function Directorio() {
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "8px" }}>
-                      <h3 style={{ margin: "0 0 4px 0", fontFamily: "'Baloo 2', sans-serif", fontSize: "18px", fontWeight: 700, color: "var(--theme-darker)" }}>
+                      <h3 style={{ margin: "0 0 4px 0", fontFamily: "'Baloo 2', sans-serif", fontSize: "18px", fontWeight: 700, color: "var(--text)" }}>
                         {medico.nombre_completo}
                       </h3>
                       <div style={{ display: "flex", alignItems: "center", gap: "4px", background: "var(--accent-gold-light)", color: "#8A6D1D", padding: "4px 8px", borderRadius: "8px", fontSize: "13px", fontWeight: 700, flexShrink: 0 }}>
@@ -165,14 +165,14 @@ export default function Directorio() {
                 </div>
 
                 <div style={{ borderTop: "1px solid var(--theme-bg-light)", paddingTop: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px", color: "#8A849C", fontSize: "14px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", color: "var(--text-muted)", fontSize: "14px" }}>
                     <MapPin size={18} style={{ color: "var(--theme-light)" }} />
                     <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                       {medico.centro_icono && <span>{medico.centro_icono}</span>}
                       {medico.nombre_centro}
                     </span>
                   </div>
-                  <div style={{ display: "flex", alignItems: "flex-start", gap: "12px", color: "#8A849C", fontSize: "14px" }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: "12px", color: "var(--text-muted)", fontSize: "14px" }}>
                     <ShieldCheck size={18} style={{ color: "var(--theme-light)", marginTop: "2px" }} />
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
                       {medico.prevision_aceptada.map((prev, idx) => (
@@ -182,7 +182,7 @@ export default function Directorio() {
                       ))}
                     </div>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px", color: "#8A849C", fontSize: "14px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", color: "var(--text-muted)", fontSize: "14px" }}>
                     <Phone size={18} style={{ color: "var(--theme-light)" }} />
                     <span>{medico.telefono_contacto}</span>
                   </div>

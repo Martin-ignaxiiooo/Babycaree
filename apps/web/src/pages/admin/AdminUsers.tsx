@@ -204,25 +204,25 @@ export default function AdminUsers() {
       {/* MÉTRICAS (Dinámicas desde Backend) */}
       <div style={{ display: "flex", gap: "16px", marginBottom: "32px", overflowX: "auto" }}>
         
-        <div style={{ flex: "1", background: "#fff", padding: "20px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", minWidth: "200px" }}>
+        <div style={{ flex: "1", background: "var(--surface)", padding: "20px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", minWidth: "200px" }}>
           <div style={{ fontSize: "28px", fontWeight: 800, color: "#1F2937", marginBottom: "8px" }}>{stats.registradas}</div>
           <div style={{ fontSize: "12px", color: "#6B7280" }}>Cuentas registradas</div>
           <div style={{ fontSize: "11px", color: "#10B981", marginTop: "8px" }}>En base de datos</div>
         </div>
 
-        <div style={{ flex: "1", background: "#fff", padding: "20px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", minWidth: "200px" }}>
+        <div style={{ flex: "1", background: "var(--surface)", padding: "20px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", minWidth: "200px" }}>
           <div style={{ fontSize: "28px", fontWeight: 800, color: "#1F2937", marginBottom: "8px" }}>{stats.activasPorcentaje}%</div>
           <div style={{ fontSize: "12px", color: "#6B7280" }}>Cuentas activas</div>
           <div style={{ fontSize: "11px", color: "#10B981", marginTop: "8px" }}>Proporción activa</div>
         </div>
 
-        <div style={{ flex: "1", background: "#fff", padding: "20px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", minWidth: "200px" }}>
+        <div style={{ flex: "1", background: "var(--surface)", padding: "20px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", minWidth: "200px" }}>
           <div style={{ fontSize: "28px", fontWeight: 800, color: "#1F2937", marginBottom: "8px" }}>{stats.perfilesInfantiles}</div>
           <div style={{ fontSize: "12px", color: "#6B7280" }}>Perfiles infantiles</div>
           <div style={{ fontSize: "11px", color: "#10B981", marginTop: "8px" }}>{stats.perfilesPromedio} por cuenta promedio</div>
         </div>
 
-        <div style={{ flex: "1", background: "#fff", padding: "20px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", minWidth: "200px" }}>
+        <div style={{ flex: "1", background: "var(--surface)", padding: "20px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", minWidth: "200px" }}>
           <div style={{ fontSize: "24px", fontWeight: 800, color: "#EAB308", marginBottom: "8px" }}>Ley Sanna</div>
           <div style={{ fontSize: "12px", color: "#6B7280" }}>{stats.leySanna} pendientes</div>
           <div style={{ fontSize: "11px", color: "#6B7280", marginTop: "8px" }}>Trámites en curso</div>

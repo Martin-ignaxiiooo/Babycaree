@@ -333,11 +333,11 @@ export default function ResultadoConsultaModal({ bebeId, cita, token, onClose, o
               {examenes.map((ex, i) => (
                 <div key={i} style={examenRow}>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 700, fontSize: "13.5px", color: "var(--theme-darker)" }}>
+                    <div style={{ fontWeight: 700, fontSize: "13.5px", color: "var(--text)" }}>
                       {ex.nombre}
                     </div>
                     {ex.fecha_sugerida && (
-                      <div style={{ fontSize: "12px", color: "#8A849C" }}>
+                      <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
                         Para el {ex.fecha_sugerida}
                       </div>
                     )}
@@ -397,7 +397,7 @@ const ov: React.CSSProperties = {
   display: "flex", alignItems: "center", justifyContent: "center", padding: "20px",
 };
 const modal: React.CSSProperties = {
-  background: "#fff", borderRadius: "24px", width: "100%", maxWidth: "520px",
+  background: "var(--surface)", borderRadius: "24px", width: "100%", maxWidth: "520px",
   maxHeight: "90vh", display: "flex", flexDirection: "column", overflow: "hidden",
   fontFamily: "'Nunito', sans-serif",
 };
@@ -420,16 +420,16 @@ const closeBtn: React.CSSProperties = {
 const body: React.CSSProperties = { padding: "22px 24px", overflowY: "auto" };
 const label: React.CSSProperties = {
   display: "block", fontSize: "12.5px", fontWeight: 800,
-  color: "var(--theme-darker)", marginBottom: "6px", marginTop: "4px",
+  color: "var(--text)", marginBottom: "6px", marginTop: "4px",
 };
 const input: React.CSSProperties = {
   width: "100%", padding: "11px 14px", borderRadius: "12px",
-  border: "1.5px solid #E4DBF7", background: "#FBFAFE", fontSize: "14px",
-  fontFamily: "'Nunito', sans-serif", color: "var(--theme-darker)",
+  border: "1.5px solid var(--border)", background: "var(--surface-3)", fontSize: "14px",
+  fontFamily: "'Nunito', sans-serif", color: "var(--text)",
   marginBottom: "14px", outline: "none", boxSizing: "border-box",
 };
 const ayuda: React.CSSProperties = {
-  fontSize: "12px", color: "#8A849C", margin: "-8px 0 16px", lineHeight: 1.5,
+  fontSize: "12px", color: "var(--text-muted)", margin: "-8px 0 16px", lineHeight: 1.5,
 };
 const toggleOn: React.CSSProperties = {
   flex: 1, padding: "11px", borderRadius: "12px", border: "2px solid var(--theme-primary)",
@@ -437,22 +437,22 @@ const toggleOn: React.CSSProperties = {
   fontSize: "13.5px", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
 };
 const toggleOff: React.CSSProperties = {
-  flex: 1, padding: "11px", borderRadius: "12px", border: "2px solid #E4DBF7",
-  background: "#fff", color: "#8A849C", fontWeight: 700,
+  flex: 1, padding: "11px", borderRadius: "12px", border: "2px solid var(--border)",
+  background: "var(--surface)", color: "var(--text-muted)", fontWeight: 700,
   fontSize: "13.5px", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
 };
 const transcripcionPreview: React.CSSProperties = {
   background: "var(--theme-bg-light)", borderRadius: "10px", padding: "10px 12px",
-  fontSize: "12.5px", color: "var(--theme-darker)", fontStyle: "italic",
+  fontSize: "12.5px", color: "var(--text)", fontStyle: "italic",
 };
 const uploadBox: React.CSSProperties = {
   display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
   padding: "20px", border: "2px dashed #D9CDF2", borderRadius: "14px",
-  background: "#FBFAFE", cursor: "pointer", marginBottom: "16px",
+  background: "var(--surface-3)", cursor: "pointer", marginBottom: "16px",
 };
 const preview: React.CSSProperties = {
   width: "100%", maxHeight: "220px", objectFit: "contain",
-  borderRadius: "12px", border: "1.5px solid #E4DBF7", background: "#FBFAFE",
+  borderRadius: "12px", border: "1.5px solid var(--border)", background: "var(--surface-3)",
 };
 const borrarFotoBtn: React.CSSProperties = {
   position: "absolute", top: "8px", right: "8px", background: "rgba(45,38,64,0.75)",
@@ -464,7 +464,7 @@ const examenRow: React.CSSProperties = {
   borderRadius: "12px", padding: "10px 12px", marginBottom: "8px",
 };
 const borrarExamenBtn: React.CSSProperties = {
-  background: "none", border: "none", cursor: "pointer", color: "#8A849C",
+  background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)",
   display: "flex", alignItems: "center",
 };
 const agregarBtn: React.CSSProperties = {
@@ -479,11 +479,11 @@ const errorBox: React.CSSProperties = {
 };
 const footer: React.CSSProperties = {
   display: "flex", gap: "10px", padding: "16px 24px",
-  borderTop: "1px solid #EDE9F8", background: "#FBFAFE",
+  borderTop: "1px solid var(--border-soft)", background: "var(--surface-3)",
 };
 const cancelBtn: React.CSSProperties = {
-  flex: 1, padding: "13px", borderRadius: "100px", border: "1.5px solid #E4DBF7",
-  background: "#fff", color: "#8A849C", fontWeight: 800, fontSize: "14px",
+  flex: 1, padding: "13px", borderRadius: "100px", border: "1.5px solid var(--border)",
+  background: "var(--surface)", color: "var(--text-muted)", fontWeight: 800, fontSize: "14px",
   cursor: "pointer", fontFamily: "'Nunito', sans-serif",
 };
 const saveBtn: React.CSSProperties = {

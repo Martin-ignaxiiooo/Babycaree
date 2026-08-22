@@ -152,13 +152,13 @@ export default function AdminArticulos() {
       {/* MÉTRICAS (Dinámicas desde Backend) */}
       <div style={{ display: "flex", gap: "16px", marginBottom: "32px", overflowX: "auto" }}>
         
-        <div style={{ flex: "1", background: "#fff", padding: "20px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", minWidth: "200px" }}>
+        <div style={{ flex: "1", background: "var(--surface)", padding: "20px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", minWidth: "200px" }}>
           <div style={{ fontSize: "28px", fontWeight: 800, color: "#1F2937", marginBottom: "8px" }}>{stats.publicados}</div>
           <div style={{ fontSize: "12px", color: "#6B7280" }}>Artículos publicados</div>
           <div style={{ fontSize: "11px", color: "#10B981", marginTop: "8px" }}>Visibles en la app</div>
         </div>
 
-        <div style={{ flex: "1", background: "#fff", padding: "20px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", minWidth: "200px" }}>
+        <div style={{ flex: "1", background: "var(--surface)", padding: "20px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", minWidth: "200px" }}>
           <div style={{ fontSize: "28px", fontWeight: 800, color: "#1F2937", marginBottom: "8px" }}>{stats.borradores}</div>
           <div style={{ fontSize: "12px", color: "#6B7280" }}>Borradores</div>
           <div style={{ fontSize: "11px", color: stats.borradores > 0 ? "#EF4444" : "#10B981", marginTop: "8px" }}>
@@ -166,13 +166,13 @@ export default function AdminArticulos() {
           </div>
         </div>
 
-        <div style={{ flex: "1", background: "#fff", padding: "20px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", minWidth: "200px" }}>
+        <div style={{ flex: "1", background: "var(--surface)", padding: "20px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", minWidth: "200px" }}>
           <div style={{ fontSize: "28px", fontWeight: 800, color: "#1F2937", marginBottom: "8px" }}>{stats.lecturasTotales}</div>
           <div style={{ fontSize: "12px", color: "#6B7280" }}>Lecturas totales</div>
           <div style={{ fontSize: "11px", color: "#10B981", marginTop: "8px" }}>Histórico de la plataforma</div>
         </div>
 
-        <div style={{ flex: "1", background: "#fff", padding: "20px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", minWidth: "200px" }}>
+        <div style={{ flex: "1", background: "var(--surface)", padding: "20px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", minWidth: "200px" }}>
           <div style={{ fontSize: "28px", fontWeight: 800, color: "#1F2937", marginBottom: "8px" }}>{stats.utilidadPromedio}</div>
           <div style={{ fontSize: "12px", color: "#6B7280" }}>Utilidad promedio</div>
           <div style={{ fontSize: "11px", color: "#10B981", marginTop: "8px" }}>Sobre 5 estrellas</div>

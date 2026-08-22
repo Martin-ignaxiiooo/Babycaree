@@ -296,7 +296,7 @@ export default function CarnetDigital({ perfil, onClose }: CarnetDigitalProps) {
             disabled={descargando}
             style={{
               flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
-              background: "#fff", color: COLOR_PRIMARY, border: "none",
+              background: "var(--surface)", color: COLOR_PRIMARY, border: "none",
               borderRadius: "14px", padding: "14px", fontWeight: 800, fontSize: "14px",
               cursor: descargando ? "wait" : "pointer", opacity: descargando ? 0.7 : 1,
             }}

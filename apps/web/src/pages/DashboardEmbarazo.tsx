@@ -227,7 +227,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
     borderRadius: "14px",
     border: "2px solid var(--theme-bg-light)",
     background: "#FDFCFF",
-    color: "var(--theme-darker)",
+    color: "var(--text)",
     outline: "none",
     boxSizing: "border-box",
     fontFamily: "'Nunito', sans-serif",
@@ -240,7 +240,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
     fontSize: "12px",
     fontWeight: 700,
     marginBottom: "8px",
-    color: "#8A849C",
+    color: "var(--text-muted)",
     textTransform: "uppercase",
     letterSpacing: "0.05em",
   };
@@ -260,7 +260,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
               style={{
                 position: "relative",
                 width: "88px", height: "88px", borderRadius: "22px",
-                background: "#fff", flexShrink: 0, overflow: "hidden", cursor: "pointer",
+                background: "var(--surface)", flexShrink: 0, overflow: "hidden", cursor: "pointer",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 boxShadow: "0 8px 22px rgba(45,38,64,0.2)",
               }}
@@ -302,7 +302,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
                 >
                   <span style={{ color: "#fff", fontSize: "9px", fontWeight: 700, textAlign: "center", lineHeight: 1.2 }}>¿Quitar foto?</span>
                   <div style={{ display: "flex", gap: "4px" }}>
-                    <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleEliminarFoto(); }} style={{ background: "#fff", color: "#B91C1C", border: "none", borderRadius: "6px", padding: "3px 7px", fontSize: "10px", fontWeight: 800, cursor: "pointer" }}>Sí</button>
+                    <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleEliminarFoto(); }} style={{ background: "var(--surface)", color: "#B91C1C", border: "none", borderRadius: "6px", padding: "3px 7px", fontSize: "10px", fontWeight: 800, cursor: "pointer" }}>Sí</button>
                     <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setConfirmandoBorrarFoto(false); }} style={{ background: "rgba(255,255,255,0.2)", color: "#fff", border: "1px solid rgba(255,255,255,0.5)", borderRadius: "6px", padding: "3px 7px", fontSize: "10px", fontWeight: 700, cursor: "pointer" }}>No</button>
                   </div>
                 </div>
@@ -396,7 +396,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
           {/* TARJETA 1: Tamaño del bebé */}
           <div style={{ ...cardStyle, flex: "1 1 320px", padding: "24px", display: "flex", flexDirection: "column" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "10px", marginBottom: "20px" }}>
-              <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--theme-darker)", margin: 0 }}>
+              <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--text)", margin: 0 }}>
                 Tamaño del Bebé
               </h2>
               <div style={{
@@ -412,7 +412,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
               <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
                 <BabyGrowthIcon semanas={semanas} porcentaje={porcentaje} fill />
                 <div style={{ flex: "1 1 140px" }}>
-                  <div style={{ fontSize: "26px", fontWeight: 800, color: "var(--theme-darker)", marginBottom: "8px" }}>
+                  <div style={{ fontSize: "26px", fontWeight: 800, color: "var(--text)", marginBottom: "8px" }}>
                     {Math.min(porcentaje, 100)}%
                   </div>
                   <div style={{ width: "100%", background: "var(--theme-bg-light)", borderRadius: "10px", height: "8px", overflow: "hidden", marginBottom: "8px" }}>
@@ -424,7 +424,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
                       transition: "width 0.4s ease",
                     }}></div>
                   </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#8A849C", fontWeight: 700 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "var(--text-muted)", fontWeight: 700 }}>
                     <span>Semana 1</span>
                     <span>Semana 40</span>
                   </div>
@@ -462,10 +462,10 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
                     }}>
                       <CalendarPlus size={20} color="var(--theme-primary)" />
                     </div>
-                    <p style={{ color: "var(--theme-darker)", fontSize: "14px", fontWeight: 700, margin: "0 0 4px 0" }}>
+                    <p style={{ color: "var(--text)", fontSize: "14px", fontWeight: 700, margin: "0 0 4px 0" }}>
                       Todavía no tienes controles agendados.
                     </p>
-                    <p style={{ color: "#8A849C", fontSize: "13px", margin: 0 }}>
+                    <p style={{ color: "var(--text-muted)", fontSize: "13px", margin: 0 }}>
                       Agregá tu próxima cita médica más abajo.
                     </p>
                   </div>
@@ -486,10 +486,10 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
                         opacity: isPast ? 0.7 : 1,
                       }}>
                         <div style={{ minWidth: 0 }}>
-                          <h4 style={{ margin: "0 0 4px 0", fontSize: "15px", color: "var(--theme-darker)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          <h4 style={{ margin: "0 0 4px 0", fontSize: "15px", color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                             {cita.notas || "Control Médico"}
                           </h4>
-                          <div style={{ fontSize: "13px", color: "#8A849C", display: "flex", alignItems: "center", gap: "8px" }}>
+                          <div style={{ fontSize: "13px", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "8px" }}>
                             <span>{cita.medico || "Sin especificar doctor"}</span>
                             {cita.lugar && <span>• {cita.lugar}</span>}
                           </div>
@@ -498,7 +498,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
                           <div style={{ fontWeight: 800, fontSize: "14px", color: "var(--theme-primary)" }}>
                             {date.toLocaleDateString("es-CL", { day: 'numeric', month: 'short' })}
                           </div>
-                          <div style={{ fontSize: "12px", color: "#8A849C" }}>
+                          <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
                             {date.toLocaleTimeString("es-CL", { hour: '2-digit', minute: '2-digit', hour12: false })}
                           </div>
                         </div>

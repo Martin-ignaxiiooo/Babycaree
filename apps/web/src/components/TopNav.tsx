@@ -198,7 +198,7 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
                   <span style={{
                     width: "22px", height: "22px", borderRadius: "50%", overflow: "hidden",
                     background: "var(--accent-coral-light)", display: "flex", alignItems: "center", justifyContent: "center",
-                    color: "var(--theme-darker)", fontSize: "11px", fontWeight: 800, flexShrink: 0,
+                    color: "var(--text)", fontSize: "11px", fontWeight: 800, flexShrink: 0,
                   }}>
                     {(() => {
                       const activeBaby = babies.find((b) => b.id === activeBabyId);
@@ -248,7 +248,7 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
                             baby.nombre?.charAt(0).toUpperCase()
                           )}
                         </div>
-                        <span style={{ flex: 1, fontSize: "14px", fontWeight: 700, color: "var(--theme-darker)" }}>
+                        <span style={{ flex: 1, fontSize: "14px", fontWeight: 700, color: "var(--text)" }}>
                           {nombreVisible(baby)}
                         </span>
                         {baby.id === activeBabyId && <Check size={16} color="var(--theme-primary)" />}
@@ -297,14 +297,14 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
                   />
                   <div style={{
                     position: "absolute", top: "46px", right: 0, width: "300px", zIndex: 50,
-                    background: "#fff", borderRadius: "16px", overflow: "hidden",
-                    boxShadow: "0 12px 32px rgba(45,38,64,0.22)", color: "var(--theme-darker)",
+                    background: "var(--surface)", borderRadius: "16px", overflow: "hidden",
+                    boxShadow: "0 12px 32px rgba(45,38,64,0.22)", color: "var(--text)",
                   }}>
-                    <div style={{ padding: "13px 16px", borderBottom: "1px solid #EDE9F8", fontWeight: 800, fontSize: "14px" }}>
+                    <div style={{ padding: "13px 16px", borderBottom: "1px solid var(--border-soft)", fontWeight: 800, fontSize: "14px" }}>
                       Notificaciones
                     </div>
                     {notifs.length === 0 ? (
-                      <div style={{ padding: "22px 16px", fontSize: "13.5px", color: "#8A849C", textAlign: "center" }}>
+                      <div style={{ padding: "22px 16px", fontSize: "13.5px", color: "var(--text-muted)", textAlign: "center" }}>
                         No tienes pendientes por ahora.
                       </div>
                     ) : (
@@ -315,7 +315,7 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
                               {n.titulo ?? n.tipo ?? "Recordatorio"}
                             </div>
                             {n.mensaje && (
-                              <div style={{ fontSize: "12.5px", color: "#8A849C", marginTop: "2px", lineHeight: 1.45 }}>
+                              <div style={{ fontSize: "12.5px", color: "var(--text-muted)", marginTop: "2px", lineHeight: 1.45 }}>
                                 {n.mensaje}
                               </div>
                             )}

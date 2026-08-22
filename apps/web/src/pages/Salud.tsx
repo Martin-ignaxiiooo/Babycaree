@@ -530,8 +530,8 @@ export default function Salud() {
       <div className="page-container">
         
         {activeTab === "vacunas" && (
-          <div style={{ background: "#fff", borderRadius: "24px", padding: "32px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
-            <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "21px", fontWeight: 700, color: "var(--theme-darker)", marginBottom: "24px" }}>Calendario de Vacunación</h2>
+          <div style={{ background: "var(--surface)", borderRadius: "24px", padding: "32px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
+            <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "21px", fontWeight: 700, color: "var(--text)", marginBottom: "24px" }}>Calendario de Vacunación</h2>
             
             {vacunas.length === 0 ? (
               <p style={{ color: "#6B7280" }}>No hay vacunas registradas en el sistema.</p>
@@ -563,7 +563,7 @@ export default function Salud() {
 
                       {/* Ya registrada: se muestra en modo lectura, con opción de editar */}
                       {vacuna.aplicada && !editando && (
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "12px", padding: "16px", background: "#fff", borderRadius: "8px", border: "1px solid #DCFCE7" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "12px", padding: "16px", background: "var(--surface)", borderRadius: "8px", border: "1px solid #DCFCE7" }}>
                           <div style={{ fontSize: "13px", color: "#374151" }}>
                             <strong>Aplicada:</strong> {vacuna.fecha_aplicacion ? new Date(vacuna.fecha_aplicacion).toLocaleDateString('es-CL') : "-"}
                             {vacuna.notas && <div style={{ marginTop: "4px", color: "#6B7280" }}>{vacuna.notas}</div>}
@@ -579,7 +579,7 @@ export default function Salud() {
 
                       {/* Formulario de registro: no se guarda nada hasta presionar "Registrar" */}
                       {editando && (
-                        <div style={{ marginTop: "12px", padding: "16px", background: "#F9FAFB", borderRadius: "8px", border: "1px solid #E5E7EB" }}>
+                        <div style={{ marginTop: "12px", padding: "16px", background: "var(--surface-2)", borderRadius: "8px", border: "1px solid #E5E7EB" }}>
                           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px", marginBottom: "16px" }}>
                             <div>
                               <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#4B5563", marginBottom: "4px" }}>Fecha de aplicación *</label>
@@ -633,16 +633,16 @@ export default function Salud() {
         )}
 
         {activeTab === "controles" && (
-          <div style={{ background: "#fff", borderRadius: "24px", padding: "32px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
+          <div style={{ background: "var(--surface)", borderRadius: "24px", padding: "32px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
-              <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "21px", fontWeight: 700, color: "var(--theme-darker)", margin: 0 }}>
+              <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "21px", fontWeight: 700, color: "var(--text)", margin: 0 }}>
                 {perfilEstado === "embarazo" ? "Controles Prenatales" : "Controles Médicos"}
               </h2>
             </div>
 
             {/* Formulario Nueva Cita */}
             <div>
-              <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "16px", color: "var(--theme-darker)" }}>Agregar Nueva Cita</h3>
+              <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "16px", color: "var(--text)" }}>Agregar Nueva Cita</h3>
 
               {/* Dictado por voz (Chrome/Edge). Se esconde si el navegador no lo soporta. */}
               {dictado.soportado && (
@@ -669,7 +669,7 @@ export default function Salud() {
                     </span>
                   </div>
                   {dictado.texto && (
-                    <div style={{ marginTop: "12px", background: "#fff", borderRadius: "12px", padding: "12px 14px", fontSize: "13.5px", color: "var(--theme-darker)", fontStyle: "italic" }}>
+                    <div style={{ marginTop: "12px", background: "var(--surface)", borderRadius: "12px", padding: "12px 14px", fontSize: "13.5px", color: "var(--text)", fontStyle: "italic" }}>
                       “{dictado.texto}”
                     </div>
                   )}
@@ -752,7 +752,7 @@ export default function Salud() {
                       onChange={e => setMedico(e.target.value)}
                       style={{ 
                         width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", 
-                        background: "#fff", outline: "none", boxSizing: "border-box", fontFamily: "Nunito"
+                        background: "var(--surface)", outline: "none", boxSizing: "border-box", fontFamily: "Nunito"
                       }} 
                     />
                   </div>
@@ -767,7 +767,7 @@ export default function Salud() {
                     onChange={e => setNotas(e.target.value)}
                     style={{ 
                       width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", 
-                      background: "#fff", outline: "none", boxSizing: "border-box", fontFamily: "Nunito"
+                      background: "var(--surface)", outline: "none", boxSizing: "border-box", fontFamily: "Nunito"
                     }} 
                   />
                 </div>
@@ -794,7 +794,7 @@ export default function Salud() {
             </div>
 
             <div style={{ borderTop: "1px solid #E5E7EB", marginTop: "28px", paddingTop: "24px" }}>
-              <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "16px", color: "var(--theme-darker)" }}>
+              <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "16px", color: "var(--text)" }}>
                 {perfilEstado === "embarazo" ? "Controles Prenatales agendados" : "Controles agendados"}
               </h3>
               <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "8px" }}>
@@ -849,10 +849,10 @@ export default function Salud() {
                             onClick={() => setCitaEditando(cita)}
                             style={{
                               padding: "6px 10px", borderRadius: "100px",
-                              border: "1.5px solid #E4DBF7", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
+                              border: "1.5px solid var(--border)", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
                               fontWeight: 800, fontSize: "11.5px", display: "inline-flex",
                               alignItems: "center", gap: "4px", whiteSpace: "nowrap",
-                              background: "#fff", color: "var(--theme-darker)",
+                              background: "var(--surface)", color: "var(--text)",
                             }}
                           >
                             <Pencil size={12} /> Editar
@@ -865,7 +865,7 @@ export default function Salud() {
                               border: "1.5px solid #FBDADA", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
                               fontWeight: 800, fontSize: "11.5px", display: "inline-flex",
                               alignItems: "center", gap: "4px", whiteSpace: "nowrap",
-                              background: "#fff", color: "#D97070",
+                              background: "var(--surface)", color: "#D97070",
                             }}
                           >
                             <Trash2 size={12} /> Eliminar
@@ -903,9 +903,9 @@ export default function Salud() {
         )}
 
         {activeTab === "crecimiento" && (
-          <div style={{ background: "#fff", borderRadius: "24px", padding: "32px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
+          <div style={{ background: "var(--surface)", borderRadius: "24px", padding: "32px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-              <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "21px", fontWeight: 700, color: "var(--theme-darker)", margin: 0 }}>
+              <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "21px", fontWeight: 700, color: "var(--text)", margin: 0 }}>
                 Evolución de Crecimiento
               </h2>
               {!rolAcceso.startsWith('solo_lectura') && (
@@ -978,11 +978,11 @@ export default function Salud() {
           display: "flex", alignItems: "center", justifyContent: "center"
         }}>
           <div style={{
-            background: "#fff", padding: "32px", borderRadius: "24px", width: "90%", maxWidth: "400px",
+            background: "var(--surface)", padding: "32px", borderRadius: "24px", width: "90%", maxWidth: "400px",
             boxShadow: "0 10px 40px rgba(0,0,0,0.2)"
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
-              <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "21px", fontWeight: 700, color: "var(--theme-darker)", margin: 0 }}>Registrar Medidas</h2>
+              <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "21px", fontWeight: 700, color: "var(--text)", margin: 0 }}>Registrar Medidas</h2>
               <button onClick={() => setIsModalOpen(false)} style={{ background: "none", border: "none", cursor: "pointer" }}>
                 <X size={24} color="#6B7280" />
               </button>

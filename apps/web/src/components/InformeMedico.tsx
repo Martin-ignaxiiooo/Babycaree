@@ -118,7 +118,7 @@ export default function InformeMedico({ bebeId, perfil, token, onClose }: Props)
 
         <div style={cuerpo} id="informe-medico">
           {cargando ? (
-            <div style={{ textAlign: "center", padding: "60px", color: "#8A849C" }}>
+            <div style={{ textAlign: "center", padding: "60px", color: "var(--text-muted)" }}>
               <Loader2 size={28} className="spin-icon" />
               <div style={{ marginTop: "12px", fontSize: "14px" }}>Reuniendo el historial…</div>
             </div>
@@ -130,7 +130,7 @@ export default function InformeMedico({ bebeId, perfil, token, onClose }: Props)
               <div style={{ borderBottom: "2px solid #2D2640", paddingBottom: "14px", marginBottom: "20px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "10px" }}>
                   <div>
-                    <h1 style={{ fontSize: "22px", margin: 0, color: "#2D2640", fontFamily: "'Baloo 2', sans-serif" }}>
+                    <h1 style={{ fontSize: "22px", margin: 0, color: "var(--text)", fontFamily: "'Baloo 2', sans-serif" }}>
                       Historial de salud
                     </h1>
                     <p style={{ margin: "4px 0 0", fontSize: "13px", color: "#6B647F" }}>
@@ -138,7 +138,7 @@ export default function InformeMedico({ bebeId, perfil, token, onClose }: Props)
                     </p>
                   </div>
                   <div style={{ textAlign: "right", fontSize: "12.5px", color: "#6B647F" }}>
-                    <div style={{ fontWeight: 800, fontSize: "16px", color: "#2D2640" }}>{perfil?.nombre ?? "—"}</div>
+                    <div style={{ fontWeight: 800, fontSize: "16px", color: "var(--text)" }}>{perfil?.nombre ?? "—"}</div>
                     <div>Nacimiento: {fecha(perfil?.fecha_nacimiento)}</div>
                     <div>Edad: {calcularEdad(perfil?.fecha_nacimiento)}</div>
                     {perfil?.prevision_salud && <div>Previsión: {perfil.prevision_salud}</div>}
@@ -202,7 +202,7 @@ export default function InformeMedico({ bebeId, perfil, token, onClose }: Props)
                 {consultas.length > 0 ? (
                   consultas.slice(0, 15).map((c: any, i: number) => (
                     <div key={i} style={{ borderLeft: "3px solid #7C5CBF", paddingLeft: "12px", marginBottom: "14px" }}>
-                      <div style={{ fontWeight: 800, fontSize: "13.5px", color: "#2D2640" }}>
+                      <div style={{ fontWeight: 800, fontSize: "13.5px", color: "var(--text)" }}>
                         {fecha(c.fecha_cita)} · {c.tipo === "control" ? "Control sano" : "Consulta"}
                         {c.especialidad ? ` · ${c.especialidad}` : ""}
                       </div>
@@ -255,13 +255,13 @@ export default function InformeMedico({ bebeId, perfil, token, onClose }: Props)
                     <Medida etiqueta="Tramo más largo" valor={duracion(datos.stats.sueno.tramo_mas_largo_min)} />
                     <Medida etiqueta="Siestas al día" valor={String(datos.stats.sueno.siestas_por_dia)} />
                   </div>
-                  <p style={{ fontSize: "11.5px", color: "#8A849C", margin: 0 }}>
+                  <p style={{ fontSize: "11.5px", color: "var(--text-muted)", margin: 0 }}>
                     Promedios calculados sobre {datos.stats.dias_con_datos} días con registro.
                   </p>
                 </Seccion>
               )}
 
-              <div style={{ borderTop: "1px solid #DDD", marginTop: "24px", paddingTop: "12px", fontSize: "11px", color: "#8A849C", lineHeight: 1.6 }}>
+              <div style={{ borderTop: "1px solid #DDD", marginTop: "24px", paddingTop: "12px", fontSize: "11px", color: "var(--text-muted)", lineHeight: 1.6 }}>
                 Este informe reúne la información registrada por la familia en Baby Care.
                 No reemplaza la ficha clínica ni constituye un documento médico oficial.
               </div>
@@ -292,7 +292,7 @@ export default function InformeMedico({ bebeId, perfil, token, onClose }: Props)
 function Seccion({ titulo, children }: any) {
   return (
     <div style={{ marginBottom: "22px", breakInside: "avoid" }}>
-      <h2 style={{ fontSize: "14px", fontWeight: 900, color: "#2D2640", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "10px", paddingBottom: "5px", borderBottom: "1px solid #E4DBF7" }}>
+      <h2 style={{ fontSize: "14px", fontWeight: 900, color: "var(--text)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "10px", paddingBottom: "5px", borderBottom: "1px solid #E4DBF7" }}>
         {titulo}
       </h2>
       {children}
@@ -303,8 +303,8 @@ function Seccion({ titulo, children }: any) {
 function Medida({ etiqueta, valor }: { etiqueta: string; valor: string }) {
   return (
     <div>
-      <div style={{ fontSize: "11px", color: "#8A849C", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.3px" }}>{etiqueta}</div>
-      <div style={{ fontSize: "17px", fontWeight: 800, color: "#2D2640" }}>{valor}</div>
+      <div style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.3px" }}>{etiqueta}</div>
+      <div style={{ fontSize: "17px", fontWeight: 800, color: "var(--text)" }}>{valor}</div>
     </div>
   );
 }
@@ -337,7 +337,7 @@ function Tabla({ columnas, filas }: { columnas: string[]; filas: any[][] }) {
 }
 
 function Vacio({ children }: any) {
-  return <p style={{ fontSize: "13px", color: "#8A849C", fontStyle: "italic", margin: 0 }}>{children}</p>;
+  return <p style={{ fontSize: "13px", color: "var(--text-muted)", fontStyle: "italic", margin: 0 }}>{children}</p>;
 }
 
 /* ── estilos del modal ── */
@@ -346,7 +346,7 @@ const ov: React.CSSProperties = {
   display: "flex", alignItems: "center", justifyContent: "center", padding: "20px",
 };
 const modal: React.CSSProperties = {
-  background: "#fff", borderRadius: "20px", width: "100%", maxWidth: "780px",
+  background: "var(--surface)", borderRadius: "20px", width: "100%", maxWidth: "780px",
   maxHeight: "92vh", display: "flex", flexDirection: "column", overflow: "hidden",
   fontFamily: "'Nunito', sans-serif",
 };
@@ -354,9 +354,9 @@ const barra: React.CSSProperties = {
   background: "linear-gradient(120deg, var(--theme-darker), var(--theme-primary))",
   padding: "16px 22px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px",
 };
-const cuerpo: React.CSSProperties = { padding: "28px 32px", overflowY: "auto", background: "#fff" };
+const cuerpo: React.CSSProperties = { padding: "28px 32px", overflowY: "auto", background: "var(--surface)" };
 const btnImprimir: React.CSSProperties = {
-  display: "flex", alignItems: "center", gap: "7px", background: "#fff",
+  display: "flex", alignItems: "center", gap: "7px", background: "var(--surface)",
   color: "var(--theme-primary)", border: "none", borderRadius: "100px",
   padding: "10px 18px", fontWeight: 800, fontSize: "13.5px", cursor: "pointer",
   fontFamily: "'Nunito', sans-serif",

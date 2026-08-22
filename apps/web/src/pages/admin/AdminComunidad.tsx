@@ -120,17 +120,17 @@ export default function AdminComunidad() {
       </div>
 
       <div style={{ display: "flex", gap: "16px", marginBottom: "32px", overflowX: "auto" }}>
-        <div style={{ flex: "1", background: "#fff", padding: "20px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", minWidth: "200px" }}>
+        <div style={{ flex: "1", background: "var(--surface)", padding: "20px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", minWidth: "200px" }}>
           <div style={{ fontSize: "28px", fontWeight: 800, color: "#1F2937", marginBottom: "8px" }}>{stats.total_foros}</div>
           <div style={{ fontSize: "12px", color: "#6B7280" }}>Foros Activos</div>
           <div style={{ fontSize: "11px", color: "#10B981", marginTop: "8px" }}>Visibles en la app</div>
         </div>
-        <div style={{ flex: "1", background: "#fff", padding: "20px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", minWidth: "200px" }}>
+        <div style={{ flex: "1", background: "var(--surface)", padding: "20px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", minWidth: "200px" }}>
           <div style={{ fontSize: "28px", fontWeight: 800, color: "#1F2937", marginBottom: "8px" }}>{stats.total_comentarios}</div>
           <div style={{ fontSize: "12px", color: "#6B7280" }}>Comentarios Totales</div>
           <div style={{ fontSize: "11px", color: "#10B981", marginTop: "8px" }}>Interacciones de usuarios</div>
         </div>
-        <div style={{ flex: "1", background: "#fff", padding: "20px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", minWidth: "200px" }}>
+        <div style={{ flex: "1", background: "var(--surface)", padding: "20px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", minWidth: "200px" }}>
           <div style={{ fontSize: "28px", fontWeight: 800, color: "#1F2937", marginBottom: "8px" }}>{data.reduce((acc, curr) => acc + (curr.likes || 0), 0)}</div>
           <div style={{ fontSize: "12px", color: "#6B7280" }}>Likes Totales</div>
           <div style={{ fontSize: "11px", color: "#10B981", marginTop: "8px" }}>Reacciones positivas</div>
@@ -195,7 +195,7 @@ export default function AdminComunidad() {
                     <button
                       onClick={() => toggleForo(item.id)}
                       style={{ 
-                        background: "#fff", 
+                        background: "var(--surface)", 
                         border: "1px solid #E5E7EB", 
                         padding: "6px 12px", 
                         borderRadius: "6px",
@@ -217,7 +217,7 @@ export default function AdminComunidad() {
                 {expandedForoId === item.id && (
                   <tr>
                     <td colSpan={6} style={{ padding: 0, borderBottom: "none" }}>
-                      <div style={{ background: "#F9FAFB", padding: "24px", borderBottom: "1px solid #E5E7EB" }}>
+                      <div style={{ background: "var(--surface-2)", padding: "24px", borderBottom: "1px solid #E5E7EB" }}>
                         <h4 style={{ margin: "0 0 16px 0", color: "#374151", display: "flex", alignItems: "center", gap: "8px" }}>
                           <MessageCircle size={18} color="#8B5CF6"/> Comentarios de la publicación
                         </h4>
@@ -229,7 +229,7 @@ export default function AdminComunidad() {
                         ) : (
                           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                             {comentarios[item.id]?.length === 0 ? (
-                              <div style={{ background: "#fff", padding: "16px", borderRadius: "8px", border: "1px dashed #D1D5DB", color: "#6B7280", fontSize: "14px", fontStyle: "italic", textAlign: "center" }}>
+                              <div style={{ background: "var(--surface)", padding: "16px", borderRadius: "8px", border: "1px dashed #D1D5DB", color: "#6B7280", fontSize: "14px", fontStyle: "italic", textAlign: "center" }}>
                                 No hay comentarios en este foro.
                               </div>
                             ) : (

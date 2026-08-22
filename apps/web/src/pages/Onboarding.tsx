@@ -52,7 +52,7 @@ function InputField({
           display: "block",
           fontSize: "13px",
           fontWeight: 700,
-          color: "var(--theme-darker)",
+          color: "var(--text)",
           textTransform: "uppercase",
           letterSpacing: "0.07em",
           marginBottom: "10px",
@@ -76,7 +76,7 @@ function InputField({
             fontSize: "17px",
             fontFamily: "'Nunito', sans-serif",
             fontWeight: 500,
-            color: "var(--theme-darker)",
+            color: "var(--text)",
             background: "#FDFCFF",
             outline: "none",
             transition: "border-color 0.2s, box-shadow 0.2s",
@@ -236,13 +236,13 @@ function TrustBadge() {
           style={{
             fontSize: "15px",
             fontWeight: 800,
-            color: "var(--theme-darker)",
+            color: "var(--text)",
             marginBottom: "3px",
           }}
         >
           Registro seguro con cifrado bancario
         </p>
-        <p style={{ fontSize: "14px", color: "#8A849C", lineHeight: 1.4 }}>
+        <p style={{ fontSize: "14px", color: "var(--text-muted)", lineHeight: 1.4 }}>
           Tus datos se resguardan bajo la Ley 19.628 y 21.719 de Chile.
         </p>
       </div>
@@ -343,7 +343,7 @@ function StepOne({
                   style={{
                     fontSize: "16px",
                     fontWeight: 800,
-                    color: "var(--theme-darker)",
+                    color: "var(--text)",
                     marginBottom: "6px",
                   }}
                 >
@@ -352,7 +352,7 @@ function StepOne({
                 <p
                   style={{
                     fontSize: "14px",
-                    color: "#8A849C",
+                    color: "var(--text-muted)",
                     lineHeight: 1.5,
                     fontWeight: 500,
                   }}
@@ -522,7 +522,7 @@ function StepThree({ baby, setBaby, flow, error }: any) {
               display: "block",
               fontSize: "11px",
               fontWeight: 700,
-              color: "var(--theme-darker)",
+              color: "var(--text)",
               textTransform: "uppercase",
               letterSpacing: "0.07em",
               marginBottom: "8px",
@@ -550,7 +550,7 @@ function StepThree({ baby, setBaby, flow, error }: any) {
               display: "block",
               fontSize: "11px",
               fontWeight: 700,
-              color: "var(--theme-darker)",
+              color: "var(--text)",
               textTransform: "uppercase",
               letterSpacing: "0.07em",
               marginBottom: "8px",
@@ -581,7 +581,7 @@ function StepThree({ baby, setBaby, flow, error }: any) {
               fontSize: "15px",
               fontFamily: "'Nunito', sans-serif",
               fontWeight: 500,
-              color: "var(--theme-darker)",
+              color: "var(--text)",
               background: "#FDFCFF",
               outline: "none",
               cursor: "pointer",
@@ -602,7 +602,7 @@ function StepThree({ baby, setBaby, flow, error }: any) {
             display: "block",
             fontSize: "11px",
             fontWeight: 700,
-            color: "var(--theme-darker)",
+            color: "var(--text)",
             textTransform: "uppercase",
             letterSpacing: "0.07em",
             marginBottom: "8px",
@@ -624,7 +624,7 @@ function StepThree({ baby, setBaby, flow, error }: any) {
             fontSize: "15px",
             fontFamily: "'Nunito', sans-serif",
             fontWeight: 500,
-            color: "var(--theme-darker)",
+            color: "var(--text)",
             background: "#FDFCFF",
             outline: "none",
             cursor: "pointer",
@@ -682,7 +682,7 @@ function StepThree({ baby, setBaby, flow, error }: any) {
               )}
             </div>
             <span
-              style={{ fontSize: "15px", fontWeight: 700, color: "var(--theme-darker)" }}
+              style={{ fontSize: "15px", fontWeight: 700, color: "var(--text)" }}
             >
               Mi bebé nació prematuro
             </span>
@@ -697,7 +697,7 @@ function StepThree({ baby, setBaby, flow, error }: any) {
                   display: "block",
                   fontSize: "11px",
                   fontWeight: 700,
-                  color: "var(--theme-darker)",
+                  color: "var(--text)",
                   textTransform: "uppercase",
                   letterSpacing: "0.07em",
                   marginBottom: "8px",
@@ -726,13 +726,13 @@ function StepThree({ baby, setBaby, flow, error }: any) {
                   fontSize: "15px",
                   fontFamily: "'Nunito', sans-serif",
                   fontWeight: 500,
-                  color: "var(--theme-darker)",
+                  color: "var(--text)",
                   background: "#FDFCFF",
                   outline: "none",
                 }}
               />
               <p
-                style={{ marginTop: "6px", fontSize: "12px", color: "#8A849C" }}
+                style={{ marginTop: "6px", fontSize: "12px", color: "var(--text-muted)" }}
               >
                 Calcularemos su edad corregida automáticamente.
               </p>
@@ -853,7 +853,7 @@ function StepFour({ consents, setConsents, error }: any) {
                   style={{
                     fontSize: "14px",
                     fontWeight: 800,
-                    color: "var(--theme-darker)",
+                    color: "var(--text)",
                   }}
                 >
                   {title}
@@ -892,7 +892,7 @@ function StepFour({ consents, setConsents, error }: any) {
               <p
                 style={{
                   fontSize: "13px",
-                  color: "#8A849C",
+                  color: "var(--text-muted)",
                   lineHeight: 1.5,
                   fontWeight: 500,
                 }}
@@ -981,7 +981,7 @@ function SuccessScreen({
           fontFamily: "'Baloo 2', sans-serif",
           fontSize: "26px",
           fontWeight: 700,
-          color: "var(--theme-darker)",
+          color: "var(--text)",
           marginBottom: "12px",
         }}
       >
@@ -989,14 +989,14 @@ function SuccessScreen({
       </h2>
       <p
         style={{
-          color: "#8A849C",
+          color: "var(--text-muted)",
           fontSize: "16px",
           lineHeight: 1.6,
           marginBottom: "2.5rem",
         }}
       >
         El espacio seguro para{" "}
-        <strong style={{ color: "var(--theme-darker)" }}>{babyName}</strong> está listo.
+        <strong style={{ color: "var(--text)" }}>{babyName}</strong> está listo.
         Empieza a registrar cada momento especial.
       </p>
       <button
@@ -1458,7 +1458,7 @@ export default function Onboarding() {
                       fontFamily: "'Baloo 2', sans-serif",
                       fontSize: "30px",
                       fontWeight: 700,
-                      color: "var(--theme-darker)",
+                      color: "var(--text)",
                       marginBottom: "10px",
                     }}
                   >
@@ -1467,7 +1467,7 @@ export default function Onboarding() {
                   <p
                     style={{
                       fontSize: "18px",
-                      color: "#8A849C",
+                      color: "var(--text-muted)",
                       fontWeight: 500,
                     }}
                   >
@@ -1523,7 +1523,7 @@ export default function Onboarding() {
                       borderRadius: "18px",
                       border: "2px solid var(--theme-bg-light)",
                       background: "white",
-                      color: "#8A849C",
+                      color: "var(--text-muted)",
                       fontSize: "17px",
                       fontWeight: 700,
                       fontFamily: "'Nunito', sans-serif",
@@ -1608,7 +1608,7 @@ export default function Onboarding() {
                 textAlign: "center",
                 marginTop: "24px",
                 fontSize: "15px",
-                color: "#8A849C",
+                color: "var(--text-muted)",
               }}
             >
               ¿Ya tienes cuenta?{" "}

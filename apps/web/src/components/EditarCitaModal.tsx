@@ -151,7 +151,7 @@ const ov: React.CSSProperties = {
   display: "flex", alignItems: "center", justifyContent: "center", padding: "20px",
 };
 const modal: React.CSSProperties = {
-  background: "#fff", borderRadius: "24px", width: "100%", maxWidth: "460px",
+  background: "var(--surface)", borderRadius: "24px", width: "100%", maxWidth: "460px",
   maxHeight: "90vh", display: "flex", flexDirection: "column", overflow: "hidden",
   fontFamily: "'Nunito', sans-serif",
 };
@@ -170,12 +170,12 @@ const closeBtn: React.CSSProperties = {
 const body: React.CSSProperties = { padding: "20px 22px", overflowY: "auto" };
 const label: React.CSSProperties = {
   display: "block", fontSize: "12.5px", fontWeight: 800,
-  color: "var(--theme-darker)", marginBottom: "6px", marginTop: "12px",
+  color: "var(--text)", marginBottom: "6px", marginTop: "12px",
 };
 const input: React.CSSProperties = {
   width: "100%", padding: "11px 14px", borderRadius: "12px",
-  border: "1.5px solid #E4DBF7", background: "#FBFAFE", fontSize: "14px",
-  fontFamily: "'Nunito', sans-serif", color: "var(--theme-darker)",
+  border: "1.5px solid var(--border)", background: "var(--surface-3)", fontSize: "14px",
+  fontFamily: "'Nunito', sans-serif", color: "var(--text)",
   outline: "none", boxSizing: "border-box",
 };
 const errorBox: React.CSSProperties = {
@@ -184,11 +184,11 @@ const errorBox: React.CSSProperties = {
 };
 const footer: React.CSSProperties = {
   display: "flex", gap: "10px", padding: "16px 22px",
-  borderTop: "1px solid #EDE9F8", background: "#FBFAFE",
+  borderTop: "1px solid var(--border-soft)", background: "var(--surface-3)",
 };
 const cancelBtn: React.CSSProperties = {
-  flex: 1, padding: "13px", borderRadius: "100px", border: "1.5px solid #E4DBF7",
-  background: "#fff", color: "#8A849C", fontWeight: 800, fontSize: "14px",
+  flex: 1, padding: "13px", borderRadius: "100px", border: "1.5px solid var(--border)",
+  background: "var(--surface)", color: "var(--text-muted)", fontWeight: 800, fontSize: "14px",
   cursor: "pointer", fontFamily: "'Nunito', sans-serif",
 };
 const saveBtn: React.CSSProperties = {

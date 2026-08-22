@@ -355,13 +355,13 @@ export default function Login() {
                     style={{
                       width: "100%",
                       padding: "16px 20px 16px 50px",
-                      border: "1.5px solid #E4DBF7",
+                      border: "1.5px solid var(--border)",
                       borderRadius: "16px",
                       fontSize: "15px",
                       fontFamily: "'Nunito', sans-serif",
                       fontWeight: 500,
-                      color: "var(--theme-darker)",
-                      background: "#FBFAFE",
+                      color: "var(--text)",
+                      background: "var(--surface-3)",
                       outline: "none",
                       transition: "border-color 0.2s, box-shadow 0.2s",
                       boxSizing: "border-box",
@@ -398,13 +398,13 @@ export default function Login() {
                     style={{
                       width: "100%",
                       padding: "16px 50px 16px 50px",
-                      border: "1.5px solid #E4DBF7",
+                      border: "1.5px solid var(--border)",
                       borderRadius: "16px",
                       fontSize: "15px",
                       fontFamily: "'Nunito', sans-serif",
                       fontWeight: 500,
-                      color: "var(--theme-darker)",
-                      background: "#FBFAFE",
+                      color: "var(--text)",
+                      background: "var(--surface-3)",
                       outline: "none",
                       transition: "border-color 0.2s, box-shadow 0.2s",
                       boxSizing: "border-box",
@@ -455,7 +455,7 @@ export default function Login() {
                       display: "flex",
                       alignItems: "center",
                       fontSize: "13px",
-                      color: "#8A849C",
+                      color: "var(--text-muted)",
                       cursor: "pointer",
                       fontWeight: 600,
                     }}
@@ -570,7 +570,7 @@ export default function Login() {
                     marginTop: "24px",
                     marginBottom: 0,
                     fontSize: "13px",
-                    color: "#8A849C",
+                    color: "var(--text-muted)",
                   }}
                 >
                   ¿Aún no tienes cuenta?{" "}
