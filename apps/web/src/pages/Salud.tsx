@@ -457,82 +457,102 @@ export default function Salud() {
       {/* ── TOP NAV GLOBAL ── */}
       <TopNav user={user} activePath="/salud" perfilEstado={perfilEstado} />
 
-      {/* ── HEADER ── */}
-      {/* El fondo ocupa todo el ancho, pero el contenido se limita al mismo
-          max-width que .page-container (1400px) para que el título y las
-          pestañas queden alineados con el contenido de abajo, igual que en
-          la pantalla de Inicio. Antes se estiraban hasta el borde de la
-          pantalla en monitores anchos. */}
-      <div style={{ background: "linear-gradient(120deg, var(--theme-darker) 0%, #3A2E5C 55%, var(--theme-dark) 100%)", color: "#fff" }}>
-        <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "48px 40px 0" }}>
-        <button onClick={() => navigate("/dashboard")} style={{ background: "none", border: "none", color: "var(--theme-light)", fontSize: "14px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", marginBottom: "24px" }}>
+      {/* ── HEADER ──
+          Mismo patrón que Comunidad: fondo claro, título sobre el contenido
+          y pestañas como píldoras. La cabecera oscura de antes rompía con el
+          resto de la app y hacía que esta pantalla se sintiera de otro
+          producto. */}
+      <div className="page-container">
+
+        <button onClick={() => navigate("/dashboard")} style={{ background: "none", border: "none", color: "var(--theme-primary)", fontSize: "14px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", marginBottom: "20px", fontFamily: "'Nunito', sans-serif", padding: 0 }}>
           <ArrowLeft size={16} /> Volver al Dashboard
         </button>
-        
-        <div style={{ display: "flex", alignItems: "center", gap: "24px", paddingBottom: "32px" }}>
-          <div style={{ width: "80px", height: "80px", borderRadius: "22px", background: "linear-gradient(135deg, var(--accent-coral), var(--theme-light))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", boxShadow: "0 8px 24px rgba(255,143,163,0.3)" }}>
-            <Syringe size={38} />
-          </div>
-          <div style={{ flex: 1 }}>
-            <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "32px", fontWeight: 700, margin: 0 }}>Salud y Crecimiento</h1>
-            <div style={{ fontSize: "15px", color: "rgba(255,255,255,0.75)", marginTop: "4px", fontWeight: 600 }}>Administra las vacunas y el progreso de tu bebé</div>
+
+        <div style={{ marginBottom: "28px", display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "16px" }}>
+          <div>
+            <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "30px", fontWeight: 700, color: "var(--text)", margin: "0 0 8px 0" }}>
+              Salud y Crecimiento
+            </h1>
+            <p style={{ fontSize: "15px", color: "var(--text-muted)", margin: 0, fontWeight: 600 }}>
+              Administra las vacunas, los controles y el progreso de tu bebé.
+            </p>
           </div>
 
-          {/* Informe para llevar al pediatra */}
           <button
             onClick={() => setShowInforme(true)}
             style={{
-              display: "flex", alignItems: "center", gap: "8px",
-              background: "rgba(255,255,255,0.15)", border: "1.5px solid rgba(255,255,255,0.3)",
-              color: "#fff", borderRadius: "100px", padding: "11px 20px",
-              fontWeight: 800, fontSize: "13.5px", cursor: "pointer",
-              fontFamily: "'Nunito', sans-serif", whiteSpace: "nowrap",
+              background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
+              color: "#fff", border: "none", padding: "12px 24px", borderRadius: "14px",
+              fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px",
+              boxShadow: "0 8px 20px var(--theme-shadow-light)", fontFamily: "'Nunito', sans-serif",
+              fontSize: "14.5px", whiteSpace: "nowrap",
             }}
           >
-            <FileDown size={16} /> Informe médico
+            <FileDown size={18} /> Informe médico
           </button>
         </div>
 
         {/* TABS */}
-        <div className="responsive-overflow" style={{ display: "flex", gap: "10px", paddingTop: "8px", whiteSpace: "nowrap" }}>
-          <button 
-            style={{ padding: "11px 20px", marginBottom: "10px", borderRadius: "100px", background: activeTab === "controles" ? "rgba(255,255,255,0.16)" : "transparent", border: activeTab === "controles" ? "1.5px solid rgba(255,255,255,0.35)" : "1.5px solid transparent", color: activeTab === "controles" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontFamily: "'Nunito', sans-serif" }}
+        <div className="responsive-overflow" style={{ display: "flex", gap: "10px", marginBottom: "32px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "16px", whiteSpace: "nowrap" }}>
+          <button
             onClick={() => setActiveTab("controles")}
-          >
+            style={{
+              background: activeTab === "controles" ? "linear-gradient(135deg, var(--theme-primary), var(--theme-light))" : "transparent",
+              color: activeTab === "controles" ? "#fff" : "var(--text-muted)",
+              border: "none", padding: "12px 22px", borderRadius: "100px",
+              fontWeight: 800, cursor: "pointer", fontSize: "14.5px",
+              display: "flex", alignItems: "center", gap: "8px", transition: "all 0.2s",
+              fontFamily: "'Nunito', sans-serif",
+              boxShadow: activeTab === "controles" ? "0 6px 16px var(--theme-shadow-light)" : "none",
+            }}>
             <CalendarCheck size={18} /> {perfilEstado === "embarazo" ? "Controles Prenatales" : "Controles"}
           </button>
-
           {perfilEstado !== "embarazo" && (
-          <button 
-            style={{ padding: "11px 20px", marginBottom: "10px", borderRadius: "100px", background: activeTab === "vacunas" ? "rgba(255,255,255,0.16)" : "transparent", border: activeTab === "vacunas" ? "1.5px solid rgba(255,255,255,0.35)" : "1.5px solid transparent", color: activeTab === "vacunas" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontFamily: "'Nunito', sans-serif" }}
+          <button
             onClick={() => setActiveTab("vacunas")}
-          >
+            style={{
+              background: activeTab === "vacunas" ? "linear-gradient(135deg, var(--theme-primary), var(--theme-light))" : "transparent",
+              color: activeTab === "vacunas" ? "#fff" : "var(--text-muted)",
+              border: "none", padding: "12px 22px", borderRadius: "100px",
+              fontWeight: 800, cursor: "pointer", fontSize: "14.5px",
+              display: "flex", alignItems: "center", gap: "8px", transition: "all 0.2s",
+              fontFamily: "'Nunito', sans-serif",
+              boxShadow: activeTab === "vacunas" ? "0 6px 16px var(--theme-shadow-light)" : "none",
+            }}>
             <Syringe size={18} /> Vacunas
           </button>
           )}
-
           {perfilEstado !== "embarazo" && (
-          <button 
-            style={{ padding: "11px 20px", marginBottom: "10px", borderRadius: "100px", background: activeTab === "crecimiento" ? "rgba(255,255,255,0.16)" : "transparent", border: activeTab === "crecimiento" ? "1.5px solid rgba(255,255,255,0.35)" : "1.5px solid transparent", color: activeTab === "crecimiento" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontFamily: "'Nunito', sans-serif" }}
+          <button
             onClick={() => setActiveTab("crecimiento")}
-          >
+            style={{
+              background: activeTab === "crecimiento" ? "linear-gradient(135deg, var(--theme-primary), var(--theme-light))" : "transparent",
+              color: activeTab === "crecimiento" ? "#fff" : "var(--text-muted)",
+              border: "none", padding: "12px 22px", borderRadius: "100px",
+              fontWeight: 800, cursor: "pointer", fontSize: "14.5px",
+              display: "flex", alignItems: "center", gap: "8px", transition: "all 0.2s",
+              fontFamily: "'Nunito', sans-serif",
+              boxShadow: activeTab === "crecimiento" ? "0 6px 16px var(--theme-shadow-light)" : "none",
+            }}>
             <TrendingUp size={18} /> Crecimiento
           </button>
           )}
-
-          <button 
-            style={{ padding: "11px 20px", marginBottom: "10px", borderRadius: "100px", background: activeTab === "examenes" ? "rgba(255,255,255,0.16)" : "transparent", border: activeTab === "examenes" ? "1.5px solid rgba(255,255,255,0.35)" : "1.5px solid transparent", color: activeTab === "examenes" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontFamily: "'Nunito', sans-serif" }}
+          <button
             onClick={() => setActiveTab("examenes")}
-          >
+            style={{
+              background: activeTab === "examenes" ? "linear-gradient(135deg, var(--theme-primary), var(--theme-light))" : "transparent",
+              color: activeTab === "examenes" ? "#fff" : "var(--text-muted)",
+              border: "none", padding: "12px 22px", borderRadius: "100px",
+              fontWeight: 800, cursor: "pointer", fontSize: "14.5px",
+              display: "flex", alignItems: "center", gap: "8px", transition: "all 0.2s",
+              fontFamily: "'Nunito', sans-serif",
+              boxShadow: activeTab === "examenes" ? "0 6px 16px var(--theme-shadow-light)" : "none",
+            }}>
             <FlaskConical size={18} /> Exámenes
           </button>
         </div>
-        </div>
-      </div>
 
-      {/* ── CONTENT AREA ── */}
-      <div className="page-container">
-        
+        {/* ── CONTENT AREA ── */}
         {activeTab === "vacunas" && (
           <div style={{ background: "var(--surface)", borderRadius: "24px", padding: "32px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
             <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "21px", fontWeight: 700, color: "var(--text)", marginBottom: "24px" }}>Calendario de Vacunación</h2>
@@ -686,11 +706,11 @@ export default function Salud() {
             <div>
               <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "16px", color: "var(--text)" }}>Agregar Nueva Cita</h3>
 
-              <div style={{ display: "grid", gridTemplateColumns: dictado.soportado ? "repeat(auto-fit, minmax(290px, 1fr))" : "1fr", gap: "24px", alignItems: "start" }}>
+              <div style={{ display: "grid", gridTemplateColumns: dictado.soportado ? "repeat(auto-fit, minmax(290px, 1fr))" : "1fr", gap: "24px", alignItems: "stretch" }}>
 
               {/* Columna izquierda: dictado por voz (Chrome/Edge). */}
               {dictado.soportado && (
-                <div style={{ background: "var(--theme-bg-light)", borderRadius: "16px", padding: "16px", marginBottom: "20px" }}>
+                <div style={{ background: "var(--theme-bg-light)", border: "1.5px solid transparent", borderRadius: "16px", padding: "20px", display: "flex", flexDirection: "column", justifyContent: "center", gap: "10px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
                     <button
                       type="button"
@@ -746,12 +766,9 @@ export default function Salud() {
               {/* Columna derecha: el formulario completo vive en un pop-up.
                   Acá quedaba muy largo al lado del bloque de voz y hacía que
                   la lista de controles empezara demasiado abajo. */}
-              <div style={{ background: "var(--surface-2)", border: "1.5px solid var(--border)", borderRadius: "16px", padding: "20px", display: "flex", flexDirection: "column", justifyContent: "center", gap: "10px", minHeight: "150px" }}>
-                <div style={{ fontSize: "13px", fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
-                  Registro manual
-                </div>
+              <div style={{ background: "var(--surface-2)", border: "1.5px solid var(--border)", borderRadius: "16px", padding: "20px", display: "flex", flexDirection: "column", justifyContent: "center", gap: "10px" }}>
                 <p style={{ fontSize: "13.5px", color: "var(--text-muted)", margin: 0, lineHeight: 1.55 }}>
-                  Completa la fecha, el médico y el centro a mano.
+                  ¿Prefieres escribirlo? Completa la fecha, el médico y el centro a mano.
                 </p>
                 <button
                   type="button"
@@ -763,7 +780,7 @@ export default function Salud() {
                     fontFamily: "'Nunito', sans-serif",
                   }}
                 >
-                  <Plus size={16} /> Agregar cita
+                  <Plus size={16} /> Registro manual
                 </button>
               </div>
 
