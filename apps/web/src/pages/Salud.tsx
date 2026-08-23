@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Syringe, Activity, Save, CheckCircle, Bell, Plus, X, FlaskConical, ClipboardCheck, Mic, MicOff, Pencil, Trash2, FileDown } from "lucide-react";
+import { ArrowLeft, Syringe, Save, CheckCircle, Bell, Plus, X, FlaskConical, ClipboardCheck, Mic, MicOff, Pencil, Trash2, FileDown, CalendarCheck, TrendingUp } from "lucide-react";
 import TopNav from "../components/TopNav";
 import DateSelect from "../components/DateSelect";
 import TimeSelect from "../components/TimeSelect";
@@ -40,6 +40,7 @@ export default function Salud() {
   const [perfilEstado, setPerfilEstado] = useState<string>("nacido");
   const [perfil, setPerfil] = useState<any>(null);
   const [showInforme, setShowInforme] = useState(false);
+  const [showFormCita, setShowFormCita] = useState(false);
 
   // Estado para Citas / Controles
   const [citas, setCitas] = useState<any[]>([]);
@@ -332,6 +333,7 @@ export default function Salud() {
         setFechaCitaTime("");
         setMedico("");
         setNotas("");
+        setShowFormCita(false);
         fetchCitas();
       }
     } catch (error) {
@@ -492,17 +494,17 @@ export default function Salud() {
         </div>
 
         {/* TABS */}
-        <div className="responsive-overflow" style={{ display: "flex", gap: "32px", borderBottom: "1px solid rgba(255,255,255,0.1)", whiteSpace: "nowrap" }}>
+        <div className="responsive-overflow" style={{ display: "flex", gap: "10px", paddingTop: "8px", whiteSpace: "nowrap" }}>
           <button 
-            style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "controles" ? "3px solid var(--accent-coral)" : "3px solid transparent", color: activeTab === "controles" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+            style={{ padding: "11px 20px", marginBottom: "10px", borderRadius: "100px", background: activeTab === "controles" ? "rgba(255,255,255,0.16)" : "transparent", border: activeTab === "controles" ? "1.5px solid rgba(255,255,255,0.35)" : "1.5px solid transparent", color: activeTab === "controles" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontFamily: "'Nunito', sans-serif" }}
             onClick={() => setActiveTab("controles")}
           >
-            <Activity size={18} /> {perfilEstado === "embarazo" ? "Controles Prenatales" : "Controles"}
+            <CalendarCheck size={18} /> {perfilEstado === "embarazo" ? "Controles Prenatales" : "Controles"}
           </button>
 
           {perfilEstado !== "embarazo" && (
           <button 
-            style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "vacunas" ? "3px solid var(--accent-coral)" : "3px solid transparent", color: activeTab === "vacunas" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+            style={{ padding: "11px 20px", marginBottom: "10px", borderRadius: "100px", background: activeTab === "vacunas" ? "rgba(255,255,255,0.16)" : "transparent", border: activeTab === "vacunas" ? "1.5px solid rgba(255,255,255,0.35)" : "1.5px solid transparent", color: activeTab === "vacunas" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontFamily: "'Nunito', sans-serif" }}
             onClick={() => setActiveTab("vacunas")}
           >
             <Syringe size={18} /> Vacunas
@@ -511,15 +513,15 @@ export default function Salud() {
 
           {perfilEstado !== "embarazo" && (
           <button 
-            style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "crecimiento" ? "3px solid var(--accent-coral)" : "3px solid transparent", color: activeTab === "crecimiento" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+            style={{ padding: "11px 20px", marginBottom: "10px", borderRadius: "100px", background: activeTab === "crecimiento" ? "rgba(255,255,255,0.16)" : "transparent", border: activeTab === "crecimiento" ? "1.5px solid rgba(255,255,255,0.35)" : "1.5px solid transparent", color: activeTab === "crecimiento" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontFamily: "'Nunito', sans-serif" }}
             onClick={() => setActiveTab("crecimiento")}
           >
-            <Activity size={18} /> Crecimiento
+            <TrendingUp size={18} /> Crecimiento
           </button>
           )}
 
           <button 
-            style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "examenes" ? "3px solid var(--accent-coral)" : "3px solid transparent", color: activeTab === "examenes" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+            style={{ padding: "11px 20px", marginBottom: "10px", borderRadius: "100px", background: activeTab === "examenes" ? "rgba(255,255,255,0.16)" : "transparent", border: activeTab === "examenes" ? "1.5px solid rgba(255,255,255,0.35)" : "1.5px solid transparent", color: activeTab === "examenes" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontFamily: "'Nunito', sans-serif" }}
             onClick={() => setActiveTab("examenes")}
           >
             <FlaskConical size={18} /> Exámenes
@@ -741,105 +743,30 @@ export default function Salud() {
                 </div>
               )}
 
-              {/* Columna derecha: registro manual */}
-              <div>
-              <div style={{ fontSize: "13px", fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "12px" }}>
-                Registro manual
+              {/* Columna derecha: el formulario completo vive en un pop-up.
+                  Acá quedaba muy largo al lado del bloque de voz y hacía que
+                  la lista de controles empezara demasiado abajo. */}
+              <div style={{ background: "var(--surface-2)", border: "1.5px solid var(--border)", borderRadius: "16px", padding: "20px", display: "flex", flexDirection: "column", justifyContent: "center", gap: "10px", minHeight: "150px" }}>
+                <div style={{ fontSize: "13px", fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                  Registro manual
+                </div>
+                <p style={{ fontSize: "13.5px", color: "var(--text-muted)", margin: 0, lineHeight: 1.55 }}>
+                  Completa la fecha, el médico y el centro a mano.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setShowFormCita(true)}
+                  style={{
+                    marginTop: "6px", alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: "8px",
+                    background: "var(--theme-primary)", color: "#fff", border: "none", borderRadius: "100px",
+                    padding: "12px 22px", fontWeight: 800, fontSize: "14px", cursor: "pointer",
+                    fontFamily: "'Nunito', sans-serif",
+                  }}
+                >
+                  <Plus size={16} /> Agregar cita
+                </button>
               </div>
 
-              {/* Tipo: control sano vs consulta puntual */}
-              <div style={{ display: "flex", gap: "10px", marginBottom: "18px", flexWrap: "wrap" }}>
-                {(["control", "cita"] as const).map((t) => (
-                  <button
-                    key={t}
-                    type="button"
-                    onClick={() => setTipoCita(t)}
-                    style={{
-                      flex: "1 1 160px", padding: "12px", borderRadius: "14px",
-                      cursor: "pointer", fontFamily: "'Nunito', sans-serif", fontWeight: 800,
-                      fontSize: "13.5px", textAlign: "left",
-                      border: tipoCita === t ? "2px solid var(--theme-primary)" : "2px solid #E4DBF7",
-                      background: tipoCita === t ? "var(--theme-primary)" : "#fff",
-                      color: tipoCita === t ? "#fff" : "var(--theme-darker)",
-                    }}
-                  >
-                    {t === "control" ? "Control sano" : "Cita médica"}
-                    <div style={{ fontSize: "11.5px", fontWeight: 600, opacity: 0.8, marginTop: "2px" }}>
-                      {t === "control" ? "Revisión periódica" : "Por un motivo puntual"}
-                    </div>
-                  </button>
-                ))}
-              </div>
-              
-              <form onSubmit={handleSaveCita} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
-                  <div style={{ flex: "1 1 220px" }}>
-                    <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Fecha</label>
-                    <DateSelect
-                      value={fechaCitaDate}
-                      onChange={setFechaCitaDate}
-                      required
-                      variant="light"
-                    />
-                  </div>
-                  <div style={{ flex: "1 1 140px" }}>
-                    <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Hora</label>
-                    <TimeSelect
-                      value={fechaCitaTime}
-                      onChange={setFechaCitaTime}
-                      required
-                      variant="light"
-                    />
-                  </div>
-                  <div style={{ flex: "1 1 200px" }}>
-                    <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Doctor/Centro (Opcional)</label>
-                    <input 
-                      type="text" 
-                      placeholder="Ej. Dr. Silva - Centro Médico"
-                      value={medico}
-                      onChange={e => setMedico(e.target.value)}
-                      style={{ 
-                        width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", 
-                        background: "var(--surface)", outline: "none", boxSizing: "border-box", fontFamily: "Nunito"
-                      }} 
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Notas / Título</label>
-                  <input 
-                    type="text" 
-                    placeholder="Ej. Ecografía Estructural"
-                    value={notas}
-                    onChange={e => setNotas(e.target.value)}
-                    style={{ 
-                      width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", 
-                      background: "var(--surface)", outline: "none", boxSizing: "border-box", fontFamily: "Nunito"
-                    }} 
-                  />
-                </div>
-
-                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "8px" }}>
-                  <button 
-                    type="submit" 
-                    disabled={isSavingCita || !fechaCita}
-                    style={{ 
-                      background: isSavingCita || !fechaCita ? "#F3F4F6" : "var(--theme-primary)",
-                      color: isSavingCita || !fechaCita ? "#9CA3AF" : "#fff",
-                      border: "none",
-                      padding: "12px 24px",
-                      borderRadius: "12px",
-                      fontWeight: 700,
-                      cursor: isSavingCita || !fechaCita ? "not-allowed" : "pointer",
-                      transition: "all 0.2s"
-                    }}
-                  >
-                    {isSavingCita ? "Guardando..." : "Guardar Cita"}
-                  </button>
-                </div>
-              </form>
-              </div>
               </div>
             </div>
 
@@ -1114,6 +1041,130 @@ export default function Salud() {
           onClose={() => setCitaResultado(null)}
           onGuardado={fetchCitas}
         />
+      )}
+
+
+      {/* Pop-up de registro manual. El formulario vivía en la columna
+          derecha, pero era largo y empujaba la lista de controles muy
+          abajo. Acá aparece solo cuando se necesita. */}
+      {showFormCita && (
+        <div
+          onClick={() => setShowFormCita(false)}
+          style={{ position: "fixed", inset: 0, background: "rgba(45,38,64,0.55)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{ background: "var(--surface)", borderRadius: "24px", width: "100%", maxWidth: "560px", maxHeight: "90vh", display: "flex", flexDirection: "column", overflow: "hidden", fontFamily: "'Nunito', sans-serif" }}
+          >
+            <div style={{ background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))", padding: "18px 24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", color: "#fff", margin: 0 }}>
+                Agregar cita
+              </h3>
+              <button
+                onClick={() => setShowFormCita(false)}
+                aria-label="Cerrar"
+                style={{ background: "rgba(255,255,255,0.22)", border: "none", borderRadius: "50%", width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#fff" }}
+              >
+                <X size={17} />
+              </button>
+            </div>
+
+            <div style={{ padding: "22px 24px", overflowY: "auto" }}>
+                  {/* Tipo: control sano vs consulta puntual */}
+                  <div style={{ display: "flex", gap: "10px", marginBottom: "18px", flexWrap: "wrap" }}>
+                    {(["control", "cita"] as const).map((t) => (
+                      <button
+                        key={t}
+                        type="button"
+                        onClick={() => setTipoCita(t)}
+                        style={{
+                          flex: "1 1 160px", padding: "12px", borderRadius: "14px",
+                          cursor: "pointer", fontFamily: "'Nunito', sans-serif", fontWeight: 800,
+                          fontSize: "13.5px", textAlign: "left",
+                          border: tipoCita === t ? "2px solid var(--theme-primary)" : "2px solid #E4DBF7",
+                          background: tipoCita === t ? "var(--theme-primary)" : "#fff",
+                          color: tipoCita === t ? "#fff" : "var(--theme-darker)",
+                        }}
+                      >
+                        {t === "control" ? "Control sano" : "Cita médica"}
+                        <div style={{ fontSize: "11.5px", fontWeight: 600, opacity: 0.8, marginTop: "2px" }}>
+                          {t === "control" ? "Revisión periódica" : "Por un motivo puntual"}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+              
+                  <form onSubmit={handleSaveCita} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                    <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+                      <div style={{ flex: "1 1 220px" }}>
+                        <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Fecha</label>
+                        <DateSelect
+                          value={fechaCitaDate}
+                          onChange={setFechaCitaDate}
+                          required
+                          variant="light"
+                        />
+                      </div>
+                      <div style={{ flex: "1 1 140px" }}>
+                        <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Hora</label>
+                        <TimeSelect
+                          value={fechaCitaTime}
+                          onChange={setFechaCitaTime}
+                          required
+                          variant="light"
+                        />
+                      </div>
+                      <div style={{ flex: "1 1 200px" }}>
+                        <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Doctor/Centro (Opcional)</label>
+                        <input 
+                          type="text" 
+                          placeholder="Ej. Dr. Silva - Centro Médico"
+                          value={medico}
+                          onChange={e => setMedico(e.target.value)}
+                          style={{ 
+                            width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", 
+                            background: "var(--surface)", outline: "none", boxSizing: "border-box", fontFamily: "Nunito"
+                          }} 
+                        />
+                      </div>
+                    </div>
+                
+                    <div>
+                      <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Notas / Título</label>
+                      <input 
+                        type="text" 
+                        placeholder="Ej. Ecografía Estructural"
+                        value={notas}
+                        onChange={e => setNotas(e.target.value)}
+                        style={{ 
+                          width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", 
+                          background: "var(--surface)", outline: "none", boxSizing: "border-box", fontFamily: "Nunito"
+                        }} 
+                      />
+                    </div>
+
+                    <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "8px" }}>
+                      <button 
+                        type="submit" 
+                        disabled={isSavingCita || !fechaCita}
+                        style={{ 
+                          background: isSavingCita || !fechaCita ? "#F3F4F6" : "var(--theme-primary)",
+                          color: isSavingCita || !fechaCita ? "#9CA3AF" : "#fff",
+                          border: "none",
+                          padding: "12px 24px",
+                          borderRadius: "12px",
+                          fontWeight: 700,
+                          cursor: isSavingCita || !fechaCita ? "not-allowed" : "pointer",
+                          transition: "all 0.2s"
+                        }}
+                      >
+                        {isSavingCita ? "Guardando..." : "Guardar Cita"}
+                      </button>
+                    </div>
+                  </form>
+            </div>
+          </div>
+        </div>
       )}
 
       {showInforme && bebeId && (
