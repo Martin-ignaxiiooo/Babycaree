@@ -17,7 +17,9 @@ export default function Salud() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   const [bebeId, setBebeId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"vacunas" | "controles" | "examenes" | "crecimiento">("vacunas");
+  // Controles es la primera pestaña: es lo que se consulta y agenda más
+  // seguido, y así el registro por voz queda a un toque de distancia.
+  const [activeTab, setActiveTab] = useState<"vacunas" | "controles" | "examenes" | "crecimiento">("controles");
   const [loading, setLoading] = useState(true);
 
   const [vacunas, setVacunas] = useState<any[]>([]);
@@ -491,21 +493,30 @@ export default function Salud() {
 
         {/* TABS */}
         <div className="responsive-overflow" style={{ display: "flex", gap: "32px", borderBottom: "1px solid rgba(255,255,255,0.1)", whiteSpace: "nowrap" }}>
-          {perfilEstado !== "embarazo" && (
-            <button 
-              style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "vacunas" ? "3px solid var(--accent-coral)" : "3px solid transparent", color: activeTab === "vacunas" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
-              onClick={() => setActiveTab("vacunas")}
-            >
-              <Syringe size={18} /> Vacunas PNI
-            </button>
-          )}
-          
           <button 
             style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "controles" ? "3px solid var(--accent-coral)" : "3px solid transparent", color: activeTab === "controles" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
             onClick={() => setActiveTab("controles")}
           >
-            <Activity size={18} /> {perfilEstado === "embarazo" ? "Controles Prenatales" : "Controles Pediátricos"}
+            <Activity size={18} /> {perfilEstado === "embarazo" ? "Controles Prenatales" : "Controles"}
           </button>
+
+          {perfilEstado !== "embarazo" && (
+          <button 
+            style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "vacunas" ? "3px solid var(--accent-coral)" : "3px solid transparent", color: activeTab === "vacunas" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+            onClick={() => setActiveTab("vacunas")}
+          >
+            <Syringe size={18} /> Vacunas
+          </button>
+          )}
+
+          {perfilEstado !== "embarazo" && (
+          <button 
+            style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "crecimiento" ? "3px solid var(--accent-coral)" : "3px solid transparent", color: activeTab === "crecimiento" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+            onClick={() => setActiveTab("crecimiento")}
+          >
+            <Activity size={18} /> Crecimiento
+          </button>
+          )}
 
           <button 
             style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "examenes" ? "3px solid var(--accent-coral)" : "3px solid transparent", color: activeTab === "examenes" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
@@ -513,15 +524,6 @@ export default function Salud() {
           >
             <FlaskConical size={18} /> Exámenes
           </button>
-
-          {perfilEstado !== "embarazo" && (
-            <button 
-              style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "crecimiento" ? "3px solid var(--accent-coral)" : "3px solid transparent", color: activeTab === "crecimiento" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
-              onClick={() => setActiveTab("crecimiento")}
-            >
-              <Activity size={18} /> Crecimiento
-            </button>
-          )}
         </div>
         </div>
       </div>
@@ -534,10 +536,40 @@ export default function Salud() {
             <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "21px", fontWeight: 700, color: "var(--text)", marginBottom: "24px" }}>Calendario de Vacunación</h2>
             
             {vacunas.length === 0 ? (
-              <p style={{ color: "#6B7280" }}>No hay vacunas registradas en el sistema.</p>
+              <p style={{ color: "var(--text-muted)" }}>No hay vacunas registradas en el sistema.</p>
             ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                {vacunas.map((vacuna) => {
+              /* Pendientes y aplicadas en columnas separadas: antes había que
+                 recorrer una lista larga para saber qué falta, que es la
+                 única pregunta urgente de esta pantalla. */
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "28px", alignItems: "start" }}>
+                {[
+                  { titulo: "Pendientes", aplicadas: false },
+                  { titulo: "Aplicadas", aplicadas: true },
+                ].map(({ titulo, aplicadas }) => {
+                  const grupo = vacunas
+                    .filter((v) => Boolean(v.aplicada) === aplicadas)
+                    .sort((a, b) => a.meses_edad_recomendada - b.meses_edad_recomendada);
+
+                  return (
+                    <div key={titulo}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "9px", marginBottom: "14px" }}>
+                        <h3 style={{ fontSize: "16px", fontWeight: 800, color: "var(--text)", margin: 0 }}>{titulo}</h3>
+                        <span style={{
+                          background: aplicadas ? "#E8F7F1" : "var(--theme-bg-light)",
+                          color: aplicadas ? "#3E8E6E" : "var(--theme-primary)",
+                          borderRadius: "100px", padding: "2px 10px", fontSize: "12px", fontWeight: 800,
+                        }}>
+                          {grupo.length}
+                        </span>
+                      </div>
+
+                      {grupo.length === 0 ? (
+                        <p style={{ color: "var(--text-muted)", fontSize: "14px" }}>
+                          {aplicadas ? "Todavía no hay vacunas aplicadas." : "¡Ninguna pendiente! Están todas al día."}
+                        </p>
+                      ) : (
+                      <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                {grupo.map((vacuna) => {
                   const editando = editingVacunaId === vacuna.vacuna_id;
                   return (
                   <div key={vacuna.vacuna_id} style={{ display: "flex", alignItems: "flex-start", gap: "20px", padding: "22px", border: vacuna.aplicada ? "1px solid #DCFCE7" : "1px solid #F1EEFA", borderRadius: "18px", background: vacuna.aplicada ? "#F3FDF6" : "#fff", boxShadow: "0 4px 16px rgba(124,92,191,0.06)" }}>
@@ -628,6 +660,11 @@ export default function Salud() {
                   );
                 })}
               </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             )}
           </div>
         )}
@@ -640,11 +677,16 @@ export default function Salud() {
               </h2>
             </div>
 
-            {/* Formulario Nueva Cita */}
+            {/* Registro por voz y registro manual, lado a lado: son dos
+                caminos para lo mismo y conviene que se vean como
+                alternativas, no como pasos de una secuencia. En pantallas
+                angostas la grilla los apila sola. */}
             <div>
               <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "16px", color: "var(--text)" }}>Agregar Nueva Cita</h3>
 
-              {/* Dictado por voz (Chrome/Edge). Se esconde si el navegador no lo soporta. */}
+              <div style={{ display: "grid", gridTemplateColumns: dictado.soportado ? "repeat(auto-fit, minmax(290px, 1fr))" : "1fr", gap: "24px", alignItems: "start" }}>
+
+              {/* Columna izquierda: dictado por voz (Chrome/Edge). */}
               {dictado.soportado && (
                 <div style={{ background: "var(--theme-bg-light)", borderRadius: "16px", padding: "16px", marginBottom: "20px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
@@ -698,6 +740,12 @@ export default function Salud() {
                   )}
                 </div>
               )}
+
+              {/* Columna derecha: registro manual */}
+              <div>
+              <div style={{ fontSize: "13px", fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "12px" }}>
+                Registro manual
+              </div>
 
               {/* Tipo: control sano vs consulta puntual */}
               <div style={{ display: "flex", gap: "10px", marginBottom: "18px", flexWrap: "wrap" }}>
@@ -791,19 +839,44 @@ export default function Salud() {
                   </button>
                 </div>
               </form>
+              </div>
+              </div>
             </div>
 
-            <div style={{ borderTop: "1px solid #E5E7EB", marginTop: "28px", paddingTop: "24px" }}>
-              <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "16px", color: "var(--text)" }}>
-                {perfilEstado === "embarazo" ? "Controles Prenatales agendados" : "Controles agendados"}
-              </h3>
-              <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "8px" }}>
-                {loading ? (
-                  <p style={{ color: "rgba(0,0,0,0.5)" }}>Cargando citas...</p>
-                ) : citas.length === 0 ? (
-                  <p style={{ color: "rgba(0,0,0,0.5)", fontSize: "14px" }}>No tienes controles registrados aún.</p>
-                ) : (
-                  citas.map(cita => {
+            {/* Próximos y anteriores, en dos columnas: son dos preguntas
+                distintas ("¿qué me toca?" y "¿qué pasó?") y mezclarlas en
+                una sola lista obligaba a buscar entre fechas. */}
+            <div style={{ borderTop: "1px solid var(--border-soft)", marginTop: "28px", paddingTop: "24px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "28px" }}>
+                {[
+                  { titulo: perfilEstado === "embarazo" ? "Próximos controles" : "Próximos controles", futuros: true },
+                  { titulo: "Controles anteriores", futuros: false },
+                ].map(({ titulo, futuros }) => {
+                  const ahora = new Date();
+                  const lista = citas
+                    .filter(c => (new Date(c.fecha_cita) >= ahora) === futuros)
+                    // Los próximos, del más cercano al más lejano; los
+                    // anteriores, del más reciente hacia atrás.
+                    .sort((a, b) => {
+                      const da = new Date(a.fecha_cita).getTime();
+                      const db = new Date(b.fecha_cita).getTime();
+                      return futuros ? da - db : db - da;
+                    });
+
+                  return (
+                    <div key={titulo}>
+                      <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "16px", color: "var(--text)" }}>
+                        {titulo}
+                      </h3>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "8px" }}>
+                        {loading ? (
+                          <p style={{ color: "var(--text-muted)" }}>Cargando citas...</p>
+                        ) : lista.length === 0 ? (
+                          <p style={{ color: "var(--text-muted)", fontSize: "14px" }}>
+                            {futuros ? "No tienes controles agendados." : "Todavía no hay controles pasados."}
+                          </p>
+                        ) : (
+                          lista.map(cita => {
                   const date = new Date(cita.fecha_cita);
                   const isPast = date < new Date();
                   return (
@@ -891,8 +964,12 @@ export default function Salud() {
                       </div>
                     </div>
                   );
-                })
-              )}
+                          })
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
