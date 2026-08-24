@@ -19,6 +19,12 @@ import {
   updateExamen,
   deleteExamen
 } from "../controllers/examenes.controller";
+import {
+  getSaludMaterna,
+  createRegistroMaterno,
+  createSintomas,
+  setPesoInicial
+} from "../controllers/salud_materna.controller";
 
 const router = Router();
 
@@ -49,5 +55,12 @@ router.patch("/:bebeId/examenes/:examenId", updateExamen);
 router.delete("/:bebeId/examenes/:examenId", deleteExamen);
 router.get("/:bebeId/examenes/:examenId/foto", getExamenFoto);
 router.get("/:bebeId/examenes/:examenId/orden-foto", getExamenOrdenFoto);
+
+// Salud de la gestante: peso, presión y síntomas de la madre (distinto
+// del peso/talla del bebé, que va en /crecimiento).
+router.get("/:bebeId/materna", getSaludMaterna);
+router.post("/:bebeId/materna", createRegistroMaterno);
+router.post("/:bebeId/materna/sintomas", createSintomas);
+router.patch("/:bebeId/materna/peso-inicial", setPesoInicial);
 
 export default router;

@@ -96,7 +96,11 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
       ...(perfilEstado === "embarazo" ? [
         { label: "Calendario", path: "/calendario", match: "calendario" },
       ] : []),
-      { label: "Salud", path: "/salud", match: "salud" },
+      // En embarazo, "Salud" es la de la gestante (peso, presión, síntomas);
+      // en un bebé nacido es la del niño (vacunas, controles, crecimiento).
+      perfilEstado === "embarazo"
+        ? { label: "Mi Salud", path: "/mi-salud", match: "mi-salud" }
+        : { label: "Salud", path: "/salud", match: "salud" },
       { label: "Comunidad", path: "/comunidad", match: "comunidad" },
       ...(perfilEstado !== "embarazo" ? [
         { label: "Directorio", path: "/directorio", match: "directorio" },
