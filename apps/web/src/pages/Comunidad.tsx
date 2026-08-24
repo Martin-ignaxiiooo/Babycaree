@@ -17,6 +17,22 @@ export default function Comunidad() {
   const tabInicial = new URLSearchParams(location.search).get("tab") === "articulos" ? "articulos" : "foros";
   const [activeTab, setActiveTab] = useState<"foros" | "articulos">(tabInicial);
   const [forosData, setForosData] = useState<any[]>([]);
+
+  // Se calculan sobre los foros ya cargados: no hace falta otra llamada.
+  const categorias = Object.entries(
+    forosData.reduce((acc: Record<string, number>, f: any) => {
+      const c = f.categoria || "Sin categoría";
+      acc[c] = (acc[c] ?? 0) + 1;
+      return acc;
+    }, {})
+  )
+    .map(([nombre, total]) => ({ nombre, total: total as number }))
+    .sort((a, b) => b.total - a.total);
+
+  const masComentados = [...forosData]
+    .filter((f: any) => (f.respuestas ?? 0) > 0)
+    .sort((a: any, b: any) => (b.respuestas ?? 0) - (a.respuestas ?? 0))
+    .slice(0, 4);
   const [articulosData, setArticulosData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -164,8 +180,10 @@ export default function Comunidad() {
           </button>
         </div>
 
-        {/* FOROS */}
+        {/* FOROS: contenido a la izquierda, barra lateral a la derecha,
+            como en el diseño. */}
         {activeTab === "foros" && (
+        <div className="comunidad-grid" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1.9fr) minmax(260px, 1fr)", gap: "22px", alignItems: "start" }}>
           <div style={{ display: "grid", gap: "16px" }}>
             {loading ? <div style={{ padding: "40px", textAlign: "center", color: "#6B7280" }}>Cargando foros...</div> : forosData.map(foro => (
               <div key={foro.id} onClick={() => navigate(`/comunidad/foro/${foro.id}`)} style={{ 
@@ -204,6 +222,63 @@ export default function Comunidad() {
               </div>
             ))}
           </div>
+
+          {/* Barra lateral. Muestra las categorías reales que existen en los
+              temas publicados, con su conteo. El mockup traía 'Grupos
+              populares' y 'Tendencias', pero eso no existe en la base y
+              habría que inventar los números: se prefiere mostrar algo
+              verdadero antes que algo que se ve bien y miente. */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+            <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "22px", boxShadow: "0 6px 20px rgba(124,92,191,0.08)" }}>
+              <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "17px", fontWeight: 700, color: "var(--text)", margin: "0 0 14px" }}>
+                Temas por categoría
+              </h3>
+
+              {categorias.length === 0 ? (
+                <p style={{ fontSize: "13.5px", color: "var(--text-muted)", margin: 0 }}>
+                  Todavía no hay temas publicados.
+                </p>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "9px" }}>
+                  {categorias.map(({ nombre, total }) => (
+                    <div key={nombre} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", background: "var(--surface-2)", borderRadius: "12px", padding: "11px 14px" }}>
+                      <span style={{ fontSize: "13.5px", fontWeight: 700, color: "var(--text)" }}>{nombre}</span>
+                      <span style={{ fontSize: "12px", fontWeight: 800, color: "var(--theme-primary)", background: "var(--theme-bg-light)", borderRadius: "100px", padding: "3px 10px" }}>
+                        {total}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "22px", boxShadow: "0 6px 20px rgba(124,92,191,0.08)" }}>
+              <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "17px", fontWeight: 700, color: "var(--text)", margin: "0 0 8px" }}>
+                Más comentados
+              </h3>
+              {masComentados.length === 0 ? (
+                <p style={{ fontSize: "13.5px", color: "var(--text-muted)", margin: 0 }}>
+                  Aún no hay conversación.
+                </p>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "10px" }}>
+                  {masComentados.map((f: any) => (
+                    <button
+                      key={f.id}
+                      onClick={() => navigate(`/comunidad/foro/${f.id}`)}
+                      style={{ background: "none", border: "none", textAlign: "left", cursor: "pointer", padding: 0, fontFamily: "'Nunito', sans-serif" }}
+                    >
+                      <div style={{ fontSize: "13.5px", fontWeight: 700, color: "var(--text)", lineHeight: 1.4 }}>{f.titulo}</div>
+                      <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px" }}>
+                        {f.respuestas} {f.respuestas === 1 ? "respuesta" : "respuestas"}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
         )}
 
         {/* ARTICULOS */}
@@ -310,6 +385,11 @@ export default function Comunidad() {
         </div>
       )}
 
+    <style>{`
+        @media (max-width: 900px) {
+          .comunidad-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </div>
   );
 }

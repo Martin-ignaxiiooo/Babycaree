@@ -133,13 +133,41 @@ export default function MiPerfil() {
     <div style={{ minHeight: "100vh", background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)", fontFamily: "'Nunito', sans-serif" }}>
       <TopNav user={initialUser} activePath="/mi-perfil" />
 
-      <div style={{ maxWidth: "600px", margin: "48px auto", background: "var(--surface)", padding: "40px", borderRadius: "26px", boxShadow: "0 10px 40px rgba(124,92,191,0.1)" }}>
-        <button onClick={() => navigate(-1)} style={{ background: "none", border: "none", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", marginBottom: "24px", fontWeight: 700 }}>
-          <ArrowLeft size={16} /> Volver
-        </button>
+      {/* Cabecera morada con el saludo y el avatar, como en el diseño. La
+          tarjeta del formulario flota sobre ella con margen negativo. */}
+      <div style={{ background: "linear-gradient(135deg, #8B5FD6 0%, #A47BE8 100%)", paddingBottom: "80px" }}>
+        <div style={{ maxWidth: "680px", margin: "0 auto", padding: "24px 24px 0" }}>
+          <button
+            onClick={() => navigate(-1)}
+            style={{ background: "none", border: "none", color: "rgba(255,255,255,0.85)", display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", marginBottom: "20px", fontWeight: 700, fontSize: "14px", fontFamily: "'Nunito', sans-serif", padding: 0 }}
+          >
+            <ArrowLeft size={16} /> Volver
+          </button>
 
-        <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "26px", fontWeight: 700, color: "var(--text)", marginBottom: "8px" }}>Modificar Mi Perfil</h1>
-        <p style={{ color: "var(--text-muted)", marginBottom: "32px", fontWeight: 600, fontSize: "14px" }}>Actualiza tus datos personales de la cuenta.</p>
+          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+            <div style={{
+              width: "62px", height: "62px", borderRadius: "50%", flexShrink: 0,
+              background: "rgba(255,255,255,0.2)", border: "2.5px solid rgba(255,255,255,0.5)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontFamily: "'Baloo 2', sans-serif", fontSize: "24px", fontWeight: 800, color: "#fff",
+            }}>
+              {(formData.nombre || initialUser?.nombre || "?").trim().charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "28px", fontWeight: 700, color: "#fff", margin: 0 }}>
+                Hola, {(formData.nombre || initialUser?.nombre || "").split(" ")[0]}
+              </h1>
+              <p style={{ color: "rgba(255,255,255,0.75)", margin: "2px 0 0", fontWeight: 600, fontSize: "14px" }}>
+                {initialUser?.email ?? ""}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ maxWidth: "680px", margin: "-60px auto 48px", background: "var(--surface)", padding: "36px 40px", borderRadius: "24px", boxShadow: "0 10px 40px rgba(90,60,150,0.12)", position: "relative" }}>
+        <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "22px", fontWeight: 700, color: "var(--text)", margin: "0 0 6px" }}>Mis datos</h2>
+        <p style={{ color: "var(--text-muted)", marginBottom: "28px", fontWeight: 600, fontSize: "14px" }}>Actualiza los datos personales de tu cuenta.</p>
 
         {message && (
           <div style={{ padding: "14px 16px", background: message.includes("Error") ? "#FEF0F0" : "#F0FBF4", color: message.includes("Error") ? "#DC6B6B" : "#2F8F5B", borderRadius: "14px", marginBottom: "24px", fontWeight: 700, fontSize: "14px" }}>
