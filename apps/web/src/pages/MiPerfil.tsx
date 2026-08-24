@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, User, Mail, Save } from "lucide-react";
+import { ArrowLeft, User, Mail, Save, ChevronRight } from "lucide-react";
 import TopNav from "../components/TopNav";
 import { useNotificaciones } from "../hooks/useNotificaciones";
 
@@ -130,179 +130,249 @@ export default function MiPerfil() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)", fontFamily: "'Nunito', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#F7F5FC", fontFamily: "'Nunito', sans-serif" }}>
       <TopNav user={initialUser} activePath="/mi-perfil" />
 
-      {/* Cabecera morada con el saludo y el avatar, como en el diseño. La
-          tarjeta del formulario flota sobre ella con margen negativo. */}
+      {/* Cabecera morada; las tarjetas flotan sobre ella. */}
       <div style={{ background: "linear-gradient(135deg, #8B5FD6 0%, #A47BE8 100%)", paddingBottom: "80px" }}>
-        <div style={{ maxWidth: "680px", margin: "0 auto", padding: "24px 24px 0" }}>
+        <div style={{ maxWidth: "1180px", margin: "0 auto", padding: "24px 32px 0" }}>
           <button
-            onClick={() => navigate(-1)}
-            style={{ background: "none", border: "none", color: "rgba(255,255,255,0.85)", display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", marginBottom: "20px", fontWeight: 700, fontSize: "14px", fontFamily: "'Nunito', sans-serif", padding: 0 }}
+            onClick={() => navigate("/dashboard")}
+            style={{ background: "none", border: "none", color: "rgba(255,255,255,0.85)", fontSize: "14px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", marginBottom: "16px", fontFamily: "'Nunito', sans-serif", padding: 0 }}
           >
             <ArrowLeft size={16} /> Volver
           </button>
+          <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "32px", fontWeight: 700, color: "#fff", margin: 0 }}>
+            Hola, {formData.nombre || "!"}
+          </h1>
+        </div>
+      </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+      <div style={{ maxWidth: "1180px", margin: "-60px auto 0", padding: "0 32px 48px" }}>
+        <div className="perfil-grid" style={{ display: "grid", gridTemplateColumns: "minmax(0, 320px) minmax(0, 1fr)", gap: "20px", alignItems: "start" }}>
+
+          {/* ── Columna izquierda: identidad ── */}
+          <Tarjeta style={{ textAlign: "center" }}>
             <div style={{
-              width: "62px", height: "62px", borderRadius: "50%", flexShrink: 0,
-              background: "rgba(255,255,255,0.2)", border: "2.5px solid rgba(255,255,255,0.5)",
+              width: "104px", height: "104px", borderRadius: "50%", margin: "0 auto 16px",
+              background: "linear-gradient(135deg, #8B5FD6, #C0A9EE)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontFamily: "'Baloo 2', sans-serif", fontSize: "24px", fontWeight: 800, color: "#fff",
+              color: "#fff", fontSize: "38px", fontWeight: 900, fontFamily: "'Baloo 2', sans-serif",
             }}>
-              {(formData.nombre || initialUser?.nombre || "?").trim().charAt(0).toUpperCase()}
+              {(formData.nombre || "?").charAt(0).toUpperCase()}
             </div>
-            <div>
-              <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "28px", fontWeight: 700, color: "#fff", margin: 0 }}>
-                Hola, {(formData.nombre || initialUser?.nombre || "").split(" ")[0]}
-              </h1>
-              <p style={{ color: "rgba(255,255,255,0.75)", margin: "2px 0 0", fontWeight: 600, fontSize: "14px" }}>
-                {initialUser?.email ?? ""}
-              </p>
+            <div style={{ fontSize: "19px", fontWeight: 800, color: "#8B5FD6", fontFamily: "'Baloo 2', sans-serif" }}>
+              {formData.nombre} {formData.apellidos}
             </div>
-          </div>
-        </div>
-      </div>
+            <div style={{ fontSize: "13.5px", color: "#8A849C", marginTop: "4px", wordBreak: "break-all" }}>
+              {formData.email}
+            </div>
+          </Tarjeta>
 
-      <div style={{ maxWidth: "680px", margin: "-60px auto 48px", background: "var(--surface)", padding: "36px 40px", borderRadius: "24px", boxShadow: "0 10px 40px rgba(90,60,150,0.12)", position: "relative" }}>
-        <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "22px", fontWeight: 700, color: "var(--text)", margin: "0 0 6px" }}>Mis datos</h2>
-        <p style={{ color: "var(--text-muted)", marginBottom: "28px", fontWeight: 600, fontSize: "14px" }}>Actualiza los datos personales de tu cuenta.</p>
+          {/* ── Columna derecha ── */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
 
-        {message && (
-          <div style={{ padding: "14px 16px", background: message.includes("Error") ? "#FEF0F0" : "#F0FBF4", color: message.includes("Error") ? "#DC6B6B" : "#2F8F5B", borderRadius: "14px", marginBottom: "24px", fontWeight: 700, fontSize: "14px" }}>
-            {message}
-          </div>
-        )}
+            {/* Datos de la cuenta */}
+            <Tarjeta>
+              <Titulo>Editar Perfil</Titulo>
+              <form onSubmit={handleSave} style={{ marginTop: "18px" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "14px" }}>
+                  <Campo etiqueta="Nombre" icono={<User size={16} color="#A99FC4" />}>
+                    <input name="nombre" value={formData.nombre} onChange={handleChange} style={input} />
+                  </Campo>
+                  <Campo etiqueta="Apellidos" icono={<User size={16} color="#A99FC4" />}>
+                    <input name="apellidos" value={formData.apellidos} onChange={handleChange} style={input} />
+                  </Campo>
+                </div>
 
-        <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          <div>
-            <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "var(--text)", marginBottom: "8px" }}>Nombre</label>
-            <div style={{ position: "relative" }}>
-              <User size={18} style={{ position: "absolute", left: "14px", top: "13px", color: "var(--theme-light)" }} />
-              <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} required style={{ width: "100%", padding: "12px 14px 12px 42px", border: "2px solid #EDE9F8", borderRadius: "14px", outline: "none", boxSizing: "border-box", fontSize: "15px" }} />
-            </div>
-          </div>
-          <div>
-            <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "var(--text)", marginBottom: "8px" }}>Apellidos</label>
-            <div style={{ position: "relative" }}>
-              <User size={18} style={{ position: "absolute", left: "14px", top: "13px", color: "var(--theme-light)" }} />
-              <input type="text" name="apellidos" value={formData.apellidos} onChange={handleChange} required style={{ width: "100%", padding: "12px 14px 12px 42px", border: "2px solid #EDE9F8", borderRadius: "14px", outline: "none", boxSizing: "border-box", fontSize: "15px" }} />
-            </div>
-          </div>
-          <div>
-            <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "var(--text)", marginBottom: "8px" }}>Correo Electrónico</label>
-            <div style={{ position: "relative" }}>
-              <Mail size={18} style={{ position: "absolute", left: "14px", top: "13px", color: "#B0ABC4" }} />
-              <input type="email" name="email" value={formData.email} onChange={handleChange} required disabled style={{ width: "100%", padding: "12px 14px 12px 42px", border: "2px solid #EDE9F8", borderRadius: "14px", outline: "none", boxSizing: "border-box", background: "#FAF9FD", color: "var(--text-muted)", fontSize: "15px" }} title="El correo no se puede cambiar por ahora" />
-            </div>
-          </div>
+                <Campo etiqueta="Correo electrónico" icono={<Mail size={16} color="#A99FC4" />}>
+                  <input value={formData.email} disabled style={{ ...input, background: "#F3F1F8", color: "#A99FC4", cursor: "not-allowed" }} />
+                </Campo>
 
-          <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "17px", fontWeight: 700, color: "var(--text)", marginTop: "12px", marginBottom: "4px" }}>
-            {tienePassword ? "Cambiar Contraseña (Opcional)" : "Crear una Contraseña (Opcional)"}
-          </h3>
-          {!tienePassword && (
-            <p style={{ color: "var(--text-muted)", fontSize: "13px", marginTop: 0, marginBottom: "4px", lineHeight: 1.5 }}>
-              Entraste con Google, así que todavía no tienes una contraseña propia.
-              Si defines una, vas a poder entrar también con tu correo.
-            </p>
-          )}
-          {tienePassword && (
-            <div>
-              <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "var(--text)", marginBottom: "8px" }}>Contraseña Actual</label>
-              <div style={{ position: "relative" }}>
-                <input type="password" name="currentPassword" value={passwordData.currentPassword} onChange={handlePasswordChange} placeholder="Ingresa tu contraseña actual" style={{ width: "100%", padding: "12px 14px", border: "2px solid #EDE9F8", borderRadius: "14px", outline: "none", boxSizing: "border-box", fontSize: "15px" }} />
+                <div style={{ borderTop: "1px solid #EDE7F9", marginTop: "18px", paddingTop: "18px" }}>
+                  <Titulo pequeno>
+                    {tienePassword ? "Cambiar contraseña" : "Definir una contraseña"}
+                  </Titulo>
+                  {!tienePassword && (
+                    <p style={{ fontSize: "13px", color: "#8A849C", margin: "6px 0 0", lineHeight: 1.55 }}>
+                      Entraste con Google, así que todavía no tienes una contraseña propia.
+                      Define una si quieres poder entrar también con tu correo.
+                    </p>
+                  )}
+                  <div style={{ display: "grid", gridTemplateColumns: tienePassword ? "repeat(auto-fit, minmax(200px, 1fr))" : "1fr", gap: "14px", marginTop: "12px" }}>
+                    {tienePassword && (
+                      <Campo etiqueta="Contraseña actual">
+                        <input type="password" name="currentPassword" value={passwordData.currentPassword} onChange={handlePasswordChange} placeholder="••••••••" style={input} />
+                      </Campo>
+                    )}
+                    <Campo etiqueta="Contraseña nueva">
+                      <input type="password" name="newPassword" value={passwordData.newPassword} onChange={handlePasswordChange} placeholder="••••••••" style={input} />
+                    </Campo>
+                  </div>
+                </div>
+
+                {message && (
+                  <div style={{
+                    marginTop: "16px", padding: "12px 14px", borderRadius: "12px", fontSize: "13.5px", fontWeight: 700,
+                    background: message.includes("Error") || message.includes("No se") || message.includes("Debes") ? "#FFF0F0" : "#E8F7F1",
+                    color: message.includes("Error") || message.includes("No se") || message.includes("Debes") ? "#D97070" : "#3E8E6E",
+                  }}>
+                    {message}
+                  </div>
+                )}
+
+                <button type="submit" disabled={loading} style={{ ...btnPrimario, marginTop: "18px", opacity: loading ? 0.6 : 1 }}>
+                  <Save size={17} /> {loading ? "Guardando…" : "Guardar Cambios"}
+                </button>
+              </form>
+            </Tarjeta>
+
+            {/* Notificaciones */}
+            <Tarjeta>
+              <Titulo>Notificaciones</Titulo>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", marginTop: "16px", flexWrap: "wrap" }}>
+                <div style={{ flex: "1 1 240px", minWidth: 0 }}>
+                  <div style={{ fontSize: "14.5px", fontWeight: 800, color: "#3F3A52" }}>Citas y vacunas</div>
+                  <div style={{ fontSize: "12.5px", color: "#8A849C", marginTop: "2px" }}>
+                    Avisos en el teléfono, además del correo.
+                  </div>
+                </div>
+
+                {notif.estado === "cargando" && <span style={{ fontSize: "13px", color: "#A99FC4" }}>Revisando…</span>}
+
+                {notif.estado === "activo" && (
+                  <Interruptor activo onClick={notif.desactivar} disabled={notif.procesando} />
+                )}
+                {notif.estado === "inactivo" && (
+                  <Interruptor activo={false} onClick={notif.activar} disabled={notif.procesando} />
+                )}
               </div>
-            </div>
-          )}
-          <div>
-            <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "var(--text)", marginBottom: "8px" }}>Nueva Contraseña</label>
-            <div style={{ position: "relative" }}>
-              <input type="password" name="newPassword" value={passwordData.newPassword} onChange={handlePasswordChange} placeholder="Ingresa tu nueva contraseña" style={{ width: "100%", padding: "12px 14px", border: "2px solid #EDE9F8", borderRadius: "14px", outline: "none", boxSizing: "border-box", fontSize: "15px" }} />
-            </div>
-          </div>
 
-          <button type="submit" disabled={loading} style={{ background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))", color: "#fff", padding: "15px", border: "none", borderRadius: "16px", fontWeight: 800, fontSize: "15px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginTop: "12px", boxShadow: "0 10px 26px var(--theme-shadow)" }}>
-            <Save size={18} />
-            {loading ? "Guardando..." : "Guardar cambios"}
-          </button>
-        </form>
+              {/* Los estados que no se resuelven con un interruptor se explican. */}
+              {["bloqueado", "requiere_instalar", "no_soportado", "no_disponible"].includes(notif.estado) && (
+                <div style={{ marginTop: "14px" }}>
+                  <Aviso>
+                    {notif.estado === "bloqueado" && "Bloqueaste las notificaciones para este sitio. Para activarlas, permítelas en los ajustes del navegador para esta página."}
+                    {notif.estado === "requiere_instalar" && "En iPhone y iPad las notificaciones solo funcionan si instalas la app: toca “Compartir” y luego “Agregar a pantalla de inicio”."}
+                    {notif.estado === "no_soportado" && "Este navegador no admite notificaciones. Los avisos te seguirán llegando por correo."}
+                    {notif.estado === "no_disponible" && "Las notificaciones no están disponibles por ahora. Los avisos te seguirán llegando por correo."}
+                  </Aviso>
+                </div>
+              )}
 
-        {/* Notificaciones push */}
-        <div style={{ borderTop: "1px solid var(--border-soft)", marginTop: "32px", paddingTop: "26px" }}>
-          <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", color: "var(--text)", margin: "0 0 6px" }}>
-            Avisos en el teléfono
-          </h2>
-          <p style={{ fontSize: "14px", color: "var(--text-muted)", lineHeight: 1.6, margin: "0 0 16px" }}>
-            Recibe las vacunas, controles y exámenes pendientes como notificación,
-            además del correo.
-          </p>
+              {notif.error && (
+                <p style={{ color: "#D97070", fontSize: "13px", fontWeight: 600, marginTop: "10px" }}>{notif.error}</p>
+              )}
+            </Tarjeta>
 
-          {notif.estado === "cargando" && (
-            <p style={{ fontSize: "13.5px", color: "var(--text-muted)" }}>Revisando…</p>
-          )}
-
-          {notif.estado === "activo" && (
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-              <span style={{ background: "#E8F7F1", color: "#3E8E6E", padding: "8px 14px", borderRadius: "100px", fontWeight: 800, fontSize: "13px" }}>
-                ✓ Activadas en este dispositivo
-              </span>
+            {/* Privacidad */}
+            <Tarjeta>
+              <Titulo>Privacidad</Titulo>
               <button
-                onClick={notif.desactivar}
-                disabled={notif.procesando}
-                style={{ background: "none", border: "none", color: "var(--text-muted)", textDecoration: "underline", cursor: "pointer", fontSize: "13px", fontWeight: 700, fontFamily: "'Nunito', sans-serif" }}
+                onClick={() => {
+                  const id = localStorage.getItem("selectedBabyId");
+                  navigate(id ? `/perfil/${id}?tab=compartir` : "/seleccionar-perfil");
+                }}
+                style={filaEnlace}
               >
-                Desactivar
+                <div style={{ textAlign: "left" }}>
+                  <div style={{ fontSize: "14.5px", fontWeight: 800, color: "#3F3A52" }}>Datos compartidos</div>
+                  <div style={{ fontSize: "12.5px", color: "#8A849C", marginTop: "2px" }}>
+                    Gestiona quién más puede ver el perfil de tu bebé.
+                  </div>
+                </div>
+                <ChevronRight size={18} color="#A99FC4" style={{ flexShrink: 0 }} />
               </button>
-            </div>
-          )}
-
-          {notif.estado === "inactivo" && (
-            <button
-              onClick={notif.activar}
-              disabled={notif.procesando}
-              style={{ background: "var(--theme-primary)", color: "#fff", border: "none", borderRadius: "100px", padding: "13px 24px", fontWeight: 800, fontSize: "14px", cursor: notif.procesando ? "not-allowed" : "pointer", opacity: notif.procesando ? 0.6 : 1, fontFamily: "'Nunito', sans-serif" }}
-            >
-              {notif.procesando ? "Activando…" : "Activar notificaciones"}
-            </button>
-          )}
-
-          {notif.estado === "bloqueado" && (
-            <Aviso>
-              Bloqueaste las notificaciones para este sitio. Para activarlas,
-              entra a los ajustes del navegador para esta página y permite las
-              notificaciones.
-            </Aviso>
-          )}
-
-          {notif.estado === "requiere_instalar" && (
-            <Aviso>
-              En iPhone y iPad las notificaciones solo funcionan si instalas la
-              app: toca “Compartir” y luego “Agregar a pantalla de inicio”.
-            </Aviso>
-          )}
-
-          {notif.estado === "no_soportado" && (
-            <Aviso>Este navegador no admite notificaciones. Los avisos te seguirán llegando por correo.</Aviso>
-          )}
-
-          {notif.estado === "no_disponible" && (
-            <Aviso>Las notificaciones no están disponibles por ahora. Los avisos te seguirán llegando por correo.</Aviso>
-          )}
-
-          {notif.error && (
-            <p style={{ color: "#D97070", fontSize: "13px", fontWeight: 600, marginTop: "10px" }}>{notif.error}</p>
-          )}
+            </Tarjeta>
+          </div>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 860px) {
+          .perfil-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </div>
+  );
+}
+
+/* ── piezas ── */
+
+function Tarjeta({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+  return (
+    <div style={{ background: "#fff", borderRadius: "20px", padding: "24px 26px", boxShadow: "0 6px 28px rgba(90,60,150,0.08)", ...style }}>
+      {children}
+    </div>
+  );
+}
+
+function Titulo({ children, pequeno }: { children: React.ReactNode; pequeno?: boolean }) {
+  return (
+    <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: pequeno ? "16px" : "19px", fontWeight: 700, color: "#3F3A52", margin: 0 }}>
+      {children}
+    </h2>
+  );
+}
+
+function Campo({ etiqueta, icono, children }: { etiqueta: string; icono?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div style={{ marginTop: "12px" }}>
+      <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", fontWeight: 800, color: "#8A849C", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "7px" }}>
+        {icono} {etiqueta}
+      </label>
+      {children}
+    </div>
+  );
+}
+
+/** Interruptor tipo switch, como en el diseño. */
+function Interruptor({ activo, onClick, disabled }: { activo: boolean; onClick: () => void; disabled?: boolean }) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      aria-pressed={activo}
+      style={{
+        width: "52px", height: "30px", borderRadius: "100px", border: "none", flexShrink: 0,
+        background: activo ? "linear-gradient(135deg, #8B5FD6, #A47BE8)" : "#DDD6EC",
+        cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.6 : 1,
+        position: "relative", transition: "background .2s",
+      }}
+    >
+      <span style={{
+        position: "absolute", top: "3px", left: activo ? "25px" : "3px",
+        width: "24px", height: "24px", borderRadius: "50%", background: "#fff",
+        transition: "left .2s", boxShadow: "0 2px 5px rgba(0,0,0,0.15)",
+      }} />
+    </button>
   );
 }
 
 function Aviso({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ background: "var(--surface-2)", border: "1.5px solid var(--border)", borderRadius: "14px", padding: "14px 16px", fontSize: "13.5px", color: "var(--text-muted)", lineHeight: 1.6 }}>
+    <div style={{ background: "#FAF8FE", border: "1px solid #EDE7F9", borderRadius: "14px", padding: "14px 16px", fontSize: "13.5px", color: "#6B647F", lineHeight: 1.6 }}>
       {children}
     </div>
   );
 }
+
+const input: React.CSSProperties = {
+  width: "100%", padding: "12px 14px", borderRadius: "12px",
+  border: "1px solid #E4DBF7", background: "#FAF8FE", fontSize: "14.5px",
+  fontFamily: "'Nunito', sans-serif", color: "#3F3A52", outline: "none", boxSizing: "border-box",
+};
+
+const btnPrimario: React.CSSProperties = {
+  display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
+  background: "linear-gradient(135deg, #8B5FD6, #A47BE8)", color: "#fff", border: "none",
+  borderRadius: "12px", padding: "14px 28px", fontWeight: 800, fontSize: "14.5px",
+  cursor: "pointer", fontFamily: "'Nunito', sans-serif",
+  boxShadow: "0 6px 16px rgba(139,95,214,0.28)",
+};
+
+const filaEnlace: React.CSSProperties = {
+  display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px",
+  width: "100%", background: "#FAF8FE", border: "1px solid #EDE7F9", borderRadius: "14px",
+  padding: "14px 16px", cursor: "pointer", marginTop: "16px", fontFamily: "'Nunito', sans-serif",
+};
