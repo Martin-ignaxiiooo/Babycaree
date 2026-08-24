@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Calendar, CalendarPlus, Plus, Sparkles, Camera, X, Loader2 } from "lucide-react";
-import DateSelect from "../components/DateSelect";
-import TimeSelect from "../components/TimeSelect";
-import BabyGrowthIcon, { HITOS_POR_MES, ETIQUETA_POR_MES, SEMANA_RANGO_POR_MES, mesDesdeSemanas } from "../components/BabyGrowthIcon";
+import { CalendarPlus, Settings2, Loader2, ChevronRight, Camera } from "lucide-react";
+import BabyGrowthIcon, { HITOS_POR_MES, mesDesdeSemanas } from "../components/BabyGrowthIcon";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api";
 
@@ -14,81 +12,59 @@ interface DashboardEmbarazoProps {
   activeBabyId: string;
 }
 
+/** "15" y "OCT" por separado, para la insignia de fecha de cada cita. */
+function partirFecha(iso: string) {
+  const d = new Date(iso);
+  return {
+    dia: String(d.getDate()).padStart(2, "0"),
+    mes: d.toLocaleDateString("es-CL", { month: "short" }).replace(".", "").toUpperCase(),
+    hora: d.toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" }),
+  };
+}
+
 export default function DashboardEmbarazo({ user, perfil, activeBabyId }: DashboardEmbarazoProps) {
   const navigate = useNavigate();
   const [citas, setCitas] = useState<any[]>([]);
+  const [articulos, setArticulos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [fechaCitaDate, setFechaCitaDate] = useState("");
-  const [fechaCitaTime, setFechaCitaTime] = useState("");
-  const fechaCita = fechaCitaDate && fechaCitaTime ? `${fechaCitaDate}T${fechaCitaTime}` : "";
-  const [medico, setMedico] = useState("");
-  const [notas, setNotas] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
-
-  // Foto de perfil (embarazo). Se maneja local porque este componente
-  // recibe "perfil" como prop desde arriba y no controla su propio fetch;
-  // se actualiza sola de nuevo cuando el usuario cambia de bebé.
-  const [fotoPerfil, setFotoPerfil] = useState<string | null>(perfil?.foto_perfil || null);
-  const [uploadingFoto, setUploadingFoto] = useState(false);
+  // Foto del perfil: se guarda local porque "perfil" llega como prop desde
+  // arriba y este componente no controla su propio fetch.
+  const [fotoPerfil, setFotoPerfil] = useState<string | null>(perfil?.foto_perfil ?? null);
+  const [subiendoFoto, setSubiendoFoto] = useState(false);
   const [fotoError, setFotoError] = useState("");
-  const [confirmandoBorrarFoto, setConfirmandoBorrarFoto] = useState(false);
+
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    setFotoPerfil(perfil?.foto_perfil || null);
-  }, [activeBabyId, perfil?.foto_perfil]);
-
-  useEffect(() => {
-    fetchCitas();
-  }, [activeBabyId]);
-
-  const fetchCitas = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-    try {
-      const res = await axios.get(`${API_URL}/v1/salud/${activeBabyId}/citas`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setCitas(res.data);
-    } catch (error) {
-      console.error("Error fetching citas", error);
-    } finally {
+    if (!activeBabyId) return;
+    const cargar = async () => {
+      const h = { Authorization: `Bearer ${token}` };
+      // allSettled: si los artículos fallan, las citas igual se muestran.
+      const [c, a] = await Promise.allSettled([
+        axios.get(`${API_URL}/v1/salud/${activeBabyId}/citas`, { headers: h }),
+        axios.get(`${API_URL}/v1/comunidad/articulos`, { headers: h }),
+      ]);
+      if (c.status === "fulfilled") setCitas(Array.isArray(c.value.data) ? c.value.data : []);
+      if (a.status === "fulfilled") setArticulos(Array.isArray(a.value.data) ? a.value.data : []);
       setLoading(false);
-    }
-  };
+    };
+    cargar();
+  }, [activeBabyId, token]);
 
-  const handleSaveCita = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!fechaCita) return;
+  const semanas = perfil?.semanas_embarazo || 1;
+  const porcentaje = Math.min(Math.round((semanas / 40) * 100), 100);
+  const mes = perfil?.mes_embarazo || mesDesdeSemanas(semanas);
+  const hito = perfil?.hito_embarazo || HITOS_POR_MES[mes];
+  const fruta = String(perfil?.fruta_embarazo || "semillita").toLowerCase();
+  const nombre = user?.nombre ? user.nombre.split(" ")[0] : "";
 
-    setIsSaving(true);
-    try {
-      const token = localStorage.getItem("token");
-      await axios.post(`${API_URL}/v1/salud/${activeBabyId}/citas`, {
-        fecha_cita: fechaCita,
-        medico,
-        notas,
-        especialidad: "Obstetricia"
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+  const ahora = new Date();
+  const proximas = citas
+    .filter((c) => new Date(c.fecha_cita) >= ahora)
+    .sort((a, b) => new Date(a.fecha_cita).getTime() - new Date(b.fecha_cita).getTime())
+    .slice(0, 4);
 
-      setFechaCitaDate("");
-      setFechaCitaTime("");
-      setMedico("");
-      setNotas("");
-      fetchCitas();
-    } catch (error) {
-      console.error("Error saving cita", error);
-      alert("Error al guardar la cita");
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  // Redimensiona/comprime la foto en el navegador antes de subirla (igual
-  // que en el dashboard del bebé ya nacido), para no guardar imágenes
-  // pesadas en la base de datos.
   const resizeImageFile = (file: File, maxDim = 480, quality = 0.82): Promise<Blob> => {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -135,8 +111,8 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
     e.target.value = "";
     if (!file || !activeBabyId) return;
 
-    const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-    if (!ALLOWED_TYPES.includes(file.type)) {
+    const PERMITIDOS = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+    if (!PERMITIDOS.includes(file.type)) {
       setFotoError("Formato no soportado. Usa JPG, PNG, WEBP o GIF.");
       return;
     }
@@ -146,452 +122,243 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
     }
 
     setFotoError("");
-    setUploadingFoto(true);
+    setSubiendoFoto(true);
     try {
-      const resizedBlob = await resizeImageFile(file);
-      const token = localStorage.getItem("token");
+      const blob = await resizeImageFile(file);
       const formData = new FormData();
-      formData.append("foto", resizedBlob, "foto.jpg");
-
+      formData.append("foto", blob, "foto.jpg");
       const res = await axios.post(`${API_URL}/v1/perfiles-bebe/${activeBabyId}/foto`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
       });
       setFotoPerfil(res.data.foto_perfil);
-    } catch (error) {
-      console.error(error);
+    } catch {
       setFotoError("No se pudo subir la foto. Intenta de nuevo.");
     } finally {
-      setUploadingFoto(false);
+      setSubiendoFoto(false);
     }
   };
 
-  const handleEliminarFoto = async () => {
-    if (!activeBabyId || uploadingFoto) return;
-    setFotoError("");
-    setUploadingFoto(true);
-    setConfirmandoBorrarFoto(false);
-    try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`${API_URL}/v1/perfiles-bebe/${activeBabyId}/foto`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setFotoPerfil(null);
-    } catch (error) {
-      console.error(error);
-      setFotoError("No se pudo quitar la foto. Intenta de nuevo.");
-    } finally {
-      setUploadingFoto(false);
-    }
-  };
-
-  // Extraer datos del backend
-  const semanas = perfil?.semanas_embarazo || 1;
-  let porcentaje = 0;
-  if (semanas > 0) {
-    porcentaje = Math.round((semanas / 40) * 100);
-  }
-  // Estos textos ahora viven en la tabla embarazo_hitos_mes y llegan desde el
-  // backend. Los objetos locales quedan solo como respaldo por si la tabla
-  // todavía no está creada en ese ambiente.
-  const mes = perfil?.mes_embarazo || mesDesdeSemanas(semanas);
-  const hito = perfil?.hito_embarazo || HITOS_POR_MES[mes];
-  const frutaActual = perfil?.fruta_embarazo || "Semillita";
-  const etiquetaMes = perfil?.etiqueta_mes_embarazo || ETIQUETA_POR_MES[mes];
-  const rangoSemana = perfil?.rango_semana_mes_embarazo || SEMANA_RANGO_POR_MES[mes];
-
-  const cardStyle: React.CSSProperties = {
-    background: "white",
-    borderRadius: "22px",
-    overflow: "hidden",
-    boxShadow: "0 6px 24px rgba(124,92,191,0.07)",
-  };
-
-  const cardHeaderBannerStyle: React.CSSProperties = {
-    background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
-    color: "white",
-    fontFamily: "'Baloo 2', sans-serif",
-    fontSize: "16px",
-    fontWeight: 700,
-    padding: "16px 22px",
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-  };
-
-  const inputStyle: React.CSSProperties = {
-    width: "100%",
-    padding: "13px 14px",
-    borderRadius: "14px",
-    border: "2px solid var(--theme-bg-light)",
-    background: "#FDFCFF",
-    color: "var(--text)",
-    outline: "none",
-    boxSizing: "border-box",
-    fontFamily: "'Nunito', sans-serif",
-    fontSize: "14px",
-    transition: "border-color 0.2s",
-  };
-
-  const labelStyle: React.CSSProperties = {
-    display: "block",
-    fontSize: "12px",
-    fontWeight: 700,
-    marginBottom: "8px",
-    color: "var(--text-muted)",
-    textTransform: "uppercase",
-    letterSpacing: "0.05em",
-  };
+  const R = 54;
+  const circunferencia = 2 * Math.PI * R;
 
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)", fontFamily: "'Nunito', sans-serif", flex: 1 }}>
-
-      {/* ── HERO: degradado contenido arriba, igual que el resto de la app ── */}
-      <div style={{
-        background: "linear-gradient(120deg, var(--theme-darker) 0%, #B85C7E 55%, var(--theme-light) 100%)",
-        padding: "40px clamp(16px, 4vw, 40px) 44px",
-      }}>
-        <div style={{ maxWidth: "1020px", margin: "0 auto" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "22px", flexWrap: "wrap" }}>
+    <div style={{ minHeight: "100vh", background: "#F7F5FC", fontFamily: "'Nunito', sans-serif" }}>
+      {/* Cabecera morada; se extiende bajo las tarjetas para que floten
+          sobre ella, como en el diseño. */}
+      <div style={{ background: "linear-gradient(135deg, #8B5FD6 0%, #A47BE8 100%)", paddingBottom: "90px" }}>
+        <div style={{ maxWidth: "1240px", margin: "0 auto", padding: "28px 32px 0" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             <label
-              htmlFor="foto-embarazo-input"
-              style={{
-                position: "relative",
-                width: "88px", height: "88px", borderRadius: "22px",
-                background: "var(--surface)", flexShrink: 0, overflow: "hidden", cursor: "pointer",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                boxShadow: "0 8px 22px rgba(45,38,64,0.2)",
-              }}
               title="Cambiar foto"
+              style={{
+                width: "58px", height: "58px", borderRadius: "50%", flexShrink: 0, cursor: "pointer",
+                background: fotoPerfil ? `url(${fotoPerfil}) center/cover` : "rgba(255,255,255,0.22)",
+                border: "2.5px solid rgba(255,255,255,0.55)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}
             >
-              {fotoPerfil ? (
-                <img src={fotoPerfil} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              ) : (
-                <Camera size={30} color="#E4C9D6" strokeWidth={2} />
-              )}
-
-              {uploadingFoto && (
-                <div style={{ position: "absolute", inset: 0, background: "rgba(255,255,255,0.85)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Loader2 size={22} color="var(--theme-primary)" className="spin-icon" />
-                </div>
-              )}
-
-              {fotoPerfil && !uploadingFoto && !confirmandoBorrarFoto && (
-                <button
-                  type="button"
-                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setConfirmandoBorrarFoto(true); }}
-                  title="Quitar foto"
-                  aria-label="Quitar foto"
-                  style={{
-                    position: "absolute", top: "4px", right: "4px",
-                    width: "20px", height: "20px", borderRadius: "50%",
-                    background: "rgba(45,38,64,0.6)", border: "none",
-                    display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", padding: 0,
-                  }}
-                >
-                  <X size={12} color="#fff" strokeWidth={3} />
-                </button>
-              )}
-
-              {confirmandoBorrarFoto && !uploadingFoto && (
-                <div
-                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                  style={{ position: "absolute", inset: 0, background: "rgba(45,38,64,0.88)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "6px", padding: "6px" }}
-                >
-                  <span style={{ color: "#fff", fontSize: "9px", fontWeight: 700, textAlign: "center", lineHeight: 1.2 }}>¿Quitar foto?</span>
-                  <div style={{ display: "flex", gap: "4px" }}>
-                    <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleEliminarFoto(); }} style={{ background: "var(--surface)", color: "#B91C1C", border: "none", borderRadius: "6px", padding: "3px 7px", fontSize: "10px", fontWeight: 800, cursor: "pointer" }}>Sí</button>
-                    <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setConfirmandoBorrarFoto(false); }} style={{ background: "rgba(255,255,255,0.2)", color: "#fff", border: "1px solid rgba(255,255,255,0.5)", borderRadius: "6px", padding: "3px 7px", fontSize: "10px", fontWeight: 700, cursor: "pointer" }}>No</button>
-                  </div>
-                </div>
-              )}
-
-              <input
-                id="foto-embarazo-input"
-                type="file"
-                accept="image/jpeg,image/png,image/webp,image/gif"
-                onChange={handleUploadFoto}
-                disabled={uploadingFoto}
-                style={{ display: "none" }}
-              />
+              {subiendoFoto ? (
+                <Loader2 size={20} color="#fff" className="spin-icon" />
+              ) : !fotoPerfil ? (
+                <Camera size={22} color="rgba(255,255,255,0.9)" />
+              ) : null}
+              <input type="file" accept="image/*" onChange={handleUploadFoto} style={{ display: "none" }} />
             </label>
 
-            <div style={{ flex: "1 1 260px", minWidth: 0 }}>
-              <div style={{
-                display: "inline-flex", alignItems: "center", gap: "8px",
-                background: "rgba(255,255,255,0.16)", color: "#fff",
-                padding: "6px 14px", borderRadius: "100px", fontSize: "12px", fontWeight: 800,
-                textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "12px",
-                border: "1px solid rgba(255,255,255,0.25)",
-              }}>
-                <Sparkles size={13} /> Semana {semanas} de 40
-              </div>
-              <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "clamp(24px, 4vw, 30px)", fontWeight: 700, color: "#fff", lineHeight: 1.2, margin: 0 }}>
-                Seguimiento de {perfil?.nombre || "tu embarazo"}
+            <div>
+              <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "32px", fontWeight: 700, color: "#fff", margin: 0 }}>
+                Hola, {nombre}
               </h1>
-              <div style={{ fontSize: "14.5px", color: "rgba(255,255,255,0.8)", marginTop: "6px", fontWeight: 600 }}>
-                Mes {mes} · {etiquetaMes}
-              </div>
               {fotoError && (
-                <div style={{ fontSize: "12px", color: "#fff", background: "rgba(185,28,28,0.85)", padding: "4px 10px", borderRadius: "8px", marginTop: "8px", fontWeight: 700, display: "inline-block" }}>{fotoError}</div>
+                <div style={{ fontSize: "12.5px", color: "#FFD9D9", fontWeight: 700, marginTop: "3px" }}>{fotoError}</div>
               )}
             </div>
-
-            {/* Mini progreso, visible también en el hero para que se vea de un vistazo */}
-            <div style={{ flex: "0 0 auto", textAlign: "center", background: "rgba(255,255,255,0.14)", border: "1px solid rgba(255,255,255,0.25)", borderRadius: "18px", padding: "14px 22px" }}>
-              <div style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "26px", fontWeight: 700, color: "#fff" }}>{Math.min(porcentaje, 100)}%</div>
-              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.75)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em" }}>del camino</div>
-            </div>
-
-            {hito && (
-              <button
-                type="button"
-                onClick={() => navigate(`/embarazo/${activeBabyId}/info`, { state: { perfil } })}
-                title="Ver datos sobre tu embarazo"
-                style={{
-                  flex: "0 0 auto",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  background: "rgba(255,255,255,0.18)",
-                  border: "1px solid rgba(255,255,255,0.35)",
-                  color: "#fff",
-                  padding: "12px 20px",
-                  borderRadius: "100px",
-                  fontSize: "13px",
-                  fontWeight: 800,
-                  fontFamily: "'Nunito', sans-serif",
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                  transition: "background 0.2s, transform 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.3)";
-                  (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.18)";
-                  (e.currentTarget as HTMLElement).style.transform = "";
-                }}
-              >
-                <Sparkles size={16} /> Datos sobre tu embarazo
-              </button>
-            )}
           </div>
         </div>
       </div>
 
-      <style>{`
-        @keyframes spin-embarazo-kf { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .spin-icon { animation: spin-embarazo-kf 0.9s linear infinite; }
-      `}</style>
+      <div style={{ maxWidth: "1240px", margin: "-70px auto 0", padding: "0 32px 48px" }}>
+        <div className="embarazo-grid" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1.65fr) minmax(300px, 1fr)", gap: "22px", alignItems: "start" }}>
 
-      {/* ── CONTENIDO ── */}
-      <div style={{ maxWidth: "1020px", margin: "0 auto", padding: "32px clamp(12px, 4vw, 20px) 40px", fontFamily: "Nunito" }}>
+          {/* Columna izquierda */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
 
-        <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", alignItems: "stretch" }}>
-
-          {/* TARJETA 1: Tamaño del bebé */}
-          <div style={{ ...cardStyle, flex: "1 1 320px", padding: "24px", display: "flex", flexDirection: "column" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "10px", marginBottom: "20px" }}>
-              <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--text)", margin: 0 }}>
-                Tamaño del Bebé
-              </h2>
-              <div style={{
-                background: "var(--theme-bg-light)", color: "var(--theme-primary)",
-                padding: "6px 12px", borderRadius: "100px", fontSize: "12px", fontWeight: 800,
-                whiteSpace: "nowrap",
-              }}>
-                Mes {mes} - {rangoSemana}
-              </div>
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
-                <BabyGrowthIcon semanas={semanas} porcentaje={porcentaje} fill />
-                <div style={{ flex: "1 1 140px" }}>
-                  <div style={{ fontSize: "26px", fontWeight: 800, color: "var(--text)", marginBottom: "8px" }}>
-                    {Math.min(porcentaje, 100)}%
+            <Tarjeta>
+              <Titulo>Progreso del Embarazo</Titulo>
+              <div style={{ display: "flex", alignItems: "center", gap: "26px", flexWrap: "wrap", marginTop: "18px" }}>
+                <div style={{ position: "relative", width: "128px", height: "128px", flexShrink: 0 }}>
+                  <svg width="128" height="128" viewBox="0 0 128 128" style={{ transform: "rotate(-90deg)" }}>
+                    <circle cx="64" cy="64" r={R} fill="none" stroke="#EDE7F9" strokeWidth="11" />
+                    <circle
+                      cx="64" cy="64" r={R} fill="none"
+                      stroke="#8B5FD6" strokeWidth="11" strokeLinecap="round"
+                      strokeDasharray={circunferencia}
+                      strokeDashoffset={circunferencia * (1 - porcentaje / 100)}
+                      style={{ transition: "stroke-dashoffset .8s ease-out" }}
+                    />
+                  </svg>
+                  <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <BabyGrowthIcon semanas={semanas} porcentaje={porcentaje} fill />
                   </div>
-                  <div style={{ width: "100%", background: "var(--theme-bg-light)", borderRadius: "10px", height: "8px", overflow: "hidden", marginBottom: "8px" }}>
-                    <div style={{
-                      width: `${Math.max(Math.min(porcentaje, 100), 3)}%`,
-                      height: "100%",
-                      background: "linear-gradient(90deg, #F4A0A0 0%, #E8607F 100%)",
-                      borderRadius: "10px",
-                      transition: "width 0.4s ease",
-                    }}></div>
+                </div>
+
+                <div style={{ flex: "1 1 220px", minWidth: 0 }}>
+                  <p style={{ fontSize: "17px", color: "#3F3A52", lineHeight: 1.55, margin: 0, fontWeight: 600 }}>
+                    Semana {semanas} — ¡Tu beb&eacute; tiene el tama&ntilde;o de{" "}
+                    {/^[aeiou]/.test(fruta) ? "un" : "una"}{" "}
+                    <strong style={{ color: "#8B5FD6" }}>{fruta}</strong>!
+                  </p>
+                  <div style={{ marginTop: "12px", height: "7px", borderRadius: "4px", background: "#EDE7F9", overflow: "hidden" }}>
+                    <div style={{ width: `${porcentaje}%`, height: "100%", background: "linear-gradient(90deg, #8B5FD6, #C0A9EE)", borderRadius: "4px" }} />
                   </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "var(--text-muted)", fontWeight: 700 }}>
-                    <span>Semana 1</span>
-                    <span>Semana 40</span>
+                  <div style={{ fontSize: "12.5px", color: "#8A849C", fontWeight: 700, marginTop: "7px" }}>
+                    Semana {semanas} de 40 &middot; {porcentaje}% del camino
                   </div>
                 </div>
               </div>
+            </Tarjeta>
 
-              <div>
-                <p style={{ fontSize: "15px", color: "#6B647F", lineHeight: 1.5, margin: 0 }}>
-                  Tiene el tamaño de un/a{" "}
-                  <strong style={{ color: "#E8607F" }}>{frutaActual}</strong>.
+            {hito && (
+              <Tarjeta>
+                <Titulo>Tu semana {semanas}</Titulo>
+                <p style={{ fontSize: "14.5px", color: "#6B647F", lineHeight: 1.75, marginTop: "12px", whiteSpace: "pre-line" }}>
+                  {hito}
                 </p>
-              </div>
-            </div>
-          </div>
+              </Tarjeta>
+            )}
 
-          <div style={{ flex: "1 1 320px", display: "flex", flexDirection: "column", gap: "24px", minWidth: 0 }}>
-
-            {/* TARJETA 2: Controles Prenatales */}
-            <div style={cardStyle}>
-              <div style={cardHeaderBannerStyle}>
-                <Calendar size={18} />
-                Controles Prenatales
-              </div>
-              <div style={{ padding: "22px", display: "flex", flexDirection: "column", gap: "12px", maxHeight: "280px", overflowY: "auto" }}>
+            <Tarjeta>
+              <Titulo>Art&iacute;culos Recomendados</Titulo>
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "16px" }}>
                 {loading ? (
-                  <p style={{ color: "#B0ABC4", fontSize: "14px", margin: 0 }}>Cargando citas...</p>
-                ) : citas.length === 0 ? (
-                  <div style={{
-                    display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center",
-                    padding: "16px",
-                  }}>
-                    <div style={{
-                      width: "44px", height: "44px", borderRadius: "50%", background: "var(--theme-bg-light)",
-                      display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "12px",
-                    }}>
-                      <CalendarPlus size={20} color="var(--theme-primary)" />
-                    </div>
-                    <p style={{ color: "var(--text)", fontSize: "14px", fontWeight: 700, margin: "0 0 4px 0" }}>
-                      Todavía no tienes controles agendados.
-                    </p>
-                    <p style={{ color: "var(--text-muted)", fontSize: "13px", margin: 0 }}>
-                      Agregá tu próxima cita médica más abajo.
-                    </p>
-                  </div>
+                  <Loader2 size={20} className="spin-icon" />
+                ) : articulos.length === 0 ? (
+                  <p style={{ fontSize: "14px", color: "#8A849C", margin: 0 }}>
+                    Pronto habr&aacute; contenido para esta etapa.
+                  </p>
                 ) : (
-                  citas.map(cita => {
-                    const date = new Date(cita.fecha_cita);
-                    const isPast = date < new Date();
-                    return (
-                      <div key={cita.id} style={{
-                        background: "var(--theme-bg-light)",
-                        borderRadius: "16px",
-                        padding: "14px 16px",
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        gap: "12px",
-                        borderLeft: `4px solid ${isPast ? "#D3CDE8" : "var(--theme-primary)"}`,
-                        opacity: isPast ? 0.7 : 1,
-                      }}>
-                        <div style={{ minWidth: 0 }}>
-                          <h4 style={{ margin: "0 0 4px 0", fontSize: "15px", color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                            {cita.notas || "Control Médico"}
-                          </h4>
-                          <div style={{ fontSize: "13px", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "8px" }}>
-                            <span>{cita.medico || "Sin especificar doctor"}</span>
-                            {cita.lugar && <span>• {cita.lugar}</span>}
-                          </div>
-                        </div>
-                        <div style={{ textAlign: "right", flexShrink: 0 }}>
-                          <div style={{ fontWeight: 800, fontSize: "14px", color: "var(--theme-primary)" }}>
-                            {date.toLocaleDateString("es-CL", { day: 'numeric', month: 'short' })}
-                          </div>
-                          <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
-                            {date.toLocaleTimeString("es-CL", { hour: '2-digit', minute: '2-digit', hour12: false })}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })
+                  articulos.slice(0, 3).map((a: any) => (
+                    <button
+                      key={a.id}
+                      onClick={() => navigate(`/comunidad/articulo/${a.id}`)}
+                      style={{
+                        background: "#FAF8FE", border: "1px solid #EDE7F9", borderRadius: "12px",
+                        padding: "14px 16px", textAlign: "left", cursor: "pointer", width: "100%",
+                        display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px",
+                        fontFamily: "'Nunito', sans-serif",
+                      }}
+                    >
+                      <span style={{ fontSize: "14px", fontWeight: 700, color: "#3F3A52" }}>{a.titulo}</span>
+                      <ChevronRight size={16} color="#A99FC4" style={{ flexShrink: 0 }} />
+                    </button>
+                  ))
                 )}
               </div>
-            </div>
-
-            {/* TARJETA 3: Agregar Nueva Cita */}
-            <div style={cardStyle}>
-              <div style={cardHeaderBannerStyle}>
-                <Plus size={18} />
-                Agregar Nueva Cita
-              </div>
-              <div style={{ padding: "22px" }}>
-                <form onSubmit={handleSaveCita} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                  <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-                    <div style={{ flex: "1 1 200px" }}>
-                      <label style={labelStyle}>Fecha</label>
-                      <DateSelect
-                        value={fechaCitaDate}
-                        onChange={setFechaCitaDate}
-                        required
-                        variant="light"
-                      />
-                    </div>
-                    <div style={{ flex: "1 1 140px" }}>
-                      <label style={labelStyle}>Hora</label>
-                      <TimeSelect
-                        value={fechaCitaTime}
-                        onChange={setFechaCitaTime}
-                        required
-                        variant="light"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Doctor/Centro (Opcional)</label>
-                    <input
-                      type="text"
-                      placeholder="Ej. Dr. Silva - Centro Médico"
-                      value={medico}
-                      onChange={e => setMedico(e.target.value)}
-                      style={inputStyle}
-                      onFocus={(e) => { e.target.style.borderColor = "var(--theme-light)"; }}
-                      onBlur={(e) => { e.target.style.borderColor = "var(--theme-bg-light)"; }}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={labelStyle}>Notas / Título</label>
-                    <input
-                      type="text"
-                      placeholder="Ej. Ecografía Estructural"
-                      value={notas}
-                      onChange={e => setNotas(e.target.value)}
-                      style={inputStyle}
-                      onFocus={(e) => { e.target.style.borderColor = "var(--theme-light)"; }}
-                      onBlur={(e) => { e.target.style.borderColor = "var(--theme-bg-light)"; }}
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isSaving || !fechaCita}
-                    style={{
-                      background: isSaving || !fechaCita ? "var(--theme-bg-light)" : "linear-gradient(135deg, #F4A0A0, #E8607F)",
-                      color: isSaving || !fechaCita ? "#B0ABC4" : "white",
-                      border: "none",
-                      padding: "14px 28px",
-                      borderRadius: "100px",
-                      fontWeight: 800,
-                      fontSize: "15px",
-                      fontFamily: "'Nunito', sans-serif",
-                      cursor: isSaving || !fechaCita ? "not-allowed" : "pointer",
-                      boxShadow: isSaving || !fechaCita ? "none" : "0 6px 18px rgba(232,96,127,0.35)",
-                      transition: "all 0.2s",
-                      width: "100%",
-                    }}
-                    onMouseEnter={(e) => { if (!isSaving && fechaCita) (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = ""; }}
-                  >
-                    {isSaving ? "Guardando..." : "Guardar Cita"}
-                  </button>
-                </form>
-              </div>
-            </div>
-
+            </Tarjeta>
           </div>
+
+          {/* Columna derecha: citas */}
+          <Tarjeta style={{ display: "flex", flexDirection: "column", minHeight: "420px" }}>
+            <Titulo>Mis Citas Pr&oacute;ximas</Titulo>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "18px", flex: 1 }}>
+              {loading ? (
+                <Loader2 size={20} className="spin-icon" />
+              ) : proximas.length === 0 ? (
+                <p style={{ fontSize: "14px", color: "#8A849C", margin: 0, lineHeight: 1.6 }}>
+                  No tienes controles agendados. A&ntilde;ade el pr&oacute;ximo para que te lo recordemos.
+                </p>
+              ) : (
+                proximas.map((c: any) => {
+                  const f = partirFecha(c.fecha_cita);
+                  return (
+                    <div
+                      key={c.id}
+                      style={{
+                        display: "flex", alignItems: "center", gap: "14px",
+                        background: "#FAF8FE", border: "1px solid #EDE7F9",
+                        borderRadius: "14px", padding: "12px 14px",
+                      }}
+                    >
+                      <div style={{ textAlign: "center", flexShrink: 0, minWidth: "42px" }}>
+                        <div style={{ fontSize: "21px", fontWeight: 900, color: "#3F3A52", lineHeight: 1, fontFamily: "'Baloo 2', sans-serif" }}>
+                          {f.dia}
+                        </div>
+                        <div style={{ fontSize: "10.5px", fontWeight: 800, color: "#A99FC4", letterSpacing: "0.5px" }}>
+                          {f.mes}
+                        </div>
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontSize: "14px", fontWeight: 800, color: "#3F3A52" }}>
+                          {c.especialidad || (c.tipo === "control" ? "Control" : "Cita m\u00e9dica")}
+                        </div>
+                        <div style={{ fontSize: "12.5px", color: "#8A849C", marginTop: "1px" }}>
+                          {f.hora}{c.medico ? ` \u00b7 ${c.medico}` : ""}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
+              <button onClick={() => navigate("/salud")} style={btnSecundario}>
+                <Settings2 size={16} /> Gestionar
+              </button>
+              <button onClick={() => navigate("/salud")} style={btnPrimario}>
+                <CalendarPlus size={16} /> A&ntilde;adir Cita
+              </button>
+            </div>
+          </Tarjeta>
         </div>
       </div>
+
+      {/* En pantallas angostas las dos columnas se apilan. */}
+      <style>{`
+        @media (max-width: 900px) {
+          .embarazo-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </div>
   );
 }
+
+function Tarjeta({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+  return (
+    <div style={{
+      background: "#fff", borderRadius: "20px", padding: "24px 26px",
+      boxShadow: "0 6px 28px rgba(90,60,150,0.08)", ...style,
+    }}>
+      {children}
+    </div>
+  );
+}
+
+function Titulo({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "#3F3A52", margin: 0 }}>
+      {children}
+    </h2>
+  );
+}
+
+const btnBase: React.CSSProperties = {
+  flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "7px",
+  padding: "13px 10px", borderRadius: "12px", cursor: "pointer",
+  fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "13.5px",
+  whiteSpace: "nowrap", border: "none",
+};
+
+const btnPrimario: React.CSSProperties = {
+  ...btnBase,
+  background: "linear-gradient(135deg, #8B5FD6, #A47BE8)",
+  color: "#fff",
+  boxShadow: "0 6px 16px rgba(139,95,214,0.28)",
+};
+
+const btnSecundario: React.CSSProperties = {
+  ...btnBase,
+  background: "#F3EEFC",
+  color: "#8B5FD6",
+};
