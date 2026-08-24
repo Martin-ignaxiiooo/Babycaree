@@ -91,6 +91,11 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
   const NavLinks = ({ pill = false }: { pill?: boolean }) => {
     const items = [
       { label: "Inicio", path: "/dashboard", match: "dashboard" },
+      // El calendario es propio del seguimiento de embarazo: en un perfil de
+      // bebé nacido las citas se ven desde Salud y no hace falta duplicarlo.
+      ...(perfilEstado === "embarazo" ? [
+        { label: "Calendario", path: "/calendario", match: "calendario" },
+      ] : []),
       { label: "Salud", path: "/salud", match: "salud" },
       { label: "Comunidad", path: "/comunidad", match: "comunidad" },
       ...(perfilEstado !== "embarazo" ? [
