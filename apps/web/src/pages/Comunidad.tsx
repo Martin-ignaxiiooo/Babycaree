@@ -133,13 +133,22 @@ export default function Comunidad() {
       <TopNav user={user} activePath="/comunidad" />
 
       {/* ── MAIN CONTENT ── */}
-      <div className="page-container">
+      {/* Cabecera morada, igual que Inicio y Perfil: las tres pantallas
+          del rediseño comparten el mismo encabezado. */}
+      <div style={{ background: "linear-gradient(135deg, #8B5FD6 0%, #A47BE8 100%)", paddingBottom: "70px" }}>
+        <div style={{ maxWidth: "1240px", margin: "0 auto", padding: "26px 32px 0" }}>
+          <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "31px", fontWeight: 700, color: "#fff", margin: 0 }}>
+            Comunidad
+          </h1>
+          <p style={{ fontSize: "14.5px", color: "rgba(255,255,255,0.8)", margin: "6px 0 0", fontWeight: 600 }}>
+            Conecta, comparte y aprende con otras familias.
+          </p>
+        </div>
+      </div>
+
+      <div className="page-container" style={{ marginTop: "-50px" }}>
         
-        <div style={{ marginBottom: "32px", display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "16px" }}>
-          <div>
-            <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "30px", fontWeight: 700, color: "var(--text)", margin: "0 0 8px 0" }}>Comunidad</h1>
-            <p style={{ fontSize: "15px", color: "var(--text-muted)", margin: 0, fontWeight: 600 }}>Comparte experiencias, resuelve dudas y aprende con otros padres y especialistas.</p>
-          </div>
+        <div style={{ marginBottom: "24px", display: "flex", justifyContent: "flex-end", flexWrap: "wrap", gap: "16px" }}>
           {activeTab === "foros" && (
             <button style={{ 
               background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))", color: "#fff", border: "none", 
@@ -185,7 +194,46 @@ export default function Comunidad() {
         {activeTab === "foros" && (
         <div className="comunidad-grid" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1.9fr) minmax(260px, 1fr)", gap: "22px", alignItems: "start" }}>
           <div style={{ display: "grid", gap: "16px" }}>
-            {loading ? <div style={{ padding: "40px", textAlign: "center", color: "#6B7280" }}>Cargando foros...</div> : forosData.map(foro => (
+
+            {/* Compositor: abre el mismo modal que el botón de arriba, pero
+                acá arriba del feed es donde uno espera encontrarlo. */}
+            <div
+              onClick={() => setShowModal(true)}
+              style={{
+                display: "flex", alignItems: "center", gap: "14px",
+                background: "var(--surface)", borderRadius: "20px", padding: "16px 18px",
+                boxShadow: "0 6px 20px rgba(124,92,191,0.08)", cursor: "pointer",
+              }}
+            >
+              <div style={{
+                width: "42px", height: "42px", borderRadius: "50%", flexShrink: 0,
+                background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                color: "#fff", fontWeight: 900, fontSize: "17px", fontFamily: "'Baloo 2', sans-serif",
+              }}>
+                {(user?.nombre ?? "?").charAt(0).toUpperCase()}
+              </div>
+              <div style={{
+                flex: 1, background: "var(--surface-2)", border: "1px solid var(--border)",
+                borderRadius: "100px", padding: "12px 18px",
+                fontSize: "14px", color: "var(--text-muted)",
+              }}>
+                ¿Qué quieres compartir hoy?
+              </div>
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowModal(true); }}
+                style={{
+                  background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
+                  color: "#fff", border: "none", borderRadius: "100px", padding: "11px 22px",
+                  fontWeight: 800, fontSize: "13.5px", cursor: "pointer", whiteSpace: "nowrap",
+                  fontFamily: "'Nunito', sans-serif",
+                }}
+              >
+                Publicar
+              </button>
+            </div>
+
+            {loading ? <div style={{ padding: "40px", textAlign: "center", color: "var(--text-muted)" }}>Cargando foros...</div> : forosData.map(foro => (
               <div key={foro.id} onClick={() => navigate(`/comunidad/foro/${foro.id}`)} style={{ 
                 background: "var(--surface)", padding: "24px", borderRadius: "20px", 
                 boxShadow: "0 6px 20px rgba(124,92,191,0.08)", display: "flex", 
@@ -225,13 +273,14 @@ export default function Comunidad() {
 
           {/* Barra lateral. Muestra las categorías reales que existen en los
               temas publicados, con su conteo. El mockup traía 'Grupos
-              populares' y 'Tendencias', pero eso no existe en la base y
-              habría que inventar los números: se prefiere mostrar algo
-              verdadero antes que algo que se ve bien y miente. */}
+              populares' y 'Tendencias'. Se usan esos nombres, pero los
+              datos salen de los foros reales: los grupos son las categorías
+              que existen y las tendencias los temas con más actividad. Los
+              números se mueven solos a medida que hay más conversación. */}
           <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
             <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "22px", boxShadow: "0 6px 20px rgba(124,92,191,0.08)" }}>
               <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "17px", fontWeight: 700, color: "var(--text)", margin: "0 0 14px" }}>
-                Temas por categoría
+                Grupos Populares
               </h3>
 
               {categorias.length === 0 ? (
@@ -254,7 +303,7 @@ export default function Comunidad() {
 
             <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "22px", boxShadow: "0 6px 20px rgba(124,92,191,0.08)" }}>
               <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "17px", fontWeight: 700, color: "var(--text)", margin: "0 0 8px" }}>
-                Más comentados
+                Tendencias
               </h3>
               {masComentados.length === 0 ? (
                 <p style={{ fontSize: "13.5px", color: "var(--text-muted)", margin: 0 }}>
