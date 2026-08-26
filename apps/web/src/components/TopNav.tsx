@@ -28,6 +28,14 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
 
   const notifs = notificaciones.length > 0 ? notificaciones : notifPropias;
 
+  // Varias páginas (Comunidad, Directorio, Galería, Mi Perfil…) no le pasan
+  // perfilEstado al TopNav, y sin ese dato el menú mostraba las opciones de
+  // bebé nacido -Directorio y Galería- incluso en un perfil de embarazo.
+  // Como acá ya se carga la lista de perfiles con su estado, se deduce del
+  // perfil activo y deja de depender de que cada página lo recuerde.
+  const estadoDeducido = babies.find((b: any) => b.id === activeBabyId)?.estado;
+  const estadoPerfil = perfilEstado ?? estadoDeducido;
+
   // Para perfiles de embarazo, mostrar "Embarazo de X" en vez del nombre a
   // secas, para no confundirlos con un bebé ya nacido en listas donde
   // aparecen mezclados.
@@ -93,16 +101,16 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
       { label: "Inicio", path: "/dashboard", match: "dashboard" },
       // El calendario es propio del seguimiento de embarazo: en un perfil de
       // bebé nacido las citas se ven desde Salud y no hace falta duplicarlo.
-      ...(perfilEstado === "embarazo" ? [
+      ...(estadoPerfil === "embarazo" ? [
         { label: "Calendario", path: "/calendario", match: "calendario" },
       ] : []),
       // En embarazo, "Salud" es la de la gestante (peso, presión, síntomas);
       // en un bebé nacido es la del niño (vacunas, controles, crecimiento).
-      perfilEstado === "embarazo"
+      estadoPerfil === "embarazo"
         ? { label: "Mi Salud", path: "/mi-salud", match: "mi-salud" }
         : { label: "Salud", path: "/salud", match: "salud" },
       { label: "Comunidad", path: "/comunidad", match: "comunidad" },
-      ...(perfilEstado !== "embarazo" ? [
+      ...(estadoPerfil !== "embarazo" ? [
         { label: "Directorio", path: "/directorio", match: "directorio" },
         { label: "Galería", path: "/galeria", match: "galeria" },
       ] : []),
