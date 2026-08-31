@@ -8,6 +8,17 @@ import TopNav from "../components/TopNav";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api/v1";
 
+// Corta el resumen a un largo fijo de caracteres para que todas las
+// tarjetas midan parecido. El artículo completo se ve al hacer clic en la
+// tarjeta (ya navega a /comunidad/articulo/:id), así que acá solo importa
+// no cortar a mitad de palabra.
+function truncarTexto(texto: string, maxCaracteres: number): string {
+  if (!texto || texto.length <= maxCaracteres) return texto || "";
+  const cortado = texto.slice(0, maxCaracteres);
+  const ultimoEspacio = cortado.lastIndexOf(" ");
+  return `${cortado.slice(0, ultimoEspacio > 0 ? ultimoEspacio : maxCaracteres)}…`;
+}
+
 export default function Comunidad() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -353,12 +364,20 @@ export default function Comunidad() {
                     </span>
                   </div>
                   <h3 style={{ margin: "0 0 12px 0", fontSize: "18px", fontWeight: 800, color: "var(--text)" }}>{art.titulo}</h3>
-                  <p style={{ margin: "0 0 16px 0", fontSize: "14px", color: "#6B7280", lineHeight: "1.5", flex: 1 }}>{art.resumen}</p>
+                  <p style={{ margin: "0 0 8px 0", fontSize: "14px", color: "#6B7280", lineHeight: "1.5", flex: 1 }}>
+                    {truncarTexto(art.resumen, 120)}
+                  </p>
+                  {art.resumen && art.resumen.length > 120 && (
+                    <span style={{ fontSize: "13px", fontWeight: 700, color: "var(--theme-primary)", marginBottom: "16px" }}>
+                      Leer artículo completo →
+                    </span>
+                  )}
                   <button
                     onClick={(e) => handleLikeArticulo(e, art.id)}
                     style={{
                       display: "flex", alignItems: "center", gap: "6px", alignSelf: "flex-start",
                       background: "none", border: "none", cursor: "pointer", padding: "4px 0",
+                      marginTop: "8px",
                       color: art.has_liked ? "var(--theme-primary)" : "#6B7280",
                     }}
                   >

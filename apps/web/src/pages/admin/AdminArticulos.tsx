@@ -15,12 +15,27 @@ export default function AdminArticulos() {
   const [formData, setFormData] = useState({
     titulo: "",
     categoria: "",
-    rango_edad_meses: 0,
+    rango_edad_meses: "",
     resumen: "",
     contenido_completo: "",
     fuente_citada: "",
     estado: "borrador",
   });
+
+  // El backend guarda rango_edad_meses como texto libre ("0-6 meses"),
+  // formato que ya esperan el controlador de inicio y la app mobile para
+  // recomendar artículos según la edad del bebé. Acá lo editamos como dos
+  // números (desde/hasta) y lo combinamos a ese mismo formato al guardar.
+  const [rangoDesde, setRangoDesde] = useState(0);
+  const [rangoHasta, setRangoHasta] = useState(0);
+
+  const parseRango = (valor: any): { desde: number; hasta: number } => {
+    const match = String(valor || "").match(/(\d+)\s*[-–a]\s*(\d+)/);
+    if (match) return { desde: parseInt(match[1], 10), hasta: parseInt(match[2], 10) };
+    const exacto = String(valor || "").match(/(\d+)/);
+    const n = exacto ? parseInt(exacto[1], 10) : 0;
+    return { desde: n, hasta: n };
+  };
 
   // ── Filtros ──
   const [filterCategory, setFilterCategory] = useState("Toda categoría");
@@ -36,7 +51,7 @@ export default function AdminArticulos() {
     let matchStatus = true;
 
     if (filterCategory !== "Toda categoría") matchCategory = a.categoria === filterCategory;
-    if (filterAge !== "Todo rango de edad") matchAge = a.rango_edad_meses === Number(filterAge);
+    if (filterAge !== "Todo rango de edad") matchAge = a.rango_edad_meses === filterAge;
     if (filterStatus !== "Todo estado") matchStatus = a.estado === filterStatus.toLowerCase();
 
     return matchCategory && matchAge && matchStatus;
@@ -48,26 +63,31 @@ export default function AdminArticulos() {
     setFormData({
       titulo: "",
       categoria: "",
-      rango_edad_meses: 0,
+      rango_edad_meses: "0-6 meses",
       resumen: "",
       contenido_completo: "",
       fuente_citada: "",
       estado: "borrador",
     });
+    setRangoDesde(0);
+    setRangoHasta(6);
     setIsEditing(false);
     setIsModalOpen(true);
   };
 
   const handleEdit = (item: any) => {
+    const { desde, hasta } = parseRango(item.rango_edad_meses);
     setFormData({
       titulo: item.titulo || "",
       categoria: item.categoria || "",
-      rango_edad_meses: item.rango_edad_meses || 0,
+      rango_edad_meses: item.rango_edad_meses || "",
       resumen: item.resumen || "",
       contenido_completo: item.contenido_completo || "",
       fuente_citada: item.fuente_citada || "",
       estado: item.estado || "borrador",
     });
+    setRangoDesde(desde);
+    setRangoHasta(hasta);
     setEditId(item.id);
     setIsEditing(true);
     setIsModalOpen(true);
@@ -253,7 +273,7 @@ export default function AdminArticulos() {
                   </div>
                 </td>
                 <td>{item.categoria}</td>
-                <td>{item.rango_edad_meses} meses</td>
+                <td>{item.rango_edad_meses}</td>
                 <td>{item.fuente_citada || "MINSAL"}</td>
                 <td>{item.lecturas || 0}</td>
                 <td>
@@ -363,20 +383,47 @@ export default function AdminArticulos() {
           </div>
           <div className="admin-form-group">
             <label>Rango Edad (Meses)</label>
-            <input
-              type="number"
-              className="admin-form-control"
-              required
-              onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Por favor completa este campo")}
-              onInput={(e) => (e.target as HTMLInputElement).setCustomValidity("")}
-              value={formData.rango_edad_meses}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  rango_edad_meses: parseInt(e.target.value),
-                })
-              }
-            />
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <input
+                type="number"
+                min={0}
+                className="admin-form-control"
+                required
+                aria-label="Edad desde (meses)"
+                placeholder="Desde"
+                onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Por favor completa este campo")}
+                onInput={(e) => (e.target as HTMLInputElement).setCustomValidity("")}
+                value={rangoDesde}
+                onChange={(e) => {
+                  const desde = parseInt(e.target.value) || 0;
+                  setRangoDesde(desde);
+                  setFormData({ ...formData, rango_edad_meses: `${desde}-${rangoHasta} meses` });
+                }}
+              />
+              <span style={{ color: "#6B7280", fontWeight: 600 }}>a</span>
+              <input
+                type="number"
+                min={0}
+                className="admin-form-control"
+                required
+                aria-label="Edad hasta (meses)"
+                placeholder="Hasta"
+                onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Por favor completa este campo")}
+                onInput={(e) => (e.target as HTMLInputElement).setCustomValidity("")}
+                value={rangoHasta}
+                onChange={(e) => {
+                  const hasta = parseInt(e.target.value) || 0;
+                  setRangoHasta(hasta);
+                  setFormData({ ...formData, rango_edad_meses: `${rangoDesde}-${hasta} meses` });
+                }}
+              />
+              <span style={{ color: "#6B7280", fontSize: "13px" }}>meses</span>
+            </div>
+            {rangoHasta < rangoDesde && (
+              <span style={{ color: "#DC2626", fontSize: "12px" }}>
+                "Hasta" debería ser mayor o igual que "Desde"
+              </span>
+            )}
           </div>
           <div className="admin-form-group">
             <label>Contenido Corto (Resumen)</label>
