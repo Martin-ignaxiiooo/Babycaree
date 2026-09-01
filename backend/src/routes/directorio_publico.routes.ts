@@ -4,9 +4,11 @@ import { verifyToken } from "../middlewares/auth.middleware";
 
 const router = Router();
 
-// Eliminar verifyToken para que sea público y pueda usarse en Onboarding (antes de iniciar sesión)
-// router.use(verifyToken);
-
+// Solo /previsiones queda público: lo usa el Paso 3 del Onboarding, antes
+// de que la persona tenga cuenta o token. El directorio de médicos y las
+// especialidades SÍ requieren sesión (ver verifyToken más abajo) — la web
+// y la app mobile ya mandan el header Authorization al pedirlos, así que
+// esto no debería romper nada del lado del cliente.
 router.get("/previsiones", async (req: Request, res: Response) => {
   try {
     const result = await query(
@@ -21,6 +23,8 @@ router.get("/previsiones", async (req: Request, res: Response) => {
     res.status(500).json({ error: "Error al obtener previsiones" });
   }
 });
+
+router.use(verifyToken);
 
 router.get("/medicos", async (req: Request, res: Response) => {
   try {
