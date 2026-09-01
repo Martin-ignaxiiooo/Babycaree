@@ -26,6 +26,11 @@ interface Medico {
   calificacion_promedio?: number | string | null;
 }
 
+// Directorio de médicos deshabilitado para el público mientras se termina
+// de definir/verificar el contenido. La funcionalidad real (fetch, filtros,
+// tarjetas) queda intacta más abajo — para reactivarla, poner esto en true.
+const MODULO_DIRECTORIO_HABILITADO = false;
+
 export default function DirectorioScreen() {
   const [medicos, setMedicos] = useState<Medico[]>([]);
   const [especialidades, setEspecialidades] = useState<any[]>([]);
@@ -36,6 +41,10 @@ export default function DirectorioScreen() {
   const [especialidad, setEspecialidad] = useState<string | null>(null);
 
   const cargar = useCallback(async (esRefresh = false) => {
+    if (!MODULO_DIRECTORIO_HABILITADO) {
+      setLoading(false);
+      return;
+    }
     esRefresh ? setRefreshing(true) : setLoading(true);
     setError(null);
     try {
@@ -100,6 +109,14 @@ export default function DirectorioScreen() {
           subtitle="Encuentra pediatras y especialistas verificados, y llámalos con un toque."
         />
 
+        {!MODULO_DIRECTORIO_HABILITADO ? (
+          <EmptyState
+            icon={<Stethoscope size={38} color={Colors.primary} />}
+            title="Módulo en desarrollo"
+            message="El Directorio de Especialistas está en construcción. Muy pronto vas a poder buscar médicos y especialistas acá."
+          />
+        ) : (
+          <>
         <View style={styles.searchBox}>
           <Search size={18} color={Colors.muted} />
           <TextInput
@@ -197,6 +214,8 @@ export default function DirectorioScreen() {
               </Card>
             );
           })
+        )}
+          </>
         )}
       </Screen>
     </SafeAreaView>
