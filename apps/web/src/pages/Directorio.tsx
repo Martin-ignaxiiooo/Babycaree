@@ -8,6 +8,37 @@ import TopNav from "../components/TopNav";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api/v1";
 
+// Directorio de médicos deshabilitado para el público mientras se termina
+// de definir/verificar el contenido. La funcionalidad real queda intacta
+// abajo (fetch, filtros, tarjetas) — para reactivarla, poner esto en true.
+const MODULO_DIRECTORIO_HABILITADO = false;
+
+function ModuloEnDesarrollo({ user }: { user: any }) {
+  return (
+    <div style={{
+      minHeight: "100vh",
+      background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)",
+      fontFamily: "'Nunito', sans-serif",
+      display: "flex",
+      flexDirection: "column",
+    }}>
+      <TopNav user={user} activePath="/directorio" />
+      <div className="page-container" style={{
+        display: "flex", flexDirection: "column", alignItems: "center",
+        justifyContent: "center", textAlign: "center", flex: 1, padding: "60px 20px",
+      }}>
+        <div style={{ fontSize: "64px", marginBottom: "16px" }}>🚧</div>
+        <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "26px", fontWeight: 700, color: "var(--text)", margin: "0 0 8px 0" }}>
+          Módulo en desarrollo
+        </h1>
+        <p style={{ fontSize: "15px", color: "var(--text-muted)", maxWidth: "420px", fontWeight: 600 }}>
+          El Directorio de Especialistas está en construcción. Muy pronto vas a poder buscar médicos y especialistas para tu bebé acá.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 interface Medico {
   id: string;
   nombre_completo: string;
@@ -38,6 +69,10 @@ export default function Directorio() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!MODULO_DIRECTORIO_HABILITADO) {
+      setLoading(false);
+      return;
+    }
     if (!token) {
       navigate("/");
       return;
@@ -72,6 +107,10 @@ export default function Directorio() {
     const matchesEsp = selectedEspecialidad ? medico.especialidad === selectedEspecialidad : true;
     return matchesSearch && matchesEsp;
   });
+
+  if (!MODULO_DIRECTORIO_HABILITADO) {
+    return <ModuloEnDesarrollo user={user} />;
+  }
 
   return (
     <div style={{
