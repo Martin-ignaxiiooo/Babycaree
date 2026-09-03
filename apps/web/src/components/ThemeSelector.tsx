@@ -150,7 +150,7 @@ export default function ThemeSelector() {
   };
 
   return (
-    <div style={{ position: "fixed", bottom: "24px", right: "24px", zIndex: 9999 }}>
+    <div className="theme-selector-fab" style={{ position: "fixed", bottom: "24px", right: "24px", zIndex: 9999 }}>
       {isOpen && (
         <div 
           style={{

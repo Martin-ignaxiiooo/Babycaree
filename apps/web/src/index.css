@@ -779,3 +779,39 @@ body {
   }
 }
 
+
+/* ─── Barra de pestañas inferior (solo móvil) ──────────────────────────────
+   En escritorio la navegación vive en la barra superior; en móvil estaba
+   escondida detrás del menú lateral y había que abrirlo para cambiar de
+   sección. Esta barra la deja a un toque, al alcance del pulgar. */
+.bottom-nav-mobile {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .bottom-nav-mobile {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 900;
+    background: var(--surface);
+    border-top: 1px solid var(--border-soft);
+    box-shadow: 0 -4px 20px rgba(45, 38, 64, 0.08);
+    /* Respeta la zona del gesto de inicio en iPhone: sin esto, la última
+       fila de texto queda debajo de la barra del sistema. */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Espacio al final de la página para que la barra no tape el contenido
+     ni el último botón de un formulario. */
+  body {
+    padding-bottom: 68px;
+  }
+
+  /* El botón flotante de temas sube para no quedar debajo de la barra. */
+  .theme-selector-fab {
+    bottom: 84px !important;
+  }
+}

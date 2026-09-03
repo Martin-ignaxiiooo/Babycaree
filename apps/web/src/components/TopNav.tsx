@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Bell, LogOut, Menu, X, ChevronDown, Baby, Check, Plus, Sparkles } from "lucide-react";
+import { Bell, LogOut, Menu, X, ChevronDown, Baby, Check, Plus, Sparkles,
+  Home, CalendarDays, HeartPulse, MessageSquare, Stethoscope, Images } from "lucide-react";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api";
 
@@ -96,8 +97,10 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
     }
   };
 
-  const NavLinks = ({ pill = false }: { pill?: boolean }) => {
-    const items = [
+  // Una sola fuente para el menú: la barra superior de escritorio y la
+  // inferior de móvil usan estos mismos items, así no se desincronizan
+  // cuando se agrega o quita una sección.
+  const navItems = [
       { label: "Inicio", path: "/dashboard", match: "dashboard" },
       // El calendario es propio del seguimiento de embarazo: en un perfil de
       // bebé nacido las citas se ven desde Salud y no hace falta duplicarlo.
@@ -114,7 +117,22 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
         { label: "Directorio", path: "/directorio", match: "directorio" },
         { label: "Galería", path: "/galeria", match: "galeria" },
       ] : []),
-    ];
+  ];
+
+
+  /** Ícono de cada sección para la barra inferior de móvil. */
+  const ICONOS: Record<string, any> = {
+    dashboard: Home,
+    calendario: CalendarDays,
+    salud: HeartPulse,
+    "mi-salud": HeartPulse,
+    comunidad: MessageSquare,
+    directorio: Stethoscope,
+    galeria: Images,
+  };
+
+  const NavLinks = ({ pill = false }: { pill?: boolean }) => {
+    const items = navItems;
     return (
       <>
         {items.map((item) => {
@@ -443,6 +461,39 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
           <div style={{ flex: 1 }} onClick={() => setMobileMenuOpen(false)}></div>
         </div>
       )}
+
+      {/* Barra de pestañas inferior (solo móvil).
+          Antes la navegación en móvil estaba escondida detrás del menú
+          lateral: había que abrirlo para cambiar de sección. Con la barra
+          abajo las secciones quedan a un toque y al alcance del pulgar.
+          El menú lateral se mantiene para lo secundario: cambiar de perfil
+          y cerrar sesión. */}
+      <nav className="bottom-nav-mobile" aria-label="Navegación principal">
+        {navItems.map((item) => {
+          const Icono = ICONOS[item.match] ?? Home;
+          const active = activePath.includes(item.match);
+          return (
+            <button
+              key={item.path}
+              onClick={() => navigate(item.path)}
+              aria-current={active ? "page" : undefined}
+              style={{
+                flex: 1, background: "none", border: "none", cursor: "pointer",
+                display: "flex", flexDirection: "column", alignItems: "center", gap: "3px",
+                padding: "8px 2px 4px", fontFamily: "'Nunito', sans-serif",
+                color: active ? "var(--theme-primary)" : "var(--text-muted)",
+                fontWeight: active ? 800 : 600, fontSize: "10.5px",
+                minWidth: 0,
+              }}
+            >
+              <Icono size={21} strokeWidth={active ? 2.4 : 2} />
+              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "100%" }}>
+                {item.label}
+              </span>
+            </button>
+          );
+        })}
+      </nav>
     </>
   );
 }
