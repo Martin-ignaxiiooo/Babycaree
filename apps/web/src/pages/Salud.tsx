@@ -421,35 +421,40 @@ export default function Salud() {
   if (loading) return <div style={{ padding: "40px", textAlign: "center" }}>Cargando módulo de salud...</div>;
   if (!bebeId) return <div style={{ padding: "40px", textAlign: "center" }}>Debes registrar un bebé primero.</div>;
 
-  // Cálculos para el Gráfico de Crecimiento
-  const seriePeso = crecimientoData?.serie_peso || [];
+  // Cálculos para el Gráfico de Comparativa de Percentil
+  const seriePercentil = crecimientoData?.serie_percentil || [];
   const etiquetasFecha = crecimientoData?.etiquetas_fecha || [];
-  const serieOms = crecimientoData?.serie_oms || [];
-  
+  const seriePercentilPromedio = crecimientoData?.serie_percentil_promedio || [];
+
   const maxPoints = 6;
-  const paddingNeeded = maxPoints - seriePeso.length;
-  const displayPesos = paddingNeeded > 0 ? [...Array(paddingNeeded).fill(null), ...seriePeso] : seriePeso.slice(-6);
-  const displayFechas = paddingNeeded > 0 ? [...Array(paddingNeeded).fill(""), ...etiquetasFecha] : etiquetasFecha.slice(-6);
-  const displayOms = paddingNeeded > 0 ? [...Array(paddingNeeded).fill(null), ...serieOms] : serieOms.slice(-6);
+  const paddingNeeded = maxPoints - seriePercentil.length;
+  // El padding va al final del arreglo para que los datos reales queden
+  // alineados a la izquierda (antes se rellenaba al principio y los
+  // corría hacia la derecha).
+  const displayPercentil = paddingNeeded > 0 ? [...seriePercentil, ...Array(paddingNeeded).fill(null)] : seriePercentil.slice(-6);
+  const displayFechas = paddingNeeded > 0 ? [...etiquetasFecha, ...Array(paddingNeeded).fill("")] : etiquetasFecha.slice(-6);
+  const displayPromedio = paddingNeeded > 0 ? [...seriePercentilPromedio, ...Array(paddingNeeded).fill(null)] : seriePercentilPromedio.slice(-6);
 
   const xPositions = [60, 110, 160, 210, 260, 310];
+  // Escala de percentil: 0 (abajo, y=85) a 100 (arriba, y=10).
   const mapY = (val: number | null) => {
-    if (val === null || val === 0) return null;
-    const y = 85 - (val * 5); 
+    if (val === null || val === undefined) return null;
+    const y = 85 - (val * 0.75);
     return Math.max(10, Math.min(85, y));
   };
 
   let pointsString = "";
-  displayPesos.forEach((w: number | null, i: number) => {
+  displayPercentil.forEach((w: number | null, i: number) => {
     const y = mapY(w);
     if (y !== null) pointsString += `${xPositions[i]},${y} `;
   });
 
-  let omsPointsString = "";
-  displayOms.forEach((w: number | null, i: number) => {
+  let promedioPointsString = "";
+  displayPromedio.forEach((w: number | null, i: number) => {
     const y = mapY(w);
-    if (y !== null) omsPointsString += `${xPositions[i]},${y} `;
+    if (y !== null) promedioPointsString += `${xPositions[i]},${y} `;
   });
+
 
   return (
     <div style={{ minHeight: "100vh", background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)", fontFamily: "'Nunito', sans-serif", display: "flex", flexDirection: "column" }}>
@@ -925,9 +930,9 @@ export default function Salud() {
 
         {activeTab === "crecimiento" && (
           <div style={{ background: "var(--surface)", borderRadius: "24px", padding: "32px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "12px" }}>
               <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "21px", fontWeight: 700, color: "var(--text)", margin: 0 }}>
-                Evolución de Crecimiento
+                Comparativa de percentil
               </h2>
               {!rolAcceso.startsWith('solo_lectura') && (
                 <button 
@@ -943,6 +948,18 @@ export default function Salud() {
                 </button>
               )}
             </div>
+
+            {/* Leyenda: percentil del bebé vs. percentil promedio (P50) */}
+            <div style={{ display: "flex", gap: "20px", marginBottom: "16px", flexWrap: "wrap" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "var(--text-muted)", fontWeight: 600 }}>
+                <span style={{ width: "18px", height: "3px", background: "var(--theme-primary)", borderRadius: "2px", display: "inline-block" }} />
+                Percentil del bebé
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "var(--text-muted)", fontWeight: 600 }}>
+                <span style={{ width: "18px", height: "0", borderTop: "2px dashed #9CA3AF", display: "inline-block" }} />
+                Percentil promedio (P50)
+              </div>
+            </div>
             
             <div style={{ width: "100%", overflowX: "auto" }}>
               <svg viewBox="0 0 340 120" style={{ width: "100%", height: "auto", overflow: "visible", minWidth: "340px" }}>
@@ -954,11 +971,11 @@ export default function Salud() {
                 <line x1="40" y1="35" x2="330" y2="35" stroke="#F3F4F6" strokeWidth="0.6"/>
                 <line x1="40" y1="60" x2="330" y2="60" stroke="#F3F4F6" strokeWidth="0.6"/>
                 
-                {/* Y Axis Labels */}
-                <text x="35" y="13" textAnchor="end" fontSize="8" fill="#9CA3AF">15kg</text>
-                <text x="35" y="38" textAnchor="end" fontSize="8" fill="#9CA3AF">10kg</text>
-                <text x="35" y="63" textAnchor="end" fontSize="8" fill="#9CA3AF">5kg</text>
-                <text x="35" y="88" textAnchor="end" fontSize="8" fill="#9CA3AF">0kg</text>
+                {/* Y Axis Labels (Percentil) */}
+                <text x="35" y="13" textAnchor="end" fontSize="8" fill="#9CA3AF">P100</text>
+                <text x="35" y="38" textAnchor="end" fontSize="8" fill="#9CA3AF">P66</text>
+                <text x="35" y="63" textAnchor="end" fontSize="8" fill="#9CA3AF">P33</text>
+                <text x="35" y="88" textAnchor="end" fontSize="8" fill="#9CA3AF">P0</text>
                 
                 {/* X Axis Labels (Dates) */}
                 {displayFechas.map((fecha: string, idx: number) => (
@@ -967,18 +984,18 @@ export default function Salud() {
                   </text>
                 ))}
                 
-                {/* P50 reference line (OMS) */}
-                {omsPointsString && (
-                  <polyline points={omsPointsString} fill="none" stroke="#E5E7EB" strokeWidth="1.5" strokeDasharray="4,3"/>
+                {/* Línea de comparación: percentil promedio (P50) */}
+                {promedioPointsString && (
+                  <polyline points={promedioPointsString} fill="none" stroke="#9CA3AF" strokeWidth="1.5" strokeDasharray="4,3"/>
                 )}
                 
-                {/* Dynamic Data Line */}
+                {/* Línea del percentil real del bebé */}
                 {pointsString && (
                   <polyline points={pointsString} fill="none" stroke="var(--theme-primary)" strokeWidth="2.5" strokeLinejoin="round"/>
                 )}
                 
-                {/* Dynamic Data Points */}
-                {displayPesos.map((w: number | null, i: number) => {
+                {/* Puntos del percentil del bebé */}
+                {displayPercentil.map((w: number | null, i: number) => {
                   const y = mapY(w);
                   if (y === null) return null;
                   return <circle key={i} cx={xPositions[i]} cy={y} r={i === maxPoints - 1 && w !== null ? 4.5 : 3.5} 

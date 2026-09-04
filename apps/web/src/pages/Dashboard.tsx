@@ -363,58 +363,59 @@ export default function Dashboard() {
   const hero = homeData?.hero || { nombre: "Sin perfiles registrados", edad_exacta: "-", peso_kg: "-", talla_cm: "-", percentil: "-" };
   const notificaciones = homeData?.notificaciones || [];
   
-  // Growth Chart Calculations
-  const seriePeso = homeData?.crecimiento?.serie_peso || [];
+  // Growth Chart Calculations (Comparativa de percentil)
+  const seriePercentil = homeData?.crecimiento?.serie_percentil || [];
   const etiquetasFecha = homeData?.crecimiento?.etiquetas_fecha || [];
-  const serieOms = homeData?.crecimiento?.serie_oms || [];
+  const seriePercentilPromedio = homeData?.crecimiento?.serie_percentil_promedio || [];
   
   // Create an array of 8 elementos máx, con padding si hay menos (igual que la referencia)
   const maxPoints = 8;
-  const paddingNeeded = maxPoints - seriePeso.length;
-  const displayPesos = paddingNeeded > 0 
-    ? [...Array(paddingNeeded).fill(null), ...seriePeso] 
-    : seriePeso.slice(-maxPoints);
+  const paddingNeeded = maxPoints - seriePercentil.length;
+  // El padding va al final para que los datos reales queden alineados a
+  // la izquierda (antes se rellenaba al principio y los corría a la derecha).
+  const displayPercentil = paddingNeeded > 0 
+    ? [...seriePercentil, ...Array(paddingNeeded).fill(null)] 
+    : seriePercentil.slice(-maxPoints);
     
   const displayFechas = paddingNeeded > 0
-    ? [...Array(paddingNeeded).fill(""), ...etiquetasFecha]
+    ? [...etiquetasFecha, ...Array(paddingNeeded).fill("")]
     : etiquetasFecha.slice(-maxPoints);
 
-  const displayOms = paddingNeeded > 0
-    ? [...Array(paddingNeeded).fill(null), ...serieOms]
-    : serieOms.slice(-maxPoints);
+  const displayPromedio = paddingNeeded > 0
+    ? [...seriePercentilPromedio, ...Array(paddingNeeded).fill(null)]
+    : seriePercentilPromedio.slice(-maxPoints);
 
   // SVG Geometry
   const xPositions = [55, 94, 132, 171, 209, 248, 286, 325];
   // Paleta arcoíris para los puntos del gráfico, igual que el diseño de referencia
   const dotColors = ["#E8D2F6", "#D4C0F4", "#A9D4F6", "#FAEDB4", "#FDC488", "#F7A4A7", "#D5A2BE", "#8D2EC9"];
+  // Escala de percentil: 0 (abajo, y=85) a 100 (arriba, y=10).
   const mapY = (val: number | null) => {
-    if (val === null || val === 0) return null;
-    // Map weight from 0kg (y=85) to 15kg (y=10)
-    // 15kg range = 75px. 1kg = 5px
-    const y = 85 - (val * 5); 
+    if (val === null || val === undefined) return null;
+    const y = 85 - (val * 0.75);
     return Math.max(10, Math.min(85, y));
   };
 
   let pointsString = "";
-  displayPesos.forEach((w: number | null, i: number) => {
+  displayPercentil.forEach((w: number | null, i: number) => {
     const y = mapY(w);
     if (y !== null) {
       pointsString += `${xPositions[i]},${y} `;
     }
   });
 
-  let omsPointsString = "";
-  displayOms.forEach((w: number | null, i: number) => {
+  let promedioPointsString = "";
+  displayPromedio.forEach((w: number | null, i: number) => {
     const y = mapY(w);
     if (y !== null) {
-      omsPointsString += `${xPositions[i]},${y} `;
+      promedioPointsString += `${xPositions[i]},${y} `;
     }
   });
 
   // Polígono del área rellena bajo la curva (misma línea + vuelta por la base)
   let areaPointsString = "";
   if (pointsString.trim()) {
-    const validIdx = displayPesos
+    const validIdx = displayPercentil
       .map((w: number | null, i: number) => (mapY(w) !== null ? i : null))
       .filter((i): i is number => i !== null);
     if (validIdx.length > 0) {
@@ -696,7 +697,7 @@ export default function Dashboard() {
             <div style={{ background: "var(--surface)", borderRadius: "26px", padding: "22px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
               <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "10px", marginBottom: "20px" }}>
                 <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--text)", margin: 0 }}>
-                  📈 Evolución de Crecimiento
+                  📈 Comparativa de percentil
                 </h3>
                 {(!homeData?.rol_acceso || !homeData.rol_acceso.startsWith('solo_lectura')) && (
                   <button 
@@ -712,6 +713,18 @@ export default function Dashboard() {
                     <Plus size={16} /> Registrar Medidas
                   </button>
                 )}
+              </div>
+
+              {/* Leyenda: percentil del bebé vs. percentil promedio (P50) */}
+              <div style={{ display: "flex", gap: "20px", marginBottom: "14px", flexWrap: "wrap" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "var(--text-muted)", fontWeight: 600 }}>
+                  <span style={{ width: "18px", height: "3px", background: "var(--theme-primary)", borderRadius: "2px", display: "inline-block" }} />
+                  Percentil del bebé
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "var(--text-muted)", fontWeight: 600 }}>
+                  <span style={{ width: "18px", height: "0", borderTop: "2px dashed #9CA3AF", display: "inline-block" }} />
+                  Percentil promedio (P50)
+                </div>
               </div>
               
               <svg viewBox="0 0 340 120" style={{ width: "100%", height: "auto", overflow: "visible" }}>
@@ -729,10 +742,10 @@ export default function Dashboard() {
                 <line x1="40" y1="35" x2="330" y2="35" stroke="#F3F4F6" strokeWidth="0.6"/>
                 <line x1="40" y1="60" x2="330" y2="60" stroke="#F3F4F6" strokeWidth="0.6"/>
                 
-                {/* Y Axis Labels */}
-                <text x="35" y="13" textAnchor="end" fontSize="8" fill="#9CA3AF">15kg</text>
-                <text x="35" y="38" textAnchor="end" fontSize="8" fill="#9CA3AF">10kg</text>
-                <text x="35" y="63" textAnchor="end" fontSize="8" fill="#9CA3AF">5kg</text>
+                {/* Y Axis Labels (Percentil) */}
+                <text x="35" y="13" textAnchor="end" fontSize="8" fill="#9CA3AF">P100</text>
+                <text x="35" y="38" textAnchor="end" fontSize="8" fill="#9CA3AF">P66</text>
+                <text x="35" y="63" textAnchor="end" fontSize="8" fill="#9CA3AF">P33</text>
                 
                 {/* X Axis Labels (Dates) */}
                 {displayFechas.map((fecha, idx) => (
@@ -746,13 +759,18 @@ export default function Dashboard() {
                   <polygon points={areaPointsString} fill="url(#growthAreaGradient)" />
                 )}
 
-                {/* Dynamic Data Line */}
+                {/* Línea de comparación: percentil promedio (P50) */}
+                {promedioPointsString && (
+                  <polyline points={promedioPointsString} fill="none" stroke="#9CA3AF" strokeWidth="1.5" strokeDasharray="4,3"/>
+                )}
+
+                {/* Línea del percentil real del bebé */}
                 {pointsString && (
                   <polyline points={pointsString} fill="none" stroke="var(--theme-primary)" strokeWidth="2.5" strokeLinejoin="round"/>
                 )}
                 
-                {/* Dynamic Data Points */}
-                {displayPesos.map((w: number | null, i: number) => {
+                {/* Puntos del percentil del bebé */}
+                {displayPercentil.map((w: number | null, i: number) => {
                   const y = mapY(w);
                   if (y === null) return null;
                   const isLast = i === maxPoints - 1 && w !== null;

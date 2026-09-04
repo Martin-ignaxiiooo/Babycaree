@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { query } from "../config/db";
+import { obtenerLMSPeso, calcularPercentil } from "../utils/percentilOms";
 
 // Helper function to calculate exact age string
 function calculateExactAge(dob: Date): string {
@@ -46,6 +47,32 @@ function calculateApproxPercentile(weight: number, dob: Date): number {
   if (zScore < 2) return 85;
   if (zScore < 2.5) return 97;
   return 99;
+}
+
+// Percentil real de peso-por-edad usando el método LMS oficial de la OMS.
+// Si la tabla oms_percentiles todavía no tiene los parámetros L/M/S para
+// ese mes y sexo (por ejemplo, porque no se ha corrido la migración
+// migrate_oms_lms.ts en este ambiente), cae de vuelta a la aproximación
+// lineal anterior para no romper el dashboard.
+async function calcularPercentilReal(
+  weight: number,
+  dob: Date,
+  fechaReferencia: Date | null,
+  sexo: string | null | undefined,
+): Promise<number> {
+  if (!weight || weight === 0) return 50;
+
+  const birth = new Date(dob);
+  const ref = fechaReferencia ? new Date(fechaReferencia) : new Date();
+  const monthsDiff = (ref.getFullYear() - birth.getFullYear()) * 12 + (ref.getMonth() - birth.getMonth());
+  const mesVida = Math.max(0, monthsDiff);
+
+  const lms = await obtenerLMSPeso(mesVida, sexo);
+  if (lms) {
+    return calcularPercentil(weight, lms);
+  }
+
+  return calculateApproxPercentile(weight, dob);
 }
 
 export const getHomeDashboard = async (req: Request, res: Response) => {
@@ -163,7 +190,9 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
       talla_cm,
       fecha_medicion,
       medicion_es_nacimiento,
-      percentil: perfil.fecha_nacimiento ? calculateApproxPercentile(peso_kg, perfil.fecha_nacimiento) : 0,
+      percentil: perfil.fecha_nacimiento
+        ? await calcularPercentilReal(peso_kg, perfil.fecha_nacimiento, fecha_medicion, perfil.sexo)
+        : 0,
       semanas_embarazo,
       fruta_embarazo,
       mes_embarazo,
@@ -358,38 +387,28 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
     const serie_peso: number[] = [];
     const serie_talla: number[] = [];
     const etiquetas_fecha: string[] = [];
-    const serie_oms: number[] = [];
-
-    // Map sexo to OMS categories
-    let omsSexo = "Unisex";
-    if (perfil.sexo?.toLowerCase() === "masculino" || perfil.sexo?.toLowerCase() === "niño" || perfil.sexo?.toLowerCase() === "m") {
-      omsSexo = "Masculino";
-    } else if (perfil.sexo?.toLowerCase() === "femenino" || perfil.sexo?.toLowerCase() === "niña" || perfil.sexo?.toLowerCase() === "f") {
-      omsSexo = "Femenino";
-    }
+    // Percentil real del bebé en cada punto (método LMS de la OMS) y la
+    // línea de comparación del percentil promedio (P50 = la mediana).
+    const serie_percentil: number[] = [];
+    const serie_percentil_promedio: number[] = [];
 
     for (const mes of sortedMonths) {
       const data = monthsData[mes];
-      serie_peso.push(parseFloat((data.pesoSum / data.count).toFixed(2)));
+      const pesoPromedio = parseFloat((data.pesoSum / data.count).toFixed(2));
+      serie_peso.push(pesoPromedio);
       serie_talla.push(parseFloat((data.tallaSum / data.count).toFixed(2)));
       etiquetas_fecha.push(`Mes ${mes}`);
 
-      // Fetch OMS data for this month
-      const omsRes = await query(
-        `SELECT peso_esperado_kg FROM oms_percentiles WHERE mes_vida = $1 AND (sexo = $2 OR sexo = 'Unisex') ORDER BY sexo DESC LIMIT 1`,
-        [mes, omsSexo]
-      );
-      if (omsRes.rows.length > 0) {
-        serie_oms.push(parseFloat(omsRes.rows[0].peso_esperado_kg));
-      } else {
-        serie_oms.push(0);
-      }
+      const lms = await obtenerLMSPeso(mes, perfil.sexo);
+      serie_percentil.push(lms ? calcularPercentil(pesoPromedio, lms) : 50);
+      serie_percentil_promedio.push(50);
     }
 
     const crecimiento = {
       serie_peso: serie_peso.length > 0 ? serie_peso : [0],
       serie_talla: serie_talla.length > 0 ? serie_talla : [0],
-      serie_oms: serie_oms.length > 0 ? serie_oms : [0],
+      serie_percentil: serie_percentil.length > 0 ? serie_percentil : [50],
+      serie_percentil_promedio: serie_percentil_promedio.length > 0 ? serie_percentil_promedio : [50],
       etiquetas_fecha: etiquetas_fecha.length > 0 ? etiquetas_fecha : ["Sin datos"]
     };
 
