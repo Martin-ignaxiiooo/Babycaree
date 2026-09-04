@@ -493,21 +493,6 @@ export default function Salud() {
 
       <div className="page-container" style={{ marginTop: "-14px" }}>
 
-        <div style={{ marginBottom: "16px", display: "flex", justifyContent: "flex-end", flexWrap: "wrap", gap: "16px" }}>
-          <button
-            onClick={() => setShowInforme(true)}
-            style={{
-              background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
-              color: "#fff", border: "none", padding: "12px 24px", borderRadius: "14px",
-              fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px",
-              boxShadow: "0 8px 20px var(--theme-shadow-light)", fontFamily: "'Nunito', sans-serif",
-              fontSize: "14.5px", whiteSpace: "nowrap",
-            }}
-          >
-            <FileDown size={18} /> Informe médico
-          </button>
-        </div>
-
         {/* TABS */}
         <div className="responsive-overflow" style={{ display: "flex", gap: "10px", marginBottom: "32px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "16px", whiteSpace: "nowrap" }}>
           <button
@@ -565,6 +550,18 @@ export default function Salud() {
               boxShadow: activeTab === "examenes" ? "0 6px 16px var(--theme-shadow-light)" : "none",
             }}>
             <FlaskConical size={18} /> Exámenes
+          </button>
+          <button
+            onClick={() => setShowInforme(true)}
+            style={{
+              background: "transparent",
+              color: "var(--text-muted)",
+              border: "none", padding: "12px 22px", borderRadius: "100px",
+              fontWeight: 800, cursor: "pointer", fontSize: "14.5px",
+              display: "flex", alignItems: "center", gap: "8px", transition: "all 0.2s",
+              fontFamily: "'Nunito', sans-serif",
+            }}>
+            <FileDown size={18} /> Informe médico
           </button>
         </div>
 
