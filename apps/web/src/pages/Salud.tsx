@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Syringe, CheckCircle, Plus, X, FlaskConical, ClipboardCheck, Mic, MicOff, Pencil, Trash2, FileDown, CalendarCheck, TrendingUp } from "lucide-react";
+import { Syringe, CheckCircle, Plus, X, FlaskConical, ClipboardCheck, Mic, MicOff, Pencil, Trash2, FileDown, CalendarCheck, TrendingUp } from "lucide-react";
 import TopNav from "../components/TopNav";
 import DateSelect from "../components/DateSelect";
 import TimeSelect from "../components/TimeSelect";
@@ -484,16 +484,12 @@ export default function Salud() {
           producto. */}
       <div className="page-container">
 
-        <button onClick={() => navigate("/dashboard")} style={{ background: "none", border: "none", color: "var(--theme-primary)", fontSize: "14px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", marginBottom: "20px", fontFamily: "'Nunito', sans-serif", padding: 0 }}>
-          <ArrowLeft size={16} /> Volver al Dashboard
-        </button>
-
-        <div style={{ marginBottom: "28px", display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "16px" }}>
+        <div style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "16px" }}>
           <div>
-            <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "30px", fontWeight: 700, color: "var(--text)", margin: "0 0 8px 0" }}>
+            <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "22px", fontWeight: 700, color: "var(--text)", margin: "0 0 2px 0" }}>
               Salud y Crecimiento
             </h1>
-            <p style={{ fontSize: "15px", color: "var(--text-muted)", margin: 0, fontWeight: 600 }}>
+            <p style={{ fontSize: "12.5px", color: "var(--text-muted)", margin: 0, fontWeight: 600 }}>
               Administra las vacunas, los controles y el progreso de tu bebé.
             </p>
           </div>

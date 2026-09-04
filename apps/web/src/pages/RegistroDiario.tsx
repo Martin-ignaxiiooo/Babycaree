@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  ArrowLeft, Milk, Moon, Baby, Plus, Trash2, Clock,
+  Milk, Moon, Baby, Plus, Trash2, Clock,
   Droplets, Loader2, Sun,
 } from "lucide-react";
 import TopNav from "../components/TopNav";
@@ -167,19 +167,13 @@ export default function RegistroDiario() {
       {/* Cabecera: mismo patrón que Salud y Galería — fondo full width,
           contenido limitado a 1400px para alinear con el resto. */}
       <div style={{ background: "linear-gradient(120deg, var(--theme-darker) 0%, #3A2E5C 55%, var(--theme-dark) 100%)", color: "#fff" }}>
-        <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "32px 40px 40px" }}>
-          <button
-            onClick={() => navigate("/dashboard")}
-            style={{ background: "none", border: "none", color: "rgba(255,255,255,0.7)", cursor: "pointer", fontSize: "14px", fontWeight: 700, display: "flex", alignItems: "center", gap: "6px", marginBottom: "18px", fontFamily: "'Nunito', sans-serif" }}
-          >
-            <ArrowLeft size={16} /> Volver al Dashboard
-          </button>
-          <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "30px", margin: 0 }}>Registro diario</h1>
-          <p style={{ color: "rgba(255,255,255,0.7)", marginTop: "6px", fontSize: "15px" }}>
+        <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "16px 40px 12px" }}>
+          <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "22px", margin: 0 }}>Registro diario</h1>
+          <p style={{ color: "rgba(255,255,255,0.7)", marginTop: "3px", fontSize: "12.5px" }}>
             Tomas, sueño y pañales. Lo del día a día, a mano.
           </p>
 
-          <div style={{ display: "flex", gap: "26px", marginTop: "22px" }}>
+          <div style={{ display: "flex", gap: "26px", marginTop: "12px" }}>
             {([["registro", "Registro"], ["patrones", "Patrones"]] as const).map(([v, l]) => (
               <button
                 key={v}
