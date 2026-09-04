@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { query } from "../config/db";
-import { obtenerLMSPeso, calcularPercentil } from "../utils/percentilOms";
+import { obtenerLMSPeso, calcularPercentil, obtenerMedianasOms } from "../utils/percentilOms";
 
 // Helper function to calculate exact age string
 function calculateExactAge(dob: Date): string {
@@ -387,28 +387,29 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
     const serie_peso: number[] = [];
     const serie_talla: number[] = [];
     const etiquetas_fecha: string[] = [];
-    // Percentil real del bebé en cada punto (método LMS de la OMS) y la
-    // línea de comparación del percentil promedio (P50 = la mediana).
-    const serie_percentil: number[] = [];
-    const serie_percentil_promedio: number[] = [];
+    // Líneas de comparación: peso y talla medianos (P50) publicados por
+    // la OMS para cada mes de vida y sexo del bebé.
+    const serie_peso_oms: number[] = [];
+    const serie_talla_oms: number[] = [];
 
     for (const mes of sortedMonths) {
       const data = monthsData[mes];
       const pesoPromedio = parseFloat((data.pesoSum / data.count).toFixed(2));
+      const tallaPromedio = parseFloat((data.tallaSum / data.count).toFixed(2));
       serie_peso.push(pesoPromedio);
-      serie_talla.push(parseFloat((data.tallaSum / data.count).toFixed(2)));
+      serie_talla.push(tallaPromedio);
       etiquetas_fecha.push(`Mes ${mes}`);
 
-      const lms = await obtenerLMSPeso(mes, perfil.sexo);
-      serie_percentil.push(lms ? calcularPercentil(pesoPromedio, lms) : 50);
-      serie_percentil_promedio.push(50);
+      const medianas = await obtenerMedianasOms(mes, perfil.sexo);
+      serie_peso_oms.push(medianas ? medianas.pesoMediano : 0);
+      serie_talla_oms.push(medianas ? medianas.tallaMediana : 0);
     }
 
     const crecimiento = {
       serie_peso: serie_peso.length > 0 ? serie_peso : [0],
       serie_talla: serie_talla.length > 0 ? serie_talla : [0],
-      serie_percentil: serie_percentil.length > 0 ? serie_percentil : [50],
-      serie_percentil_promedio: serie_percentil_promedio.length > 0 ? serie_percentil_promedio : [50],
+      serie_peso_oms: serie_peso_oms.length > 0 ? serie_peso_oms : [0],
+      serie_talla_oms: serie_talla_oms.length > 0 ? serie_talla_oms : [0],
       etiquetas_fecha: etiquetas_fecha.length > 0 ? etiquetas_fecha : ["Sin datos"]
     };
 

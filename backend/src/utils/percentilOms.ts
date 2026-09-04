@@ -90,3 +90,34 @@ export async function obtenerLMSPeso(mesVida: number, sexo: string | null | unde
   const { l_valor, m_valor, s_valor } = res.rows[0];
   return { l: parseFloat(l_valor), m: parseFloat(m_valor), s: parseFloat(s_valor) };
 }
+
+/**
+ * Obtiene el peso y la talla medianos (P50) publicados por la OMS para un
+ * mes de vida y sexo determinados. A diferencia de obtenerLMSPeso, esta
+ * consulta no requiere que la migración de LMS se haya corrido: funciona
+ * incluso con las 7 filas "dummy" antiguas (cae a 'Unisex' si no hay
+ * datos para el sexo exacto), y sigue funcionando con los datos oficiales
+ * una vez migrados.
+ */
+export async function obtenerMedianasOms(
+  mesVida: number,
+  sexo: string | null | undefined,
+): Promise<{ pesoMediano: number; tallaMediana: number } | null> {
+  const sexoOms = mapearSexoOms(sexo);
+  const mesClamp = Math.max(0, Math.min(60, mesVida));
+
+  const res = await query(
+    `SELECT peso_esperado_kg, talla_esperada_cm FROM oms_percentiles
+     WHERE mes_vida = $1 AND (sexo = $2 OR sexo = 'Unisex')
+     ORDER BY sexo DESC LIMIT 1`,
+    [mesClamp, sexoOms],
+  );
+
+  if (res.rows.length === 0) return null;
+
+  const { peso_esperado_kg, talla_esperada_cm } = res.rows[0];
+  return {
+    pesoMediano: parseFloat(peso_esperado_kg),
+    tallaMediana: parseFloat(talla_esperada_cm),
+  };
+}

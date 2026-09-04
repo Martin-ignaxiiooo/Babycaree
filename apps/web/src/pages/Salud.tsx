@@ -421,39 +421,54 @@ export default function Salud() {
   if (loading) return <div style={{ padding: "40px", textAlign: "center" }}>Cargando módulo de salud...</div>;
   if (!bebeId) return <div style={{ padding: "40px", textAlign: "center" }}>Debes registrar un bebé primero.</div>;
 
-  // Cálculos para el Gráfico de Comparativa de Percentil
-  const seriePercentil = crecimientoData?.serie_percentil || [];
+  // Cálculos para los Gráficos de Evolución de Peso y Talla
+  const seriePeso = crecimientoData?.serie_peso || [];
+  const serieTalla = crecimientoData?.serie_talla || [];
   const etiquetasFecha = crecimientoData?.etiquetas_fecha || [];
-  const seriePercentilPromedio = crecimientoData?.serie_percentil_promedio || [];
+  const seriePesoOms = crecimientoData?.serie_peso_oms || [];
+  const serieTallaOms = crecimientoData?.serie_talla_oms || [];
 
   const maxPoints = 6;
-  const paddingNeeded = maxPoints - seriePercentil.length;
+  const paddingNeeded = maxPoints - seriePeso.length;
   // El padding va al final del arreglo para que los datos reales queden
   // alineados a la izquierda (antes se rellenaba al principio y los
   // corría hacia la derecha).
-  const displayPercentil = paddingNeeded > 0 ? [...seriePercentil, ...Array(paddingNeeded).fill(null)] : seriePercentil.slice(-6);
-  const displayFechas = paddingNeeded > 0 ? [...etiquetasFecha, ...Array(paddingNeeded).fill("")] : etiquetasFecha.slice(-6);
-  const displayPromedio = paddingNeeded > 0 ? [...seriePercentilPromedio, ...Array(paddingNeeded).fill(null)] : seriePercentilPromedio.slice(-6);
+  const padEnd = (arr: any[], filler: any) => (paddingNeeded > 0 ? [...arr, ...Array(paddingNeeded).fill(filler)] : arr.slice(-maxPoints));
+
+  const displayPesos = padEnd(seriePeso, null);
+  const displayTallas = padEnd(serieTalla, null);
+  const displayFechas = padEnd(etiquetasFecha, "");
+  const displayPesoOms = padEnd(seriePesoOms, null);
+  const displayTallaOms = padEnd(serieTallaOms, null);
 
   const xPositions = [60, 110, 160, 210, 260, 310];
-  // Escala de percentil: 0 (abajo, y=85) a 100 (arriba, y=10).
-  const mapY = (val: number | null) => {
-    if (val === null || val === undefined) return null;
-    const y = 85 - (val * 0.75);
+
+  // Escala de peso: 0kg (abajo, y=85) a 15kg (arriba, y=10).
+  const mapYPeso = (val: number | null) => {
+    if (val === null || val === undefined || val === 0) return null;
+    const y = 85 - (val * 5);
+    return Math.max(10, Math.min(85, y));
+  };
+  // Escala de talla: 40cm (abajo, y=85) a 120cm (arriba, y=10).
+  const mapYTalla = (val: number | null) => {
+    if (val === null || val === undefined || val === 0) return null;
+    const y = 85 - ((val - 40) / 80) * 75;
     return Math.max(10, Math.min(85, y));
   };
 
-  let pointsString = "";
-  displayPercentil.forEach((w: number | null, i: number) => {
-    const y = mapY(w);
-    if (y !== null) pointsString += `${xPositions[i]},${y} `;
-  });
+  const buildPoints = (arr: (number | null)[], mapY: (v: number | null) => number | null) => {
+    let s = "";
+    arr.forEach((w, i) => {
+      const y = mapY(w);
+      if (y !== null) s += `${xPositions[i]},${y} `;
+    });
+    return s;
+  };
 
-  let promedioPointsString = "";
-  displayPromedio.forEach((w: number | null, i: number) => {
-    const y = mapY(w);
-    if (y !== null) promedioPointsString += `${xPositions[i]},${y} `;
-  });
+  const pesoPointsString = buildPoints(displayPesos, mapYPeso);
+  const pesoOmsPointsString = buildPoints(displayPesoOms, mapYPeso);
+  const tallaPointsString = buildPoints(displayTallas, mapYTalla);
+  const tallaOmsPointsString = buildPoints(displayTallaOms, mapYTalla);
 
 
   return (
@@ -929,10 +944,10 @@ export default function Salud() {
         )}
 
         {activeTab === "crecimiento" && (
-          <div style={{ background: "var(--surface)", borderRadius: "24px", padding: "32px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
+          <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "12px" }}>
               <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "21px", fontWeight: 700, color: "var(--text)", margin: 0 }}>
-                Comparativa de percentil
+                Evolución de Crecimiento
               </h2>
               {!rolAcceso.startsWith('solo_lectura') && (
                 <button 
@@ -949,59 +964,100 @@ export default function Salud() {
               )}
             </div>
 
-            {/* Leyenda: percentil del bebé vs. percentil promedio (P50) */}
-            <div style={{ display: "flex", gap: "20px", marginBottom: "16px", flexWrap: "wrap" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "var(--text-muted)", fontWeight: 600 }}>
-                <span style={{ width: "18px", height: "3px", background: "var(--theme-primary)", borderRadius: "2px", display: "inline-block" }} />
-                Percentil del bebé
+            <div className="responsive-grid">
+              {/* ── GRÁFICO DE PESO ── */}
+              <div style={{ background: "var(--surface)", borderRadius: "24px", padding: "28px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
+                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "17px", fontWeight: 700, color: "var(--text)", margin: "0 0 12px 0" }}>
+                  Evolución de Peso
+                </h3>
+                <div style={{ display: "flex", gap: "20px", marginBottom: "14px", flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "var(--text-muted)", fontWeight: 600 }}>
+                    <span style={{ width: "18px", height: "3px", background: "var(--theme-primary)", borderRadius: "2px", display: "inline-block" }} />
+                    Peso del bebé
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "var(--text-muted)", fontWeight: 600 }}>
+                    <span style={{ width: "18px", height: "0", borderTop: "2px dashed #9CA3AF", display: "inline-block" }} />
+                    Promedio OMS
+                  </div>
+                </div>
+                <div style={{ width: "100%", overflowX: "auto" }}>
+                  <svg viewBox="0 0 340 120" style={{ width: "100%", height: "auto", overflow: "visible", minWidth: "300px" }}>
+                    <rect width="340" height="100" fill="#F9FAFB" rx="8"/>
+                    <line x1="40" y1="10" x2="40" y2="85" stroke="#E5E7EB" strokeWidth="0.8"/>
+                    <line x1="40" y1="85" x2="330" y2="85" stroke="#E5E7EB" strokeWidth="0.8"/>
+                    <line x1="40" y1="35" x2="330" y2="35" stroke="#F3F4F6" strokeWidth="0.6"/>
+                    <line x1="40" y1="60" x2="330" y2="60" stroke="#F3F4F6" strokeWidth="0.6"/>
+                    <text x="35" y="13" textAnchor="end" fontSize="8" fill="#9CA3AF">15kg</text>
+                    <text x="35" y="38" textAnchor="end" fontSize="8" fill="#9CA3AF">10kg</text>
+                    <text x="35" y="63" textAnchor="end" fontSize="8" fill="#9CA3AF">5kg</text>
+                    <text x="35" y="88" textAnchor="end" fontSize="8" fill="#9CA3AF">0kg</text>
+                    {displayFechas.map((fecha: string, idx: number) => (
+                      <text key={idx} x={xPositions[idx]} y="105" textAnchor="middle" fontSize="9" fill="#9CA3AF" fontWeight="600">
+                        {fecha || ""}
+                      </text>
+                    ))}
+                    {pesoOmsPointsString && (
+                      <polyline points={pesoOmsPointsString} fill="none" stroke="#9CA3AF" strokeWidth="1.5" strokeDasharray="4,3"/>
+                    )}
+                    {pesoPointsString && (
+                      <polyline points={pesoPointsString} fill="none" stroke="var(--theme-primary)" strokeWidth="2.5" strokeLinejoin="round"/>
+                    )}
+                    {displayPesos.map((w: number | null, i: number) => {
+                      const y = mapYPeso(w);
+                      if (y === null) return null;
+                      return <circle key={i} cx={xPositions[i]} cy={y} r={i === maxPoints - 1 && w !== null ? 4.5 : 3.5} 
+                        fill="var(--theme-primary)" stroke={i === maxPoints - 1 ? "#fff" : "none"} strokeWidth={2}/>;
+                    })}
+                  </svg>
+                </div>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "var(--text-muted)", fontWeight: 600 }}>
-                <span style={{ width: "18px", height: "0", borderTop: "2px dashed #9CA3AF", display: "inline-block" }} />
-                Percentil promedio (P50)
+
+              {/* ── GRÁFICO DE TALLA ── */}
+              <div style={{ background: "var(--surface)", borderRadius: "24px", padding: "28px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
+                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "17px", fontWeight: 700, color: "var(--text)", margin: "0 0 12px 0" }}>
+                  Evolución de Talla
+                </h3>
+                <div style={{ display: "flex", gap: "20px", marginBottom: "14px", flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "var(--text-muted)", fontWeight: 600 }}>
+                    <span style={{ width: "18px", height: "3px", background: "var(--accent-coral, #E8927C)", borderRadius: "2px", display: "inline-block" }} />
+                    Talla del bebé
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "var(--text-muted)", fontWeight: 600 }}>
+                    <span style={{ width: "18px", height: "0", borderTop: "2px dashed #9CA3AF", display: "inline-block" }} />
+                    Promedio OMS
+                  </div>
+                </div>
+                <div style={{ width: "100%", overflowX: "auto" }}>
+                  <svg viewBox="0 0 340 120" style={{ width: "100%", height: "auto", overflow: "visible", minWidth: "300px" }}>
+                    <rect width="340" height="100" fill="#F9FAFB" rx="8"/>
+                    <line x1="40" y1="10" x2="40" y2="85" stroke="#E5E7EB" strokeWidth="0.8"/>
+                    <line x1="40" y1="85" x2="330" y2="85" stroke="#E5E7EB" strokeWidth="0.8"/>
+                    <line x1="40" y1="35" x2="330" y2="35" stroke="#F3F4F6" strokeWidth="0.6"/>
+                    <line x1="40" y1="60" x2="330" y2="60" stroke="#F3F4F6" strokeWidth="0.6"/>
+                    <text x="35" y="13" textAnchor="end" fontSize="8" fill="#9CA3AF">120cm</text>
+                    <text x="35" y="38" textAnchor="end" fontSize="8" fill="#9CA3AF">93cm</text>
+                    <text x="35" y="63" textAnchor="end" fontSize="8" fill="#9CA3AF">67cm</text>
+                    <text x="35" y="88" textAnchor="end" fontSize="8" fill="#9CA3AF">40cm</text>
+                    {displayFechas.map((fecha: string, idx: number) => (
+                      <text key={idx} x={xPositions[idx]} y="105" textAnchor="middle" fontSize="9" fill="#9CA3AF" fontWeight="600">
+                        {fecha || ""}
+                      </text>
+                    ))}
+                    {tallaOmsPointsString && (
+                      <polyline points={tallaOmsPointsString} fill="none" stroke="#9CA3AF" strokeWidth="1.5" strokeDasharray="4,3"/>
+                    )}
+                    {tallaPointsString && (
+                      <polyline points={tallaPointsString} fill="none" stroke="var(--accent-coral, #E8927C)" strokeWidth="2.5" strokeLinejoin="round"/>
+                    )}
+                    {displayTallas.map((w: number | null, i: number) => {
+                      const y = mapYTalla(w);
+                      if (y === null) return null;
+                      return <circle key={i} cx={xPositions[i]} cy={y} r={i === maxPoints - 1 && w !== null ? 4.5 : 3.5} 
+                        fill="var(--accent-coral, #E8927C)" stroke={i === maxPoints - 1 ? "#fff" : "none"} strokeWidth={2}/>;
+                    })}
+                  </svg>
+                </div>
               </div>
-            </div>
-            
-            <div style={{ width: "100%", overflowX: "auto" }}>
-              <svg viewBox="0 0 340 120" style={{ width: "100%", height: "auto", overflow: "visible", minWidth: "340px" }}>
-                <rect width="340" height="100" fill="#F9FAFB" rx="8"/>
-                
-                {/* Y Axes Lines */}
-                <line x1="40" y1="10" x2="40" y2="85" stroke="#E5E7EB" strokeWidth="0.8"/>
-                <line x1="40" y1="85" x2="330" y2="85" stroke="#E5E7EB" strokeWidth="0.8"/>
-                <line x1="40" y1="35" x2="330" y2="35" stroke="#F3F4F6" strokeWidth="0.6"/>
-                <line x1="40" y1="60" x2="330" y2="60" stroke="#F3F4F6" strokeWidth="0.6"/>
-                
-                {/* Y Axis Labels (Percentil) */}
-                <text x="35" y="13" textAnchor="end" fontSize="8" fill="#9CA3AF">P100</text>
-                <text x="35" y="38" textAnchor="end" fontSize="8" fill="#9CA3AF">P66</text>
-                <text x="35" y="63" textAnchor="end" fontSize="8" fill="#9CA3AF">P33</text>
-                <text x="35" y="88" textAnchor="end" fontSize="8" fill="#9CA3AF">P0</text>
-                
-                {/* X Axis Labels (Dates) */}
-                {displayFechas.map((fecha: string, idx: number) => (
-                  <text key={idx} x={xPositions[idx]} y="105" textAnchor="middle" fontSize="9" fill="#9CA3AF" fontWeight="600">
-                    {fecha || ""}
-                  </text>
-                ))}
-                
-                {/* Línea de comparación: percentil promedio (P50) */}
-                {promedioPointsString && (
-                  <polyline points={promedioPointsString} fill="none" stroke="#9CA3AF" strokeWidth="1.5" strokeDasharray="4,3"/>
-                )}
-                
-                {/* Línea del percentil real del bebé */}
-                {pointsString && (
-                  <polyline points={pointsString} fill="none" stroke="var(--theme-primary)" strokeWidth="2.5" strokeLinejoin="round"/>
-                )}
-                
-                {/* Puntos del percentil del bebé */}
-                {displayPercentil.map((w: number | null, i: number) => {
-                  const y = mapY(w);
-                  if (y === null) return null;
-                  return <circle key={i} cx={xPositions[i]} cy={y} r={i === maxPoints - 1 && w !== null ? 4.5 : 3.5} 
-                    fill="var(--theme-primary)" stroke={i === maxPoints - 1 ? "#fff" : "none"} strokeWidth={2}/>;
-                })}
-              </svg>
             </div>
           </div>
         )}
