@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Bell, LogOut, Menu, X, ChevronDown, Baby, Check, Plus, Sparkles,
-  Home, CalendarDays, HeartPulse, MessageSquare, Stethoscope, Images } from "lucide-react";
+  Home, CalendarDays, HeartPulse, MessageSquare, Stethoscope, Images, NotebookPen } from "lucide-react";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api";
 
@@ -107,6 +107,11 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
       ...(estadoPerfil === "embarazo" ? [
         { label: "Calendario", path: "/calendario", match: "calendario" },
       ] : []),
+      // El diario (tomas, sueño, pañales) es propio de un bebé ya nacido;
+      // no aplica durante el embarazo.
+      ...(estadoPerfil !== "embarazo" ? [
+        { label: "Diario", path: "/diario", match: "diario" },
+      ] : []),
       // En embarazo, "Salud" es la de la gestante (peso, presión, síntomas);
       // en un bebé nacido es la del niño (vacunas, controles, crecimiento).
       estadoPerfil === "embarazo"
@@ -124,6 +129,7 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
   const ICONOS: Record<string, any> = {
     dashboard: Home,
     calendario: CalendarDays,
+    diario: NotebookPen,
     salud: HeartPulse,
     "mi-salud": HeartPulse,
     comunidad: MessageSquare,
