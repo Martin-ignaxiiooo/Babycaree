@@ -71,7 +71,7 @@ export default function AdminPrevision() {
         },
       );
       fetchData();
-    } catch (e) {
+    } catch  {
       alert("Error al eliminar previsión");
     }
   };
@@ -99,7 +99,7 @@ export default function AdminPrevision() {
       }
       setIsModalOpen(false);
       fetchData();
-    } catch (e) {
+    } catch  {
       alert("Error al guardar previsión");
     }
   };

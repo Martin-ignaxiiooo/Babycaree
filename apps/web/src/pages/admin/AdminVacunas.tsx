@@ -51,7 +51,7 @@ export default function AdminVacunas() {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchData();
-    } catch (e) {
+    } catch  {
       alert("Error al eliminar vacuna");
     }
   };
@@ -100,7 +100,7 @@ export default function AdminVacunas() {
       }
       setIsModalOpen(false);
       fetchData();
-    } catch (e) {
+    } catch  {
       alert("Error al guardar vacuna");
     }
   };

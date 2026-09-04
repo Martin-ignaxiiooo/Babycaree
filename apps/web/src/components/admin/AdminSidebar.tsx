@@ -17,7 +17,7 @@ import { useAdminAuth } from "../../hooks/useAdminAuth";
 export default function AdminSidebar() {
   const location = useLocation();
   const pathname = location.pathname;
-  const { rol, isAdminGeneral, isAuditor, canManageUsers, canManageDirectorio, canManageArticulos, canManageVacunas, canManageOMS, canManageComunidad } = useAdminAuth();
+  const { isAdminGeneral, isAuditor, canManageUsers, canManageDirectorio, canManageArticulos, canManageOMS, canManageComunidad } = useAdminAuth();
 
   const allMenuItems = [
     { name: "Dashboard", path: "/admin/panel", icon: <HeartPulse size={20} /> },

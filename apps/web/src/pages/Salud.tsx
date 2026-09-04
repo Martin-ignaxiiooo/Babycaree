@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Syringe, Save, CheckCircle, Bell, Plus, X, FlaskConical, ClipboardCheck, Mic, MicOff, Pencil, Trash2, FileDown, CalendarCheck, TrendingUp } from "lucide-react";
+import { ArrowLeft, Syringe, CheckCircle, Plus, X, FlaskConical, ClipboardCheck, Mic, MicOff, Pencil, Trash2, FileDown, CalendarCheck, TrendingUp } from "lucide-react";
 import TopNav from "../components/TopNav";
 import DateSelect from "../components/DateSelect";
 import TimeSelect from "../components/TimeSelect";

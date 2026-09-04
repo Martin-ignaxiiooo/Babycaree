@@ -10,9 +10,7 @@ interface CarnetDigitalProps {
 // en un <canvas> para exportarlo como PNG, y el canvas no puede leer
 // variables CSS — así frente/dorso y la imagen exportada quedan idénticos.
 const COLOR_PRIMARY = "#7C5CBF";
-const COLOR_LIGHT = "#A07ADF";
 const COLOR_DARKER = "#2D2640";
-const COLOR_BG = "#EDE9F8";
 
 function calcularEdad(fechaNacimiento: string): string {
   if (!fechaNacimiento) return "-";

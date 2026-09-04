@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { BookOpen, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import AdminModal from "../../components/admin/AdminModal";
@@ -102,7 +101,7 @@ export default function AdminArticulos() {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchData();
-    } catch (e) {
+    } catch  {
       alert("Error al eliminar artículo");
     }
   };
@@ -155,7 +154,7 @@ export default function AdminArticulos() {
       }
       setIsModalOpen(false);
       fetchData();
-    } catch (e) {
+    } catch  {
       alert("Error al guardar artículo");
     }
   };

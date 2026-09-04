@@ -40,17 +40,6 @@ export default function ForoDetalle() {
     fetchDetalle();
   }, [id, token, navigate]);
 
-  const handleLike = async () => {
-    try {
-      await axios.post(`${API_URL}/comunidad/foros/${id}/like`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      fetchDetalle();
-    } catch (error) {
-      console.error("Error toggling like:", error);
-    }
-  };
-
   const handleComentar = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!nuevoComentario.trim()) return;

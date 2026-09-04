@@ -56,7 +56,7 @@ export default function AdminComunidad() {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setComentarios(prev => ({ ...prev, [foroId]: res.data }));
-      } catch (e) {
+      } catch  {
         alert("Error al cargar comentarios");
       } finally {
         setLoadingComentarios(null);
@@ -79,7 +79,7 @@ export default function AdminComunidad() {
       }));
       // Actualizar contador
       fetchData();
-    } catch (e) {
+    } catch  {
       alert("Error al eliminar el comentario");
     }
   };
@@ -100,7 +100,7 @@ export default function AdminComunidad() {
       }));
       setNuevoComentario(prev => ({ ...prev, [foroId]: "" }));
       fetchData();
-    } catch (e) {
+    } catch  {
       alert("Error al publicar el comentario");
     }
   };

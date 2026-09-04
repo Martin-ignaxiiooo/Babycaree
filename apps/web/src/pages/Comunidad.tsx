@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { 
-  Bell, LogOut, MessageCircle, FileText, ChevronRight, ThumbsUp, MessageSquare, Clock, X
+  MessageCircle, FileText, ChevronRight, ThumbsUp, MessageSquare, Clock, X
 } from "lucide-react";
 import axios from "axios";
 import TopNav from "../components/TopNav";
@@ -76,11 +76,6 @@ export default function Comunidad() {
     }
     fetchData();
   }, [token, navigate]);
-
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/");
-  };
 
   const handleLike = async (e: React.MouseEvent, foroId: string) => {
     e.stopPropagation(); // Evita que se dispare la navegación al detalle del post

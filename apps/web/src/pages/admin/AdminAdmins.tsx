@@ -136,7 +136,7 @@ export default function AdminAdmins() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAdmins(admins.filter((a) => a.id !== id));
-    } catch (e) {
+    } catch  {
       alert("Error al eliminar administrador (puede que sea admin_general y no se pueda eliminar)");
     }
   };

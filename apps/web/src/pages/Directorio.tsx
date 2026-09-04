@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
-  Bell, LogOut, Search, MapPin, Star, Phone, ShieldCheck, User 
+  Search, MapPin, Star, Phone, ShieldCheck, User 
 } from "lucide-react";
 import axios from "axios";
 import TopNav from "../components/TopNav";
@@ -95,11 +95,6 @@ export default function Directorio() {
 
     fetchData();
   }, [token, navigate]);
-
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/");
-  };
 
   const filteredMedicos = medicos.filter(medico => {
     const matchesSearch = medico.nombre_completo.toLowerCase().includes(searchTerm.toLowerCase()) || 

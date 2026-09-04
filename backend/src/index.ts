@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import cron from "node-cron";
-// import { connectRedis } from "./config/redis";
 import { globalLimiter } from "./middlewares/rateLimit.middleware";
 import { verifyToken } from "./middlewares/auth.middleware";
 import helmet from "helmet";
@@ -87,8 +86,6 @@ app.use("/api/v1/comunidad", comunidadRoutes);
 // Iniciar servicios y servidor
 const startServer = async () => {
   try {
-    // await connectRedis(); // Redis not used and crashes Render free tier
-
     // Rutas de prueba
     app.get("/api/health", (req, res) => {
       res.json({ status: "ok", message: "Baby Care API is running" });

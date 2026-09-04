@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Activity, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import AdminModal from "../../components/admin/AdminModal";
@@ -84,7 +84,7 @@ export default function AdminOMS() {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchData();
-    } catch (e) {
+    } catch  {
       alert("Error al eliminar registro");
     }
   };

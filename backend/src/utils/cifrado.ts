@@ -70,9 +70,6 @@ function obtenerClave(): Buffer | null {
   return claveCache;
 }
 
-/** True si el cifrado está operativo. Útil para diagnósticos. */
-export const cifradoActivo = (): boolean => obtenerClave() !== null;
-
 /** True si el valor ya está cifrado por nosotros. */
 export const estaCifrado = (valor: unknown): boolean =>
   typeof valor === "string" && valor.startsWith(PREFIJO);

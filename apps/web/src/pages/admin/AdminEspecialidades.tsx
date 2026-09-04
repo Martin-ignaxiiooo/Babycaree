@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Stethoscope, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import AdminModal from "../../components/admin/AdminModal";
@@ -69,7 +68,7 @@ export default function AdminEspecialidades() {
         },
       );
       fetchData(); // Recargar datos
-    } catch (e) {
+    } catch  {
       alert("Error al eliminar especialidad (puede que esté en uso)");
     }
   };
@@ -123,7 +122,7 @@ export default function AdminEspecialidades() {
       }
       setIsModalOpen(false);
       fetchData(); // Recargar datos
-    } catch (e) {
+    } catch  {
       alert("Error al guardar especialidad");
     }
   };

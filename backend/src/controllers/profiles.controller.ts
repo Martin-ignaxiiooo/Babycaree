@@ -228,44 +228,6 @@ export const getMyBabies = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const getPublicBabyProfile = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-
-    // Obtener datos del bebé
-    const babyRes = await query(
-      "SELECT id, nombre, fecha_nacimiento, sexo, es_prematuro, semanas_gestacion FROM perfiles_bebes WHERE id = $1",
-      [id],
-    );
-
-    if (babyRes.rows.length === 0) {
-      return res.status(404).json({ error: "Perfil de bebé no encontrado" });
-    }
-
-    const baby = babyRes.rows[0];
-
-    // Obtener calendario de vacunas
-    const vacunasRes = await query(
-      `
-      SELECT vp.id as vacuna_id, vp.nombre, vp.enfermedades_previene, vp.meses_edad_recomendada,
-             rv.aplicada, rv.fecha_aplicacion, rv.lugar_aplicacion 
-      FROM vacunas_pni vp
-      LEFT JOIN registro_vacunas rv ON vp.id = rv.vacuna_id AND rv.bebe_id = $1
-      ORDER BY vp.meses_edad_recomendada ASC, vp.id ASC
-    `,
-      [id],
-    );
-
-    res.json({
-      baby,
-      vacunas: vacunasRes.rows,
-    });
-  } catch (error) {
-    console.error("Error in getPublicBabyProfile:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
-  }
-};
-
 export const deleteBabyProfile = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user.id;

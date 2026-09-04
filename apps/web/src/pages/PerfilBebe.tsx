@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import CryptoJS from "crypto-js";
 import { 
-  ArrowLeft, Camera, User, Search, Lock, Bell, IdCard
+  ArrowLeft, User, Search, Lock, IdCard
 } from "lucide-react";
 import TopNav from "../components/TopNav";
 import DateSelect from "../components/DateSelect";
@@ -26,8 +25,6 @@ export default function PerfilBebe() {
       setActiveTab(tab);
     }
   }, [location.search]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [isInviting, setIsInviting] = useState(false);
   const [editMode, setEditMode] = useState(false);
   
@@ -161,32 +158,6 @@ export default function PerfilBebe() {
       });
       if (res.ok) {
         setSearchResults(await res.json());
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleSincronizarContactos = async () => {
-    const mockContacts = [
-      { email: "prueba@iniciativababy.cl", name: "Contacto Prueba" },
-      { email: "admin2@correo.cl", name: "Admin 2" }
-    ];
-    const hashes = mockContacts.map(c => CryptoJS.SHA256(c.email.trim().toLowerCase()).toString(CryptoJS.enc.Hex));
-    
-    try {
-      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/personas/sincronizar-contactos`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ hashes })
-      });
-      if (res.ok) {
-        alert("Contactos sincronizados. Busca en 'Mis contactos'.");
-        setSearchTab("contactos");
-        buscarPersonas("", "contactos");
       }
     } catch (error) {
       console.error(error);

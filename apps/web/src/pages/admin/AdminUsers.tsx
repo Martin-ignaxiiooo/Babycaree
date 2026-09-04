@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Users, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import AdminModal from "../../components/admin/AdminModal";
@@ -122,7 +121,7 @@ export default function AdminUsers() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUsuarios(usuarios.filter((u) => u.id !== id));
-    } catch (e) {
+    } catch  {
       alert("Error al eliminar usuario");
     }
   };

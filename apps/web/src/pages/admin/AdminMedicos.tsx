@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { UserCheck, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import AdminModal from "../../components/admin/AdminModal";
@@ -99,7 +98,7 @@ export default function AdminMedicos() {
         },
       );
       fetchData();
-    } catch (e) {
+    } catch  {
       alert("Error al eliminar médico");
     }
   };
@@ -148,7 +147,7 @@ export default function AdminMedicos() {
       }
       setIsModalOpen(false);
       fetchData();
-    } catch (e) {
+    } catch  {
       alert("Error al guardar médico");
     }
   };

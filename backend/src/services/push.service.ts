@@ -106,15 +106,3 @@ export async function enviarPush(usuarioId: string, aviso: Aviso): Promise<numbe
 
   return enviados;
 }
-
-/**
- * Envía a varios usuarios a la vez (por ejemplo, a todos los cuidadores
- * de un bebé). Los errores de un destinatario no frenan a los demás.
- */
-export async function enviarPushAVarios(usuarioIds: string[], aviso: Aviso): Promise<number> {
-  if (!configurado || usuarioIds.length === 0) return 0;
-  const resultados = await Promise.all(
-    usuarioIds.map((id) => enviarPush(id, aviso).catch(() => 0)),
-  );
-  return resultados.reduce((a, b) => a + b, 0);
-}
