@@ -576,41 +576,43 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="hero-stats-grid" style={{ alignItems: "center", padding: "14px 24px 14px 0" }}>
-            <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "10px 16px", textAlign: "center", minWidth: "100px", boxShadow: "0 4px 14px rgba(45,38,64,0.06)" }}>
-              <div className="stat-icon-circle" style={{ background: "#DED0F7" }}>
-                <ScaleIcon size={42} color="#7C5CBF" />
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <div className="hero-stats-grid" style={{ alignItems: "center", padding: "14px 24px 14px 0" }}>
+              <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "10px 16px", textAlign: "center", minWidth: "100px", boxShadow: "0 4px 14px rgba(45,38,64,0.06)" }}>
+                <div className="stat-icon-circle" style={{ background: "#DED0F7" }}>
+                  <ScaleIcon size={42} color="#7C5CBF" />
+                </div>
+                <div style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: 600 }}>Peso:</div>
+                <div style={{ fontSize: "16px", fontWeight: 800, color: "var(--text)" }}>{hero.peso_kg !== "-" && hero.peso_kg !== 0 ? `${hero.peso_kg}kg` : "N/A"}</div>
               </div>
-              <div style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: 600 }}>Peso:</div>
-              <div style={{ fontSize: "16px", fontWeight: 800, color: "var(--text)" }}>{hero.peso_kg !== "-" && hero.peso_kg !== 0 ? `${hero.peso_kg}kg` : "N/A"}</div>
-            </div>
-            <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "10px 16px", textAlign: "center", minWidth: "100px", boxShadow: "0 4px 14px rgba(45,38,64,0.06)" }}>
-              <div className="stat-icon-circle" style={{ background: "#F7B8C4" }}>
-                <Ruler size={42} color="#7A3B45" strokeWidth={2.2} />
+              <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "10px 16px", textAlign: "center", minWidth: "100px", boxShadow: "0 4px 14px rgba(45,38,64,0.06)" }}>
+                <div className="stat-icon-circle" style={{ background: "#F7B8C4" }}>
+                  <Ruler size={42} color="#7A3B45" strokeWidth={2.2} />
+                </div>
+                <div style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: 600 }}>Altura:</div>
+                <div style={{ fontSize: "16px", fontWeight: 800, color: "var(--text)" }}>{hero.talla_cm !== "-" && hero.talla_cm !== 0 ? `${hero.talla_cm}cm` : "N/A"}</div>
               </div>
-              <div style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: 600 }}>Altura:</div>
-              <div style={{ fontSize: "16px", fontWeight: 800, color: "var(--text)" }}>{hero.talla_cm !== "-" && hero.talla_cm !== 0 ? `${hero.talla_cm}cm` : "N/A"}</div>
-            </div>
-            <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "10px 16px", textAlign: "center", minWidth: "100px", boxShadow: "0 4px 14px rgba(45,38,64,0.06)" }}>
-              <div className="stat-icon-circle" style={{ background: "#F7DE8B" }}>
-                <Star size={42} color="#8A6D1D" strokeWidth={2.2} />
+              <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "10px 16px", textAlign: "center", minWidth: "100px", boxShadow: "0 4px 14px rgba(45,38,64,0.06)" }}>
+                <div className="stat-icon-circle" style={{ background: "#F7DE8B" }}>
+                  <Star size={42} color="#8A6D1D" strokeWidth={2.2} />
+                </div>
+                <div style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: 600 }}>Percentil:</div>
+                <div style={{ fontSize: "16px", fontWeight: 800, color: "var(--text)" }}>P{hero.percentil}</div>
               </div>
-              <div style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: 600 }}>Percentil:</div>
-              <div style={{ fontSize: "16px", fontWeight: 800, color: "var(--text)" }}>P{hero.percentil}</div>
             </div>
-          </div>
 
-          {/* Fecha del último registro: deja claro a qué momento corresponden
-              las medidas de arriba, en vez de parecer siempre "de hoy". */}
-          {hero.fecha_medicion && (
-            <div style={{
-              gridColumn: "1 / -1", textAlign: "center", fontSize: "12px",
-              color: "var(--text-muted)", fontWeight: 600, marginTop: "-4px", paddingBottom: "4px",
-            }}>
-              {hero.medicion_es_nacimiento ? "Medidas de nacimiento · " : "Último registro · "}
-              {new Date(hero.fecha_medicion).toLocaleDateString("es-CL", { day: "numeric", month: "long", year: "numeric" })}
-            </div>
-          )}
+            {/* Fecha del último registro: deja claro a qué momento corresponden
+                las medidas de arriba, en vez de parecer siempre "de hoy". */}
+            {hero.fecha_medicion && (
+              <div style={{
+                textAlign: "center", fontSize: "12px",
+                color: "var(--text-muted)", fontWeight: 600, marginTop: "-4px", paddingBottom: "4px",
+              }}>
+                {hero.medicion_es_nacimiento ? "Medidas de nacimiento · " : "Último registro · "}
+                {new Date(hero.fecha_medicion).toLocaleDateString("es-CL", { day: "numeric", month: "long", year: "numeric" })}
+              </div>
+            )}
+          </div>
         </div>
 
         <style>{`
