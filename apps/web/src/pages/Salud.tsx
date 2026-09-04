@@ -478,22 +478,22 @@ export default function Salud() {
       <TopNav user={user} activePath="/salud" perfilEstado={perfilEstado} />
 
       {/* ── HEADER ──
-          Mismo patrón que Comunidad: fondo claro, título sobre el contenido
-          y pestañas como píldoras. La cabecera oscura de antes rompía con el
-          resto de la app y hacía que esta pantalla se sintiera de otro
-          producto. */}
-      <div className="page-container">
+          Mismo patrón que Comunidad: banner morado con título+descripción,
+          acciones y pestañas ya en el contenido claro de abajo. */}
+      <div style={{ background: "linear-gradient(135deg, #8B5FD6 0%, #A47BE8 100%)", paddingBottom: "26px" }}>
+        <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "16px 40px 0" }}>
+          <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "22px", fontWeight: 700, color: "#fff", margin: 0 }}>
+            Salud y Crecimiento
+          </h1>
+          <p style={{ fontSize: "12.5px", color: "rgba(255,255,255,0.8)", margin: "3px 0 0", fontWeight: 600 }}>
+            Administra las vacunas, los controles y el progreso de tu bebé.
+          </p>
+        </div>
+      </div>
 
-        <div style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "16px" }}>
-          <div>
-            <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "22px", fontWeight: 700, color: "var(--text)", margin: "0 0 2px 0" }}>
-              Salud y Crecimiento
-            </h1>
-            <p style={{ fontSize: "12.5px", color: "var(--text-muted)", margin: 0, fontWeight: 600 }}>
-              Administra las vacunas, los controles y el progreso de tu bebé.
-            </p>
-          </div>
+      <div className="page-container" style={{ marginTop: "-14px" }}>
 
+        <div style={{ marginBottom: "16px", display: "flex", justifyContent: "flex-end", flexWrap: "wrap", gap: "16px" }}>
           <button
             onClick={() => setShowInforme(true)}
             style={{

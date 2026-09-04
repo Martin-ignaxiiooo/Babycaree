@@ -164,12 +164,11 @@ export default function RegistroDiario() {
         onLogout={() => { localStorage.clear(); navigate("/"); }}
       />
 
-      {/* Cabecera: mismo patrón que Salud y Galería — fondo full width,
-          contenido limitado a 1400px para alinear con el resto. */}
-      <div style={{ background: "linear-gradient(120deg, var(--theme-darker) 0%, #3A2E5C 55%, var(--theme-dark) 100%)", color: "#fff" }}>
+      {/* Cabecera: mismo color/gradiente morado que Comunidad y Salud. */}
+      <div style={{ background: "linear-gradient(135deg, #8B5FD6 0%, #A47BE8 100%)", color: "#fff" }}>
         <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "16px 40px 12px" }}>
           <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "22px", margin: 0 }}>Registro diario</h1>
-          <p style={{ color: "rgba(255,255,255,0.7)", marginTop: "3px", fontSize: "12.5px" }}>
+          <p style={{ color: "rgba(255,255,255,0.8)", marginTop: "3px", fontSize: "12.5px" }}>
             Tomas, sueño y pañales. Lo del día a día, a mano.
           </p>
 
