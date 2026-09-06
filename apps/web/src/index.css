@@ -675,14 +675,14 @@ body {
   }
   
   .hero-stats-grid {
-    justify-content: space-between;
+    justify-content: center;
     width: 100%;
     flex-wrap: nowrap;
     gap: 8px;
   }
   
   .hero-stats-grid > div {
-    flex: 1 1 0;
+    flex: 0 1 100px;
     min-width: 0 !important;
     padding: 10px 6px !important;
   }
@@ -707,6 +707,12 @@ body {
     width: 54px;
     height: 54px;
     margin-bottom: 4px;
+  }
+
+  /* Los módulos (Diario, Perfil, Salud, Comunidad, Galería) como botones
+     grandes son redundantes en móvil: ya están en la barra inferior. */
+  .dashboard-modules-grid {
+    display: none;
   }
 
   .stat-icon-circle {

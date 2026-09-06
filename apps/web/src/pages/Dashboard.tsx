@@ -821,8 +821,10 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* COLUMNA 2: Módulos */}
-          <div style={{ background: "var(--surface)", borderRadius: "26px", padding: "22px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
+          {/* COLUMNA 2: Módulos (se oculta en móvil: ya están todos accesibles
+              desde la barra de navegación inferior, y como botones grandes
+              acá abajo quedaban redundantes y ocupaban mucho espacio). */}
+          <div className="dashboard-modules-grid" style={{ background: "var(--surface)", borderRadius: "26px", padding: "22px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
             <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--text)", marginBottom: "20px" }}>
               Módulos
             </h3>
