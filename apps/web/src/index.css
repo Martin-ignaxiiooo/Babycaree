@@ -709,6 +709,34 @@ body {
     margin-bottom: 4px;
   }
 
+  /* Registro diario: las 4 tarjetas de resumen (tomas hoy, biberón,
+     durmiendo, pañales) en una sola fila también en móvil, en vez de
+     acomodarse en 2x2. */
+  .diario-resumen-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 6px !important;
+  }
+  .diario-resumen-grid > div {
+    padding: 8px 6px !important;
+    border-radius: 14px !important;
+  }
+  .diario-resumen-grid > div > div:first-child {
+    width: 24px !important;
+    height: 24px !important;
+    margin-bottom: 6px !important;
+  }
+  .diario-resumen-grid > div > div:first-child svg {
+    width: 13px !important;
+    height: 13px !important;
+  }
+  .diario-resumen-grid > div > div:nth-child(2) {
+    font-size: 13px !important;
+  }
+  .diario-resumen-grid > div > div:nth-child(3) {
+    font-size: 8.5px !important;
+    line-height: 1.2;
+  }
+
   /* Los módulos (Diario, Perfil, Salud, Comunidad, Galería) como botones
      grandes son redundantes en móvil: ya están en la barra inferior. */
   .dashboard-modules-grid {
