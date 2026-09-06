@@ -203,7 +203,7 @@ export default function RegistroDiario() {
         {resumen && (
           <>
           <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "20px", color: "var(--text)", margin: "0 0 14px" }}>
-            Registros de hoy
+            Últimos registros de hoy
           </h2>
           <div className="diario-resumen-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "14px", marginBottom: "26px" }}>
             <Tarjeta icono={<Milk size={19} color="#1976D2" />} bg="#E3F2FD" valor={resumen.hoy.tomas} etiqueta="tomas hoy" />
