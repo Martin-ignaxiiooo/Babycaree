@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import TopNav from "../components/TopNav";
 import NotificacionDetalleModal from "../components/NotificacionDetalleModal";
+import { marcarNotifLeida } from "../utils/notificacionesLeidas";
 import DashboardEmbarazo from "./DashboardEmbarazo";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api";
@@ -664,6 +665,7 @@ export default function Dashboard() {
                   return (
                     <div key={idx}
                       onClick={() => {
+                        marcarNotifLeida(activeBabyId, n);
                         // El artículo recomendado sí lleva a otra pantalla;
                         // citas y vacunas abren el detalle sin sacarte del inicio.
                         if (n.tipo === "articulo" && n.articulo_id) {

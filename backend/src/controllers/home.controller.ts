@@ -207,7 +207,7 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
 
     // A. Vacunas atrasadas/proximas
     const vacunasRes = await query(
-      `SELECT v.nombre, v.enfermedades_previene, v.meses_edad_recomendada,
+      `SELECT rv.id, v.nombre, v.enfermedades_previene, v.meses_edad_recomendada,
               rv.fecha_aplicacion
        FROM registro_vacunas rv
        JOIN vacunas_pni v ON rv.vacuna_id = v.id
@@ -224,6 +224,9 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
       
       if (diffDays < 0) {
         notificaciones.push({
+          // Id estable: sirve para que el frontend recuerde qué
+          // notificaciones ya se revisaron (marcar como leída).
+          id: `vacuna_${v.id}_atrasada`,
           tipo: "vacuna_atrasada",
           prioridad: "alta",
           titulo: v.nombre + " — Atrasada",
@@ -240,6 +243,7 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
         total_alertas++;
       } else if (diffDays <= 7) {
         notificaciones.push({
+          id: `vacuna_${v.id}_proxima`,
           tipo: "vacuna_proxima",
           prioridad: "media",
           titulo: v.nombre + " — Próxima",
@@ -262,7 +266,7 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
     // reflejan un compromiso que ya se tomó, no solo un recordatorio
     // automático del calendario de vacunación.
     const citasRes = await query(
-      `SELECT especialidad, fecha_cita, medico, lugar, notas, tipo
+      `SELECT id, especialidad, fecha_cita, medico, lugar, notas, tipo
        FROM citas_medicas
        WHERE bebe_id = $1 AND estado = 'programada' AND fecha_cita > NOW()
        ORDER BY fecha_cita ASC`,
@@ -278,6 +282,7 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
       if (diffDays <= 30) {
         const esControl = c.tipo === "control";
         notificaciones.push({
+          id: `cita_${c.id}`,
           tipo: esControl ? "control_proximo" : "cita_proxima",
           prioridad: "media",
           titulo: esControl ? `Control ${c.especialidad || "sano"}` : `Cita: ${c.especialidad || "consulta"}`,
@@ -317,6 +322,7 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
 
     if (articuloIdeal) {
       notificaciones.push({
+        id: `articulo_${articuloIdeal.id}`,
         tipo: "articulo",
         prioridad: "baja",
         titulo: articuloIdeal.titulo,

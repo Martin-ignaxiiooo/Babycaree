@@ -4,6 +4,7 @@ import axios from "axios";
 import { Bell, LogOut, Menu, X, ChevronDown, Baby, Check, Plus, Sparkles,
   Home, CalendarDays, HeartPulse, MessageSquare, Stethoscope, Images, NotebookPen } from "lucide-react";
 import NotificacionDetalleModal from "./NotificacionDetalleModal";
+import { cargarNotifsLeidas, marcarNotifLeida, claveNotif, onNotifLeida } from "../utils/notificacionesLeidas";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api";
 
@@ -30,6 +31,30 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
   const activeBabyId = typeof window !== "undefined" ? localStorage.getItem("selectedBabyId") : null;
 
   const notifs = notificaciones.length > 0 ? notificaciones : notifPropias;
+
+  // Notificaciones ya revisadas (persistidas por bebé en localStorage,
+  // ver utils/notificacionesLeidas). El contador de la campanita solo
+  // cuenta las que faltan por revisar.
+  const [leidas, setLeidas] = useState<Set<string>>(() => cargarNotifsLeidas(activeBabyId));
+  useEffect(() => {
+    setLeidas(cargarNotifsLeidas(activeBabyId));
+  }, [activeBabyId]);
+  useEffect(() => {
+    // Si se marca como leída desde otro lado de la misma página (por
+    // ejemplo, el bloque "Lo que se viene" del Dashboard), el contador
+    // de acá se actualiza igual sin recargar.
+    return onNotifLeida(({ bebeId, clave }) => {
+      if (bebeId !== activeBabyId) return;
+      setLeidas((prev) => new Set(prev).add(clave));
+    });
+  }, [activeBabyId]);
+  const notifsNoLeidas = notifs.filter((n) => !leidas.has(claveNotif(n)));
+
+  const abrirDetalleNotif = (n: any) => {
+    setNotifOpen(false);
+    setNotifDetalle(n);
+    marcarNotifLeida(activeBabyId, n);
+  };
 
   // Varias páginas (Comunidad, Directorio, Galería, Mi Perfil…) no le pasan
   // perfilEstado al TopNav, y sin ese dato el menú mostraba las opciones de
@@ -316,17 +341,17 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
               <div
                 style={{ position: "relative", cursor: "pointer", width: "38px", height: "38px", borderRadius: "10px", background: "rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}
                 onClick={() => setNotifOpen((v) => !v)}
-                title={notifs.length > 0 ? `${notifs.length} pendiente(s)` : "Sin notificaciones"}
+                title={notifsNoLeidas.length > 0 ? `${notifsNoLeidas.length} pendiente(s)` : "Sin notificaciones nuevas"}
               >
                 <Bell size={19} />
-                {notifs.length > 0 && (
+                {notifsNoLeidas.length > 0 && (
                   <span style={{
                     position: "absolute", top: -4, right: -4, background: "var(--accent-coral)",
                     minWidth: 18, height: 18, borderRadius: 9, border: "2px solid var(--theme-darker)",
                     display: "flex", alignItems: "center", justifyContent: "center",
                     fontSize: "10.5px", fontWeight: 900, color: "#fff", padding: "0 4px",
                   }}>
-                    {notifs.length > 9 ? "9+" : notifs.length}
+                    {notifsNoLeidas.length > 9 ? "9+" : notifsNoLeidas.length}
                   </span>
                 )}
               </div>
@@ -352,22 +377,35 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
                       </div>
                     ) : (
                       <div style={{ maxHeight: "320px", overflowY: "auto" }}>
-                        {notifs.map((n, i) => (
-                          <div
-                            key={i}
-                            onClick={() => { setNotifOpen(false); setNotifDetalle(n); }}
-                            style={{ padding: "12px 16px", borderBottom: i < notifs.length - 1 ? "1px solid #F5F2FC" : "none", cursor: "pointer" }}
-                          >
-                            <div style={{ fontWeight: 700, fontSize: "13.5px" }}>
-                              {n.titulo ?? n.tipo ?? "Recordatorio"}
-                            </div>
-                            {n.mensaje && (
-                              <div style={{ fontSize: "12.5px", color: "var(--text-muted)", marginTop: "2px", lineHeight: 1.45 }}>
-                                {n.mensaje}
+                        {notifs.map((n, i) => {
+                          const noLeida = !leidas.has(claveNotif(n));
+                          return (
+                            <div
+                              key={i}
+                              onClick={() => abrirDetalleNotif(n)}
+                              style={{
+                                padding: "12px 16px", borderBottom: i < notifs.length - 1 ? "1px solid #F5F2FC" : "none",
+                                cursor: "pointer", display: "flex", alignItems: "flex-start", gap: "8px",
+                                background: noLeida ? "var(--theme-bg-light)" : "transparent",
+                              }}
+                            >
+                              <span style={{
+                                width: "7px", height: "7px", borderRadius: "50%", marginTop: "5px", flexShrink: 0,
+                                background: noLeida ? "var(--accent-coral)" : "transparent",
+                              }} />
+                              <div style={{ minWidth: 0 }}>
+                                <div style={{ fontWeight: noLeida ? 800 : 600, fontSize: "13.5px" }}>
+                                  {n.titulo ?? n.tipo ?? "Recordatorio"}
+                                </div>
+                                {n.mensaje && (
+                                  <div style={{ fontSize: "12.5px", color: "var(--text-muted)", marginTop: "2px", lineHeight: 1.45 }}>
+                                    {n.mensaje}
+                                  </div>
+                                )}
                               </div>
-                            )}
-                          </div>
-                        ))}
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
