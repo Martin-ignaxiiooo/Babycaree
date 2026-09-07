@@ -58,6 +58,8 @@ export default function Salud() {
   };
   const fechaCita = fechaCitaDate && fechaCitaTime ? `${fechaCitaDate}T${fechaCitaTime}` : "";
   const [medico, setMedico] = useState("");
+  const [especialidad, setEspecialidad] = useState("");
+  const [lugar, setLugar] = useState("");
   const [notas, setNotas] = useState("");
   const [isSavingCita, setIsSavingCita] = useState(false);
   // Cita cuyo resultado se está registrando (modal "¿cómo te fue?").
@@ -88,6 +90,8 @@ export default function Salud() {
       setFechaCitaTime(`${p(datos.fecha.getHours())}:${p(datos.fecha.getMinutes())}`);
     }
     if (datos.medico) setMedico(datos.medico);
+    if (datos.especialidad) setEspecialidad(datos.especialidad);
+    if (datos.lugar) setLugar(datos.lugar);
     if (datos.tipo) setTipoCita(datos.tipo);
     setNotas(textoOriginal);
 
@@ -134,6 +138,8 @@ export default function Salud() {
       setFechaCitaDate("");
       setFechaCitaTime("");
       setMedico("");
+      setEspecialidad("");
+      setLugar("");
       setNotas("");
       fetchCitas();
 
@@ -326,12 +332,21 @@ export default function Salud() {
       const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/citas`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ fecha_cita: iso, medico, notas, tipo: tipoCita, especialidad: tipoCita === "control" ? "Control sano" : "Consulta" })
+        body: JSON.stringify({
+          fecha_cita: iso,
+          medico: medico.trim() || null,
+          especialidad: especialidad.trim() || (tipoCita === "control" ? "Control sano" : "Consulta"),
+          lugar: lugar.trim() || null,
+          notas,
+          tipo: tipoCita,
+        })
       });
       if (res.ok) {
         setFechaCitaDate("");
         setFechaCitaTime("");
         setMedico("");
+        setEspecialidad("");
+        setLugar("");
         setNotas("");
         setShowFormCita(false);
         fetchCitas();
@@ -1198,12 +1213,41 @@ export default function Salud() {
                         />
                       </div>
                       <div style={{ flex: "1 1 200px" }}>
-                        <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Doctor/Centro (Opcional)</label>
+                        <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Médico (Opcional)</label>
                         <input 
                           type="text" 
-                          placeholder="Ej. Dr. Silva - Centro Médico"
+                          placeholder="Ej. Dra. Pérez"
                           value={medico}
                           onChange={e => setMedico(e.target.value)}
+                          style={{ 
+                            width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", 
+                            background: "var(--surface)", outline: "none", boxSizing: "border-box", fontFamily: "Nunito"
+                          }} 
+                        />
+                      </div>
+                    </div>
+
+                    <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+                      <div style={{ flex: "1 1 200px" }}>
+                        <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Especialidad (Opcional)</label>
+                        <input 
+                          type="text" 
+                          placeholder="Ej. Pediatría"
+                          value={especialidad}
+                          onChange={e => setEspecialidad(e.target.value)}
+                          style={{ 
+                            width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", 
+                            background: "var(--surface)", outline: "none", boxSizing: "border-box", fontFamily: "Nunito"
+                          }} 
+                        />
+                      </div>
+                      <div style={{ flex: "1 1 200px" }}>
+                        <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Lugar (Opcional)</label>
+                        <input 
+                          type="text" 
+                          placeholder="Ej. Cesfam / Clínica"
+                          value={lugar}
+                          onChange={e => setLugar(e.target.value)}
                           style={{ 
                             width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", 
                             background: "var(--surface)", outline: "none", boxSizing: "border-box", fontFamily: "Nunito"
