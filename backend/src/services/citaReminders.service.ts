@@ -2,45 +2,49 @@ import { query } from "../config/db";
 import { sendAppointmentReminder, sendPostAppointmentFollowUp, sendExamReminder } from "../config/mailer";
 import { enviarPush } from "./push.service";
 
-// Cada "ventana" define cuándo se dispara un recordatorio, en base a cuánto
-// falta para la cita. Al no superponerse, un cron corriendo cada cierto
-// tiempo dispara cada recordatorio una sola vez por cita (el flag en la BD
-// evita reenvíos si el job corre varias veces dentro de la misma ventana).
+// Las 5 ventanas disponibles para configurar (ver Mi Perfil > Notificaciones).
+// Cada una cubre el tramo entre la ventana anterior y la suya, contiguas y
+// sin superponerse, para que un cron corriendo cada cierto tiempo la
+// detecte una sola vez sin importar cada cuánto pase.
 const VENTANAS = [
-  { columna: "recordatorio_7d_enviado", desde: "1 day", hasta: "7 days", etiqueta: "1 semana" },
-  { columna: "recordatorio_1d_enviado", desde: "2 hours", hasta: "1 day", etiqueta: "1 día" },
-  { columna: "recordatorio_2h_enviado", desde: "0 minutes", hasta: "2 hours", etiqueta: "2 horas" },
+  { horas: 168, desde: "72 hours", hasta: "168 hours", etiqueta: "7 días" },
+  { horas: 72, desde: "48 hours", hasta: "72 hours", etiqueta: "3 días" },
+  { horas: 48, desde: "24 hours", hasta: "48 hours", etiqueta: "2 días" },
+  { horas: 24, desde: "2 hours", hasta: "24 hours", etiqueta: "1 día" },
+  { horas: 2, desde: "0 minutes", hasta: "2 hours", etiqueta: "2 horas" },
 ] as const;
 
-// Revisa las 3 ventanas y envía los correos correspondientes. Se llama desde
-// un cron job (ver index.ts) cada cierto tiempo mientras el servidor esté
-// corriendo — no depende de infraestructura externa de Render.
+// Revisa las 5 ventanas y envía los correos correspondientes, respetando la
+// preferencia de cada destinatario (activo/inactivo y qué ventanas quiere).
+// Se llama desde un cron job (ver index.ts) cada cierto tiempo mientras el
+// servidor esté corriendo — no depende de infraestructura externa de Render.
 export async function revisarYEnviarRecordatorios(): Promise<void> {
   for (const ventana of VENTANAS) {
     try {
-      // Nota: ventana.columna se interpola directo porque es un nombre de
-      // columna fijo definido en VENTANAS (arriba, en este mismo archivo),
-      // nunca proviene de datos externos/usuario — Postgres no permite
-      // parametrizar nombres de columna. Los intervalos sí van parametrizados.
+      // Nota: los intervalos van parametrizados; solo los nombres de columna
+      // fijos de VENTANAS (arriba, en este archivo) se interpolan directo.
       const citasRes = await query(
         `SELECT c.id, c.especialidad, c.medico, c.lugar, c.fecha_cita,
                 b.id as bebe_id, b.nombre as bebe_nombre, b.usuario_id
          FROM citas_medicas c
          JOIN perfiles_bebes b ON c.bebe_id = b.id
          WHERE c.estado = 'programada'
-           AND c.${ventana.columna} = FALSE
            AND c.fecha_cita > NOW() + $1::interval
            AND c.fecha_cita <= NOW() + $2::interval`,
         [ventana.desde, ventana.hasta],
       );
 
+      let enviadosVentana = 0;
+
       for (const cita of citasRes.rows) {
         // Destinatarios: el dueño de la cuenta + familiares con acceso
-        // compartido que hayan activado "recibir_notificaciones"
+        // compartido que hayan activado "recibir_notificaciones", junto
+        // con la preferencia de cada uno sobre estos recordatorios.
         const destinatariosRes = await query(
-          `SELECT u.id, u.email, u.nombre FROM usuarios u WHERE u.id = $1
+          `SELECT u.id, u.email, u.nombre, u.recordatorios_citas_activos, u.recordatorios_citas_horas
+           FROM usuarios u WHERE u.id = $1
            UNION
-           SELECT u.id, u.email, u.nombre
+           SELECT u.id, u.email, u.nombre, u.recordatorios_citas_activos, u.recordatorios_citas_horas
            FROM accesos_compartidos_bebe acb
            JOIN usuarios u ON u.id = acb.id_usuario_invitado
            WHERE acb.id_perfil_bebe = $2 AND acb.estado = 'activo' AND acb.recibir_notificaciones = TRUE`,
@@ -48,6 +52,20 @@ export async function revisarYEnviarRecordatorios(): Promise<void> {
         );
 
         for (const destinatario of destinatariosRes.rows) {
+          // Preferencia desactivada, o esta ventana en particular no
+          // seleccionada: no le corresponde este recordatorio.
+          if (!destinatario.recordatorios_citas_activos) continue;
+          const horasConfiguradas: number[] = destinatario.recordatorios_citas_horas || [];
+          if (!horasConfiguradas.includes(ventana.horas)) continue;
+
+          // Evita reenvíos: a diferencia de antes, esto es por destinatario
+          // (no por cita), porque cada uno puede tener ventanas distintas.
+          const yaEnviadoRes = await query(
+            `SELECT 1 FROM recordatorios_citas_enviados WHERE cita_id = $1 AND usuario_id = $2 AND horas_antes = $3`,
+            [cita.id, destinatario.id, ventana.horas],
+          );
+          if (yaEnviadoRes.rows.length > 0) continue;
+
           try {
             await sendAppointmentReminder(
               destinatario.email,
@@ -60,25 +78,28 @@ export async function revisarYEnviarRecordatorios(): Promise<void> {
             console.error(`[recordatorios] Error enviando a ${destinatario.email}:`, emailError);
           }
 
+          await query(
+            `INSERT INTO recordatorios_citas_enviados (cita_id, usuario_id, horas_antes)
+             VALUES ($1, $2, $3) ON CONFLICT (cita_id, usuario_id, horas_antes) DO NOTHING`,
+            [cita.id, destinatario.id, ventana.horas],
+          );
+
           // El push va además del correo, no en su lugar: no todos aceptan
           // el permiso, y en iOS solo llega si instalaron la PWA. Si falla,
-          // el correo ya salió.
+          // el correo ya salió. Respeta la misma preferencia de ventanas.
           enviarPush(destinatario.id, {
             titulo: `${cita.bebe_nombre}: ${cita.especialidad || "control médico"}`,
             cuerpo: `Es ${ventana.etiqueta}${cita.medico ? ` con ${cita.medico}` : ""}.`,
             url: "/salud",
-            tag: `cita-${cita.id}`,
+            tag: `cita-${cita.id}-${ventana.horas}`,
           }).catch(() => {});
-        }
 
-        await query(
-          `UPDATE citas_medicas SET ${ventana.columna} = TRUE WHERE id = $1`,
-          [cita.id],
-        );
+          enviadosVentana++;
+        }
       }
 
-      if (citasRes.rows.length > 0) {
-        console.log(`[recordatorios] Enviados ${citasRes.rows.length} recordatorio(s) de "${ventana.etiqueta}"`);
+      if (enviadosVentana > 0) {
+        console.log(`[recordatorios] Enviados ${enviadosVentana} recordatorio(s) de "${ventana.etiqueta}"`);
       }
     } catch (error) {
       console.error(`[recordatorios] Error revisando ventana "${ventana.etiqueta}":`, error);

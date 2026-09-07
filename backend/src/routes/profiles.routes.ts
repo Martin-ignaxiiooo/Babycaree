@@ -5,6 +5,8 @@ import {
   updateMe,
   updatePassword,
   getPasswordEstado,
+  getPreferenciasNotificaciones,
+  updatePreferenciasNotificaciones,
   createBabyProfile,
   getMyBabies,
   deleteBabyProfile,
@@ -30,6 +32,8 @@ router.get("/me", getMe);
 router.patch("/me", updateMe);
 router.patch("/me/password", updatePassword);
 router.get("/me/password-estado", getPasswordEstado);
+router.get("/me/preferencias-notificaciones", getPreferenciasNotificaciones);
+router.patch("/me/preferencias-notificaciones", updatePreferenciasNotificaciones);
 router.post("/babies", createBabyProfile);
 router.get("/babies", getMyBabies);
 router.delete("/babies/:id", deleteBabyProfile);
