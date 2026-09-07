@@ -856,10 +856,10 @@ export default function Salud() {
                 calendario -pasados y futuros marcados con un punto de
                 color distinto- y el detalle del día elegido al costado. */}
             <div style={{ borderTop: "1px solid var(--border-soft)", marginTop: "28px", paddingTop: "24px" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1.15fr) minmax(280px, 1fr)", gap: "24px", alignItems: "start" }}>
+              <div className="controles-calendario-grid" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1.15fr) minmax(280px, 1fr)", gap: "24px", alignItems: "start" }}>
 
                 {/* ── Calendario ── */}
-                <div style={{ background: "var(--surface-2)", border: "1.5px solid var(--border-soft)", borderRadius: "20px", padding: "22px" }}>
+                <div style={{ background: "var(--surface)", boxShadow: "0 4px 20px rgba(124,92,191,0.08)", borderRadius: "20px", padding: "22px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
                     <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "17px", fontWeight: 700, color: "var(--text)", margin: 0 }}>
                       {MESES_CAL[calCursor.getMonth()]} {calCursor.getFullYear()}

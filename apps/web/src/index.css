@@ -744,6 +744,13 @@ body {
     display: none;
   }
 
+  /* Calendario de controles (Salud): en desktop es calendario + detalle
+     lado a lado; en móvil se apilan (calendario arriba, detalle abajo)
+     en vez de superponerse por falta de espacio horizontal. */
+  .controles-calendario-grid {
+    grid-template-columns: 1fr !important;
+  }
+
   .stat-icon-circle {
     width: 46px;
     height: 46px;
