@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Bell, LogOut, Menu, X, ChevronDown, Baby, Check, Plus, Sparkles,
   Home, CalendarDays, HeartPulse, MessageSquare, Stethoscope, Images, NotebookPen } from "lucide-react";
+import NotificacionDetalleModal from "./NotificacionDetalleModal";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api";
 
@@ -20,6 +21,7 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
   const [babies, setBabies] = useState<any[]>([]);
   const [switcherOpen, setSwitcherOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [notifDetalle, setNotifDetalle] = useState<any | null>(null);
   // Solo el Dashboard le pasaba notificaciones al TopNav; en el resto de las
   // pantallas la campana salía siempre vacía aunque hubiera citas próximas.
   // Si no vienen por props, se cargan acá para que funcione en toda la app.
@@ -351,7 +353,11 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
                     ) : (
                       <div style={{ maxHeight: "320px", overflowY: "auto" }}>
                         {notifs.map((n, i) => (
-                          <div key={i} style={{ padding: "12px 16px", borderBottom: i < notifs.length - 1 ? "1px solid #F5F2FC" : "none" }}>
+                          <div
+                            key={i}
+                            onClick={() => { setNotifOpen(false); setNotifDetalle(n); }}
+                            style={{ padding: "12px 16px", borderBottom: i < notifs.length - 1 ? "1px solid #F5F2FC" : "none", cursor: "pointer" }}
+                          >
                             <div style={{ fontWeight: 700, fontSize: "13.5px" }}>
                               {n.titulo ?? n.tipo ?? "Recordatorio"}
                             </div>
@@ -512,6 +518,8 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
           );
         })}
       </nav>
+
+      <NotificacionDetalleModal notif={notifDetalle} onClose={() => setNotifDetalle(null)} />
     </>
   );
 }
