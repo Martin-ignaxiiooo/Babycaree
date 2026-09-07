@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Syringe, CheckCircle, Plus, X, FlaskConical, ClipboardCheck, Mic, MicOff, Pencil, Trash2, FileDown, CalendarCheck, TrendingUp } from "lucide-react";
+import { Syringe, CheckCircle, Plus, X, FlaskConical, ClipboardCheck, Mic, MicOff, Pencil, Trash2, FileDown, CalendarCheck, TrendingUp, ChevronLeft, ChevronRight } from "lucide-react";
 import TopNav from "../components/TopNav";
 import DateSelect from "../components/DateSelect";
 import TimeSelect from "../components/TimeSelect";
@@ -10,6 +10,37 @@ import EditarCitaModal from "../components/EditarCitaModal";
 import InformeMedico from "../components/InformeMedico";
 import { useDictado } from "../hooks/useDictado";
 import { interpretarDictado } from "../utils/interpretarDictado";
+
+const DIAS_CAL = ["D", "L", "M", "M", "J", "V", "S"];
+const MESES_CAL = [
+  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
+];
+
+const mismoDiaCal = (a: Date, b: Date) =>
+  a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+
+/** Celdas del mes para el calendario de controles: incluye los días de
+    relleno del mes anterior/siguiente para completar semanas. */
+function armarMesCal(anio: number, mes: number) {
+  const primero = new Date(anio, mes, 1);
+  const arranque = primero.getDay();
+  const diasMes = new Date(anio, mes + 1, 0).getDate();
+  const diasMesAnterior = new Date(anio, mes, 0).getDate();
+
+  const celdas: { dia: number; delMes: boolean; fecha: Date }[] = [];
+  for (let i = arranque - 1; i >= 0; i--) {
+    celdas.push({ dia: diasMesAnterior - i, delMes: false, fecha: new Date(anio, mes - 1, diasMesAnterior - i) });
+  }
+  for (let d = 1; d <= diasMes; d++) {
+    celdas.push({ dia: d, delMes: true, fecha: new Date(anio, mes, d) });
+  }
+  while (celdas.length % 7 !== 0) {
+    const siguiente = celdas.length - (arranque + diasMes) + 1;
+    celdas.push({ dia: siguiente, delMes: false, fecha: new Date(anio, mes + 1, siguiente) });
+  }
+  return celdas;
+}
 
 export default function Salud() {
   const navigate = useNavigate();
@@ -61,6 +92,10 @@ export default function Salud() {
   const [especialidad, setEspecialidad] = useState("");
   const [lugar, setLugar] = useState("");
   const [notas, setNotas] = useState("");
+  // Calendario unificado de controles (reemplaza las dos columnas de
+  // "próximos"/"anteriores", que se volvían una lista interminable).
+  const [calCursor, setCalCursor] = useState(() => { const h = new Date(); return new Date(h.getFullYear(), h.getMonth(), 1); });
+  const [calSeleccionado, setCalSeleccionado] = useState<Date>(new Date());
   const [isSavingCita, setIsSavingCita] = useState(false);
   // Cita cuyo resultado se está registrando (modal "¿cómo te fue?").
   const [citaResultado, setCitaResultado] = useState<any | null>(null);
@@ -815,133 +850,187 @@ export default function Salud() {
               </div>
             </div>
 
-            {/* Próximos y anteriores, en dos columnas: son dos preguntas
-                distintas ("¿qué me toca?" y "¿qué pasó?") y mezclarlas en
-                una sola lista obligaba a buscar entre fechas. */}
+            {/* Calendario unificado de controles: antes eran dos columnas
+                separadas ("próximos" / "anteriores") que se convertían en
+                una lista interminable con el tiempo. Ahora es un solo
+                calendario -pasados y futuros marcados con un punto de
+                color distinto- y el detalle del día elegido al costado. */}
             <div style={{ borderTop: "1px solid var(--border-soft)", marginTop: "28px", paddingTop: "24px" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "28px" }}>
-                {[
-                  { titulo: perfilEstado === "embarazo" ? "Próximos controles" : "Próximos controles", futuros: true },
-                  { titulo: "Controles anteriores", futuros: false },
-                ].map(({ titulo, futuros }) => {
-                  const ahora = new Date();
-                  const lista = citas
-                    .filter(c => (new Date(c.fecha_cita) >= ahora) === futuros)
-                    // Los próximos, del más cercano al más lejano; los
-                    // anteriores, del más reciente hacia atrás.
-                    .sort((a, b) => {
-                      const da = new Date(a.fecha_cita).getTime();
-                      const db = new Date(b.fecha_cita).getTime();
-                      return futuros ? da - db : db - da;
-                    });
+              <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1.15fr) minmax(280px, 1fr)", gap: "24px", alignItems: "start" }}>
 
-                  return (
-                    <div key={titulo}>
-                      <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "16px", color: "var(--text)" }}>
-                        {titulo}
-                      </h3>
-                      <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "8px" }}>
-                        {loading ? (
-                          <p style={{ color: "var(--text-muted)" }}>Cargando citas...</p>
-                        ) : lista.length === 0 ? (
-                          <p style={{ color: "var(--text-muted)", fontSize: "14px" }}>
-                            {futuros ? "No tienes controles agendados." : "Todavía no hay controles pasados."}
-                          </p>
-                        ) : (
-                          lista.map(cita => {
-                  const date = new Date(cita.fecha_cita);
-                  const isPast = date < new Date();
-                  return (
-                    <div key={cita.id} style={{ 
-                      background: isPast ? "#F9FAFB" : "#FDF4FF", 
-                      borderRadius: "16px", 
-                      padding: "16px",
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      borderLeft: `4px solid ${isPast ? "#E5E7EB" : "#D4A5E3"}`
-                    }}>
-                      <div>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-                          <h4 style={{ margin: 0, fontSize: "16px", color: isPast ? "#6B7280" : "var(--theme-darker)" }}>
-                            {cita.especialidad || cita.notas || "Control Médico"}
-                          </h4>
-                          <span
-                            style={{
-                              fontSize: "10.5px", fontWeight: 800, padding: "2px 9px",
-                              borderRadius: "100px", textTransform: "uppercase", letterSpacing: "0.3px",
-                              background: cita.tipo === "control" ? "#E8F7F1" : "var(--theme-bg-light)",
-                              color: cita.tipo === "control" ? "#3E8E6E" : "var(--theme-primary)",
-                            }}
-                          >
-                            {cita.tipo === "control" ? "Control" : "Cita"}
-                          </span>
-                        </div>
-                        <div style={{ fontSize: "13px", color: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", gap: "10px" }}>
-                          <span>{cita.medico || "Sin especificar doctor"}</span>
-                          {cita.lugar && <span>• {cita.lugar}</span>}
-                        </div>
-                      </div>
-                      <div style={{ textAlign: "right" }}>
-                        <div style={{ fontWeight: 700, fontSize: "15px", color: isPast ? "#6B7280" : "#D4A5E3" }}>
-                          {date.toLocaleDateString("es-CL", { day: 'numeric', month: 'short' })}
-                        </div>
-                        <div style={{ fontSize: "12px", color: "rgba(0,0,0,0.5)" }}>
-                          {date.toLocaleTimeString("es-CL", { hour: '2-digit', minute:'2-digit' })}
-                        </div>
-                        <div style={{ display: "flex", gap: "6px", marginTop: "8px", justifyContent: "flex-end", flexWrap: "wrap" }}>
-                          <button
-                            onClick={() => setCitaEditando(cita)}
-                            style={{
-                              padding: "6px 10px", borderRadius: "100px",
-                              border: "1.5px solid var(--border)", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
-                              fontWeight: 800, fontSize: "11.5px", display: "inline-flex",
-                              alignItems: "center", gap: "4px", whiteSpace: "nowrap",
-                              background: "var(--surface)", color: "var(--text)",
-                            }}
-                          >
-                            <Pencil size={12} /> Editar
-                          </button>
-                          <button
-                            onClick={() => eliminarCita(cita.id)}
-                            title="Eliminar esta cita"
-                            style={{
-                              padding: "6px 10px", borderRadius: "100px",
-                              border: "1.5px solid #FBDADA", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
-                              fontWeight: 800, fontSize: "11.5px", display: "inline-flex",
-                              alignItems: "center", gap: "4px", whiteSpace: "nowrap",
-                              background: "var(--surface)", color: "#D97070",
-                            }}
-                          >
-                            <Trash2 size={12} /> Eliminar
-                          </button>
-                          {/* Solo para citas ya pasadas: registrar lo que ocurrió. */}
-                          {isPast && (
-                            <button
-                              onClick={() => setCitaResultado(cita)}
-                              style={{
-                                padding: "6px 12px", borderRadius: "100px",
-                                border: "none", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
-                                fontWeight: 800, fontSize: "11.5px", display: "inline-flex",
-                                alignItems: "center", gap: "5px", whiteSpace: "nowrap",
-                                background: cita.diagnostico ? "#E8F7F1" : "var(--theme-primary)",
-                                color: cita.diagnostico ? "#3E8E6E" : "#fff",
-                              }}
-                            >
-                              <ClipboardCheck size={13} />
-                              {cita.diagnostico ? "Ver resultado" : "¿Cómo te fue?"}
-                            </button>
+                {/* ── Calendario ── */}
+                <div style={{ background: "var(--surface-2)", border: "1.5px solid var(--border-soft)", borderRadius: "20px", padding: "22px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                    <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "17px", fontWeight: 700, color: "var(--text)", margin: 0 }}>
+                      {MESES_CAL[calCursor.getMonth()]} {calCursor.getFullYear()}
+                    </h3>
+                    <div style={{ display: "flex", gap: "6px" }}>
+                      <button
+                        onClick={() => setCalCursor(new Date(calCursor.getFullYear(), calCursor.getMonth() - 1, 1))}
+                        style={{ width: "30px", height: "30px", borderRadius: "9px", border: "1px solid var(--border-soft)", background: "var(--surface)", color: "var(--theme-primary)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                      >
+                        <ChevronLeft size={16} />
+                      </button>
+                      <button
+                        onClick={() => setCalCursor(new Date(calCursor.getFullYear(), calCursor.getMonth() + 1, 1))}
+                        style={{ width: "30px", height: "30px", borderRadius: "9px", border: "1px solid var(--border-soft)", background: "var(--surface)", color: "var(--theme-primary)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                      >
+                        <ChevronRight size={16} />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "4px", marginBottom: "6px" }}>
+                    {DIAS_CAL.map((d, i) => (
+                      <div key={i} style={{ textAlign: "center", fontSize: "10.5px", fontWeight: 800, color: "#A99FC4", padding: "5px 0" }}>{d}</div>
+                    ))}
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "4px" }}>
+                    {armarMesCal(calCursor.getFullYear(), calCursor.getMonth()).map((c, i) => {
+                      const ahora = new Date();
+                      const citasDia = c.delMes ? citas.filter(ci => mismoDiaCal(new Date(ci.fecha_cita), c.fecha)) : [];
+                      const tienePasado = citasDia.some(ci => new Date(ci.fecha_cita) < ahora);
+                      const tieneProximo = citasDia.some(ci => new Date(ci.fecha_cita) >= ahora);
+                      const esHoy = mismoDiaCal(c.fecha, ahora);
+                      const estaSeleccionado = mismoDiaCal(c.fecha, calSeleccionado);
+                      return (
+                        <button
+                          key={i}
+                          onClick={() => c.delMes && setCalSeleccionado(c.fecha)}
+                          disabled={!c.delMes}
+                          style={{
+                            aspectRatio: "1", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                            borderRadius: "10px", fontSize: "13px", fontWeight: 700, gap: "3px", border: "none",
+                            cursor: c.delMes ? "pointer" : "default", fontFamily: "'Nunito', sans-serif",
+                            background: estaSeleccionado ? "var(--theme-primary)" : esHoy ? "var(--theme-bg-light)" : "transparent",
+                            color: estaSeleccionado ? "#fff" : !c.delMes ? "#C9C4D6" : esHoy ? "var(--theme-primary)" : "var(--text)",
+                          }}
+                        >
+                          {c.dia}
+                          {(tienePasado || tieneProximo) && (
+                            <span style={{ display: "flex", gap: "2px" }}>
+                              {tienePasado && <span style={{ width: "4.5px", height: "4.5px", borderRadius: "50%", background: estaSeleccionado ? "#fff" : "var(--theme-primary)" }} />}
+                              {tieneProximo && <span style={{ width: "4.5px", height: "4.5px", borderRadius: "50%", background: estaSeleccionado ? "#fff" : "#E88AA6" }} />}
+                            </span>
                           )}
-                        </div>
-                      </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div style={{ display: "flex", gap: "18px", marginTop: "16px", paddingTop: "14px", borderTop: "1px solid var(--border-soft)", flexWrap: "wrap" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "var(--text-muted)", fontWeight: 700 }}>
+                      <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: "var(--theme-primary)" }} /> Control anterior
                     </div>
-                  );
-                          })
-                        )}
-                      </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "var(--text-muted)", fontWeight: 700 }}>
+                      <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#E88AA6" }} /> Próximo control
                     </div>
-                  );
-                })}
+                  </div>
+                </div>
+
+                {/* ── Detalle del día elegido ── */}
+                <div>
+                  <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "16px", color: "var(--text)" }}>
+                    {calSeleccionado.toLocaleDateString("es-CL", { day: "numeric", month: "long" })}
+                  </h3>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                    {loading ? (
+                      <p style={{ color: "var(--text-muted)" }}>Cargando citas...</p>
+                    ) : (() => {
+                      const citasDelDia = citas
+                        .filter(c => mismoDiaCal(new Date(c.fecha_cita), calSeleccionado))
+                        .sort((a, b) => new Date(a.fecha_cita).getTime() - new Date(b.fecha_cita).getTime());
+
+                      if (citasDelDia.length === 0) {
+                        return (
+                          <p style={{ color: "var(--text-muted)", fontSize: "14px" }}>
+                            No hay controles registrados este día. Elige un día marcado con punto en el calendario.
+                          </p>
+                        );
+                      }
+
+                      return citasDelDia.map(cita => {
+                        const date = new Date(cita.fecha_cita);
+                        const isPast = date < new Date();
+                        return (
+                          <div key={cita.id} style={{
+                            background: isPast ? "#F9FAFB" : "#FDF4FF",
+                            borderRadius: "16px",
+                            padding: "16px",
+                            borderLeft: `4px solid ${isPast ? "var(--theme-primary)" : "#D4A5E3"}`
+                          }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px", flexWrap: "wrap" }}>
+                              <h4 style={{ margin: 0, fontSize: "16px", color: isPast ? "#6B7280" : "var(--theme-darker)" }}>
+                                {cita.especialidad || cita.notas || "Control Médico"}
+                              </h4>
+                              <span
+                                style={{
+                                  fontSize: "10.5px", fontWeight: 800, padding: "2px 9px",
+                                  borderRadius: "100px", textTransform: "uppercase", letterSpacing: "0.3px",
+                                  background: cita.tipo === "control" ? "#E8F7F1" : "var(--theme-bg-light)",
+                                  color: cita.tipo === "control" ? "#3E8E6E" : "var(--theme-primary)",
+                                }}
+                              >
+                                {cita.tipo === "control" ? "Control" : "Cita"}
+                              </span>
+                            </div>
+                            <div style={{ fontSize: "13px", color: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", marginBottom: "12px" }}>
+                              <span>{cita.medico || "Sin especificar doctor"}</span>
+                              {cita.lugar && <span>• {cita.lugar}</span>}
+                              <span>• {date.toLocaleTimeString("es-CL", { hour: '2-digit', minute: '2-digit' })}</span>
+                            </div>
+                            <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                              <button
+                                onClick={() => setCitaEditando(cita)}
+                                style={{
+                                  padding: "6px 10px", borderRadius: "100px",
+                                  border: "1.5px solid var(--border)", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
+                                  fontWeight: 800, fontSize: "11.5px", display: "inline-flex",
+                                  alignItems: "center", gap: "4px", whiteSpace: "nowrap",
+                                  background: "var(--surface)", color: "var(--text)",
+                                }}
+                              >
+                                <Pencil size={12} /> Editar
+                              </button>
+                              <button
+                                onClick={() => eliminarCita(cita.id)}
+                                title="Eliminar esta cita"
+                                style={{
+                                  padding: "6px 10px", borderRadius: "100px",
+                                  border: "1.5px solid #FBDADA", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
+                                  fontWeight: 800, fontSize: "11.5px", display: "inline-flex",
+                                  alignItems: "center", gap: "4px", whiteSpace: "nowrap",
+                                  background: "var(--surface)", color: "#D97070",
+                                }}
+                              >
+                                <Trash2 size={12} /> Eliminar
+                              </button>
+                              {/* Solo para citas ya pasadas: registrar lo que ocurrió. */}
+                              {isPast && (
+                                <button
+                                  onClick={() => setCitaResultado(cita)}
+                                  style={{
+                                    padding: "6px 12px", borderRadius: "100px",
+                                    border: "none", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
+                                    fontWeight: 800, fontSize: "11.5px", display: "inline-flex",
+                                    alignItems: "center", gap: "5px", whiteSpace: "nowrap",
+                                    background: cita.diagnostico ? "#E8F7F1" : "var(--theme-primary)",
+                                    color: cita.diagnostico ? "#3E8E6E" : "#fff",
+                                  }}
+                                >
+                                  <ClipboardCheck size={13} />
+                                  {cita.diagnostico ? "Ver resultado" : "¿Cómo te fue?"}
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      });
+                    })()}
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
