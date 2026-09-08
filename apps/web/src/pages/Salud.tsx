@@ -553,8 +553,26 @@ export default function Salud() {
 
       <div className="page-container" style={{ marginTop: "-14px" }}>
 
+        {/* Informe médico: en desktop es un botón de texto más en la fila de
+            pestañas (ver más abajo); en móvil pasa a un ícono circular
+            aparte, arriba de la grilla, para no competir por espacio. */}
+        <div className="informe-btn-row-mobile" style={{ display: "none", justifyContent: "flex-end", marginBottom: "12px" }}>
+          <button
+            onClick={() => setShowInforme(true)}
+            aria-label="Informe médico"
+            title="Informe médico"
+            style={{
+              width: "42px", height: "42px", borderRadius: "50%", border: "none", cursor: "pointer",
+              background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))", color: "#fff",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              boxShadow: "0 6px 16px var(--theme-shadow-light)",
+            }}>
+            <FileDown size={19} />
+          </button>
+        </div>
+
         {/* TABS */}
-        <div className="responsive-overflow" style={{ display: "flex", gap: "10px", marginBottom: "32px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "16px", whiteSpace: "nowrap" }}>
+        <div className="responsive-overflow salud-tabs-row" style={{ display: "flex", gap: "10px", marginBottom: "32px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "16px", whiteSpace: "nowrap" }}>
           <button
             onClick={() => setActiveTab("controles")}
             style={{
@@ -613,6 +631,7 @@ export default function Salud() {
           </button>
           <button
             onClick={() => setShowInforme(true)}
+            className="informe-btn-desktop"
             style={{
               background: "transparent",
               color: "var(--text-muted)",

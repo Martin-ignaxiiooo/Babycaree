@@ -744,6 +744,31 @@ body {
     display: none;
   }
 
+  /* Pestañas de Salud y Crecimiento: en desktop es una fila horizontal
+     (Controles/Vacunas/Crecimiento/Exámenes/Informe médico) que en
+     pantallas angostas se cortaba y quedaba con scroll lateral poco claro.
+     En móvil pasa a una grilla de 2 columnas (sin scroll), e "Informe
+     médico" sale de la fila -ya no compite por espacio- y pasa a un
+     botón circular aparte, arriba a la derecha. */
+  .salud-tabs-row {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    white-space: normal !important;
+    overflow: visible !important;
+  }
+  .salud-tabs-row button {
+    padding: 11px 10px !important;
+    font-size: 13px !important;
+    justify-content: center !important;
+  }
+  .informe-btn-desktop {
+    display: none !important;
+  }
+  .informe-btn-row-mobile {
+    display: flex !important;
+  }
+
   /* Calendario de controles (Salud): en desktop es calendario + detalle
      lado a lado; en móvil se apilan (calendario arriba, detalle abajo)
      en vez de superponerse por falta de espacio horizontal. */
