@@ -43,33 +43,56 @@ function comparar(antes: number, ahora: number, unidad: "tomas" | "sueno") {
 /** Gráfico de barras simple, sin librerías: son pocos datos y así no pesa. */
 function Barras({ datos, campo, color, formato }: any) {
   const max = Math.max(...datos.map((d: any) => d[campo]), 1);
+
+  // Agrupa los días consecutivos que caen en el mismo mes, para mostrar el
+  // nombre del mes una sola vez, centrado bajo ese grupo (en vez de
+  // repetirlo pegado a cada número de día).
+  const grupos: { mes: string; cantidad: number }[] = [];
+  datos.forEach((d: any) => {
+    const mes = new Date(d.dia + "T12:00:00").toLocaleDateString("es-CL", { month: "short" }).replace(".", "");
+    const ultimo = grupos[grupos.length - 1];
+    if (ultimo && ultimo.mes === mes) ultimo.cantidad++;
+    else grupos.push({ mes, cantidad: 1 });
+  });
+
   return (
-    <div style={{ display: "flex", alignItems: "flex-end", gap: "4px", height: "110px", marginTop: "14px" }}>
-      {datos.map((d: any, i: number) => {
-        const valor = d[campo];
-        const alto = Math.max((valor / max) * 100, valor > 0 ? 6 : 2);
-        const fecha = new Date(d.dia + "T12:00:00");
-        // El día solo (ej. "8") es ambiguo si el rango de 14/30 días cruza
-        // un cambio de mes ("28, 29, 30, 1, 2..." sin indicar que cambió el
-        // mes). Se agrega el mes abreviado en la primera barra y cada vez
-        // que cambia, sin repetirlo en el resto para no saturar el eje.
-        const fechaAnterior = i > 0 ? new Date(datos[i - 1].dia + "T12:00:00") : null;
-        const mostrarMes = i === 0 || (fechaAnterior !== null && fecha.getMonth() !== fechaAnterior.getMonth());
-        return (
-          <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "5px" }} title={`${fecha.toLocaleDateString("es-CL", { day: "numeric", month: "short" })}: ${formato(valor)}`}>
-            <div
-              style={{
-                width: "100%", height: `${alto}%`, minHeight: "3px",
-                background: valor > 0 ? color : "#EDE9F8",
-                borderRadius: "5px 5px 3px 3px", transition: "height .3s",
-              }}
-            />
-            <span style={{ fontSize: "9.5px", color: "#B0ABC4", fontWeight: 700, whiteSpace: "nowrap" }}>
-              {fecha.getDate()}{mostrarMes ? ` ${fecha.toLocaleDateString("es-CL", { month: "short" }).replace(".", "")}` : ""}
+    <div style={{ marginTop: "14px" }}>
+      <div style={{ display: "flex", alignItems: "flex-end", gap: "4px", height: "110px" }}>
+        {datos.map((d: any, i: number) => {
+          const valor = d[campo];
+          const alto = Math.max((valor / max) * 100, valor > 0 ? 6 : 2);
+          const fecha = new Date(d.dia + "T12:00:00");
+          return (
+            <div key={i} style={{ flex: 1, height: "100%", display: "flex", alignItems: "flex-end" }} title={`${fecha.toLocaleDateString("es-CL", { day: "numeric", month: "short" })}: ${formato(valor)}`}>
+              <div
+                style={{
+                  width: "100%", height: `${alto}%`, minHeight: "3px",
+                  background: valor > 0 ? color : "#EDE9F8",
+                  borderRadius: "5px 5px 3px 3px", transition: "height .3s",
+                }}
+              />
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ display: "flex", gap: "4px", marginTop: "5px" }}>
+        {datos.map((d: any, i: number) => (
+          <div key={i} style={{ flex: 1, textAlign: "center" }}>
+            <span style={{ fontSize: "9.5px", color: "#B0ABC4", fontWeight: 700 }}>
+              {new Date(d.dia + "T12:00:00").getDate()}
             </span>
           </div>
-        );
-      })}
+        ))}
+      </div>
+      <div style={{ display: "flex", marginTop: "3px" }}>
+        {grupos.map((g, i) => (
+          <div key={i} style={{ flex: g.cantidad, textAlign: "center" }}>
+            <span style={{ fontSize: "9px", color: "#8A849C", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.3px" }}>
+              {g.mes}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
