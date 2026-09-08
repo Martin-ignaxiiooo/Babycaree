@@ -129,6 +129,10 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
   // cuando se agrega o quita una sección.
   const navItems = [
       { label: "Inicio", path: "/dashboard", match: "dashboard" },
+      // Requiere un bebé activo, ya que la ruta depende de su id.
+      ...(activeBabyId ? [
+        { label: "Perfil del bebé", mobileLabel: "Perfil", path: `/perfil/${activeBabyId}`, match: "perfil" },
+      ] : []),
       // El calendario es propio del seguimiento de embarazo: en un perfil de
       // bebé nacido las citas se ven desde Salud y no hace falta duplicarlo.
       ...(estadoPerfil === "embarazo" ? [
@@ -148,10 +152,6 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
       ...(estadoPerfil !== "embarazo" ? [
         { label: "Directorio", path: "/directorio", match: "directorio" },
         { label: "Galería", path: "/galeria", match: "galeria" },
-      ] : []),
-      // Requiere un bebé activo, ya que la ruta depende de su id.
-      ...(activeBabyId ? [
-        { label: "Perfil del bebé", mobileLabel: "Perfil", path: `/perfil/${activeBabyId}`, match: "perfil" },
       ] : []),
   ];
 
