@@ -151,7 +151,7 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
       ] : []),
       // Requiere un bebé activo, ya que la ruta depende de su id.
       ...(activeBabyId ? [
-        { label: "Perfil del bebé", path: `/perfil/${activeBabyId}`, match: "perfil" },
+        { label: "Perfil del bebé", mobileLabel: "Perfil", path: `/perfil/${activeBabyId}`, match: "perfil" },
       ] : []),
   ];
 
@@ -543,7 +543,7 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
             >
               <Icono size={21} strokeWidth={active ? 2.4 : 2} />
               <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "100%" }}>
-                {item.label}
+                {(item as any).mobileLabel ?? item.label}
               </span>
             </button>
           );
