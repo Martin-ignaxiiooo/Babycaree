@@ -149,6 +149,10 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
         { label: "Directorio", path: "/directorio", match: "directorio" },
         { label: "Galería", path: "/galeria", match: "galeria" },
       ] : []),
+      // Requiere un bebé activo, ya que la ruta depende de su id.
+      ...(activeBabyId ? [
+        { label: "Perfil del bebé", path: `/perfil/${activeBabyId}`, match: "perfil" },
+      ] : []),
   ];
 
 
@@ -162,6 +166,7 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
     comunidad: MessageSquare,
     directorio: Stethoscope,
     galeria: Images,
+    perfil: Baby,
   };
 
   const NavLinks = ({ pill = false }: { pill?: boolean }) => {
@@ -464,18 +469,6 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
 
             <div style={{ display: "flex", flexDirection: "column", gap: "4px", fontSize: "15.5px", fontWeight: 700 }}>
               <NavLinks />
-              {activeBabyId && (
-                <span
-                  onClick={() => { setMobileMenuOpen(false); navigate(`/perfil/${activeBabyId}`); }}
-                  style={{
-                    cursor: "pointer",
-                    padding: "11px 12px", borderRadius: "12px",
-                    color: "rgba(255,255,255,0.75)",
-                  }}
-                >
-                  Perfil
-                </span>
-              )}
             </div>
 
             {babies.length > 1 && (
