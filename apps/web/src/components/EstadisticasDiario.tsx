@@ -57,13 +57,14 @@ function Lineas({ datos, campo, color, formato }: any) {
     else grupos.push({ mes, cantidad: 1 });
   });
 
-  // Coordenadas iguales a las de Evolución de Peso/Talla (Salud.tsx): caja
-  // de 340x100 con margen para los ejes, punto centrado en su columna.
-  const left = 40, right = 330, top = 10, bottom = 85;
-  const x = (i: number) => left + ((i + 0.5) / n) * (right - left);
-  const y = (valor: number) => bottom - (valor / max) * (bottom - top);
+  // Cada punto va al centro de su columna (igual que los números de día de
+  // abajo, que usan flex:1 y quedan centrados), para que el punto de cada
+  // día quede justo arriba de su propia etiqueta.
+  const x = (i: number) => ((i + 0.5) / n) * 100;
+  const y = (valor: number) => 92 - (valor / max) * 84; // deja margen arriba/abajo para que los puntos no se corten
 
   const puntos = datos.map((d: any, i: number) => `${x(i)},${y(d[campo])}`).join(" ");
+  const area = `${x(0)},100 ${puntos} ${x(n - 1)},100`;
 
   return (
     <div style={{ marginTop: "14px", display: "flex", gap: "8px" }}>
@@ -75,25 +76,25 @@ function Lineas({ datos, campo, color, formato }: any) {
       </div>
 
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ width: "100%", overflowX: "auto" }}>
-          <svg viewBox="0 0 340 100" style={{ width: "100%", height: `${alto}px`, overflow: "visible", minWidth: "260px" }}>
-            <rect width="340" height="100" fill="#F9FAFB" rx="8" />
-            <line x1={left} y1={top} x2={left} y2={bottom} stroke="#E5E7EB" strokeWidth="0.8" />
-            <line x1={left} y1={bottom} x2={right} y2={bottom} stroke="#E5E7EB" strokeWidth="0.8" />
-            <line x1={left} y1={(top + bottom) / 2} x2={right} y2={(top + bottom) / 2} stroke="#F3F4F6" strokeWidth="0.6" />
-            <polyline points={puntos} fill="none" stroke={color} strokeWidth="2.5" strokeLinejoin="round" />
-            {datos.map((d: any, i: number) => {
-              const valor = d[campo];
-              const fecha = new Date(d.dia + "T12:00:00");
-              const esUltimo = i === n - 1;
-              return (
-                <circle key={i} cx={x(i)} cy={y(valor)} r={esUltimo ? 4.5 : 3.5} fill={color} stroke={esUltimo ? "#fff" : "none"} strokeWidth={2}>
-                  <title>{`${fecha.toLocaleDateString("es-CL", { day: "numeric", month: "short" })}: ${formato(valor)}`}</title>
-                </circle>
-              );
-            })}
-          </svg>
-        </div>
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: "100%", height: `${alto}px`, overflow: "visible" }}>
+          <defs>
+            <linearGradient id={`grad-${campo}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={color} stopOpacity="0.3" />
+              <stop offset="100%" stopColor={color} stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <polygon points={area} fill={`url(#grad-${campo})`} />
+          <polyline points={puntos} fill="none" stroke={color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+          {datos.map((d: any, i: number) => {
+            const valor = d[campo];
+            const fecha = new Date(d.dia + "T12:00:00");
+            return (
+              <circle key={i} cx={x(i)} cy={y(valor)} r="1.6" fill={color} vectorEffect="non-scaling-stroke">
+                <title>{`${fecha.toLocaleDateString("es-CL", { day: "numeric", month: "short" })}: ${formato(valor)}`}</title>
+              </circle>
+            );
+          })}
+        </svg>
         <div style={{ display: "flex", gap: "4px", marginTop: "5px" }}>
           {datos.map((d: any, i: number) => (
             <div key={i} style={{ flex: 1, textAlign: "center" }}>
