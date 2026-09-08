@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Milk, Moon, Baby, Plus,
+  Milk, Moon, Baby, Plus, X,
   Droplets, Sun,
 } from "lucide-react";
 import TopNav from "../components/TopNav";
@@ -201,10 +201,10 @@ export default function RegistroDiario() {
 
         {/* Formulario de toma */}
         {abierto === "toma" && (
-          <Panel>
+          <Modal titulo="Registrar toma" onClose={() => setAbierto(null)}>
             <Etiqueta>¿De dónde comió?</Etiqueta>
             <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "18px" }}>
-              {([["pecho_izq", "Pecho izq."], ["biberon", "Biberón"], ["pecho_der", "Pecho der."]] as const).map(([v, l]) => (
+              {([["pecho_izq", "Pecho izq."], ["pecho_der", "Pecho der."], ["biberon", "Biberón"]] as const).map(([v, l]) => (
                 <Opcion key={v} activo={fuente === v} onClick={() => setFuente(v)}>{l}</Opcion>
               ))}
             </div>
@@ -230,12 +230,12 @@ export default function RegistroDiario() {
                   : { tipo: "toma", fuente, duracion_min: duracionMin }
               )}
             />
-          </Panel>
+          </Modal>
         )}
 
         {/* Formulario de pañal */}
         {abierto === "panal" && (
-          <Panel>
+          <Modal titulo="Cambio de pañal" onClose={() => setAbierto(null)}>
             <Etiqueta>¿Qué había?</Etiqueta>
             <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "18px" }}>
               {([["pis", "Pipí"], ["caca", "Caca"], ["mixto", "Ambos"]] as const).map(([v, l]) => (
@@ -244,7 +244,7 @@ export default function RegistroDiario() {
             </div>
             <CampoNota nota={nota} setNota={setNota} />
             <Guardar disabled={guardando} onClick={() => registrar({ tipo: "panal", panal_tipo: panalTipo })} />
-          </Panel>
+          </Modal>
         )}
 
         {error && (
@@ -298,10 +298,40 @@ function BotonRapido({ tipo, activo, onClick, label }: any) {
   );
 }
 
-function Panel({ children }: any) {
+function Modal({ titulo, onClose, children }: any) {
   return (
-    <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "22px 24px", marginBottom: "16px", boxShadow: "0 4px 18px rgba(124,92,191,0.07)" }}>
-      {children}
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed", inset: 0, background: "rgba(45,38,64,0.5)", zIndex: 1000,
+        display: "flex", alignItems: "center", justifyContent: "center", padding: "20px",
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: "var(--surface)", borderRadius: "22px", width: "100%", maxWidth: "420px",
+          maxHeight: "90vh", overflowY: "auto", padding: "24px", boxShadow: "0 20px 60px rgba(45,38,64,0.3)",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
+          <div style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "18px", fontWeight: 700, color: "var(--text)" }}>
+            {titulo}
+          </div>
+          <button
+            onClick={onClose}
+            aria-label="Cerrar"
+            style={{
+              background: "var(--surface-2)", border: "none", borderRadius: "50%",
+              width: "30px", height: "30px", display: "flex", alignItems: "center",
+              justifyContent: "center", cursor: "pointer", color: "var(--text-muted)", flexShrink: 0,
+            }}
+          >
+            <X size={16} />
+          </button>
+        </div>
+        {children}
+      </div>
     </div>
   );
 }
