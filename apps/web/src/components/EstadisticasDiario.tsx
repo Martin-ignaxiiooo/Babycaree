@@ -86,7 +86,7 @@ function Dato({ valor, etiqueta }: { valor: string; etiqueta: string }) {
   );
 }
 
-export default function EstadisticasDiario({ bebeId, token }: { bebeId: string; token: string }) {
+export default function EstadisticasDiario({ bebeId, token, refreshKey }: { bebeId: string; token: string; refreshKey?: number }) {
   const [datos, setDatos] = useState<any>(null);
   const [dias, setDias] = useState(14);
   const [cargando, setCargando] = useState(true);
@@ -108,7 +108,11 @@ export default function EstadisticasDiario({ bebeId, token }: { bebeId: string; 
     }
   }, [bebeId, token, dias]);
 
-  useEffect(() => { cargar(); }, [cargar]);
+  // refreshKey cambia cada vez que se agrega/borra un registro desde la
+  // página que contiene este componente (Registro diario), para que los
+  // gráficos se actualicen sin tener que recargar la página entera.
+  useEffect(() => { cargar(); }, [cargar, refreshKey]);
+
 
   if (cargando) {
     return <div style={{ textAlign: "center", padding: "50px", color: "var(--text-muted)" }}><Loader2 size={26} className="spin-icon" /></div>;

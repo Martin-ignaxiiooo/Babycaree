@@ -63,6 +63,10 @@ export default function RegistroDiario() {
   const [duracionMin, setDuracionMin] = useState(15);
   const [panalTipo, setPanalTipo] = useState<"pis" | "caca" | "mixto">("pis");
   const [nota, setNota] = useState("");
+  // Cambia cada vez que se agrega/borra un registro, para que
+  // EstadisticasDiario (los gráficos de Patrones) se refresque también sin
+  // tener que recargar la página entera.
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     if (!token) { navigate("/"); return; }
@@ -110,6 +114,7 @@ export default function RegistroDiario() {
       setAbierto(null);
       setNota("");
       cargar();
+      setRefreshKey((k) => k + 1);
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -123,6 +128,7 @@ export default function RegistroDiario() {
       method: "PATCH", headers: { Authorization: `Bearer ${token}` },
     });
     cargar();
+    setRefreshKey((k) => k + 1);
   };
 
   const suenoEnCurso = resumen?.sueno_en_curso;
@@ -146,21 +152,6 @@ export default function RegistroDiario() {
       </div>
 
       <div className="page-container" style={{ padding: "28px 40px 60px" }}>
-        {/* Resumen de hoy */}
-        {resumen && (
-          <>
-          <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "20px", color: "var(--text)", margin: "0 0 14px" }}>
-            Últimos registros de hoy
-          </h2>
-          <div className="diario-resumen-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "14px", marginBottom: "26px" }}>
-            <Tarjeta icono={<Milk size={19} color="#1976D2" />} bg="#E3F2FD" valor={resumen.hoy.tomas} etiqueta="tomas hoy" />
-            <Tarjeta icono={<Droplets size={19} color="#0288D1" />} bg="#E1F5FE" valor={`${resumen.hoy.ml_total} ml`} etiqueta="de biberón" />
-            <Tarjeta icono={<Moon size={19} color="#7C5CBF" />} bg="#EDE7F6" valor={duracionTexto(resumen.hoy.sueno_min)} etiqueta="durmiendo" />
-            <Tarjeta icono={<Baby size={19} color="#B27B16" />} bg="#FFF4E0" valor={resumen.hoy.panales} etiqueta="pañales" />
-          </div>
-          </>
-        )}
-
         {/* Sueño en curso: acción destacada, es lo único con estado abierto */}
         {suenoEnCurso && (
           <div style={{ background: "linear-gradient(120deg, #4A3770, #7C5CBF)", borderRadius: "20px", padding: "20px 24px", marginBottom: "22px", display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
@@ -197,6 +188,21 @@ export default function RegistroDiario() {
           )}
           <BotonRapido tipo="panal" activo={abierto === "panal"} onClick={() => setAbierto(abierto === "panal" ? null : "panal")} label="Cambio de pañal" />
         </div>
+        )}
+
+        {/* Resumen de hoy */}
+        {resumen && (
+          <>
+          <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "20px", color: "var(--text)", margin: "0 0 14px" }}>
+            Últimos registros de hoy
+          </h2>
+          <div className="diario-resumen-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "14px", marginBottom: "26px" }}>
+            <Tarjeta icono={<Milk size={19} color="#1976D2" />} bg="#E3F2FD" valor={resumen.hoy.tomas} etiqueta="tomas hoy" />
+            <Tarjeta icono={<Droplets size={19} color="#0288D1" />} bg="#E1F5FE" valor={`${resumen.hoy.ml_total} ml`} etiqueta="de biberón" />
+            <Tarjeta icono={<Moon size={19} color="#7C5CBF" />} bg="#EDE7F6" valor={duracionTexto(resumen.hoy.sueno_min)} etiqueta="durmiendo" />
+            <Tarjeta icono={<Baby size={19} color="#B27B16" />} bg="#FFF4E0" valor={resumen.hoy.panales} etiqueta="pañales" />
+          </div>
+          </>
         )}
 
         {/* Formulario de toma */}
@@ -238,7 +244,7 @@ export default function RegistroDiario() {
           <Modal titulo="Cambio de pañal" onClose={() => setAbierto(null)}>
             <Etiqueta>¿Qué había?</Etiqueta>
             <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "18px" }}>
-              {([["pis", "Pipí"], ["caca", "Caca"], ["mixto", "Ambos"]] as const).map(([v, l]) => (
+              {([["pis", "Pipí"], ["caca", "Popó"], ["mixto", "Ambos"]] as const).map(([v, l]) => (
                 <Opcion key={v} activo={panalTipo === v} onClick={() => setPanalTipo(v)}>{l}</Opcion>
               ))}
             </div>
@@ -259,7 +265,7 @@ export default function RegistroDiario() {
         <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "20px", color: "var(--text)", margin: "26px 0 14px" }}>
           Patrones
         </h2>
-        {bebeId && <EstadisticasDiario bebeId={bebeId} token={token!} />}
+        {bebeId && <EstadisticasDiario bebeId={bebeId} token={token!} refreshKey={refreshKey} />}
       </div>
     </div>
   );
