@@ -41,9 +41,10 @@ function comparar(antes: number, ahora: number, unidad: "tomas" | "sueno") {
 }
 
 /** Gráfico de barras simple, sin librerías: son pocos datos y así no pesa. */
-function Barras({ datos, campo, color, formato }: any) {
+function Lineas({ datos, campo, color, formato }: any) {
   const max = Math.max(...datos.map((d: any) => d[campo]), 1);
   const alto = 110;
+  const n = datos.length;
 
   // Agrupa los días consecutivos que caen en el mismo mes, para mostrar el
   // nombre del mes una sola vez, centrado bajo ese grupo (en vez de
@@ -56,9 +57,18 @@ function Barras({ datos, campo, color, formato }: any) {
     else grupos.push({ mes, cantidad: 1 });
   });
 
+  // Cada punto va al centro de su columna (igual que los números de día de
+  // abajo, que usan flex:1 y quedan centrados), para que el punto de cada
+  // día quede justo arriba de su propia etiqueta.
+  const x = (i: number) => ((i + 0.5) / n) * 100;
+  const y = (valor: number) => 92 - (valor / max) * 84; // deja margen arriba/abajo para que los puntos no se corten
+
+  const puntos = datos.map((d: any, i: number) => `${x(i)},${y(d[campo])}`).join(" ");
+  const area = `${x(0)},100 ${puntos} ${x(n - 1)},100`;
+
   return (
     <div style={{ marginTop: "14px", display: "flex", gap: "8px" }}>
-      {/* Eje Y: escala de referencia para leer las barras sin pasar el mouse */}
+      {/* Eje Y: escala de referencia para leer el gráfico sin pasar el mouse */}
       <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: `${alto}px`, flexShrink: 0 }}>
         <span style={{ fontSize: "9px", color: "#B0ABC4", fontWeight: 700, whiteSpace: "nowrap" }}>{formato(max)}</span>
         <span style={{ fontSize: "9px", color: "#B0ABC4", fontWeight: 700, whiteSpace: "nowrap" }}>{formato(Math.round(max / 2))}</span>
@@ -66,24 +76,25 @@ function Barras({ datos, campo, color, formato }: any) {
       </div>
 
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", alignItems: "flex-end", gap: "4px", height: `${alto}px` }}>
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: "100%", height: `${alto}px`, overflow: "visible" }}>
+          <defs>
+            <linearGradient id={`grad-${campo}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={color} stopOpacity="0.3" />
+              <stop offset="100%" stopColor={color} stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <polygon points={area} fill={`url(#grad-${campo})`} />
+          <polyline points={puntos} fill="none" stroke={color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
           {datos.map((d: any, i: number) => {
             const valor = d[campo];
-            const altoBarra = Math.max((valor / max) * 100, valor > 0 ? 6 : 2);
             const fecha = new Date(d.dia + "T12:00:00");
             return (
-              <div key={i} style={{ flex: 1, height: "100%", display: "flex", alignItems: "flex-end" }} title={`${fecha.toLocaleDateString("es-CL", { day: "numeric", month: "short" })}: ${formato(valor)}`}>
-                <div
-                  style={{
-                    width: "100%", height: `${altoBarra}%`, minHeight: "3px",
-                    background: valor > 0 ? color : "#EDE9F8",
-                    borderRadius: "5px 5px 3px 3px", transition: "height .3s",
-                  }}
-                />
-              </div>
+              <circle key={i} cx={x(i)} cy={y(valor)} r="1.6" fill={color} vectorEffect="non-scaling-stroke">
+                <title>{`${fecha.toLocaleDateString("es-CL", { day: "numeric", month: "short" })}: ${formato(valor)}`}</title>
+              </circle>
             );
           })}
-        </div>
+        </svg>
         <div style={{ display: "flex", gap: "4px", marginTop: "5px" }}>
           {datos.map((d: any, i: number) => (
             <div key={i} style={{ flex: 1, textAlign: "center" }}>
@@ -241,7 +252,7 @@ export default function EstadisticasDiario({ bebeId, token, refreshKey }: { bebe
         <div style={{ display: "flex", alignItems: "center", gap: "7px", marginTop: "18px", fontSize: "12.5px", color: "var(--text-muted)", fontWeight: 700 }}>
           <Milk size={14} color="#1976D2" /> Tomas por día
         </div>
-        <Barras datos={datos.por_dia} campo="tomas" color="#64B5F6" formato={(v: number) => `${v} tomas`} />
+        <Lineas datos={datos.por_dia} campo="tomas" color="#64B5F6" formato={(v: number) => `${v} tomas`} />
       </Bloque>
 
       {/* Sueño */}
@@ -254,7 +265,7 @@ export default function EstadisticasDiario({ bebeId, token, refreshKey }: { bebe
         <div style={{ display: "flex", alignItems: "center", gap: "7px", marginTop: "18px", fontSize: "12.5px", color: "var(--text-muted)", fontWeight: 700 }}>
           <Moon size={14} color="#7C5CBF" /> Total dormido por día
         </div>
-        <Barras datos={datos.por_dia} campo="sueno_min" color="#A07ADF" formato={duracion} />
+        <Lineas datos={datos.por_dia} campo="sueno_min" color="#A07ADF" formato={duracion} />
       </Bloque>
 
       {/* Pañales */}
@@ -268,7 +279,7 @@ export default function EstadisticasDiario({ bebeId, token, refreshKey }: { bebe
         <div style={{ display: "flex", alignItems: "center", gap: "7px", marginTop: "18px", fontSize: "12.5px", color: "var(--text-muted)", fontWeight: 700 }}>
           <Baby size={14} color="#B27B16" /> Cambios por día
         </div>
-        <Barras datos={datos.por_dia} campo="panales" color="#F7C873" formato={(v: number) => `${v} pañales`} />
+        <Lineas datos={datos.por_dia} campo="panales" color="#F7C873" formato={(v: number) => `${v} pañales`} />
       </Bloque>
 
       <p style={{ fontSize: "12px", color: "#B0ABC4", textAlign: "center", lineHeight: 1.6, marginTop: "18px" }}>
