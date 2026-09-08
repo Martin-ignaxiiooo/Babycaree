@@ -530,6 +530,7 @@ export default function Dashboard() {
                   const config: Record<string, { icon: any; color: string; bg: string; label: string }> = {
                     control_proximo: { icon: Clock, color: "#1E4E8C", bg: "linear-gradient(90deg, #8CC9F0 0%, #D7EEFF 100%)", label: "Agendado" },
                     vacuna_atrasada: { icon: Clock, color: "#8A5212", bg: "linear-gradient(90deg, #FEAD53 0%, #FFE6CD 100%)", label: "Pendiente" },
+                    vacuna_pendiente: { icon: Lollipop, color: "#8A5212", bg: "linear-gradient(90deg, #FEAD53 0%, #FFE6CD 100%)", label: "Pendiente" },
                     vacuna_proxima: { icon: Lollipop, color: "#1E4E8C", bg: "linear-gradient(90deg, #8CC9F0 0%, #D7EEFF 100%)", label: "Próximo" },
                     articulo: { icon: Check, color: "#7C5CBF", bg: "#E3D2FA", label: "Recomendado" },
                   };

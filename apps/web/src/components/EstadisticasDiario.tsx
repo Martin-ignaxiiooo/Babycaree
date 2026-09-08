@@ -84,12 +84,12 @@ export function Lineas({ datos, campo, color, formato }: any) {
             </linearGradient>
           </defs>
           <polygon points={area} fill={`url(#grad-${campo})`} />
-          <polyline points={puntos} fill="none" stroke={color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+          <polyline points={puntos} fill="none" stroke={color} strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
           {datos.map((d: any, i: number) => {
             const valor = d[campo];
             const fecha = new Date(d.dia + "T12:00:00");
             return (
-              <circle key={i} cx={x(i)} cy={y(valor)} r="1.6" fill={color} vectorEffect="non-scaling-stroke">
+              <circle key={i} cx={x(i)} cy={y(valor)} r="2.2" fill={color}>
                 <title>{`${fecha.toLocaleDateString("es-CL", { day: "numeric", month: "short" })}: ${formato(valor)}`}</title>
               </circle>
             );
