@@ -58,7 +58,7 @@ export default function Salud() {
   // "Registrar". editingVacunaId marca cuál tarjeta tiene el formulario
   // abierto; formVacuna guarda los valores en borrador (sin persistir).
   const [editingVacunaId, setEditingVacunaId] = useState<number | null>(null);
-  const [formVacuna, setFormVacuna] = useState<{ fecha_aplicacion: string; notas: string }>({ fecha_aplicacion: "", notas: "" });
+  const [formVacuna, setFormVacuna] = useState<{ fecha_aplicacion: string; hora_aplicacion: string; notas: string }>({ fecha_aplicacion: "", hora_aplicacion: "", notas: "" });
   const [guardandoVacuna, setGuardandoVacuna] = useState(false);
 
   // Estado para Crecimiento
@@ -399,24 +399,34 @@ export default function Salud() {
   const abrirRegistroVacuna = (vacuna: any) => {
     if (rolAcceso.startsWith('solo_lectura')) return;
     setEditingVacunaId(vacuna.vacuna_id);
+    const ahora = new Date();
+    const existente = vacuna.fecha_aplicacion ? new Date(vacuna.fecha_aplicacion) : null;
+    const base = existente && !Number.isNaN(existente.getTime()) ? existente : ahora;
+    const p = (n: number) => String(n).padStart(2, "0");
     setFormVacuna({
-      fecha_aplicacion: vacuna.fecha_aplicacion
-        ? vacuna.fecha_aplicacion.split('T')[0]
-        : new Date().toISOString().split('T')[0],
+      fecha_aplicacion: `${base.getFullYear()}-${p(base.getMonth() + 1)}-${p(base.getDate())}`,
+      hora_aplicacion: `${p(base.getHours())}:${p(base.getMinutes())}`,
       notas: vacuna.notas || "",
     });
   };
 
   const cancelarRegistroVacuna = () => {
     setEditingVacunaId(null);
-    setFormVacuna({ fecha_aplicacion: "", notas: "" });
+    setFormVacuna({ fecha_aplicacion: "", hora_aplicacion: "", notas: "" });
   };
 
   // Único punto donde de verdad se guarda algo — recién al presionar
   // "Registrar". Antes cada cambio de fecha/notas se guardaba solo con
   // tocar el campo, sin que el usuario confirmara nada.
   const confirmarRegistroVacuna = async (vacunaId: number) => {
-    if (!formVacuna.fecha_aplicacion) return;
+    if (!formVacuna.fecha_aplicacion || !formVacuna.hora_aplicacion) return;
+    // Se arma como Date con los componentes locales y se envía en ISO (con
+    // "Z" explícito) para que Postgres no interprete la hora local como si
+    // fuera UTC — mismo fix que ya se usa para citas (ver fechaCitaISO).
+    const [anio, mes, dia] = formVacuna.fecha_aplicacion.split("-").map(Number);
+    const [hora, minuto] = formVacuna.hora_aplicacion.split(":").map(Number);
+    const fechaISO = new Date(anio, mes - 1, dia, hora, minuto).toISOString();
+
     setGuardandoVacuna(true);
     try {
       const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/vacunas/${vacunaId}`, {
@@ -427,13 +437,13 @@ export default function Salud() {
         },
         body: JSON.stringify({
           aplicada: true,
-          fecha_aplicacion: formVacuna.fecha_aplicacion,
+          fecha_aplicacion: fechaISO,
           notas: formVacuna.notas || null,
         })
       });
       if (res.ok) {
         setVacunas(prev => prev.map(v => v.vacuna_id === vacunaId
-          ? { ...v, aplicada: true, fecha_aplicacion: formVacuna.fecha_aplicacion, notas: formVacuna.notas }
+          ? { ...v, aplicada: true, fecha_aplicacion: fechaISO, notas: formVacuna.notas }
           : v));
         cancelarRegistroVacuna();
       }
@@ -682,7 +692,9 @@ export default function Salud() {
                       {vacuna.aplicada && !editando && (
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "12px", padding: "16px", background: "var(--surface)", borderRadius: "8px", border: "1px solid #DCFCE7" }}>
                           <div style={{ fontSize: "13px", color: "#374151" }}>
-                            <strong>Aplicada:</strong> {vacuna.fecha_aplicacion ? new Date(vacuna.fecha_aplicacion).toLocaleDateString('es-CL') : "-"}
+                            <strong>Aplicada:</strong> {vacuna.fecha_aplicacion
+                              ? `${new Date(vacuna.fecha_aplicacion).toLocaleDateString('es-CL')} · ${new Date(vacuna.fecha_aplicacion).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })}`
+                              : "-"}
                             {vacuna.notas && <div style={{ marginTop: "4px", color: "#6B7280" }}>{vacuna.notas}</div>}
                           </div>
                           <button
@@ -708,6 +720,14 @@ export default function Salud() {
                               />
                             </div>
                             <div>
+                              <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#4B5563", marginBottom: "4px" }}>Hora de aplicación *</label>
+                              <TimeSelect
+                                value={formVacuna.hora_aplicacion}
+                                onChange={(isoTime) => setFormVacuna(f => ({ ...f, hora_aplicacion: isoTime }))}
+                                variant="light"
+                              />
+                            </div>
+                            <div>
                               <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#4B5563", marginBottom: "4px" }}>Notas / Reacciones</label>
                               <input 
                                 type="text" 
@@ -721,11 +741,11 @@ export default function Salud() {
                           <div style={{ display: "flex", gap: "10px" }}>
                             <button
                               onClick={() => confirmarRegistroVacuna(vacuna.vacuna_id)}
-                              disabled={!formVacuna.fecha_aplicacion || guardandoVacuna}
+                              disabled={!formVacuna.fecha_aplicacion || !formVacuna.hora_aplicacion || guardandoVacuna}
                               style={{
-                                background: !formVacuna.fecha_aplicacion || guardandoVacuna ? "#D1D5DB" : "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
+                                background: !formVacuna.fecha_aplicacion || !formVacuna.hora_aplicacion || guardandoVacuna ? "#D1D5DB" : "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
                                 color: "#fff", border: "none", borderRadius: "10px", padding: "10px 20px",
-                                fontWeight: 800, fontSize: "14px", cursor: !formVacuna.fecha_aplicacion || guardandoVacuna ? "not-allowed" : "pointer",
+                                fontWeight: 800, fontSize: "14px", cursor: !formVacuna.fecha_aplicacion || !formVacuna.hora_aplicacion || guardandoVacuna ? "not-allowed" : "pointer",
                               }}
                             >
                               {guardandoVacuna ? "Guardando..." : "Registrar"}

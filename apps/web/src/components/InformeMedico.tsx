@@ -23,9 +23,22 @@ interface Props {
   onClose: () => void;
 }
 
+// Varias fechas que pasan por acá vienen de columnas DATE (nacimiento,
+// mediciones de crecimiento, exámenes): Postgres/node-pg las entrega como
+// medianoche UTC, y mostrarlas con la hora local (Chile, UTC-3/-4) las
+// corría un día hacia atrás. Como un timestamp real casi nunca cae
+// exactamente en medianoche UTC por casualidad, se usa eso como señal de
+// "esto es solo una fecha, sin hora real" y se lee con getters UTC (sin
+// conversión de huso horario) en vez de locales.
 function fecha(iso?: string | null): string {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit", year: "numeric" });
+  const d = new Date(iso);
+  const esSoloFecha = d.getUTCHours() === 0 && d.getUTCMinutes() === 0 && d.getUTCSeconds() === 0;
+  if (esSoloFecha) {
+    const p = (n: number) => String(n).padStart(2, "0");
+    return `${p(d.getUTCDate())}/${p(d.getUTCMonth() + 1)}/${d.getUTCFullYear()}`;
+  }
+  return d.toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
 function duracion(min: number): string {
