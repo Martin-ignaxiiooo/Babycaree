@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   Camera, X,
-  Ruler, Star, Check, Clock, Loader2, Lollipop, Plus,
+  Ruler, Star, Check, Clock, Loader2, Plus, Syringe,
 } from "lucide-react";
 import TopNav from "../components/TopNav";
 import NotificacionDetalleModal from "../components/NotificacionDetalleModal";
@@ -529,9 +529,9 @@ export default function Dashboard() {
                   // recomendado, que no es una "tarea completada").
                   const config: Record<string, { icon: any; color: string; bg: string; label: string }> = {
                     control_proximo: { icon: Clock, color: "#1E4E8C", bg: "linear-gradient(90deg, #8CC9F0 0%, #D7EEFF 100%)", label: "Agendado" },
-                    vacuna_atrasada: { icon: Clock, color: "#8A5212", bg: "linear-gradient(90deg, #FEAD53 0%, #FFE6CD 100%)", label: "Pendiente" },
-                    vacuna_pendiente: { icon: Lollipop, color: "#8A5212", bg: "linear-gradient(90deg, #FEAD53 0%, #FFE6CD 100%)", label: "Pendiente" },
-                    vacuna_proxima: { icon: Lollipop, color: "#1E4E8C", bg: "linear-gradient(90deg, #8CC9F0 0%, #D7EEFF 100%)", label: "Próximo" },
+                    vacuna_atrasada: { icon: Syringe, color: "#8A5212", bg: "linear-gradient(90deg, #FEAD53 0%, #FFE6CD 100%)", label: "Pendiente" },
+                    vacuna_pendiente: { icon: Syringe, color: "#8A5212", bg: "linear-gradient(90deg, #FEAD53 0%, #FFE6CD 100%)", label: "Pendiente" },
+                    vacuna_proxima: { icon: Syringe, color: "#1E4E8C", bg: "linear-gradient(90deg, #8CC9F0 0%, #D7EEFF 100%)", label: "Próximo" },
                     articulo: { icon: Check, color: "#7C5CBF", bg: "#E3D2FA", label: "Recomendado" },
                   };
                   const { icon: StatusIcon, color: statusColor, bg: statusBg, label: statusLabel } =
@@ -579,7 +579,7 @@ export default function Dashboard() {
                           fontSize: "14px", fontWeight: 700, color: "var(--text)",
                           overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"
                         }}>
-                          {n.titulo}
+                          {n.tipo?.startsWith("vacuna_") ? `Vacuna: ${n.titulo}` : n.titulo}
                         </span>
                       </div>
                       <span style={{ fontSize: "12px", fontWeight: 700, color: statusColor, flexShrink: 0, whiteSpace: "nowrap" }}>
