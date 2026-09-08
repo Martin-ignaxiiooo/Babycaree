@@ -662,6 +662,10 @@ export default function Salud() {
                 ].map(({ titulo, aplicadas }) => {
                   const grupo = vacunas
                     .filter((v) => Boolean(v.aplicada) === aplicadas)
+                    // Las que todavía no corresponden por edad (ej. la de
+                    // los 18 meses en un bebé de 2 meses) no cuentan como
+                    // "pendientes": no son algo que falte hacer ahora.
+                    .filter((v) => aplicadas || !v.no_corresponde_aun)
                     .sort((a, b) => a.meses_edad_recomendada - b.meses_edad_recomendada);
 
                   return (

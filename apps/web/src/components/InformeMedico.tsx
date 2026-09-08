@@ -104,7 +104,9 @@ export default function InformeMedico({ bebeId, perfil, token, onClose }: Props)
   }, [bebeId, token]);
 
   const aplicadas = (datos?.vacunas ?? []).filter((v: any) => v.aplicada);
-  const pendientes = (datos?.vacunas ?? []).filter((v: any) => !v.aplicada);
+  // Las que todavía no corresponden por edad (ej. la de los 18 meses en un
+  // bebé de 2 meses) no son "pendientes": no son algo que falte hacer aún.
+  const pendientes = (datos?.vacunas ?? []).filter((v: any) => !v.aplicada && !v.no_corresponde_aun);
   const consultas = (datos?.citas ?? []).filter((c: any) => c.diagnostico || c.asistio);
   const ultimoCrec = (datos?.crecimiento ?? [])[0];
 

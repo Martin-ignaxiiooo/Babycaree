@@ -36,13 +36,31 @@ export const getVacunas = async (req: AuthRequest, res: Response) => {
         rv.fecha_aplicacion,
         rv.aplicada,
         rv.lugar_aplicacion,
-        rv.notas
+        rv.notas,
+        b.fecha_nacimiento
       FROM vacunas_pni v
       LEFT JOIN registro_vacunas rv ON v.id = rv.vacuna_id AND rv.bebe_id = $1
+      JOIN perfiles_bebes b ON b.id = $1
       ORDER BY v.meses_edad_recomendada ASC, v.id ASC
     `, [bebeId]);
 
-    res.json(result.rows);
+    // Edad actual del bebé en meses (mismo cálculo que se usa en el resto
+    // del backend: diferencia de mes calendario, no días/30).
+    const fechaNacimiento = result.rows[0]?.fecha_nacimiento ? new Date(result.rows[0].fecha_nacimiento) : null;
+    const hoy = new Date();
+    const edadMeses = fechaNacimiento
+      ? Math.max(0, (hoy.getFullYear() - fechaNacimiento.getFullYear()) * 12 + (hoy.getMonth() - fechaNacimiento.getMonth()))
+      : 0;
+
+    // "no_corresponde_aun": la vacuna es para una edad que el bebé todavía
+    // no alcanza (ej. la de los 18 meses en un bebé de 2 meses). Antes se
+    // mostraba igual como "pendiente", lo cual era engañoso.
+    const vacunas = result.rows.map(({ fecha_nacimiento, ...v }) => ({
+      ...v,
+      no_corresponde_aun: !v.aplicada && v.meses_edad_recomendada > edadMeses,
+    }));
+
+    res.json(vacunas);
   } catch (error) {
     console.error("Error en getVacunas:", error);
     res.status(500).json({ error: "Error interno del servidor" });
