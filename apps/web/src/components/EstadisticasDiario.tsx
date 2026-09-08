@@ -3,7 +3,7 @@ import { Loader2, TrendingUp, TrendingDown, Minus, Moon, Milk, Baby } from "luci
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api";
 
-function duracion(min: number): string {
+export function duracion(min: number): string {
   if (!min) return "—";
   const h = Math.floor(min / 60);
   const m = Math.round(min % 60);
@@ -41,7 +41,7 @@ function comparar(antes: number, ahora: number, unidad: "tomas" | "sueno") {
 }
 
 /** Gráfico de barras simple, sin librerías: son pocos datos y así no pesa. */
-function Lineas({ datos, campo, color, formato }: any) {
+export function Lineas({ datos, campo, color, formato }: any) {
   const max = Math.max(...datos.map((d: any) => d[campo]), 1);
   const alto = 110;
   const n = datos.length;

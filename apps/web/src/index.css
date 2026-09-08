@@ -615,22 +615,6 @@ body {
   flex-wrap: wrap;
 }
 
-/* Iconos de módulos y de stats del hero: tamaño fijo en desktop,
-   controlado por CSS (no por el prop size del componente) para poder
-   achicarlos limpiamente en mobile con la media query de abajo. */
-.module-icon-wrap {
-  width: 96px;
-  height: 96px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 4px;
-}
-.module-icon-wrap svg {
-  width: 100%;
-  height: 100%;
-}
-
 .stat-icon-circle {
   width: 76px;
   height: 76px;
@@ -703,12 +687,6 @@ body {
     white-space: nowrap;
   }
 
-  .module-icon-wrap {
-    width: 54px;
-    height: 54px;
-    margin-bottom: 4px;
-  }
-
   /* Registro diario: las 4 tarjetas de resumen (tomas hoy, biberón,
      durmiendo, pañales) en una sola fila también en móvil, en vez de
      acomodarse en 2x2. */
@@ -736,12 +714,6 @@ body {
   .diario-resumen-grid > div > div:nth-child(3) {
     font-size: 8.5px !important;
     line-height: 1.2;
-  }
-
-  /* Los módulos (Diario, Perfil, Salud, Comunidad, Galería) como botones
-     grandes son redundantes en móvil: ya están en la barra inferior. */
-  .dashboard-modules-grid {
-    display: none;
   }
 
   /* Pestañas de Salud y Crecimiento: en desktop es una fila horizontal
