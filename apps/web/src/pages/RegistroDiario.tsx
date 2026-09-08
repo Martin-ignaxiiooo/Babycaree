@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Milk, Moon, Baby, Plus, Trash2, Clock,
-  Droplets, Loader2, Sun,
+  Milk, Moon, Baby, Plus,
+  Droplets, Sun,
 } from "lucide-react";
 import TopNav from "../components/TopNav";
 import EstadisticasDiario from "../components/EstadisticasDiario";
@@ -33,21 +33,7 @@ function duracionTexto(min: number): string {
   return h > 0 ? `${h}h ${m}min` : `${m} min`;
 }
 
-/** Etiqueta legible de un registro, según su tipo. */
-function describir(r: any): string {
-  if (r.tipo === "toma") {
-    if (r.fuente === "biberon") return `Biberón · ${r.cantidad_ml ?? "?"} ml`;
-    const lado = r.fuente === "pecho_izq" ? "izquierdo" : "derecho";
-    return r.duracion_min ? `Pecho ${lado} · ${r.duracion_min} min` : `Pecho ${lado}`;
-  }
-  if (r.tipo === "sueno") {
-    if (!r.sueno_fin) return "Durmiendo ahora";
-    const min = (new Date(r.sueno_fin).getTime() - new Date(r.sueno_inicio).getTime()) / 60000;
-    return `Durmió ${duracionTexto(min)}`;
-  }
-  return { pis: "Pañal · pipí", caca: "Pañal · caca", mixto: "Pañal · mixto" }[r.panal_tipo as string] ?? "Pañal";
-}
-
+/** Colores e ícono por tipo de registro, usados en los botones rápidos. */
 const ESTILO_TIPO: Record<Tipo, { bg: string; fg: string; Icon: any }> = {
   toma:  { bg: "#E3F2FD", fg: "#1976D2", Icon: Milk },
   sueno: { bg: "#EDE7F6", fg: "#7C5CBF", Icon: Moon },
@@ -63,14 +49,11 @@ export default function RegistroDiario() {
   // escribir en él: se le ocultan los botones en vez de dejar que fallen.
   const [soloLectura, setSoloLectura] = useState(false);
 
-  const [registros, setRegistros] = useState<any[]>([]);
   const [resumen, setResumen] = useState<any>(null);
-  const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Formulario abierto (null = ninguno). Se abre uno a la vez para que la
   // pantalla no se llene de campos cuando se registra con una sola mano.
-  const [vista, setVista] = useState<"registro" | "patrones">("registro");
   const [abierto, setAbierto] = useState<Tipo | null>(null);
   const [guardando, setGuardando] = useState(false);
 
@@ -93,13 +76,11 @@ export default function RegistroDiario() {
   const cargar = useCallback(async () => {
     if (!bebeId) return;
     try {
-      const [regRes, resRes, homeRes] = await Promise.all([
-        fetch(`${API_URL}/v1/diario/${bebeId}/registros?limite=50`, { headers: { Authorization: `Bearer ${token}` } }),
+      const [resRes, homeRes] = await Promise.all([
         fetch(`${API_URL}/v1/diario/${bebeId}/registros/resumen`, { headers: { Authorization: `Bearer ${token}` } }),
         fetch(`${API_URL}/v1/home/${bebeId}`, { headers: { Authorization: `Bearer ${token}` } }),
       ]);
-      if (!regRes.ok || !resRes.ok) throw new Error();
-      setRegistros(await regRes.json());
+      if (!resRes.ok) throw new Error();
       setResumen(await resRes.json());
       if (homeRes.ok) {
         const home = await homeRes.json();
@@ -108,8 +89,6 @@ export default function RegistroDiario() {
       setError(null);
     } catch {
       setError("No pudimos cargar los registros.");
-    } finally {
-      setCargando(false);
     }
   }, [bebeId, token]);
 
@@ -146,14 +125,6 @@ export default function RegistroDiario() {
     cargar();
   };
 
-  const eliminar = async (id: string) => {
-    if (!bebeId || !confirm("¿Eliminar este registro?")) return;
-    await fetch(`${API_URL}/v1/diario/${bebeId}/registros/${id}`, {
-      method: "DELETE", headers: { Authorization: `Bearer ${token}` },
-    });
-    cargar();
-  };
-
   const suenoEnCurso = resumen?.sueno_en_curso;
 
   return (
@@ -171,34 +142,10 @@ export default function RegistroDiario() {
           <p style={{ color: "rgba(255,255,255,0.8)", marginTop: "3px", fontSize: "12.5px" }}>
             Tomas, sueño y pañales. Lo del día a día, a mano.
           </p>
-
-          <div style={{ display: "flex", gap: "26px", marginTop: "12px" }}>
-            {([["registro", "Registro"], ["patrones", "Patrones"]] as const).map(([v, l]) => (
-              <button
-                key={v}
-                onClick={() => setVista(v)}
-                style={{
-                  background: "none", border: "none", cursor: "pointer",
-                  padding: "0 0 10px", fontFamily: "'Nunito', sans-serif",
-                  fontSize: "15px", fontWeight: 800,
-                  color: vista === v ? "#fff" : "rgba(255,255,255,0.55)",
-                  borderBottom: vista === v ? "3px solid var(--accent-coral, #F4A0A0)" : "3px solid transparent",
-                }}
-              >
-                {l}
-              </button>
-            ))}
-          </div>
         </div>
       </div>
 
       <div className="page-container" style={{ padding: "28px 40px 60px" }}>
-        {vista === "patrones" && bebeId && (
-          <EstadisticasDiario bebeId={bebeId} token={token!} />
-        )}
-
-        {vista === "registro" && (
-        <>
         {/* Resumen de hoy */}
         {resumen && (
           <>
@@ -306,48 +253,13 @@ export default function RegistroDiario() {
           </div>
         )}
 
-        {/* Línea de tiempo */}
+        {/* Patrones: antes vivía en una pestaña separada; ahora reemplaza
+            el listado plano de "Últimos registros" al final de esta misma
+            vista. */}
         <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "20px", color: "var(--text)", margin: "26px 0 14px" }}>
-          Últimos registros
+          Patrones
         </h2>
-
-        {cargando ? (
-          <div style={{ textAlign: "center", padding: "50px", color: "var(--text-muted)" }}><Loader2 size={26} className="spin-icon" /></div>
-        ) : registros.length === 0 ? (
-          <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "50px 24px", textAlign: "center", boxShadow: "0 4px 18px rgba(124,92,191,0.06)" }}>
-            <Clock size={38} color="var(--theme-primary)" style={{ opacity: 0.45 }} />
-            <div style={{ fontWeight: 800, color: "var(--text)", marginTop: "12px", fontSize: "16px" }}>Todavía no hay registros</div>
-            <div style={{ color: "var(--text-muted)", fontSize: "14px", marginTop: "5px" }}>
-              Usa los botones de arriba para anotar la primera toma o cambio de pañal.
-            </div>
-          </div>
-        ) : (
-          registros.map((r) => {
-            const est = ESTILO_TIPO[r.tipo as Tipo];
-            return (
-              <div key={r.id} style={{ background: "var(--surface)", borderRadius: "16px", padding: "14px 18px", marginBottom: "10px", display: "flex", alignItems: "center", gap: "14px", boxShadow: "0 3px 14px rgba(124,92,191,0.05)" }}>
-                <div style={{ width: "42px", height: "42px", borderRadius: "12px", background: est.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <est.Icon size={20} color={est.fg} />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 700, color: "var(--text)", fontSize: "15px" }}>{describir(r)}</div>
-                  <div style={{ color: "var(--text-muted)", fontSize: "12.5px", marginTop: "2px" }}>
-                    {hora(r.fecha_hora)} · {haceCuanto(r.fecha_hora)}
-                    {r.registrado_por_nombre ? ` · ${r.registrado_por_nombre}` : ""}
-                  </div>
-                  {r.nota && <div style={{ color: "#6B647F", fontSize: "13px", marginTop: "5px", fontStyle: "italic" }}>{r.nota}</div>}
-                </div>
-                {!soloLectura && (
-                  <button onClick={() => eliminar(r.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "#C4BFD4", padding: "6px" }} aria-label="Eliminar">
-                    <Trash2 size={15} />
-                  </button>
-                )}
-              </div>
-            );
-          })
-        )}
-        </>
-        )}
+        {bebeId && <EstadisticasDiario bebeId={bebeId} token={token!} />}
       </div>
     </div>
   );
