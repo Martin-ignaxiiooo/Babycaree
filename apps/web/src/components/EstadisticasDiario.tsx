@@ -43,6 +43,7 @@ function comparar(antes: number, ahora: number, unidad: "tomas" | "sueno") {
 /** Gráfico de barras simple, sin librerías: son pocos datos y así no pesa. */
 function Barras({ datos, campo, color, formato }: any) {
   const max = Math.max(...datos.map((d: any) => d[campo]), 1);
+  const alto = 110;
 
   // Agrupa los días consecutivos que caen en el mismo mes, para mostrar el
   // nombre del mes una sola vez, centrado bajo ese grupo (en vez de
@@ -56,42 +57,51 @@ function Barras({ datos, campo, color, formato }: any) {
   });
 
   return (
-    <div style={{ marginTop: "14px" }}>
-      <div style={{ display: "flex", alignItems: "flex-end", gap: "4px", height: "110px" }}>
-        {datos.map((d: any, i: number) => {
-          const valor = d[campo];
-          const alto = Math.max((valor / max) * 100, valor > 0 ? 6 : 2);
-          const fecha = new Date(d.dia + "T12:00:00");
-          return (
-            <div key={i} style={{ flex: 1, height: "100%", display: "flex", alignItems: "flex-end" }} title={`${fecha.toLocaleDateString("es-CL", { day: "numeric", month: "short" })}: ${formato(valor)}`}>
-              <div
-                style={{
-                  width: "100%", height: `${alto}%`, minHeight: "3px",
-                  background: valor > 0 ? color : "#EDE9F8",
-                  borderRadius: "5px 5px 3px 3px", transition: "height .3s",
-                }}
-              />
+    <div style={{ marginTop: "14px", display: "flex", gap: "8px" }}>
+      {/* Eje Y: escala de referencia para leer las barras sin pasar el mouse */}
+      <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: `${alto}px`, flexShrink: 0 }}>
+        <span style={{ fontSize: "9px", color: "#B0ABC4", fontWeight: 700, whiteSpace: "nowrap" }}>{formato(max)}</span>
+        <span style={{ fontSize: "9px", color: "#B0ABC4", fontWeight: 700, whiteSpace: "nowrap" }}>{formato(Math.round(max / 2))}</span>
+        <span style={{ fontSize: "9px", color: "#B0ABC4", fontWeight: 700 }}>0</span>
+      </div>
+
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: "flex", alignItems: "flex-end", gap: "4px", height: `${alto}px` }}>
+          {datos.map((d: any, i: number) => {
+            const valor = d[campo];
+            const altoBarra = Math.max((valor / max) * 100, valor > 0 ? 6 : 2);
+            const fecha = new Date(d.dia + "T12:00:00");
+            return (
+              <div key={i} style={{ flex: 1, height: "100%", display: "flex", alignItems: "flex-end" }} title={`${fecha.toLocaleDateString("es-CL", { day: "numeric", month: "short" })}: ${formato(valor)}`}>
+                <div
+                  style={{
+                    width: "100%", height: `${altoBarra}%`, minHeight: "3px",
+                    background: valor > 0 ? color : "#EDE9F8",
+                    borderRadius: "5px 5px 3px 3px", transition: "height .3s",
+                  }}
+                />
+              </div>
+            );
+          })}
+        </div>
+        <div style={{ display: "flex", gap: "4px", marginTop: "5px" }}>
+          {datos.map((d: any, i: number) => (
+            <div key={i} style={{ flex: 1, textAlign: "center" }}>
+              <span style={{ fontSize: "9.5px", color: "#B0ABC4", fontWeight: 700 }}>
+                {new Date(d.dia + "T12:00:00").getDate()}
+              </span>
             </div>
-          );
-        })}
-      </div>
-      <div style={{ display: "flex", gap: "4px", marginTop: "5px" }}>
-        {datos.map((d: any, i: number) => (
-          <div key={i} style={{ flex: 1, textAlign: "center" }}>
-            <span style={{ fontSize: "9.5px", color: "#B0ABC4", fontWeight: 700 }}>
-              {new Date(d.dia + "T12:00:00").getDate()}
-            </span>
-          </div>
-        ))}
-      </div>
-      <div style={{ display: "flex", marginTop: "3px" }}>
-        {grupos.map((g, i) => (
-          <div key={i} style={{ flex: g.cantidad, textAlign: "center" }}>
-            <span style={{ fontSize: "9px", color: "#8A849C", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.3px" }}>
-              {g.mes}
-            </span>
-          </div>
-        ))}
+          ))}
+        </div>
+        <div style={{ display: "flex", marginTop: "3px" }}>
+          {grupos.map((g, i) => (
+            <div key={i} style={{ flex: g.cantidad, textAlign: "center" }}>
+              <span style={{ fontSize: "9px", color: "#8A849C", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.3px" }}>
+                {g.mes}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
