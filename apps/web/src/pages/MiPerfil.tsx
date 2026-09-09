@@ -178,7 +178,7 @@ export default function MiPerfil() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F7F5FC", fontFamily: "'Nunito', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "var(--page-bg)", fontFamily: "'Nunito', sans-serif" }}>
       <TopNav user={initialUser} activePath="/mi-perfil" />
 
       {/* Cabecera morada; las tarjetas flotan sobre ella. */}
@@ -405,7 +405,7 @@ export default function MiPerfil() {
 
 function Tarjeta({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (
-    <div style={{ background: "#fff", borderRadius: "20px", padding: "24px 26px", boxShadow: "0 6px 28px rgba(90,60,150,0.08)", ...style }}>
+    <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "24px 26px", boxShadow: "0 6px 28px rgba(90,60,150,0.08)", ...style }}>
       {children}
     </div>
   );

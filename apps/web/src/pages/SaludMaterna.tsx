@@ -114,7 +114,7 @@ export default function SaludMaterna() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: "100vh", background: "#F7F5FC" }}>
+      <div style={{ minHeight: "100vh", background: "var(--page-bg)" }}>
         <TopNav user={user} activePath="/salud" perfilEstado="embarazo" />
         <div style={{ textAlign: "center", padding: "80px" }}><Loader2 size={28} className="spin-icon" /></div>
       </div>
@@ -122,7 +122,7 @@ export default function SaludMaterna() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F7F5FC", fontFamily: "'Nunito', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "var(--page-bg)", fontFamily: "'Nunito', sans-serif" }}>
       <TopNav user={user} activePath="/salud" perfilEstado="embarazo" />
 
       <div style={{ background: "linear-gradient(135deg, #8B5FD6 0%, #A47BE8 100%)", paddingBottom: "80px" }}>
@@ -346,7 +346,7 @@ export default function SaludMaterna() {
 
 function Tarjeta({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ background: "#fff", borderRadius: "20px", padding: "22px 24px", boxShadow: "0 6px 28px rgba(90,60,150,0.08)" }}>
+    <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "22px 24px", boxShadow: "0 6px 28px rgba(90,60,150,0.08)" }}>
       {children}
     </div>
   );
@@ -409,6 +409,6 @@ const overlay: React.CSSProperties = {
 };
 
 const caja: React.CSSProperties = {
-  background: "#fff", borderRadius: "20px", padding: "26px", width: "100%", maxWidth: "420px",
+  background: "var(--surface)", borderRadius: "20px", padding: "26px", width: "100%", maxWidth: "420px",
   fontFamily: "'Nunito', sans-serif",
 };

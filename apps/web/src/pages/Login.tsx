@@ -231,7 +231,7 @@ export default function Login() {
           <div
             className="auth-box"
             style={{
-              background: "white",
+              background: "var(--surface)",
               borderRadius: "32px",
               boxShadow: "0 20px 60px rgba(45,38,64,0.14)",
               padding: "2.75rem",

@@ -290,7 +290,7 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
                 {switcherOpen && (
                   <div style={{
                     position: "absolute", top: "calc(100% + 12px)", right: 0,
-                    background: "white", borderRadius: "20px", boxShadow: "0 16px 40px rgba(45,38,64,0.22)",
+                    background: "var(--surface)", borderRadius: "20px", boxShadow: "0 16px 40px rgba(45,38,64,0.22)",
                     minWidth: "240px", overflow: "hidden", zIndex: 200,
                     border: "1px solid rgba(124,92,191,0.08)",
                   }}>

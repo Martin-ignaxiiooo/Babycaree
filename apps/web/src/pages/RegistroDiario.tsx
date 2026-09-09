@@ -134,7 +134,7 @@ export default function RegistroDiario() {
   const suenoEnCurso = resumen?.sueno_en_curso;
 
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)" }}>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(165deg, var(--page-bg) 0%, var(--theme-bg-light) 100%)" }}>
       <TopNav
         user={user}
         activePath="/diario"

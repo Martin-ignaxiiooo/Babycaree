@@ -244,7 +244,7 @@ export default function Dashboard() {
   if (homeData?.perfil?.estado === 'embarazo') {
     const notificaciones = homeData?.notificaciones || [];
     return (
-      <div style={{ minHeight: "100vh", background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)", fontFamily: "'Nunito', sans-serif", display: "flex", flexDirection: "column" }}>
+      <div style={{ minHeight: "100vh", background: "linear-gradient(165deg, var(--page-bg) 0%, var(--theme-bg-light) 100%)", fontFamily: "'Nunito', sans-serif", display: "flex", flexDirection: "column" }}>
         <TopNav user={user} notificaciones={notificaciones} onLogout={handleLogout} activePath="/dashboard" perfilEstado="embarazo" />
         <DashboardEmbarazo user={user} perfil={homeData.perfil} activeBabyId={activeBabyId!} />
       </div>

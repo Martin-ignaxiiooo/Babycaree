@@ -136,14 +136,14 @@ export default function SeleccionarPerfil() {
 
   if (loading || !user) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Nunito', sans-serif", background: "linear-gradient(160deg, #F6F2FF 0%, #FDF1F5 100%)" }}>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Nunito', sans-serif", background: "linear-gradient(160deg, var(--theme-bg-light) 0%, var(--page-bg) 100%)" }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "14px" }}>
           <div style={{
             width: "44px", height: "44px", borderRadius: "50%",
             border: "4px solid var(--theme-bg-light)", borderTopColor: "var(--theme-primary)",
             animation: "spin 0.8s linear infinite",
           }} />
-          <span style={{ color: "var(--theme-dark)", fontWeight: 700 }}>Cargando tus perfiles...</span>
+          <span style={{ color: "var(--theme-primary)", fontWeight: 700 }}>Cargando tus perfiles...</span>
         </div>
       </div>
     );
@@ -152,7 +152,7 @@ export default function SeleccionarPerfil() {
   return (
     <div style={{
       minHeight: "100vh",
-      background: "linear-gradient(160deg, #F6F2FF 0%, #FDF1F5 55%, #FFF8EE 100%)",
+      background: "linear-gradient(160deg, var(--theme-bg-light) 0%, var(--page-bg) 55%, var(--theme-bg-hover) 100%)",
       fontFamily: "'Nunito', sans-serif",
       display: "flex", flexDirection: "column", alignItems: "center",
       padding: "4rem 1.5rem 3rem",
@@ -184,7 +184,7 @@ export default function SeleccionarPerfil() {
             key={baby.id}
             onClick={() => handleSelectBaby(baby.id)}
             style={{
-              background: "white",
+              background: "var(--surface)",
               padding: "2rem 1.75rem",
               borderRadius: "26px",
               boxShadow: "0 10px 34px rgba(124,92,191,0.1)",
@@ -295,10 +295,10 @@ export default function SeleccionarPerfil() {
       {/* Modal */}
       {isModalOpen && (
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(45,38,64,0.55)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "16px" }}>
-          <div style={{ background: "white", padding: "2.25rem", borderRadius: "26px", width: "100%", maxWidth: "500px", maxHeight: "90vh", overflowY: "auto", position: "relative", boxShadow: "0 30px 70px rgba(45,38,64,0.3)" }}>
+          <div style={{ background: "var(--surface)", padding: "2.25rem", borderRadius: "26px", width: "100%", maxWidth: "500px", maxHeight: "90vh", overflowY: "auto", position: "relative", boxShadow: "0 30px 70px rgba(45,38,64,0.3)" }}>
             <button
               onClick={() => setIsModalOpen(false)}
-              style={{ position: "absolute", right: "18px", top: "18px", background: "#F3F1F9", border: "none", borderRadius: "50%", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--text-muted)" }}
+              style={{ position: "absolute", right: "18px", top: "18px", background: "var(--surface-2)", border: "none", borderRadius: "50%", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--text-muted)" }}
             >
               <X size={18} />
             </button>
