@@ -334,7 +334,7 @@ export default function Dashboard() {
         
         {/* ── HOME HERO FULL WIDTH ── */}
         <div style={{
-          background: "linear-gradient(120deg, var(--theme-bg-light) 0%, #F3E4EC 100%)",
+          background: "linear-gradient(120deg, var(--theme-bg-light) 0%, var(--theme-bg-hover) 100%)",
           borderRadius: "26px",
           marginBottom: "22px",
           display: "flex",
@@ -460,7 +460,7 @@ export default function Dashboard() {
 
             <div>
               <div style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "27px", fontWeight: 700, color: "var(--text)", marginBottom: "4px" }}>{hero.nombre}</div>
-              <div style={{ fontSize: "14px", color: "var(--theme-dark)", opacity: 0.75, fontWeight: 600 }}>{hero.edad_exacta}</div>
+              <div style={{ fontSize: "14px", color: "var(--text-muted)", fontWeight: 600 }}>{hero.edad_exacta}</div>
               {fotoError && (
                 <div style={{ fontSize: "12px", color: "#DC2626", marginTop: "4px", fontWeight: 600 }}>{fotoError}</div>
               )}
