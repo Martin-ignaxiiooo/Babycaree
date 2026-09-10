@@ -489,22 +489,8 @@ export default function PerfilBebe() {
                 </div>
               </div>
 
-              {/* CARNET DIGITAL: RUT Y CONTACTO DE EMERGENCIA */}
+              {/* CARNET DIGITAL */}
               <div style={{ ...cardStyle, gridColumn: "1 / -1" }}>
-                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--text)", marginBottom: "6px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "12px" }}>Carnet Digital</h3>
-                <p style={{ fontSize: "13px", color: "var(--text-muted)", margin: "10px 0 20px" }}>Estos datos aparecen en el carnet pediátrico digital que puedes mostrar en el consultorio.</p>
-
-                <div className="hero-stats-grid" style={{ marginBottom: "16px" }}>
-                  <div>
-                    <label style={labelStyle}>Contacto de emergencia — nombre</label>
-                    {editMode ? <input type="text" name="contacto_emergencia_nombre" value={editData.contacto_emergencia_nombre || ""} onChange={handleChange} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.contacto_emergencia_nombre || "-"}</div>}
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Contacto de emergencia — teléfono</label>
-                    {editMode ? <input type="tel" name="contacto_emergencia_telefono" placeholder="+56 9 1234 5678" value={editData.contacto_emergencia_telefono || ""} onChange={handleChange} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.contacto_emergencia_telefono || "-"}</div>}
-                  </div>
-                </div>
-
                 <button
                   type="button"
                   onClick={() => setShowCarnet(true)}
