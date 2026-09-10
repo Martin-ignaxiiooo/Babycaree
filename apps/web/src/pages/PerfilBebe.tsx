@@ -298,27 +298,43 @@ export default function PerfilBebe() {
             </div>
           )}
         </div>
-
-        {/* TABS CONTAINER */}
-        <div style={{ display: "flex", gap: "32px", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
-          <button 
-            style={{ padding: "12px 0", background: "none", border: "none", borderBottom: activeTab === "detalle" ? "3px solid var(--accent-coral)" : "3px solid transparent", color: activeTab === "detalle" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
-            onClick={() => { setActiveTab("detalle"); navigate(`/perfil/${id}?tab=detalle`, { replace: true }); }}
-          >
-            <User size={18} /> Datos del bebé
-          </button>
-          <button 
-            style={{ padding: "12px 0", background: "none", border: "none", borderBottom: activeTab === "compartir" ? "3px solid var(--accent-coral)" : "3px solid transparent", color: activeTab === "compartir" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
-            onClick={() => { setActiveTab("compartir"); navigate(`/perfil/${id}?tab=compartir`, { replace: true }); }}
-          >
-            <Lock size={18} /> Compartir acceso
-          </button>
-        </div>
         </div>
       </div>
 
       {/* ── CONTENT AREA ── */}
-      <div className="page-container" style={{ display: "flex", gap: "40px", alignItems: "flex-start" }}>
+      <div className="page-container">
+
+        {/* TABS: mismo patrón de píldoras que usa Salud.tsx */}
+        <div className="responsive-overflow" style={{ display: "flex", gap: "10px", marginBottom: "32px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "16px", whiteSpace: "nowrap" }}>
+          <button
+            onClick={() => { setActiveTab("detalle"); navigate(`/perfil/${id}?tab=detalle`, { replace: true }); }}
+            style={{
+              background: activeTab === "detalle" ? "linear-gradient(135deg, var(--theme-primary), var(--theme-light))" : "transparent",
+              color: activeTab === "detalle" ? "#fff" : "var(--text-muted)",
+              border: "none", padding: "12px 22px", borderRadius: "100px",
+              fontWeight: 800, cursor: "pointer", fontSize: "14.5px",
+              display: "flex", alignItems: "center", gap: "8px", transition: "all 0.2s",
+              fontFamily: "'Nunito', sans-serif",
+              boxShadow: activeTab === "detalle" ? "0 6px 16px var(--theme-shadow-light)" : "none",
+            }}>
+            <User size={18} /> Datos del bebé
+          </button>
+          <button
+            onClick={() => { setActiveTab("compartir"); navigate(`/perfil/${id}?tab=compartir`, { replace: true }); }}
+            style={{
+              background: activeTab === "compartir" ? "linear-gradient(135deg, var(--theme-primary), var(--theme-light))" : "transparent",
+              color: activeTab === "compartir" ? "#fff" : "var(--text-muted)",
+              border: "none", padding: "12px 22px", borderRadius: "100px",
+              fontWeight: 800, cursor: "pointer", fontSize: "14.5px",
+              display: "flex", alignItems: "center", gap: "8px", transition: "all 0.2s",
+              fontFamily: "'Nunito', sans-serif",
+              boxShadow: activeTab === "compartir" ? "0 6px 16px var(--theme-shadow-light)" : "none",
+            }}>
+            <Lock size={18} /> Compartir acceso
+          </button>
+        </div>
+
+        <div style={{ display: "flex", gap: "40px", alignItems: "flex-start" }}>
         
         {activeTab === "detalle" && (
           <div style={{ width: "100%" }}>
@@ -682,6 +698,7 @@ export default function PerfilBebe() {
           </div>
         )}
 
+        </div>
       </div>
 
       {showCarnet && perfil && (
