@@ -4,7 +4,6 @@ import {
   User, Search, Lock, IdCard
 } from "lucide-react";
 import TopNav from "../components/TopNav";
-import DateSelect from "../components/DateSelect";
 import CarnetDigital from "../components/CarnetDigital";
 
 export default function PerfilBebe() {
@@ -367,12 +366,12 @@ export default function PerfilBebe() {
                   {editMode ? <input type="text" name="nombre" value={editData.nombre || ""} onChange={handleChange} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.nombre}</div>}
                 </div>
                 
-                <div style={{ display: "flex", gap: "16px", marginBottom: "16px" }}>
-                  <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", gap: "16px", marginBottom: "16px", flexWrap: "wrap" }}>
+                  <div style={{ flex: 1, minWidth: "160px" }}>
                     <label style={labelStyle}>Apodo</label>
                     {editMode ? <input type="text" name="apodo" value={editData.apodo || ""} onChange={handleChange} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.apodo || "-"}</div>}
                   </div>
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, minWidth: "160px" }}>
                     <label style={labelStyle}>Sexo registrado</label>
                     {editMode ? (
                       <select name="sexo" value={editData.sexo || ""} onChange={handleChange} style={inputStyle}>
@@ -387,12 +386,12 @@ export default function PerfilBebe() {
                   </div>
                 </div>
 
-                <div style={{ display: "flex", gap: "16px" }}>
-                  <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+                  <div style={{ flex: 1, minWidth: "160px" }}>
                     <label style={labelStyle}>Fecha de nacimiento</label>
-                    {editMode ? <DateSelect value={editData.fecha_nacimiento ? editData.fecha_nacimiento.split('T')[0] : ""} onChange={(isoDate) => setEditData({ ...editData, fecha_nacimiento: isoDate })} max={new Date().toISOString().split('T')[0]} variant="light" /> : <div style={readOnlyStyle}>{perfil.fecha_nacimiento ? new Date(perfil.fecha_nacimiento).toLocaleDateString('es-CL') : "-"}</div>}
+                    {editMode ? <input type="date" name="fecha_nacimiento" value={editData.fecha_nacimiento ? editData.fecha_nacimiento.split('T')[0] : ""} onChange={handleChange} max={new Date().toISOString().split('T')[0]} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.fecha_nacimiento ? new Date(perfil.fecha_nacimiento).toLocaleDateString('es-CL') : "-"}</div>}
                   </div>
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, minWidth: "160px" }}>
                     <label style={labelStyle}>Previsión de salud</label>
                     {editMode ? (
                       <select name="prevision_salud" value={editData.prevision_salud || ""} onChange={handleChange} style={inputStyle}>
@@ -412,8 +411,8 @@ export default function PerfilBebe() {
               <div style={cardStyle}>
                 <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--text)", marginBottom: "20px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "12px" }}>Datos de Nacimiento</h3>
                 
-                <div style={{ display: "flex", gap: "16px", marginBottom: "16px" }}>
-                  <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", gap: "16px", marginBottom: "16px", flexWrap: "wrap" }}>
+                  <div style={{ flex: 1, minWidth: "160px" }}>
                     <label style={labelStyle}>Peso al nacer (kg)</label>
                     {editMode ? (
                       <input
@@ -432,7 +431,7 @@ export default function PerfilBebe() {
                       <div style={readOnlyStyle}>{perfil.peso_nacimiento_g ? `${(perfil.peso_nacimiento_g / 1000).toFixed(2)} kg` : "-"}</div>
                     )}
                   </div>
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, minWidth: "160px" }}>
                     <label style={labelStyle}>Talla al nacer (cm)</label>
                     {editMode ? <input type="number" name="talla_nacimiento_cm" value={editData.talla_nacimiento_cm || ""} onChange={handleChange} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.talla_nacimiento_cm || "-"}</div>}
                   </div>
@@ -479,11 +478,11 @@ export default function PerfilBebe() {
                 </div>
 
                 <div className="hero-stats-grid">
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, minWidth: "160px" }}>
                     <label style={labelStyle}>Alergias conocidas</label>
                     {editMode ? <textarea name="alergias" rows={3} value={editData.alergias || ""} onChange={handleChange} style={inputStyle}></textarea> : <div style={{ ...readOnlyStyle, minHeight: "80px" }}>{perfil.alergias || "-"}</div>}
                   </div>
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, minWidth: "160px" }}>
                     <label style={labelStyle}>Condiciones médicas crónicas</label>
                     {editMode ? <textarea name="condiciones_cronicas" rows={3} value={editData.condiciones_cronicas || ""} onChange={handleChange} style={inputStyle}></textarea> : <div style={{ ...readOnlyStyle, minHeight: "80px" }}>{perfil.condiciones_cronicas || "-"}</div>}
                   </div>
@@ -568,7 +567,7 @@ export default function PerfilBebe() {
                   accesos.map(acceso => (
                     <div key={acceso.id} style={{ display: "flex", alignItems: "center", padding: "16px", border: "1px solid #E5E7EB", borderRadius: "12px", marginBottom: "12px" }}>
                       <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "var(--theme-bg-light)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "24px", marginRight: "16px" }}>🧑‍.</div>
-                      <div style={{ flex: 1 }}>
+                      <div style={{ flex: 1, minWidth: "160px" }}>
                         <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--text)" }}>{acceso.usuario_invitado?.nombre || "Usuario"}</div>
                         <div style={{ fontSize: "13px", color: "#6B7280" }}>{acceso.usuario_invitado?.email}</div>
                       </div>
@@ -623,7 +622,7 @@ export default function PerfilBebe() {
                     {searchResults.map(res => (
                       <div key={res.email} style={{ display: "flex", alignItems: "center", padding: "12px", borderBottom: "1px solid #F3F4F6" }}>
                         <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "var(--theme-bg-light)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", marginRight: "12px" }}>🧑</div>
-                        <div style={{ flex: 1 }}>
+                        <div style={{ flex: 1, minWidth: "160px" }}>
                           <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>
                             {res.nombre || "Usuario"} 
                             {res.en_app && <span style={{ marginLeft: "8px", fontSize: "10px", background: "#D1FAE5", color: "#065F46", padding: "2px 8px", borderRadius: "12px" }}>En la app</span>}
@@ -655,7 +654,7 @@ export default function PerfilBebe() {
                 {searchQuery.includes("@") && searchQuery.includes(".") && !searchResults.some(res => res.email.toLowerCase() === searchQuery.trim().toLowerCase()) && (
                   <div style={{ display: "flex", alignItems: "center", padding: "12px", borderBottom: "1px solid #F3F4F6" }}>
                     <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "var(--theme-bg-light)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", marginRight: "12px" }}>✉️</div>
-                    <div style={{ flex: 1 }}>
+                    <div style={{ flex: 1, minWidth: "160px" }}>
                       <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>
                         Invitar por correo electrónico
                       </div>
