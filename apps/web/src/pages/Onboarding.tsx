@@ -1438,7 +1438,7 @@ export default function Onboarding() {
           <div
             className="auth-box"
             style={{
-              background: "white",
+              background: "var(--surface)",
               borderRadius: "32px",
               // Misma sombra y padding que la caja del Login, para que las
               // dos pantallas de entrada se sientan del mismo producto.
@@ -1521,7 +1521,7 @@ export default function Onboarding() {
                       padding: "18px 28px",
                       borderRadius: "18px",
                       border: "2px solid var(--theme-bg-light)",
-                      background: "white",
+                      background: "var(--surface)",
                       color: "var(--text-muted)",
                       fontSize: "17px",
                       fontWeight: 700,

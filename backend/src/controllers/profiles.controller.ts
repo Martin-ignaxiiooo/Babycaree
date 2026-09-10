@@ -44,6 +44,60 @@ export const updateMe = async (req: AuthRequest, res: Response) => {
   }
 };
 
+// Ventanas válidas (horas antes de la cita). Deben coincidir con las que
+// consume citaReminders.service.ts.
+const HORAS_VALIDAS = [168, 72, 48, 24, 2];
+
+export const getPreferenciasNotificaciones = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user.id;
+    const result = await query(
+      "SELECT recordatorios_citas_activos, recordatorios_citas_horas FROM usuarios WHERE id = $1",
+      [userId],
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error("Error in getPreferenciasNotificaciones:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
+export const updatePreferenciasNotificaciones = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user.id;
+    const { activos, horas } = req.body;
+
+    if (horas !== undefined) {
+      if (!Array.isArray(horas) || horas.some((h: any) => !HORAS_VALIDAS.includes(h))) {
+        return res.status(400).json({ error: "Ventanas inválidas" });
+      }
+    }
+
+    const result = await query(
+      `UPDATE usuarios SET
+         recordatorios_citas_activos = COALESCE($1, recordatorios_citas_activos),
+         recordatorios_citas_horas = COALESCE($2, recordatorios_citas_horas)
+       WHERE id = $3
+       RETURNING recordatorios_citas_activos, recordatorios_citas_horas`,
+      [activos ?? null, horas ?? null, userId],
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error("Error in updatePreferenciasNotificaciones:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
 export const updatePassword = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user.id;

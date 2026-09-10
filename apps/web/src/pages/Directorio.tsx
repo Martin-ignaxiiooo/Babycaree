@@ -210,7 +210,7 @@ export default function Directorio() {
                     <ShieldCheck size={18} style={{ color: "var(--theme-light)", marginTop: "2px" }} />
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
                       {medico.prevision_aceptada.map((prev, idx) => (
-                        <span key={idx} style={{ background: "var(--theme-bg-light)", color: "var(--theme-dark)", padding: "2px 10px", borderRadius: "12px", fontSize: "12px", fontWeight: 700 }}>
+                        <span key={idx} style={{ background: "var(--theme-bg-light)", color: "var(--theme-primary)", padding: "2px 10px", borderRadius: "12px", fontSize: "12px", fontWeight: 700 }}>
                           {prev}
                         </span>
                       ))}

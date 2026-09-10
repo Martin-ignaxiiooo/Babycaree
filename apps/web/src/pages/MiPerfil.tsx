@@ -29,6 +29,12 @@ export default function MiPerfil() {
   // esas no se les pide la "actual" (no existe una que puedan conocer).
   const [tienePassword, setTienePassword] = useState(true);
 
+  // Preferencias de recordatorios de citas por correo/push: activo o no, y
+  // cuáles de las 5 ventanas disponibles quiere recibir.
+  const [recordatoriosActivos, setRecordatoriosActivos] = useState(true);
+  const [recordatoriosHoras, setRecordatoriosHoras] = useState<number[]>([168, 24, 2]);
+  const [guardandoRecordatorios, setGuardandoRecordatorios] = useState(false);
+
   React.useEffect(() => {
     fetch("https://babycare-backend-msyq.onrender.com/api/profiles/me/password-estado", {
       headers: { Authorization: `Bearer ${token}` },
@@ -37,6 +43,48 @@ export default function MiPerfil() {
       .then((d) => { if (d) setTienePassword(d.definida !== false); })
       .catch(() => {});
   }, [token]);
+
+  React.useEffect(() => {
+    fetch("https://babycare-backend-msyq.onrender.com/api/profiles/me/preferencias-notificaciones", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!d) return;
+        setRecordatoriosActivos(d.recordatorios_citas_activos !== false);
+        setRecordatoriosHoras(d.recordatorios_citas_horas ?? [168, 24, 2]);
+      })
+      .catch(() => {});
+  }, [token]);
+
+  const guardarPreferenciasRecordatorios = async (cambios: { activos?: boolean; horas?: number[] }) => {
+    setGuardandoRecordatorios(true);
+    try {
+      const res = await fetch("https://babycare-backend-msyq.onrender.com/api/profiles/me/preferencias-notificaciones", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(cambios),
+      });
+      if (res.ok) {
+        const d = await res.json();
+        setRecordatoriosActivos(d.recordatorios_citas_activos !== false);
+        setRecordatoriosHoras(d.recordatorios_citas_horas ?? []);
+      }
+    } catch {
+      // Si falla, el toggle vuelve a su valor guardado en el próximo fetch;
+      // no bloqueamos la pantalla por un error de red puntual.
+    } finally {
+      setGuardandoRecordatorios(false);
+    }
+  };
+
+  const alternarVentanaRecordatorio = (horas: number) => {
+    const nuevas = recordatoriosHoras.includes(horas)
+      ? recordatoriosHoras.filter((h) => h !== horas)
+      : [...recordatoriosHoras, horas];
+    setRecordatoriosHoras(nuevas);
+    guardarPreferenciasRecordatorios({ horas: nuevas });
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -130,7 +178,7 @@ export default function MiPerfil() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F7F5FC", fontFamily: "'Nunito', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "var(--page-bg)", fontFamily: "'Nunito', sans-serif" }}>
       <TopNav user={initialUser} activePath="/mi-perfil" />
 
       {/* Cabecera morada; las tarjetas flotan sobre ella. */}
@@ -265,6 +313,62 @@ export default function MiPerfil() {
               )}
             </Tarjeta>
 
+            {/* Recordatorios de citas por correo (y push, cuando esté activado arriba) */}
+            <Tarjeta>
+              <Titulo>Recordatorios de citas</Titulo>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", marginTop: "16px", flexWrap: "wrap" }}>
+                <div style={{ flex: "1 1 240px", minWidth: 0 }}>
+                  <div style={{ fontSize: "14.5px", fontWeight: 800, color: "#3F3A52" }}>Recibir recordatorios</div>
+                  <div style={{ fontSize: "12.5px", color: "#8A849C", marginTop: "2px" }}>
+                    Avisos antes de cada cita o control médico agendado.
+                  </div>
+                </div>
+                <Interruptor
+                  activo={recordatoriosActivos}
+                  disabled={guardandoRecordatorios}
+                  onClick={() => {
+                    const nuevo = !recordatoriosActivos;
+                    setRecordatoriosActivos(nuevo);
+                    guardarPreferenciasRecordatorios({ activos: nuevo });
+                  }}
+                />
+              </div>
+
+              <div style={{
+                display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "16px",
+                opacity: recordatoriosActivos ? 1 : 0.45, pointerEvents: recordatoriosActivos ? "auto" : "none",
+              }}>
+                {[
+                  { horas: 168, etiqueta: "7 días antes" },
+                  { horas: 72, etiqueta: "3 días antes" },
+                  { horas: 48, etiqueta: "2 días antes" },
+                  { horas: 24, etiqueta: "1 día antes" },
+                  { horas: 2, etiqueta: "2 horas antes" },
+                ].map(({ horas, etiqueta }) => {
+                  const activa = recordatoriosHoras.includes(horas);
+                  return (
+                    <button
+                      key={horas}
+                      onClick={() => alternarVentanaRecordatorio(horas)}
+                      disabled={guardandoRecordatorios}
+                      style={{
+                        padding: "8px 16px", borderRadius: "100px", cursor: "pointer",
+                        fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "13px",
+                        border: activa ? "none" : "1.5px solid #E4DBF7",
+                        background: activa ? "linear-gradient(135deg, #8B5FD6, #A47BE8)" : "#FAF8FE",
+                        color: activa ? "#fff" : "#8A849C",
+                      }}
+                    >
+                      {etiqueta}
+                    </button>
+                  );
+                })}
+              </div>
+              <p style={{ fontSize: "12px", color: "#A99FC4", marginTop: "12px", marginBottom: 0, lineHeight: 1.5 }}>
+                Puedes elegir varias, ninguna, o todas. Los recordatorios llegan por correo y, si activaste las notificaciones de arriba, también al teléfono.
+              </p>
+            </Tarjeta>
+
             {/* Privacidad */}
             <Tarjeta>
               <Titulo>Privacidad</Titulo>
@@ -301,7 +405,7 @@ export default function MiPerfil() {
 
 function Tarjeta({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (
-    <div style={{ background: "#fff", borderRadius: "20px", padding: "24px 26px", boxShadow: "0 6px 28px rgba(90,60,150,0.08)", ...style }}>
+    <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "24px 26px", boxShadow: "0 6px 28px rgba(90,60,150,0.08)", ...style }}>
       {children}
     </div>
   );

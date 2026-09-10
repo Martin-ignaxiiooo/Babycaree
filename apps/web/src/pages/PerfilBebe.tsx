@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { 
-  ArrowLeft, User, Search, Lock, IdCard
+  User, Search, Lock, IdCard
 } from "lucide-react";
 import TopNav from "../components/TopNav";
-import DateSelect from "../components/DateSelect";
 import CarnetDigital from "../components/CarnetDigital";
 
 export default function PerfilBebe() {
@@ -26,7 +25,12 @@ export default function PerfilBebe() {
     }
   }, [location.search]);
   const [isInviting, setIsInviting] = useState(false);
-  const [editMode, setEditMode] = useState(false);
+  // Antes había un botón para elegir manualmente "Vista de lectura" o
+  // "Editar Perfil". Ahora se muestra siempre en modo edición, excepto
+  // cuando el acceso de la persona es de solo lectura -en cuyo caso no
+  // hay opción de cambiarlo, simplemente no puede editar.
+  const [soloLectura, setSoloLectura] = useState(false);
+  const editMode = !soloLectura;
   
   const [perfil, setPerfil] = useState<any>(null);
   const [editData, setEditData] = useState<any>({});
@@ -65,6 +69,18 @@ export default function PerfilBebe() {
       }
     }
   }, [token, id, activeTab]);
+
+  useEffect(() => {
+    if (!token || !id) return;
+    fetch(`https://babycare-backend-msyq.onrender.com/api/v1/home/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data) setSoloLectura(["solo_lectura", "solo_lectura_galeria"].includes(data.rol_acceso));
+      })
+      .catch(() => {});
+  }, [token, id]);
 
   const fetchPerfil = async () => {
     try {
@@ -130,7 +146,6 @@ export default function PerfilBebe() {
       }
 
       if (res.ok) {
-        setEditMode(false);
         fetchPerfil();
         setShowConfirmGestation(false);
         setPendingSave(false);
@@ -246,7 +261,7 @@ export default function PerfilBebe() {
 
   if (errorPerfil) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "#F8F7FC", padding: "20px" }}>
+      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--page-bg)", padding: "20px" }}>
            <h2 style={{ color: "#EF4444", marginBottom: "16px" }}>Error al cargar el perfil</h2>
            <p style={{ color: "#6B7280", marginBottom: "24px" }}>{errorPerfil}</p>
            <button style={{ background: "var(--theme-primary)", color: "#fff", padding: "12px 24px", borderRadius: "12px", fontWeight: 700 }} onClick={() => fetchPerfil()}>Intentar de nuevo</button>
@@ -261,67 +276,72 @@ export default function PerfilBebe() {
     <div style={{ minHeight: "100vh", background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)", fontFamily: "'Nunito', sans-serif", display: "flex", flexDirection: "column" }}>
       
       {/* ── TOP NAV GLOBAL ── */}
-      <TopNav user={user} activePath="/dashboard" />
+      <TopNav user={user} activePath="/perfil" />
 
       {/* ── PERFIL HEADER (Full width) ── */}
       {/* El fondo ocupa todo el ancho, pero el contenido se limita al mismo
           max-width que .page-container (1400px) para que quede alineado con
           el contenido de abajo, igual que en la pantalla de Inicio. */}
-      <div style={{ background: "linear-gradient(120deg, var(--theme-darker) 0%, #3A2E5C 55%, var(--theme-dark) 100%)", color: "#fff" }}>
-        <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "48px 40px 0" }}>
-        <button onClick={() => navigate("/dashboard")} style={{ background: "none", border: "none", color: "var(--theme-light)", fontSize: "14px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", marginBottom: "24px" }}>
-          <ArrowLeft size={16} /> Volver al Dashboard
-        </button>
-        
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", paddingBottom: "24px", flexWrap: "wrap", gap: "20px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
-            <div style={{ width: "96px", height: "96px", borderRadius: "50%", background: "linear-gradient(135deg, var(--theme-light), var(--accent-coral))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "40px", boxShadow: "0 0 0 4px rgba(255,255,255,0.2)" }}>
+      <div style={{ background: "linear-gradient(135deg, #8B5FD6 0%, #A47BE8 100%)", color: "#fff" }}>
+        <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "20px 40px 0" }}>
+
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", paddingBottom: "18px", flexWrap: "wrap", gap: "20px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "18px" }}>
+            <div style={{ width: "68px", height: "68px", borderRadius: "50%", background: "linear-gradient(135deg, var(--theme-light), var(--accent-coral))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "28px", boxShadow: "0 0 0 4px rgba(255,255,255,0.2)" }}>
               👶
             </div>
             <div>
-              <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "34px", fontWeight: 700, margin: 0 }}>{perfil.nombre}</h1>
-              <div style={{ fontSize: "15px", color: "rgba(255,255,255,0.75)", marginTop: "4px", fontWeight: 600 }}>Apodo: {perfil.apodo || "No definido"}</div>
+              <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "26px", fontWeight: 700, margin: 0 }}>{perfil.nombre}</h1>
+              <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.75)", marginTop: "3px", fontWeight: 600 }}>Apodo: {perfil.apodo || "No definido"}</div>
             </div>
           </div>
 
-          {activeTab === "detalle" && (
-            <div style={{ display: "flex", gap: "12px" }}>
-              <button 
-                style={{ background: !editMode ? "#fff" : "rgba(255,255,255,0.08)", color: !editMode ? "var(--theme-darker)" : "#fff", border: "2px solid rgba(255,255,255,0.7)", padding: "10px 22px", borderRadius: "100px", fontSize: "14px", fontWeight: 800, cursor: "pointer", transition: "0.2s" }}
-                onClick={() => setEditMode(false)}
-              >
-                👁️ Vista de lectura
-              </button>
-              <button 
-                style={{ background: editMode ? "#fff" : "rgba(255,255,255,0.08)", color: editMode ? "var(--theme-darker)" : "#fff", border: "2px solid rgba(255,255,255,0.7)", padding: "10px 22px", borderRadius: "100px", fontSize: "14px", fontWeight: 800, cursor: "pointer", transition: "0.2s" }}
-                onClick={() => setEditMode(true)}
-              >
-                ✏️ Editar Perfil
-              </button>
+          {activeTab === "detalle" && soloLectura && (
+            <div style={{
+              background: "rgba(255,255,255,0.12)", border: "1.5px solid rgba(255,255,255,0.35)",
+              borderRadius: "100px", padding: "8px 18px", fontSize: "13px", fontWeight: 800,
+            }}>
+              👁️ Solo lectura
             </div>
           )}
-        </div>
-
-        {/* TABS CONTAINER */}
-        <div style={{ display: "flex", gap: "32px", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
-          <button 
-            style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "detalle" ? "3px solid var(--accent-coral)" : "3px solid transparent", color: activeTab === "detalle" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
-            onClick={() => { setActiveTab("detalle"); navigate(`/perfil/${id}?tab=detalle`, { replace: true }); }}
-          >
-            <User size={18} /> Datos del bebé
-          </button>
-          <button 
-            style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "compartir" ? "3px solid var(--accent-coral)" : "3px solid transparent", color: activeTab === "compartir" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
-            onClick={() => { setActiveTab("compartir"); navigate(`/perfil/${id}?tab=compartir`, { replace: true }); }}
-          >
-            <Lock size={18} /> Compartir acceso
-          </button>
         </div>
         </div>
       </div>
 
       {/* ── CONTENT AREA ── */}
-      <div className="page-container" style={{ display: "flex", gap: "40px", alignItems: "flex-start" }}>
+      <div className="page-container" style={{ marginTop: "-14px" }}>
+
+        {/* TABS: mismo patrón de píldoras que usa Salud.tsx */}
+        <div className="responsive-overflow" style={{ display: "flex", gap: "10px", marginBottom: "32px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "16px", whiteSpace: "nowrap" }}>
+          <button
+            onClick={() => { setActiveTab("detalle"); navigate(`/perfil/${id}?tab=detalle`, { replace: true }); }}
+            style={{
+              background: activeTab === "detalle" ? "linear-gradient(135deg, var(--theme-primary), var(--theme-light))" : "transparent",
+              color: activeTab === "detalle" ? "#fff" : "var(--text-muted)",
+              border: "none", padding: "12px 22px", borderRadius: "100px",
+              fontWeight: 800, cursor: "pointer", fontSize: "14.5px",
+              display: "flex", alignItems: "center", gap: "8px", transition: "all 0.2s",
+              fontFamily: "'Nunito', sans-serif",
+              boxShadow: activeTab === "detalle" ? "0 6px 16px var(--theme-shadow-light)" : "none",
+            }}>
+            <User size={18} /> Datos del bebé
+          </button>
+          <button
+            onClick={() => { setActiveTab("compartir"); navigate(`/perfil/${id}?tab=compartir`, { replace: true }); }}
+            style={{
+              background: activeTab === "compartir" ? "linear-gradient(135deg, var(--theme-primary), var(--theme-light))" : "transparent",
+              color: activeTab === "compartir" ? "#fff" : "var(--text-muted)",
+              border: "none", padding: "12px 22px", borderRadius: "100px",
+              fontWeight: 800, cursor: "pointer", fontSize: "14.5px",
+              display: "flex", alignItems: "center", gap: "8px", transition: "all 0.2s",
+              fontFamily: "'Nunito', sans-serif",
+              boxShadow: activeTab === "compartir" ? "0 6px 16px var(--theme-shadow-light)" : "none",
+            }}>
+            <Lock size={18} /> Compartir acceso
+          </button>
+        </div>
+
+        <div style={{ display: "flex", gap: "40px", alignItems: "flex-start" }}>
         
         {activeTab === "detalle" && (
           <div style={{ width: "100%" }}>
@@ -346,12 +366,12 @@ export default function PerfilBebe() {
                   {editMode ? <input type="text" name="nombre" value={editData.nombre || ""} onChange={handleChange} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.nombre}</div>}
                 </div>
                 
-                <div style={{ display: "flex", gap: "16px", marginBottom: "16px" }}>
-                  <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", gap: "16px", marginBottom: "16px", flexWrap: "wrap" }}>
+                  <div style={{ flex: 1, minWidth: "160px" }}>
                     <label style={labelStyle}>Apodo</label>
                     {editMode ? <input type="text" name="apodo" value={editData.apodo || ""} onChange={handleChange} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.apodo || "-"}</div>}
                   </div>
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, minWidth: "160px" }}>
                     <label style={labelStyle}>Sexo registrado</label>
                     {editMode ? (
                       <select name="sexo" value={editData.sexo || ""} onChange={handleChange} style={inputStyle}>
@@ -366,12 +386,12 @@ export default function PerfilBebe() {
                   </div>
                 </div>
 
-                <div style={{ display: "flex", gap: "16px" }}>
-                  <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+                  <div style={{ flex: 1, minWidth: "160px" }}>
                     <label style={labelStyle}>Fecha de nacimiento</label>
-                    {editMode ? <DateSelect value={editData.fecha_nacimiento ? editData.fecha_nacimiento.split('T')[0] : ""} onChange={(isoDate) => setEditData({ ...editData, fecha_nacimiento: isoDate })} max={new Date().toISOString().split('T')[0]} variant="light" /> : <div style={readOnlyStyle}>{perfil.fecha_nacimiento ? new Date(perfil.fecha_nacimiento).toLocaleDateString('es-CL') : "-"}</div>}
+                    {editMode ? <input type="date" name="fecha_nacimiento" value={editData.fecha_nacimiento ? editData.fecha_nacimiento.split('T')[0] : ""} onChange={handleChange} max={new Date().toISOString().split('T')[0]} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.fecha_nacimiento ? new Date(perfil.fecha_nacimiento).toLocaleDateString('es-CL') : "-"}</div>}
                   </div>
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, minWidth: "160px" }}>
                     <label style={labelStyle}>Previsión de salud</label>
                     {editMode ? (
                       <select name="prevision_salud" value={editData.prevision_salud || ""} onChange={handleChange} style={inputStyle}>
@@ -391,8 +411,8 @@ export default function PerfilBebe() {
               <div style={cardStyle}>
                 <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--text)", marginBottom: "20px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "12px" }}>Datos de Nacimiento</h3>
                 
-                <div style={{ display: "flex", gap: "16px", marginBottom: "16px" }}>
-                  <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", gap: "16px", marginBottom: "16px", flexWrap: "wrap" }}>
+                  <div style={{ flex: 1, minWidth: "160px" }}>
                     <label style={labelStyle}>Peso al nacer (kg)</label>
                     {editMode ? (
                       <input
@@ -411,7 +431,7 @@ export default function PerfilBebe() {
                       <div style={readOnlyStyle}>{perfil.peso_nacimiento_g ? `${(perfil.peso_nacimiento_g / 1000).toFixed(2)} kg` : "-"}</div>
                     )}
                   </div>
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, minWidth: "160px" }}>
                     <label style={labelStyle}>Talla al nacer (cm)</label>
                     {editMode ? <input type="number" name="talla_nacimiento_cm" value={editData.talla_nacimiento_cm || ""} onChange={handleChange} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.talla_nacimiento_cm || "-"}</div>}
                   </div>
@@ -458,11 +478,11 @@ export default function PerfilBebe() {
                 </div>
 
                 <div className="hero-stats-grid">
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, minWidth: "160px" }}>
                     <label style={labelStyle}>Alergias conocidas</label>
                     {editMode ? <textarea name="alergias" rows={3} value={editData.alergias || ""} onChange={handleChange} style={inputStyle}></textarea> : <div style={{ ...readOnlyStyle, minHeight: "80px" }}>{perfil.alergias || "-"}</div>}
                   </div>
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, minWidth: "160px" }}>
                     <label style={labelStyle}>Condiciones médicas crónicas</label>
                     {editMode ? <textarea name="condiciones_cronicas" rows={3} value={editData.condiciones_cronicas || ""} onChange={handleChange} style={inputStyle}></textarea> : <div style={{ ...readOnlyStyle, minHeight: "80px" }}>{perfil.condiciones_cronicas || "-"}</div>}
                   </div>
@@ -547,7 +567,7 @@ export default function PerfilBebe() {
                   accesos.map(acceso => (
                     <div key={acceso.id} style={{ display: "flex", alignItems: "center", padding: "16px", border: "1px solid #E5E7EB", borderRadius: "12px", marginBottom: "12px" }}>
                       <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "var(--theme-bg-light)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "24px", marginRight: "16px" }}>🧑‍.</div>
-                      <div style={{ flex: 1 }}>
+                      <div style={{ flex: 1, minWidth: "160px" }}>
                         <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--text)" }}>{acceso.usuario_invitado?.nombre || "Usuario"}</div>
                         <div style={{ fontSize: "13px", color: "#6B7280" }}>{acceso.usuario_invitado?.email}</div>
                       </div>
@@ -602,7 +622,7 @@ export default function PerfilBebe() {
                     {searchResults.map(res => (
                       <div key={res.email} style={{ display: "flex", alignItems: "center", padding: "12px", borderBottom: "1px solid #F3F4F6" }}>
                         <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "var(--theme-bg-light)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", marginRight: "12px" }}>🧑</div>
-                        <div style={{ flex: 1 }}>
+                        <div style={{ flex: 1, minWidth: "160px" }}>
                           <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>
                             {res.nombre || "Usuario"} 
                             {res.en_app && <span style={{ marginLeft: "8px", fontSize: "10px", background: "#D1FAE5", color: "#065F46", padding: "2px 8px", borderRadius: "12px" }}>En la app</span>}
@@ -634,7 +654,7 @@ export default function PerfilBebe() {
                 {searchQuery.includes("@") && searchQuery.includes(".") && !searchResults.some(res => res.email.toLowerCase() === searchQuery.trim().toLowerCase()) && (
                   <div style={{ display: "flex", alignItems: "center", padding: "12px", borderBottom: "1px solid #F3F4F6" }}>
                     <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "var(--theme-bg-light)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", marginRight: "12px" }}>✉️</div>
-                    <div style={{ flex: 1 }}>
+                    <div style={{ flex: 1, minWidth: "160px" }}>
                       <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>
                         Invitar por correo electrónico
                       </div>
@@ -685,6 +705,7 @@ export default function PerfilBebe() {
           </div>
         )}
 
+        </div>
       </div>
 
       {showCarnet && perfil && (

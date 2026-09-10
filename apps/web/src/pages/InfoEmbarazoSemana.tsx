@@ -48,7 +48,7 @@ export default function InfoEmbarazoSemana() {
   const etiquetaMes = perfil?.etiqueta_mes_embarazo || ETIQUETA_POR_MES[mes];
 
   const cardStyle: React.CSSProperties = {
-    background: "white",
+    background: "var(--surface)",
     borderRadius: "22px",
     overflow: "hidden",
     boxShadow: "0 6px 24px rgba(124,92,191,0.07)",
@@ -67,7 +67,7 @@ export default function InfoEmbarazoSemana() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)", fontFamily: "'Nunito', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(165deg, var(--page-bg) 0%, var(--theme-bg-light) 100%)", fontFamily: "'Nunito', sans-serif" }}>
       <TopNav user={user} onLogout={handleLogout} activePath="/dashboard" perfilEstado="embarazo" />
 
       <div style={{ maxWidth: "760px", margin: "0 auto", padding: "28px clamp(12px, 4vw, 20px) 48px" }}>

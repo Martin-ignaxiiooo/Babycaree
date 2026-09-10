@@ -126,7 +126,7 @@ export default function Calendario() {
   const delDia = citasDe(seleccionado);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F7F5FC", fontFamily: "'Nunito', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "var(--page-bg)", fontFamily: "'Nunito', sans-serif" }}>
       <TopNav user={user} activePath="/calendario" perfilEstado={perfil?.estado} />
 
       <div style={{ background: "linear-gradient(135deg, #8B5FD6 0%, #A47BE8 100%)", paddingBottom: "80px" }}>
@@ -326,7 +326,7 @@ export default function Calendario() {
 
 function Tarjeta({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ background: "#fff", borderRadius: "20px", padding: "22px 24px", boxShadow: "0 6px 28px rgba(90,60,150,0.08)" }}>
+    <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "22px 24px", boxShadow: "0 6px 28px rgba(90,60,150,0.08)" }}>
       {children}
     </div>
   );

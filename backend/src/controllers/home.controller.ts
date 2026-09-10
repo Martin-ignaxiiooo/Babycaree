@@ -205,61 +205,58 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
     const notificaciones: any[] = [];
     let total_alertas = 0;
 
-    // A. Vacunas atrasadas/proximas
-    const vacunasRes = await query(
-      `SELECT rv.id, v.nombre, v.enfermedades_previene, v.meses_edad_recomendada,
-              rv.fecha_aplicacion
-       FROM registro_vacunas rv
-       JOIN vacunas_pni v ON rv.vacuna_id = v.id
-       WHERE rv.bebe_id = $1 AND rv.aplicada = FALSE
-       ORDER BY rv.fecha_aplicacion ASC`,
+    // A. Vacunas pendientes: antes esto consultaba solo filas ya existentes
+    // en registro_vacunas con aplicada=FALSE, pero esas filas nunca se
+    // crean para vacunas todavía no aplicadas (solo existen una vez que se
+    // registran) — así que esta notificación casi nunca disparaba. Ahora
+    // se consulta el catálogo completo (igual que getVacunas en
+    // salud.controller.ts) y se calcula cuáles ya corresponden por la edad
+    // actual del bebé.
+    const vacunasCatalogoRes = await query(
+      `SELECT v.id, v.nombre, v.enfermedades_previene, v.meses_edad_recomendada, rv.aplicada
+       FROM vacunas_pni v
+       LEFT JOIN registro_vacunas rv ON v.id = rv.vacuna_id AND rv.bebe_id = $1
+       ORDER BY v.meses_edad_recomendada ASC, v.id ASC`,
       [idPerfil]
     );
 
-    vacunasRes.rows.forEach((v: any) => {
-      const fecha = new Date(v.fecha_aplicacion);
+    if (perfil.fecha_nacimiento) {
+      const nacimiento = new Date(perfil.fecha_nacimiento);
       const hoy = new Date();
-      const diffTime = fecha.getTime() - hoy.getTime();
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      
-      if (diffDays < 0) {
+      const edadMeses = Math.max(0, (hoy.getFullYear() - nacimiento.getFullYear()) * 12 + (hoy.getMonth() - nacimiento.getMonth()));
+
+      vacunasCatalogoRes.rows.forEach((v: any) => {
+        if (v.aplicada) return;
+        // No corresponde aún por edad (ej. la de los 18 meses en un bebé
+        // de 2 meses): no es "pendiente", es una vacuna futura.
+        if (v.meses_edad_recomendada > edadMeses) return;
+
+        // Fecha estimada en la que correspondía (nacimiento + meses
+        // recomendados), solo para mostrarla en el detalle: no hay una
+        // fecha programada real guardada para vacunas no aplicadas.
+        const fechaEstimada = new Date(nacimiento);
+        fechaEstimada.setMonth(fechaEstimada.getMonth() + v.meses_edad_recomendada);
+
+        const atrasada = v.meses_edad_recomendada < edadMeses;
         notificaciones.push({
-          // Id estable: sirve para que el frontend recuerde qué
-          // notificaciones ya se revisaron (marcar como leída).
-          id: `vacuna_${v.id}_atrasada`,
-          tipo: "vacuna_atrasada",
-          prioridad: "alta",
-          titulo: v.nombre + " — Atrasada",
-          dias_atraso: Math.abs(diffDays),
-          mensaje: `Atrasada por ${Math.abs(diffDays)} días. Agenda tu hora.`,
+          id: `vacuna_${v.id}_pendiente`,
+          tipo: atrasada ? "vacuna_atrasada" : "vacuna_pendiente",
+          prioridad: atrasada ? "alta" : "media",
+          titulo: v.nombre + (atrasada ? " — Atrasada" : " — Pendiente"),
+          mensaje: atrasada
+            ? "Atrasada según el calendario del PNI. Agenda tu hora."
+            : "Corresponde a la edad actual del bebé. Agenda tu hora.",
           detalle: {
             es_vacuna: true,
             nombre: v.nombre,
             previene: v.enfermedades_previene,
             meses_edad_recomendada: v.meses_edad_recomendada,
-            fecha_programada: v.fecha_aplicacion,
+            fecha_programada: fechaEstimada.toISOString(),
           },
         });
         total_alertas++;
-      } else if (diffDays <= 7) {
-        notificaciones.push({
-          id: `vacuna_${v.id}_proxima`,
-          tipo: "vacuna_proxima",
-          prioridad: "media",
-          titulo: v.nombre + " — Próxima",
-          dias_restantes: diffDays,
-          mensaje: `Programada para los próximos ${diffDays} días.`,
-          detalle: {
-            es_vacuna: true,
-            nombre: v.nombre,
-            previene: v.enfermedades_previene,
-            meses_edad_recomendada: v.meses_edad_recomendada,
-            fecha_programada: v.fecha_aplicacion,
-          },
-        });
-        total_alertas++;
-      }
-    });
+      });
+    }
 
     // B. Citas Médicas — estas son agendadas activamente por la madre (o
     // quien tenga acceso), así que van con la prioridad más alta de todas:
@@ -340,6 +337,7 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
       control_proximo: 0,
       cita_proxima: 0,
       vacuna_atrasada: 1,
+      vacuna_pendiente: 1.5,
       vacuna_proxima: 2,
       articulo: 3,
     };
@@ -348,8 +346,11 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
       const pesoTipo = (ordenTipo[a.tipo] ?? 9) - (ordenTipo[b.tipo] ?? 9);
       if (pesoTipo !== 0) return pesoTipo;
 
-      // Dentro del mismo tipo: lo más urgente primero
-      if (a.tipo === "vacuna_atrasada") return (b.dias_atraso ?? 0) - (a.dias_atraso ?? 0);
+      // Dentro del mismo tipo: la vacuna que corresponde a una edad menor
+      // es la más atrasada, va primero.
+      if (a.tipo === "vacuna_atrasada" || a.tipo === "vacuna_pendiente") {
+        return (a.detalle?.meses_edad_recomendada ?? 0) - (b.detalle?.meses_edad_recomendada ?? 0);
+      }
       return (a.dias_restantes ?? 0) - (b.dias_restantes ?? 0);
     });
 

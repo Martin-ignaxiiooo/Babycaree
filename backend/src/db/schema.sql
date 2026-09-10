@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS registro_vacunas (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     bebe_id UUID REFERENCES perfiles_bebes(id) ON DELETE CASCADE,
     vacuna_id INTEGER REFERENCES vacunas_pni(id) ON DELETE RESTRICT,
-    fecha_aplicacion DATE,
+    fecha_aplicacion TIMESTAMP WITH TIME ZONE,
     aplicada BOOLEAN DEFAULT FALSE,
     lugar_aplicacion VARCHAR(255),
     notas TEXT,

@@ -142,7 +142,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
   const circunferencia = 2 * Math.PI * R;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F7F5FC", fontFamily: "'Nunito', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "var(--page-bg)", fontFamily: "'Nunito', sans-serif" }}>
       {/* Cabecera morada; se extiende bajo las tarjetas para que floten
           sobre ella, como en el diseño. */}
       <div style={{ background: "linear-gradient(135deg, #8B5FD6 0%, #A47BE8 100%)", paddingBottom: "90px" }}>

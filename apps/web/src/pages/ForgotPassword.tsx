@@ -438,7 +438,7 @@ export default function ForgotPassword() {
           <div
             className="auth-box"
             style={{
-              background: "white",
+              background: "var(--surface)",
               borderRadius: "32px",
               boxShadow: "0 12px 50px rgba(45,38,64,0.09)",
               padding: "3.5rem",

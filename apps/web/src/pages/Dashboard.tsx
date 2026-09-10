@@ -3,134 +3,23 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   Camera, X,
-  Ruler, Star, Check, Clock, Loader2, Lollipop, Plus,
+  Ruler, Star, Check, Clock, Loader2, Plus, Syringe,
 } from "lucide-react";
 import TopNav from "../components/TopNav";
 import NotificacionDetalleModal from "../components/NotificacionDetalleModal";
+import DiarioResumenMini from "../components/DiarioResumenMini";
 import { marcarNotifLeida } from "../utils/notificacionesLeidas";
 import DashboardEmbarazo from "./DashboardEmbarazo";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api";
 
-// Iconos que no existen en lucide-react, dibujados a mano para calzar con el diseño de referencia
-function DiarioIcon({ size = 28 }: { size?: number }) {
-  const stroke = "#4A3770";
-  return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-      {/* Cuaderno */}
-      <rect x="10" y="7" width="26" height="34" rx="4" fill="#DCEBFF" stroke={stroke} strokeWidth="1.8" />
-      {/* Lomo con anillas */}
-      <path d="M16 7v34" stroke={stroke} strokeWidth="1.4" opacity="0.5" />
-      <circle cx="13" cy="14" r="1.1" fill={stroke} opacity="0.6" />
-      <circle cx="13" cy="24" r="1.1" fill={stroke} opacity="0.6" />
-      <circle cx="13" cy="34" r="1.1" fill={stroke} opacity="0.6" />
-      {/* Renglones anotados */}
-      <path d="M20 16h11" stroke={stroke} strokeWidth="1.6" strokeLinecap="round" opacity="0.75" />
-      <path d="M20 22h11" stroke={stroke} strokeWidth="1.6" strokeLinecap="round" opacity="0.75" />
-      <path d="M20 28h7" stroke={stroke} strokeWidth="1.6" strokeLinecap="round" opacity="0.75" />
-      {/* Biberón: lo que se anota acá */}
-      <rect x="28" y="27" width="10" height="14" rx="3" fill="#FBD8B8" stroke={stroke} strokeWidth="1.6" />
-      <path d="M30.5 27v-2.5h5V27" stroke={stroke} strokeWidth="1.6" fill="#F4A0A0" />
-      <path d="M29.5 34h7" stroke={stroke} strokeWidth="1.3" strokeLinecap="round" opacity="0.55" />
-    </svg>
-  );
-}
-
-function BabyFaceIcon({ size = 28 }: { size?: number }) {
-  const stroke = "#4A3770";
-  return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-      {/* Orejas */}
-      <circle cx="9" cy="25" r="4.5" fill="#FBD8B8" stroke={stroke} strokeWidth="1.6" />
-      <circle cx="39" cy="25" r="4.5" fill="#FBD8B8" stroke={stroke} strokeWidth="1.6" />
-      {/* Cabeza */}
-      <circle cx="24" cy="24" r="17" fill="#FBD8B8" stroke={stroke} strokeWidth="1.8" />
-      {/* Remolino de pelo */}
-      <path d="M21 9c1.5-1.3 4-1.3 4.5 0.5c0.4 1.5-1 2-2 1.2" stroke={stroke} strokeWidth="1.4" strokeLinecap="round" fill="none" />
-      {/* Ojo izquierdo: punto */}
-      <circle cx="17.5" cy="23" r="1.8" fill={stroke} />
-      {/* Ojo derecho: guiño (curva) */}
-      <path d="M27.5 23c1 -1.6 3 -1.6 4 0" stroke={stroke} strokeWidth="1.8" strokeLinecap="round" fill="none" />
-      {/* Nariz */}
-      <circle cx="23" cy="27.5" r="0.9" fill={stroke} opacity="0.55" />
-      {/* Sonrisa */}
-      <path d="M19.5 30c1.4 2 3 2.8 4.5 2.8s3.1-0.8 4.5-2.8" stroke={stroke} strokeWidth="1.8" strokeLinecap="round" fill="none" />
-      {/* Cachetes */}
-      <circle cx="13.5" cy="29" r="2.2" fill="#F4A0A0" opacity="0.6" />
-      <circle cx="34.5" cy="29" r="2.2" fill="#F4A0A0" opacity="0.6" />
-    </svg>
-  );
-}
-
+// Icono que no existe en lucide-react, dibujado a mano para calzar con el diseño de referencia
 function ScaleIcon({ size = 20, color = "var(--theme-primary)" }: { size?: number; color?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <rect x="4" y="4" width="16" height="16" rx="4" stroke={color} strokeWidth="2" />
       <ellipse cx="12" cy="12" rx="5" ry="3.2" stroke={color} strokeWidth="2" />
       <circle cx="12" cy="12" r="1" fill={color} />
-    </svg>
-  );
-}
-
-function HeartPlusIcon({ size = 32 }: { size?: number }) {
-  const stroke = "#4A3770";
-  return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-      <path
-        d="M24 40 C24 40 6 28.5 6 15.5 C6 9 11 5 16.5 5 C20.3 5 23 7.6 24 9.5 C25 7.6 27.7 5 31.5 5 C37 5 42 9 42 15.5 C42 28.5 24 40 24 40 Z"
-        fill="#F4AAB6" stroke={stroke} strokeWidth="1.8" strokeLinejoin="round"
-      />
-      <path d="M15 12c-4 1-5 5-3.5 9" stroke="#FFFFFF" strokeWidth="1.6" strokeLinecap="round" opacity="0.55" fill="none" />
-      <polygon
-        points="32,23 38,23 38,27 42,27 42,33 38,33 38,37 32,37 32,33 28,33 28,27 32,27"
-        fill="#B9AEEA" stroke={stroke} strokeWidth="1.6" strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function ComunidadIcon({ size = 32 }: { size?: number }) {
-  const stroke = "#4A3770";
-  // Forma de globo de diálogo (rect redondeado + colita), estilo lucide MessageSquare
-  const bubblePath = "M2 4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-5 4v-4H4a2 2 0 0 1-2-2V4z";
-  return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-      <g transform="translate(3,4) scale(1.35)">
-        <path d={bubblePath} fill="#B9AEEA" stroke={stroke} strokeWidth="1" strokeLinejoin="round" />
-        <circle cx="8" cy="9" r="1" fill={stroke} />
-        <circle cx="12" cy="9" r="1" fill={stroke} />
-        <circle cx="16" cy="9" r="1" fill={stroke} />
-      </g>
-      <g transform="translate(45,26) scale(-1.05,1.05)">
-        <path d={bubblePath} fill="#FBD97B" stroke={stroke} strokeWidth="1" strokeLinejoin="round" />
-        <circle cx="8" cy="9" r="1" fill={stroke} />
-        <circle cx="12" cy="9" r="1" fill={stroke} />
-        <circle cx="16" cy="9" r="1" fill={stroke} />
-      </g>
-    </svg>
-  );
-}
-
-function GaleriaIcon({ size = 32 }: { size?: number }) {
-  const stroke = "#4A3770";
-  return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-      <defs>
-        <clipPath id="galeriaInnerClip">
-          <rect x="10" y="15" width="21" height="15" rx="1" />
-        </clipPath>
-      </defs>
-      {/* Foto de atrás (rotada, asoma detrás) */}
-      <rect x="15" y="7" width="24" height="24" rx="3" fill="#E4D9F7" stroke={stroke} strokeWidth="1.3" transform="rotate(9 27 19)" />
-      {/* Foto principal */}
-      <rect x="7" y="11" width="26" height="24" rx="3" fill="#FDFBF6" stroke={stroke} strokeWidth="1.7" />
-      <g clipPath="url(#galeriaInnerClip)">
-        <rect x="10" y="15" width="21" height="15" fill="#BFE3F5" />
-        <circle cx="16" cy="19.5" r="2.4" fill="#FBD97B" stroke={stroke} strokeWidth="0.8" />
-        <polygon points="10,30 18,20 24,30" fill="#6FBF73" />
-        <polygon points="19,30 26,21.5 31,30" fill="#8ED18F" />
-      </g>
-      <rect x="10" y="15" width="21" height="15" rx="1" fill="none" stroke={stroke} strokeWidth="1" />
     </svg>
   );
 }
@@ -355,7 +244,7 @@ export default function Dashboard() {
   if (homeData?.perfil?.estado === 'embarazo') {
     const notificaciones = homeData?.notificaciones || [];
     return (
-      <div style={{ minHeight: "100vh", background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)", fontFamily: "'Nunito', sans-serif", display: "flex", flexDirection: "column" }}>
+      <div style={{ minHeight: "100vh", background: "linear-gradient(165deg, var(--page-bg) 0%, var(--theme-bg-light) 100%)", fontFamily: "'Nunito', sans-serif", display: "flex", flexDirection: "column" }}>
         <TopNav user={user} notificaciones={notificaciones} onLogout={handleLogout} activePath="/dashboard" perfilEstado="embarazo" />
         <DashboardEmbarazo user={user} perfil={homeData.perfil} activeBabyId={activeBabyId!} />
       </div>
@@ -445,7 +334,7 @@ export default function Dashboard() {
         
         {/* ── HOME HERO FULL WIDTH ── */}
         <div style={{
-          background: "linear-gradient(120deg, var(--theme-bg-light) 0%, #F3E4EC 100%)",
+          background: "linear-gradient(120deg, var(--theme-bg-light) 0%, var(--theme-bg-hover) 100%)",
           borderRadius: "26px",
           marginBottom: "22px",
           display: "flex",
@@ -571,7 +460,7 @@ export default function Dashboard() {
 
             <div>
               <div style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "27px", fontWeight: 700, color: "var(--text)", marginBottom: "4px" }}>{hero.nombre}</div>
-              <div style={{ fontSize: "14px", color: "var(--theme-dark)", opacity: 0.75, fontWeight: 600 }}>{hero.edad_exacta}</div>
+              <div style={{ fontSize: "14px", color: "var(--text-muted)", fontWeight: 600 }}>{hero.edad_exacta}</div>
               {fotoError && (
                 <div style={{ fontSize: "12px", color: "#DC2626", marginTop: "4px", fontWeight: 600 }}>{fotoError}</div>
               )}
@@ -640,8 +529,9 @@ export default function Dashboard() {
                   // recomendado, que no es una "tarea completada").
                   const config: Record<string, { icon: any; color: string; bg: string; label: string }> = {
                     control_proximo: { icon: Clock, color: "#1E4E8C", bg: "linear-gradient(90deg, #8CC9F0 0%, #D7EEFF 100%)", label: "Agendado" },
-                    vacuna_atrasada: { icon: Clock, color: "#8A5212", bg: "linear-gradient(90deg, #FEAD53 0%, #FFE6CD 100%)", label: "Pendiente" },
-                    vacuna_proxima: { icon: Lollipop, color: "#1E4E8C", bg: "linear-gradient(90deg, #8CC9F0 0%, #D7EEFF 100%)", label: "Próximo" },
+                    vacuna_atrasada: { icon: Syringe, color: "#8A5212", bg: "linear-gradient(90deg, #FEAD53 0%, #FFE6CD 100%)", label: "Pendiente" },
+                    vacuna_pendiente: { icon: Syringe, color: "#8A5212", bg: "linear-gradient(90deg, #FEAD53 0%, #FFE6CD 100%)", label: "Pendiente" },
+                    vacuna_proxima: { icon: Syringe, color: "#1E4E8C", bg: "linear-gradient(90deg, #8CC9F0 0%, #D7EEFF 100%)", label: "Próximo" },
                     articulo: { icon: Check, color: "#7C5CBF", bg: "#E3D2FA", label: "Recomendado" },
                   };
                   const { icon: StatusIcon, color: statusColor, bg: statusBg, label: statusLabel } =
@@ -689,7 +579,7 @@ export default function Dashboard() {
                           fontSize: "14px", fontWeight: 700, color: "var(--text)",
                           overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"
                         }}>
-                          {n.titulo}
+                          {n.tipo?.startsWith("vacuna_") ? `Vacuna: ${n.titulo}` : n.titulo}
                         </span>
                       </div>
                       <span style={{ fontSize: "12px", fontWeight: 700, color: statusColor, flexShrink: 0, whiteSpace: "nowrap" }}>
@@ -824,34 +714,15 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* COLUMNA 2: Módulos (se oculta en móvil: ya están todos accesibles
-              desde la barra de navegación inferior, y como botones grandes
-              acá abajo quedaban redundantes y ocupaban mucho espacio). */}
-          <div className="dashboard-modules-grid" style={{ background: "var(--surface)", borderRadius: "26px", padding: "22px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
+          {/* COLUMNA 2: Patrones del Diario (últimos 7 días, fijo, sin
+              selector — la versión completa con más rango vive en /diario).
+              Antes acá estaban los botones grandes de Módulos; se sacaron
+              por ser redundantes con la barra de navegación. */}
+          <div style={{ background: "var(--surface)", borderRadius: "26px", padding: "22px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
             <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--text)", marginBottom: "20px" }}>
-              Módulos
+              Patrones del Diario
             </h3>
-
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-
-              {[
-                { icon: DiarioIcon, label: "Diario", hoverBg: "#E3F2FD", hoverBorder: "#1976D2", onClick: () => navigate("/diario") },
-                { icon: BabyFaceIcon, label: "Perfil", hoverBg: "var(--theme-bg-light)", hoverBorder: "var(--theme-primary)", onClick: () => navigate(`/perfil/${hero.id}`) },
-                { icon: HeartPlusIcon, label: "Salud", hoverBg: "#FFF0F0", hoverBorder: "#F4A0A0", onClick: () => navigate("/salud") },
-                { icon: ComunidadIcon, label: "Comunidad", hoverBg: "#F3EEFD", hoverBorder: "#B39DDB", onClick: () => navigate("/comunidad") },
-                { icon: GaleriaIcon, label: "Galería", hoverBg: "#E8F0FE", hoverBorder: "#6B9BF4", onClick: () => navigate("/galeria") },
-              ].map(({ icon: Icon, label, hoverBg, hoverBorder, onClick }) => (
-                <div key={label} onClick={onClick} style={{ background: "var(--surface-2)", padding: "10px 8px", borderRadius: "20px", textAlign: "center", cursor: "pointer", border: "2px solid transparent", transition: "all 0.2s" }}
-                     onMouseEnter={e => { e.currentTarget.style.borderColor = hoverBorder; e.currentTarget.style.background = hoverBg; }}
-                     onMouseLeave={e => { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.background = "#F9FAFB"; }}>
-                  <div className="module-icon-wrap">
-                    <Icon size={96} />
-                  </div>
-                  <div style={{ fontSize: "14px", fontWeight: 800, color: "var(--text)" }}>{label}</div>
-                </div>
-              ))}
-
-            </div>
+            {activeBabyId && <DiarioResumenMini bebeId={activeBabyId} token={localStorage.getItem("token")!} />}
           </div>
         </div>
 

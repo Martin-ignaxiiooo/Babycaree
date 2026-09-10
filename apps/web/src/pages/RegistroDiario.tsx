@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Milk, Moon, Baby, Plus, Trash2, Clock,
-  Droplets, Loader2, Sun,
+  Milk, Moon, Baby, Plus, X,
+  Droplets, Sun,
 } from "lucide-react";
 import TopNav from "../components/TopNav";
 import EstadisticasDiario from "../components/EstadisticasDiario";
@@ -33,21 +33,7 @@ function duracionTexto(min: number): string {
   return h > 0 ? `${h}h ${m}min` : `${m} min`;
 }
 
-/** Etiqueta legible de un registro, según su tipo. */
-function describir(r: any): string {
-  if (r.tipo === "toma") {
-    if (r.fuente === "biberon") return `Biberón · ${r.cantidad_ml ?? "?"} ml`;
-    const lado = r.fuente === "pecho_izq" ? "izquierdo" : "derecho";
-    return r.duracion_min ? `Pecho ${lado} · ${r.duracion_min} min` : `Pecho ${lado}`;
-  }
-  if (r.tipo === "sueno") {
-    if (!r.sueno_fin) return "Durmiendo ahora";
-    const min = (new Date(r.sueno_fin).getTime() - new Date(r.sueno_inicio).getTime()) / 60000;
-    return `Durmió ${duracionTexto(min)}`;
-  }
-  return { pis: "Pañal · pipí", caca: "Pañal · caca", mixto: "Pañal · mixto" }[r.panal_tipo as string] ?? "Pañal";
-}
-
+/** Colores e ícono por tipo de registro, usados en los botones rápidos. */
 const ESTILO_TIPO: Record<Tipo, { bg: string; fg: string; Icon: any }> = {
   toma:  { bg: "#E3F2FD", fg: "#1976D2", Icon: Milk },
   sueno: { bg: "#EDE7F6", fg: "#7C5CBF", Icon: Moon },
@@ -63,14 +49,11 @@ export default function RegistroDiario() {
   // escribir en él: se le ocultan los botones en vez de dejar que fallen.
   const [soloLectura, setSoloLectura] = useState(false);
 
-  const [registros, setRegistros] = useState<any[]>([]);
   const [resumen, setResumen] = useState<any>(null);
-  const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Formulario abierto (null = ninguno). Se abre uno a la vez para que la
   // pantalla no se llene de campos cuando se registra con una sola mano.
-  const [vista, setVista] = useState<"registro" | "patrones">("registro");
   const [abierto, setAbierto] = useState<Tipo | null>(null);
   const [guardando, setGuardando] = useState(false);
 
@@ -80,6 +63,10 @@ export default function RegistroDiario() {
   const [duracionMin, setDuracionMin] = useState(15);
   const [panalTipo, setPanalTipo] = useState<"pis" | "caca" | "mixto">("pis");
   const [nota, setNota] = useState("");
+  // Cambia cada vez que se agrega/borra un registro, para que
+  // EstadisticasDiario (los gráficos de Patrones) se refresque también sin
+  // tener que recargar la página entera.
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     if (!token) { navigate("/"); return; }
@@ -93,13 +80,11 @@ export default function RegistroDiario() {
   const cargar = useCallback(async () => {
     if (!bebeId) return;
     try {
-      const [regRes, resRes, homeRes] = await Promise.all([
-        fetch(`${API_URL}/v1/diario/${bebeId}/registros?limite=50`, { headers: { Authorization: `Bearer ${token}` } }),
+      const [resRes, homeRes] = await Promise.all([
         fetch(`${API_URL}/v1/diario/${bebeId}/registros/resumen`, { headers: { Authorization: `Bearer ${token}` } }),
         fetch(`${API_URL}/v1/home/${bebeId}`, { headers: { Authorization: `Bearer ${token}` } }),
       ]);
-      if (!regRes.ok || !resRes.ok) throw new Error();
-      setRegistros(await regRes.json());
+      if (!resRes.ok) throw new Error();
       setResumen(await resRes.json());
       if (homeRes.ok) {
         const home = await homeRes.json();
@@ -108,8 +93,6 @@ export default function RegistroDiario() {
       setError(null);
     } catch {
       setError("No pudimos cargar los registros.");
-    } finally {
-      setCargando(false);
     }
   }, [bebeId, token]);
 
@@ -131,6 +114,7 @@ export default function RegistroDiario() {
       setAbierto(null);
       setNota("");
       cargar();
+      setRefreshKey((k) => k + 1);
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -144,20 +128,13 @@ export default function RegistroDiario() {
       method: "PATCH", headers: { Authorization: `Bearer ${token}` },
     });
     cargar();
-  };
-
-  const eliminar = async (id: string) => {
-    if (!bebeId || !confirm("¿Eliminar este registro?")) return;
-    await fetch(`${API_URL}/v1/diario/${bebeId}/registros/${id}`, {
-      method: "DELETE", headers: { Authorization: `Bearer ${token}` },
-    });
-    cargar();
+    setRefreshKey((k) => k + 1);
   };
 
   const suenoEnCurso = resumen?.sueno_en_curso;
 
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)" }}>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(165deg, var(--page-bg) 0%, var(--theme-bg-light) 100%)" }}>
       <TopNav
         user={user}
         activePath="/diario"
@@ -171,49 +148,10 @@ export default function RegistroDiario() {
           <p style={{ color: "rgba(255,255,255,0.8)", marginTop: "3px", fontSize: "12.5px" }}>
             Tomas, sueño y pañales. Lo del día a día, a mano.
           </p>
-
-          <div style={{ display: "flex", gap: "26px", marginTop: "12px" }}>
-            {([["registro", "Registro"], ["patrones", "Patrones"]] as const).map(([v, l]) => (
-              <button
-                key={v}
-                onClick={() => setVista(v)}
-                style={{
-                  background: "none", border: "none", cursor: "pointer",
-                  padding: "0 0 10px", fontFamily: "'Nunito', sans-serif",
-                  fontSize: "15px", fontWeight: 800,
-                  color: vista === v ? "#fff" : "rgba(255,255,255,0.55)",
-                  borderBottom: vista === v ? "3px solid var(--accent-coral, #F4A0A0)" : "3px solid transparent",
-                }}
-              >
-                {l}
-              </button>
-            ))}
-          </div>
         </div>
       </div>
 
       <div className="page-container" style={{ padding: "28px 40px 60px" }}>
-        {vista === "patrones" && bebeId && (
-          <EstadisticasDiario bebeId={bebeId} token={token!} />
-        )}
-
-        {vista === "registro" && (
-        <>
-        {/* Resumen de hoy */}
-        {resumen && (
-          <>
-          <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "20px", color: "var(--text)", margin: "0 0 14px" }}>
-            Últimos registros de hoy
-          </h2>
-          <div className="diario-resumen-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "14px", marginBottom: "26px" }}>
-            <Tarjeta icono={<Milk size={19} color="#1976D2" />} bg="#E3F2FD" valor={resumen.hoy.tomas} etiqueta="tomas hoy" />
-            <Tarjeta icono={<Droplets size={19} color="#0288D1" />} bg="#E1F5FE" valor={`${resumen.hoy.ml_total} ml`} etiqueta="de biberón" />
-            <Tarjeta icono={<Moon size={19} color="#7C5CBF" />} bg="#EDE7F6" valor={duracionTexto(resumen.hoy.sueno_min)} etiqueta="durmiendo" />
-            <Tarjeta icono={<Baby size={19} color="#B27B16" />} bg="#FFF4E0" valor={resumen.hoy.panales} etiqueta="pañales" />
-          </div>
-          </>
-        )}
-
         {/* Sueño en curso: acción destacada, es lo único con estado abierto */}
         {suenoEnCurso && (
           <div style={{ background: "linear-gradient(120deg, #4A3770, #7C5CBF)", borderRadius: "20px", padding: "20px 24px", marginBottom: "22px", display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
@@ -252,12 +190,27 @@ export default function RegistroDiario() {
         </div>
         )}
 
+        {/* Resumen de hoy */}
+        {resumen && (
+          <>
+          <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "20px", color: "var(--text)", margin: "0 0 14px" }}>
+            Últimos registros de hoy
+          </h2>
+          <div className="diario-resumen-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "14px", marginBottom: "26px" }}>
+            <Tarjeta icono={<Milk size={19} color="#1976D2" />} bg="#E3F2FD" valor={resumen.hoy.tomas} etiqueta="tomas hoy" />
+            <Tarjeta icono={<Droplets size={19} color="#0288D1" />} bg="#E1F5FE" valor={`${resumen.hoy.ml_total} ml`} etiqueta="de biberón" />
+            <Tarjeta icono={<Moon size={19} color="#7C5CBF" />} bg="#EDE7F6" valor={duracionTexto(resumen.hoy.sueno_min)} etiqueta="durmiendo" />
+            <Tarjeta icono={<Baby size={19} color="#B27B16" />} bg="#FFF4E0" valor={resumen.hoy.panales} etiqueta="pañales" />
+          </div>
+          </>
+        )}
+
         {/* Formulario de toma */}
         {abierto === "toma" && (
-          <Panel>
+          <Modal titulo="Registrar toma" onClose={() => setAbierto(null)}>
             <Etiqueta>¿De dónde comió?</Etiqueta>
             <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "18px" }}>
-              {([["pecho_izq", "Pecho izq."], ["biberon", "Biberón"], ["pecho_der", "Pecho der."]] as const).map(([v, l]) => (
+              {([["pecho_izq", "Pecho izq."], ["pecho_der", "Pecho der."], ["biberon", "Biberón"]] as const).map(([v, l]) => (
                 <Opcion key={v} activo={fuente === v} onClick={() => setFuente(v)}>{l}</Opcion>
               ))}
             </div>
@@ -283,21 +236,21 @@ export default function RegistroDiario() {
                   : { tipo: "toma", fuente, duracion_min: duracionMin }
               )}
             />
-          </Panel>
+          </Modal>
         )}
 
         {/* Formulario de pañal */}
         {abierto === "panal" && (
-          <Panel>
+          <Modal titulo="Cambio de pañal" onClose={() => setAbierto(null)}>
             <Etiqueta>¿Qué había?</Etiqueta>
             <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "18px" }}>
-              {([["pis", "Pipí"], ["caca", "Caca"], ["mixto", "Ambos"]] as const).map(([v, l]) => (
+              {([["pis", "Pipí"], ["caca", "Popó"], ["mixto", "Ambos"]] as const).map(([v, l]) => (
                 <Opcion key={v} activo={panalTipo === v} onClick={() => setPanalTipo(v)}>{l}</Opcion>
               ))}
             </div>
             <CampoNota nota={nota} setNota={setNota} />
             <Guardar disabled={guardando} onClick={() => registrar({ tipo: "panal", panal_tipo: panalTipo })} />
-          </Panel>
+          </Modal>
         )}
 
         {error && (
@@ -306,48 +259,13 @@ export default function RegistroDiario() {
           </div>
         )}
 
-        {/* Línea de tiempo */}
+        {/* Patrones: antes vivía en una pestaña separada; ahora reemplaza
+            el listado plano de "Últimos registros" al final de esta misma
+            vista. */}
         <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "20px", color: "var(--text)", margin: "26px 0 14px" }}>
-          Últimos registros
+          Patrones
         </h2>
-
-        {cargando ? (
-          <div style={{ textAlign: "center", padding: "50px", color: "var(--text-muted)" }}><Loader2 size={26} className="spin-icon" /></div>
-        ) : registros.length === 0 ? (
-          <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "50px 24px", textAlign: "center", boxShadow: "0 4px 18px rgba(124,92,191,0.06)" }}>
-            <Clock size={38} color="var(--theme-primary)" style={{ opacity: 0.45 }} />
-            <div style={{ fontWeight: 800, color: "var(--text)", marginTop: "12px", fontSize: "16px" }}>Todavía no hay registros</div>
-            <div style={{ color: "var(--text-muted)", fontSize: "14px", marginTop: "5px" }}>
-              Usa los botones de arriba para anotar la primera toma o cambio de pañal.
-            </div>
-          </div>
-        ) : (
-          registros.map((r) => {
-            const est = ESTILO_TIPO[r.tipo as Tipo];
-            return (
-              <div key={r.id} style={{ background: "var(--surface)", borderRadius: "16px", padding: "14px 18px", marginBottom: "10px", display: "flex", alignItems: "center", gap: "14px", boxShadow: "0 3px 14px rgba(124,92,191,0.05)" }}>
-                <div style={{ width: "42px", height: "42px", borderRadius: "12px", background: est.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <est.Icon size={20} color={est.fg} />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 700, color: "var(--text)", fontSize: "15px" }}>{describir(r)}</div>
-                  <div style={{ color: "var(--text-muted)", fontSize: "12.5px", marginTop: "2px" }}>
-                    {hora(r.fecha_hora)} · {haceCuanto(r.fecha_hora)}
-                    {r.registrado_por_nombre ? ` · ${r.registrado_por_nombre}` : ""}
-                  </div>
-                  {r.nota && <div style={{ color: "#6B647F", fontSize: "13px", marginTop: "5px", fontStyle: "italic" }}>{r.nota}</div>}
-                </div>
-                {!soloLectura && (
-                  <button onClick={() => eliminar(r.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "#C4BFD4", padding: "6px" }} aria-label="Eliminar">
-                    <Trash2 size={15} />
-                  </button>
-                )}
-              </div>
-            );
-          })
-        )}
-        </>
-        )}
+        {bebeId && <EstadisticasDiario bebeId={bebeId} token={token!} refreshKey={refreshKey} />}
       </div>
     </div>
   );
@@ -386,10 +304,40 @@ function BotonRapido({ tipo, activo, onClick, label }: any) {
   );
 }
 
-function Panel({ children }: any) {
+function Modal({ titulo, onClose, children }: any) {
   return (
-    <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "22px 24px", marginBottom: "16px", boxShadow: "0 4px 18px rgba(124,92,191,0.07)" }}>
-      {children}
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed", inset: 0, background: "rgba(45,38,64,0.5)", zIndex: 1000,
+        display: "flex", alignItems: "center", justifyContent: "center", padding: "20px",
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: "var(--surface)", borderRadius: "22px", width: "100%", maxWidth: "420px",
+          maxHeight: "90vh", overflowY: "auto", padding: "24px", boxShadow: "0 20px 60px rgba(45,38,64,0.3)",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
+          <div style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "18px", fontWeight: 700, color: "var(--text)" }}>
+            {titulo}
+          </div>
+          <button
+            onClick={onClose}
+            aria-label="Cerrar"
+            style={{
+              background: "var(--surface-2)", border: "none", borderRadius: "50%",
+              width: "30px", height: "30px", display: "flex", alignItems: "center",
+              justifyContent: "center", cursor: "pointer", color: "var(--text-muted)", flexShrink: 0,
+            }}
+          >
+            <X size={16} />
+          </button>
+        </div>
+        {children}
+      </div>
     </div>
   );
 }

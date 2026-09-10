@@ -129,6 +129,10 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
   // cuando se agrega o quita una sección.
   const navItems = [
       { label: "Inicio", path: "/dashboard", match: "dashboard" },
+      // Requiere un bebé activo, ya que la ruta depende de su id.
+      ...(activeBabyId ? [
+        { label: "Perfil del bebé", mobileLabel: "Perfil", path: `/perfil/${activeBabyId}`, match: "perfil" },
+      ] : []),
       // El calendario es propio del seguimiento de embarazo: en un perfil de
       // bebé nacido las citas se ven desde Salud y no hace falta duplicarlo.
       ...(estadoPerfil === "embarazo" ? [
@@ -162,6 +166,7 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
     comunidad: MessageSquare,
     directorio: Stethoscope,
     galeria: Images,
+    perfil: Baby,
   };
 
   const NavLinks = ({ pill = false }: { pill?: boolean }) => {
@@ -285,7 +290,7 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
                 {switcherOpen && (
                   <div style={{
                     position: "absolute", top: "calc(100% + 12px)", right: 0,
-                    background: "white", borderRadius: "20px", boxShadow: "0 16px 40px rgba(45,38,64,0.22)",
+                    background: "var(--surface)", borderRadius: "20px", boxShadow: "0 16px 40px rgba(45,38,64,0.22)",
                     minWidth: "240px", overflow: "hidden", zIndex: 200,
                     border: "1px solid rgba(124,92,191,0.08)",
                   }}>
@@ -464,18 +469,6 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
 
             <div style={{ display: "flex", flexDirection: "column", gap: "4px", fontSize: "15.5px", fontWeight: 700 }}>
               <NavLinks />
-              {activeBabyId && (
-                <span
-                  onClick={() => { setMobileMenuOpen(false); navigate(`/perfil/${activeBabyId}`); }}
-                  style={{
-                    cursor: "pointer",
-                    padding: "11px 12px", borderRadius: "12px",
-                    color: "rgba(255,255,255,0.75)",
-                  }}
-                >
-                  Perfil
-                </span>
-              )}
             </div>
 
             {babies.length > 1 && (
@@ -550,7 +543,7 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
             >
               <Icono size={21} strokeWidth={active ? 2.4 : 2} />
               <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "100%" }}>
-                {item.label}
+                {(item as any).mobileLabel ?? item.label}
               </span>
             </button>
           );

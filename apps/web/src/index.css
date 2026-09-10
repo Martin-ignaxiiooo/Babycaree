@@ -615,22 +615,6 @@ body {
   flex-wrap: wrap;
 }
 
-/* Iconos de módulos y de stats del hero: tamaño fijo en desktop,
-   controlado por CSS (no por el prop size del componente) para poder
-   achicarlos limpiamente en mobile con la media query de abajo. */
-.module-icon-wrap {
-  width: 96px;
-  height: 96px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 4px;
-}
-.module-icon-wrap svg {
-  width: 100%;
-  height: 100%;
-}
-
 .stat-icon-circle {
   width: 76px;
   height: 76px;
@@ -703,12 +687,6 @@ body {
     white-space: nowrap;
   }
 
-  .module-icon-wrap {
-    width: 54px;
-    height: 54px;
-    margin-bottom: 4px;
-  }
-
   /* Registro diario: las 4 tarjetas de resumen (tomas hoy, biberón,
      durmiendo, pañales) en una sola fila también en móvil, en vez de
      acomodarse en 2x2. */
@@ -738,10 +716,29 @@ body {
     line-height: 1.2;
   }
 
-  /* Los módulos (Diario, Perfil, Salud, Comunidad, Galería) como botones
-     grandes son redundantes en móvil: ya están en la barra inferior. */
-  .dashboard-modules-grid {
-    display: none;
+  /* Pestañas de Salud y Crecimiento: en desktop es una fila horizontal
+     (Controles/Vacunas/Crecimiento/Exámenes/Informe médico) que en
+     pantallas angostas se cortaba y quedaba con scroll lateral poco claro.
+     En móvil pasa a una grilla de 2 columnas (sin scroll), e "Informe
+     médico" sale de la fila -ya no compite por espacio- y pasa a un
+     botón circular aparte, arriba a la derecha. */
+  .salud-tabs-row {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    white-space: normal !important;
+    overflow: visible !important;
+  }
+  .salud-tabs-row button {
+    padding: 11px 10px !important;
+    font-size: 13px !important;
+    justify-content: center !important;
+  }
+  .informe-btn-desktop {
+    display: none !important;
+  }
+  .informe-btn-row-mobile {
+    display: flex !important;
   }
 
   /* Calendario de controles (Salud): en desktop es calendario + detalle
