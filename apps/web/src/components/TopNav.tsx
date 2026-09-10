@@ -467,10 +467,9 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
               </button>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "4px", fontSize: "15.5px", fontWeight: 700 }}>
-              <NavLinks />
-            </div>
-
+            {/* Se sacaron los botones de navegación (Inicio...Galería) de este
+                drawer a pedido: quedan disponibles en la barra inferior de
+                móvil, y acá solo interesa el cambio de perfil + logout. */}
             {babies.length > 1 && (
               <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "18px" }}>
                 <div style={{ fontSize: "11px", fontWeight: 800, color: "rgba(255,255,255,0.45)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "10px" }}>
