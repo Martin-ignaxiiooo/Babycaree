@@ -282,7 +282,7 @@ export default function PerfilBebe() {
       {/* El fondo ocupa todo el ancho, pero el contenido se limita al mismo
           max-width que .page-container (1400px) para que quede alineado con
           el contenido de abajo, igual que en la pantalla de Inicio. */}
-      <div style={{ background: "linear-gradient(120deg, var(--theme-darker) 0%, #3A2E5C 55%, var(--theme-dark) 100%)", color: "#fff" }}>
+      <div style={{ background: "linear-gradient(135deg, #8B5FD6 0%, #A47BE8 100%)", color: "#fff" }}>
         <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "20px 40px 0" }}>
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", paddingBottom: "18px", flexWrap: "wrap", gap: "20px" }}>
@@ -309,7 +309,7 @@ export default function PerfilBebe() {
       </div>
 
       {/* ── CONTENT AREA ── */}
-      <div className="page-container">
+      <div className="page-container" style={{ marginTop: "-14px" }}>
 
         {/* TABS: mismo patrón de píldoras que usa Salud.tsx */}
         <div className="responsive-overflow" style={{ display: "flex", gap: "10px", marginBottom: "32px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "16px", whiteSpace: "nowrap" }}>
