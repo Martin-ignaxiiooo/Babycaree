@@ -496,10 +496,6 @@ export default function PerfilBebe() {
 
                 <div className="hero-stats-grid" style={{ marginBottom: "16px" }}>
                   <div>
-                    <label style={labelStyle}>RUT del bebé (opcional)</label>
-                    {editMode ? <input type="text" name="rut" placeholder="12.345.678-9" value={editData.rut || ""} onChange={handleChange} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.rut || "-"}</div>}
-                  </div>
-                  <div>
                     <label style={labelStyle}>Contacto de emergencia — nombre</label>
                     {editMode ? <input type="text" name="contacto_emergencia_nombre" value={editData.contacto_emergencia_nombre || ""} onChange={handleChange} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.contacto_emergencia_nombre || "-"}</div>}
                   </div>

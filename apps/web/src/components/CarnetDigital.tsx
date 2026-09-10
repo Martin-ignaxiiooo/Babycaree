@@ -98,7 +98,6 @@ export default function CarnetDigital({ perfil, onClose }: CarnetDigitalProps) {
             ["Fecha de nacimiento", formatFecha(perfil.fecha_nacimiento)],
             ["Peso y talla al nacer", pesoTalla],
             ["Semanas de gestación", perfil.semanas_gestacion_nac ? `${perfil.semanas_gestacion_nac} semanas` : "No registrado"],
-            ["RUT", perfil.rut || "No registrado"],
             ["Previsión", perfil.nombre_prevision || perfil.prevision_salud || "No registrada"],
           ];
           let y = 288;
@@ -276,7 +275,6 @@ export default function CarnetDigital({ perfil, onClose }: CarnetDigitalProps) {
                 <CampoCarnet label="Fecha de nacimiento" valor={formatFecha(perfil.fecha_nacimiento)} />
                 <CampoCarnet label="Peso y talla al nacer" valor={pesoTalla} />
                 <CampoCarnet label="Semanas de gestación" valor={perfil.semanas_gestacion_nac ? `${perfil.semanas_gestacion_nac} sem.` : "No registrado"} />
-                <CampoCarnet label="RUT" valor={perfil.rut || "No registrado"} />
                 <CampoCarnet label="Previsión" valor={perfil.nombre_prevision || perfil.prevision_salud || "No registrada"} />
               </div>
 
