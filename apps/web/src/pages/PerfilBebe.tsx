@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { 
-  ArrowLeft, User, Search, Lock, IdCard
+  User, Search, Lock, IdCard
 } from "lucide-react";
 import TopNav from "../components/TopNav";
 import DateSelect from "../components/DateSelect";
@@ -261,26 +261,23 @@ export default function PerfilBebe() {
     <div style={{ minHeight: "100vh", background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)", fontFamily: "'Nunito', sans-serif", display: "flex", flexDirection: "column" }}>
       
       {/* ── TOP NAV GLOBAL ── */}
-      <TopNav user={user} activePath="/dashboard" />
+      <TopNav user={user} activePath="/perfil" />
 
       {/* ── PERFIL HEADER (Full width) ── */}
       {/* El fondo ocupa todo el ancho, pero el contenido se limita al mismo
           max-width que .page-container (1400px) para que quede alineado con
           el contenido de abajo, igual que en la pantalla de Inicio. */}
       <div style={{ background: "linear-gradient(120deg, var(--theme-darker) 0%, #3A2E5C 55%, var(--theme-dark) 100%)", color: "#fff" }}>
-        <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "48px 40px 0" }}>
-        <button onClick={() => navigate("/dashboard")} style={{ background: "none", border: "none", color: "var(--theme-light)", fontSize: "14px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", marginBottom: "24px" }}>
-          <ArrowLeft size={16} /> Volver al Dashboard
-        </button>
-        
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", paddingBottom: "24px", flexWrap: "wrap", gap: "20px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
-            <div style={{ width: "96px", height: "96px", borderRadius: "50%", background: "linear-gradient(135deg, var(--theme-light), var(--accent-coral))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "40px", boxShadow: "0 0 0 4px rgba(255,255,255,0.2)" }}>
+        <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "20px 40px 0" }}>
+
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", paddingBottom: "18px", flexWrap: "wrap", gap: "20px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "18px" }}>
+            <div style={{ width: "68px", height: "68px", borderRadius: "50%", background: "linear-gradient(135deg, var(--theme-light), var(--accent-coral))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "28px", boxShadow: "0 0 0 4px rgba(255,255,255,0.2)" }}>
               👶
             </div>
             <div>
-              <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "34px", fontWeight: 700, margin: 0 }}>{perfil.nombre}</h1>
-              <div style={{ fontSize: "15px", color: "rgba(255,255,255,0.75)", marginTop: "4px", fontWeight: 600 }}>Apodo: {perfil.apodo || "No definido"}</div>
+              <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "26px", fontWeight: 700, margin: 0 }}>{perfil.nombre}</h1>
+              <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.75)", marginTop: "3px", fontWeight: 600 }}>Apodo: {perfil.apodo || "No definido"}</div>
             </div>
           </div>
 
@@ -305,13 +302,13 @@ export default function PerfilBebe() {
         {/* TABS CONTAINER */}
         <div style={{ display: "flex", gap: "32px", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
           <button 
-            style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "detalle" ? "3px solid var(--accent-coral)" : "3px solid transparent", color: activeTab === "detalle" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+            style={{ padding: "12px 0", background: "none", border: "none", borderBottom: activeTab === "detalle" ? "3px solid var(--accent-coral)" : "3px solid transparent", color: activeTab === "detalle" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
             onClick={() => { setActiveTab("detalle"); navigate(`/perfil/${id}?tab=detalle`, { replace: true }); }}
           >
             <User size={18} /> Datos del bebé
           </button>
           <button 
-            style={{ padding: "16px 0", background: "none", border: "none", borderBottom: activeTab === "compartir" ? "3px solid var(--accent-coral)" : "3px solid transparent", color: activeTab === "compartir" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+            style={{ padding: "12px 0", background: "none", border: "none", borderBottom: activeTab === "compartir" ? "3px solid var(--accent-coral)" : "3px solid transparent", color: activeTab === "compartir" ? "#fff" : "rgba(255,255,255,0.6)", fontSize: "15px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
             onClick={() => { setActiveTab("compartir"); navigate(`/perfil/${id}?tab=compartir`, { replace: true }); }}
           >
             <Lock size={18} /> Compartir acceso
