@@ -26,7 +26,12 @@ export default function PerfilBebe() {
     }
   }, [location.search]);
   const [isInviting, setIsInviting] = useState(false);
-  const [editMode, setEditMode] = useState(false);
+  // Antes había un botón para elegir manualmente "Vista de lectura" o
+  // "Editar Perfil". Ahora se muestra siempre en modo edición, excepto
+  // cuando el acceso de la persona es de solo lectura -en cuyo caso no
+  // hay opción de cambiarlo, simplemente no puede editar.
+  const [soloLectura, setSoloLectura] = useState(false);
+  const editMode = !soloLectura;
   
   const [perfil, setPerfil] = useState<any>(null);
   const [editData, setEditData] = useState<any>({});
@@ -65,6 +70,18 @@ export default function PerfilBebe() {
       }
     }
   }, [token, id, activeTab]);
+
+  useEffect(() => {
+    if (!token || !id) return;
+    fetch(`https://babycare-backend-msyq.onrender.com/api/v1/home/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data) setSoloLectura(["solo_lectura", "solo_lectura_galeria"].includes(data.rol_acceso));
+      })
+      .catch(() => {});
+  }, [token, id]);
 
   const fetchPerfil = async () => {
     try {
@@ -130,7 +147,6 @@ export default function PerfilBebe() {
       }
 
       if (res.ok) {
-        setEditMode(false);
         fetchPerfil();
         setShowConfirmGestation(false);
         setPendingSave(false);
@@ -281,20 +297,12 @@ export default function PerfilBebe() {
             </div>
           </div>
 
-          {activeTab === "detalle" && (
-            <div style={{ display: "flex", gap: "12px" }}>
-              <button 
-                style={{ background: !editMode ? "#fff" : "rgba(255,255,255,0.08)", color: !editMode ? "var(--theme-darker)" : "#fff", border: "2px solid rgba(255,255,255,0.7)", padding: "10px 22px", borderRadius: "100px", fontSize: "14px", fontWeight: 800, cursor: "pointer", transition: "0.2s" }}
-                onClick={() => setEditMode(false)}
-              >
-                👁️ Vista de lectura
-              </button>
-              <button 
-                style={{ background: editMode ? "#fff" : "rgba(255,255,255,0.08)", color: editMode ? "var(--theme-darker)" : "#fff", border: "2px solid rgba(255,255,255,0.7)", padding: "10px 22px", borderRadius: "100px", fontSize: "14px", fontWeight: 800, cursor: "pointer", transition: "0.2s" }}
-                onClick={() => setEditMode(true)}
-              >
-                ✏️ Editar Perfil
-              </button>
+          {activeTab === "detalle" && soloLectura && (
+            <div style={{
+              background: "rgba(255,255,255,0.12)", border: "1.5px solid rgba(255,255,255,0.35)",
+              borderRadius: "100px", padding: "8px 18px", fontSize: "13px", fontWeight: 800,
+            }}>
+              👁️ Solo lectura
             </div>
           )}
         </div>
