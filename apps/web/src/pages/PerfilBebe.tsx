@@ -505,21 +505,19 @@ export default function PerfilBebe() {
                   </div>
                 </div>
 
-                {!editMode && (
-                  <button
-                    type="button"
-                    onClick={() => setShowCarnet(true)}
-                    style={{
-                      display: "flex", alignItems: "center", gap: "8px",
-                      background: "var(--theme-bg-light)", color: "var(--theme-primary)",
-                      border: "none", borderRadius: "12px", padding: "12px 20px",
-                      fontWeight: 800, fontSize: "14px", cursor: "pointer",
-                    }}
-                  >
-                    <IdCard size={18} />
-                    Ver carnet digital
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => setShowCarnet(true)}
+                  style={{
+                    display: "flex", alignItems: "center", gap: "8px",
+                    background: "var(--theme-bg-light)", color: "var(--theme-primary)",
+                    border: "none", borderRadius: "12px", padding: "12px 20px",
+                    fontWeight: 800, fontSize: "14px", cursor: "pointer",
+                  }}
+                >
+                  <IdCard size={18} />
+                  Ver carnet digital
+                </button>
               </div>
             </div>
 
