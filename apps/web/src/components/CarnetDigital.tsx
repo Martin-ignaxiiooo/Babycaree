@@ -51,7 +51,7 @@ export default function CarnetDigital({ perfil, onClose }: CarnetDigitalProps) {
   const descargarComoPNG = async () => {
     setDescargando(true);
     try {
-      const W = 900, H = 560, R = 32;
+      const W = 900, H = 640, R = 32;
       const canvas = document.createElement("canvas");
       canvas.width = W;
       canvas.height = H;
@@ -222,7 +222,7 @@ export default function CarnetDigital({ perfil, onClose }: CarnetDigitalProps) {
             ref={cardRef}
             onClick={() => setVolteado(!volteado)}
             style={{
-              position: "relative", width: "100%", aspectRatio: "900 / 560",
+              position: "relative", width: "100%", aspectRatio: "900 / 640",
               transformStyle: "preserve-3d", transition: "transform 0.6s",
               transform: volteado ? "rotateY(180deg)" : "rotateY(0deg)",
               cursor: "pointer",
@@ -287,11 +287,11 @@ export default function CarnetDigital({ perfil, onClose }: CarnetDigitalProps) {
             <div style={{
               position: "absolute", inset: 0, backfaceVisibility: "hidden",
               transform: "rotateY(180deg)",
-              borderRadius: "20px", padding: "24px 28px",
+              borderRadius: "20px", padding: "20px 24px",
               background: `linear-gradient(135deg, ${COLOR_DARKER}, ${COLOR_PRIMARY})`,
               boxShadow: "0 20px 50px rgba(45,38,64,0.4)",
-              display: "flex", flexDirection: "column", gap: "clamp(7px,2vw,12px)",
-              overflow: "hidden",
+              display: "flex", flexDirection: "column", gap: "clamp(5px,1.5vw,9px)",
+              overflowY: "auto", overflowX: "hidden",
             }}>
               <div>
                 <div style={{ color: "#fff", fontWeight: 900, fontSize: "clamp(14px, 4vw, 18px)" }}>Datos médicos</div>
