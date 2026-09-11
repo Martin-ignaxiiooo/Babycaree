@@ -115,8 +115,8 @@ export const aceptarInvitacion = async (req: Request, res: Response) => {
     const passwordHash = await bcrypt.hash(password, 12);
 
     const result = await query(
-      `INSERT INTO usuarios (email, password_hash, nombre, apellidos, consentimiento_ley_19628, consentimiento_ley_21719)
-       VALUES ($1, $2, $3, $4, $5, $6)
+      `INSERT INTO usuarios (email, password_hash, nombre, apellidos, consentimiento_ley_19628, consentimiento_ley_21719, ultima_conexion)
+       VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP)
        RETURNING id, email, nombre, apellidos, rol`,
       [
         email.toLowerCase(),

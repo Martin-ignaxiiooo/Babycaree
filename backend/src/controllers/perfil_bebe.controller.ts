@@ -213,7 +213,11 @@ export const listarAccesos = async (req: Request, res: Response): Promise<void> 
     }
 
     const result = await query(
-      `SELECT a.*, u.nombre, u.apellidos FROM accesos_compartidos_bebe a LEFT JOIN usuarios u ON a.id_usuario_invitado = u.id WHERE a.id_perfil_bebe = $1 AND a.estado != 'revocado' ORDER BY a.fecha_invitacion DESC`,
+      `SELECT a.*, u.nombre, u.apellidos, u.email AS email_usuario, u.ultima_conexion
+       FROM accesos_compartidos_bebe a
+       LEFT JOIN usuarios u ON a.id_usuario_invitado = u.id
+       WHERE a.id_perfil_bebe = $1 AND a.estado != 'revocado'
+       ORDER BY a.fecha_invitacion DESC`,
       [id]
     );
 

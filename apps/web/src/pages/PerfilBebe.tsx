@@ -533,14 +533,31 @@ export default function PerfilBebe() {
                     Aún no has compartido el acceso con nadie.
                   </div>
                 ) : (
-                  accesos.map(acceso => (
-                    <div key={acceso.id} style={{ display: "flex", alignItems: "center", padding: "16px", border: "1px solid #E5E7EB", borderRadius: "12px", marginBottom: "12px" }}>
-                      <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "var(--theme-bg-light)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "24px", marginRight: "16px" }}>🧑‍.</div>
+                  accesos.map(acceso => {
+                    // El backend devuelve estos campos planos (no dentro de
+                    // un objeto 'usuario_invitado', como se leía antes: por
+                    // eso siempre aparecía "Usuario" sin correo).
+                    const nombreCompleto = [acceso.nombre, acceso.apellidos].filter(Boolean).join(" ");
+                    const pendiente = acceso.estado === "pendiente";
+                    return (
+                    <div key={acceso.id} style={{ display: "flex", alignItems: "center", padding: "16px", border: "1px solid #E5E7EB", borderRadius: "12px", marginBottom: "12px", flexWrap: "wrap", gap: "12px" }}>
+                      <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "var(--theme-bg-light)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "24px", flexShrink: 0 }}>🧑</div>
                       <div style={{ flex: 1, minWidth: "160px" }}>
-                        <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--text)" }}>{acceso.usuario_invitado?.nombre || "Usuario"}</div>
-                        <div style={{ fontSize: "13px", color: "#6B7280" }}>{acceso.usuario_invitado?.email}</div>
+                        <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--text)" }}>
+                          {nombreCompleto || "Invitación pendiente"}
+                        </div>
+                        <div style={{ fontSize: "13px", color: "#6B7280" }}>
+                          {acceso.email_usuario || acceso.correo_invitado}
+                        </div>
+                        <div style={{ fontSize: "12px", color: "#9CA3AF", marginTop: "3px" }}>
+                          {pendiente
+                            ? "Aún no acepta la invitación"
+                            : acceso.ultima_conexion
+                              ? `Último ingreso: ${new Date(acceso.ultima_conexion).toLocaleDateString("es-CL", { day: "numeric", month: "short", year: "numeric" })}`
+                              : "Sin ingresos registrados"}
+                        </div>
                       </div>
-                      <select value={acceso.nivel_permiso} onChange={(e) => modificarPermiso(acceso.id, e.target.value)} style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #E5E7EB", background: "var(--surface-2)", color: "var(--text)", fontWeight: 700, marginRight: "16px" }}>
+                      <select value={acceso.nivel_permiso} onChange={(e) => modificarPermiso(acceso.id, e.target.value)} style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #E5E7EB", background: "var(--surface-2)", color: "var(--text)", fontWeight: 700 }}>
                         <option value="solo_lectura">Solo lectura</option>
                         <option value="papa">Papá (Acceso a todo)</option>
                         <option value="abuela">Abuela (Acceso a todo)</option>
@@ -548,7 +565,8 @@ export default function PerfilBebe() {
                       </select>
                       <button onClick={() => revocarAcceso(acceso.id)} style={{ background: "#FEE2E2", color: "#EF4444", border: "none", padding: "10px", borderRadius: "8px", cursor: "pointer", fontWeight: "bold" }}>Revocar</button>
                     </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
 

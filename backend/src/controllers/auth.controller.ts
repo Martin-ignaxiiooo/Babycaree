@@ -174,6 +174,15 @@ export const googleAuth = async (req: Request, res: Response) => {
     }
 
     const user = userRes.rows[0];
+
+    // El login normal ya actualizaba ultima_conexion, pero este camino
+    // (Google) no lo hacía: quien entrara siempre por Google quedaba
+    // marcado como que nunca se conectó.
+    await query(
+      "UPDATE usuarios SET ultima_conexion = CURRENT_TIMESTAMP WHERE id = $1",
+      [user.id],
+    ).catch(() => {});
+
     const token = jwt.sign(
       { id: user.id, email: user.email, rol: user.rol },
       JWT_SECRET,
