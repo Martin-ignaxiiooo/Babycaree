@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Syringe, CheckCircle, Plus, X, FlaskConical, ClipboardCheck, Mic, MicOff, Pencil, Trash2, FileDown, CalendarCheck, TrendingUp, ChevronLeft, ChevronRight } from "lucide-react";
+import { Syringe, CheckCircle, Plus, X, FlaskConical, ClipboardCheck, Mic, MicOff, Pencil, Trash2, FileDown, CalendarCheck, TrendingUp, ChevronLeft, ChevronRight, HeartPulse } from "lucide-react";
 import TopNav from "../components/TopNav";
 import DateSelect from "../components/DateSelect";
 import TimeSelect from "../components/TimeSelect";
@@ -542,8 +542,8 @@ export default function Salud() {
           acciones y pestañas ya en el contenido claro de abajo. */}
       <div style={{ background: "linear-gradient(135deg, #8B5FD6 0%, #A47BE8 100%)", paddingBottom: "26px" }}>
         <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "16px 40px 0" }}>
-          <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "22px", fontWeight: 700, color: "#fff", margin: 0 }}>
-            Salud y Crecimiento
+          <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "22px", fontWeight: 700, color: "#fff", margin: 0, display: "flex", alignItems: "center", gap: "10px" }}>
+            <HeartPulse size={22} /> Salud y Crecimiento
           </h1>
           <p style={{ fontSize: "12.5px", color: "rgba(255,255,255,0.8)", margin: "3px 0 0", fontWeight: 600 }}>
             Administra las vacunas, los controles y el progreso de tu bebé.

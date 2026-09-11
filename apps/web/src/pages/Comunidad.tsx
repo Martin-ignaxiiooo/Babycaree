@@ -143,8 +143,8 @@ export default function Comunidad() {
           del rediseño comparten el mismo encabezado. */}
       <div style={{ background: "linear-gradient(135deg, #8B5FD6 0%, #A47BE8 100%)", paddingBottom: "26px" }}>
         <div style={{ maxWidth: "1240px", margin: "0 auto", padding: "16px 32px 0" }}>
-          <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "22px", fontWeight: 700, color: "#fff", margin: 0 }}>
-            Comunidad
+          <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "22px", fontWeight: 700, color: "#fff", margin: 0, display: "flex", alignItems: "center", gap: "10px" }}>
+            <MessageSquare size={22} /> Comunidad
           </h1>
           <p style={{ fontSize: "12.5px", color: "rgba(255,255,255,0.8)", margin: "3px 0 0", fontWeight: 600 }}>
             Conecta, comparte y aprende con otras familias.

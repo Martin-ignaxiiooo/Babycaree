@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight, PlusCircle, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, PlusCircle, Loader2, CalendarDays } from "lucide-react";
 import TopNav from "../components/TopNav";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api";
@@ -136,8 +136,8 @@ export default function Calendario() {
               SEMANA {semanas} DE 40
             </span>
           )}
-          <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "31px", fontWeight: 700, color: "#fff", margin: 0 }}>
-            Mi Calendario
+          <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "31px", fontWeight: 700, color: "#fff", margin: 0, display: "flex", alignItems: "center", gap: "12px" }}>
+            <CalendarDays size={28} /> Mi Calendario
           </h1>
           <p style={{ fontSize: "14.5px", color: "rgba(255,255,255,0.8)", margin: "6px 0 0", fontWeight: 600 }}>
             Gestiona tus citas médicas y haz seguimiento de tu progreso semanal.

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
-  Search, MapPin, Star, Phone, ShieldCheck, User 
+  Search, MapPin, Star, Phone, ShieldCheck, User, Stethoscope 
 } from "lucide-react";
 import axios from "axios";
 import TopNav from "../components/TopNav";
@@ -123,7 +123,9 @@ export default function Directorio() {
         
         {/* Header & Search */}
         <div style={{ marginBottom: "36px" }}>
-          <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "30px", fontWeight: 700, color: "var(--text)", margin: "0 0 8px 0" }}>Directorio de Especialistas</h1>
+          <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "30px", fontWeight: 700, color: "var(--text)", margin: "0 0 8px 0", display: "flex", alignItems: "center", gap: "12px" }}>
+            <Stethoscope size={28} /> Directorio de Especialistas
+          </h1>
           <p style={{ fontSize: "15px", color: "var(--text-muted)", margin: "0 0 24px 0", fontWeight: 600 }}>Encuentra a los mejores médicos y especialistas para tu bebé.</p>
           
           <div style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
