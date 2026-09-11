@@ -46,7 +46,10 @@ export default function PerfilBebe() {
   const [showCarnet, setShowCarnet] = useState(false);
   
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchTab, setSearchTab] = useState<"todos" | "contactos" | "familia">("todos");
+  // Antes había 3 botones (Todos / Mis contactos / Otros perfiles) para
+  // cambiar esto; se quitaron, así que la búsqueda siempre usa "todos"
+  // (que combina familiares vinculados + búsqueda por correo exacto).
+  const searchTab = "todos";
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [selectedInvite, setSelectedInvite] = useState<any>(null);
   const [invitePerm, setInvitePerm] = useState("solo_lectura");
@@ -587,19 +590,13 @@ export default function PerfilBebe() {
                   <Search size={20} style={{ color: "var(--theme-primary)" }} /> Buscar a quién compartir
                 </h3>
                 
-                <div style={{ display: "flex", gap: "8px", marginBottom: "16px" }}>
-                  <button onClick={() => { setSearchTab("todos"); buscarPersonas(searchQuery, "todos"); }} style={{ flex: 1, padding: "10px", borderRadius: "12px", border: "none", background: searchTab === "todos" ? "var(--theme-primary)" : "#F3F4F6", color: searchTab === "todos" ? "#fff" : "#4B5563", fontWeight: 700, cursor: "pointer" }}>Todos</button>
-                  <button onClick={() => { setSearchTab("contactos"); buscarPersonas(searchQuery, "contactos"); }} style={{ flex: 1, padding: "10px", borderRadius: "12px", border: "1px solid #E5E7EB", background: searchTab === "contactos" ? "var(--theme-primary)" : "#F9FAFB", color: searchTab === "contactos" ? "#fff" : "#4B5563", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>📱 Mis contactos</button>
-                  <button onClick={() => { setSearchTab("familia"); buscarPersonas(searchQuery, "familia"); }} style={{ flex: 1, padding: "10px", borderRadius: "12px", border: "1px solid #E5E7EB", background: searchTab === "familia" ? "var(--theme-primary)" : "#F9FAFB", color: searchTab === "familia" ? "#fff" : "#4B5563", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>👥 Otros perfiles</button>
-                </div>
-                
                 <p style={{ fontSize: "13px", color: "#6B7280", marginBottom: "24px" }}>Busca entre tus contactos, familiares ya registrados en Baby Care, o escribe un correo para invitar a alguien nuevo.</p>
 
                 <div style={{ position: "relative", marginBottom: "24px" }}>
                   <Search size={20} style={{ position: "absolute", left: "16px", top: "14px", color: "#9CA3AF" }} />
                   <input 
                     type="text" 
-                    placeholder="Busca por nombre o correo electrónico..." 
+                    placeholder="Busca por correo electrónico" 
                     value={searchQuery}
                     onChange={(e) => {
                       setSearchQuery(e.target.value);
