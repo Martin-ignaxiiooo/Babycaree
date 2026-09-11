@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {
-  Milk, Moon, Baby, Syringe, CalendarClock, X, Mic, MicOff, Plus,
+  Milk, Moon, Baby, Syringe, CalendarClock, X, Mic, MicOff, Plus, Sun,
 } from "lucide-react";
 import { useDictado } from "../hooks/useDictado";
 import { interpretarDictado } from "../utils/interpretarDictado";
@@ -599,12 +599,16 @@ type AccionRapida = "toma" | "sueno" | "panal" | "cita" | "vacuna" | null;
 
 export default function AccesosRapidos({ bebeId, token, onRegistrado }: { bebeId: string; token: string; onRegistrado?: () => void }) {
   const [abierto, setAbierto] = useState<AccionRapida>(null);
-  const [suenoEnCurso, setSuenoEnCurso] = useState(false);
+  // Objeto {id, sueno_inicio} si hay un sueño abierto, o null si no.
+  // Antes se guardaba solo un boolean y se perdía el id, así que no
+  // había forma de despertar desde acá cuando ya había uno en curso.
+  const [suenoEnCurso, setSuenoEnCurso] = useState<any | null>(null);
+  const [despertando, setDespertando] = useState(false);
 
   const cargarResumen = () => {
     fetch(`${API_URL}/v1/diario/${bebeId}/registros/resumen`, { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => (r.ok ? r.json() : null))
-      .then((data) => setSuenoEnCurso(Boolean(data?.sueno_en_curso)))
+      .then((data) => setSuenoEnCurso(data?.sueno_en_curso ?? null))
       .catch(() => {});
   };
 
@@ -615,9 +619,25 @@ export default function AccesosRapidos({ bebeId, token, onRegistrado }: { bebeId
     onRegistrado?.();
   };
 
-  const botones: { key: AccionRapida; icon: any; label: string; bg: string; color: string }[] = [
+  const despertar = async () => {
+    if (!suenoEnCurso?.id) return;
+    setDespertando(true);
+    try {
+      const res = await fetch(`${API_URL}/v1/diario/${bebeId}/registros/${suenoEnCurso.id}/despertar`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) onSaved();
+    } finally {
+      setDespertando(false);
+    }
+  };
+
+  const botones: { key: AccionRapida; icon: any; label: string; bg: string; color: string; onClick?: () => void }[] = [
     { key: "toma", icon: Milk, label: "Registrar toma", bg: "#E3F2FD", color: "#1976D2" },
-    ...(suenoEnCurso ? [] : [{ key: "sueno" as AccionRapida, icon: Moon, label: "Se durmió", bg: "#EDE7F6", color: "#7C5CBF" }]),
+    suenoEnCurso
+      ? { key: null, icon: Sun, label: despertando ? "Despertando…" : "Ya despertó", bg: "#FFF4E0", color: "#B27B16", onClick: despertar }
+      : { key: "sueno" as AccionRapida, icon: Moon, label: "Se durmió", bg: "#EDE7F6", color: "#7C5CBF" },
     { key: "panal", icon: Baby, label: "Cambio de pañal", bg: "#FFF4E0", color: "#B27B16" },
     { key: "cita", icon: CalendarClock, label: "Agendar cita", bg: "#D7EEFF", color: "#1E4E8C" },
     { key: "vacuna", icon: Syringe, label: "Registrar vacuna", bg: "#FFE6CD", color: "#8A5212" },
@@ -629,10 +649,11 @@ export default function AccesosRapidos({ bebeId, token, onRegistrado }: { bebeId
         Accesos rápidos
       </h3>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))", gap: "10px" }}>
-        {botones.map(({ key, icon: Icon, label, bg, color }) => (
+        {botones.map(({ key, icon: Icon, label, bg, color, onClick }) => (
           <button
-            key={key}
-            onClick={() => setAbierto(key)}
+            key={label}
+            onClick={onClick ?? (() => setAbierto(key))}
+            disabled={label === "Despertando…"}
             style={{
               background: "var(--surface)", border: "none", borderRadius: "18px", padding: "14px 8px",
               display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", cursor: "pointer",
