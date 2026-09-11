@@ -58,7 +58,7 @@ export default function RegistroDiario() {
   const [guardando, setGuardando] = useState(false);
 
   // Campos del formulario
-  const [fuente, setFuente] = useState<"pecho_izq" | "pecho_der" | "biberon">("biberon");
+  const [fuente, setFuente] = useState<"pecho" | "biberon">("biberon");
   const [cantidadMl, setCantidadMl] = useState(120);
   const [duracionMin, setDuracionMin] = useState(15);
   const [panalTipo, setPanalTipo] = useState<"pis" | "caca" | "mixto">("pis");
@@ -209,12 +209,11 @@ export default function RegistroDiario() {
 
         {/* Formulario de toma */}
         {abierto === "toma" && (
-          <Modal titulo="Registrar toma" onClose={() => setAbierto(null)}>
+          <Modal titulo="Registrar alimentación" onClose={() => setAbierto(null)}>
             <Etiqueta>¿De dónde comió?</Etiqueta>
-            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "18px" }}>
-              {([["pecho_izq", "Pecho izq."], ["pecho_der", "Pecho der."], ["biberon", "Biberón"]] as const).map(([v, l]) => (
-                <Opcion key={v} activo={fuente === v} onClick={() => setFuente(v)}>{l}</Opcion>
-              ))}
+            <div style={{ display: "flex", gap: "14px", justifyContent: "center", marginBottom: "18px" }}>
+              <OpcionIcono emoji="🤱" label="Pecho" activo={fuente === "pecho"} onClick={() => setFuente("pecho")} />
+              <OpcionIcono emoji="🍼" label="Biberón" activo={fuente === "biberon"} onClick={() => setFuente("biberon")} />
             </div>
 
             {fuente === "biberon" ? (
@@ -361,6 +360,27 @@ function Opcion({ activo, onClick, children }: any) {
       }}
     >
       {children}
+    </button>
+  );
+}
+
+/** Igual que Opcion, pero con un ícono grande arriba en vez de solo
+    texto (usado para elegir Pecho/Biberón al registrar una toma). */
+function OpcionIcono({ emoji, label, activo, onClick }: any) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        flex: "0 1 110px", padding: "18px 10px", borderRadius: "18px", cursor: "pointer",
+        fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "13.5px",
+        border: activo ? "2px solid var(--theme-primary)" : "2px solid #E4DBF7",
+        background: activo ? "linear-gradient(135deg, var(--theme-primary), var(--theme-light))" : "#fff",
+        color: activo ? "#fff" : "var(--theme-darker)",
+        display: "flex", flexDirection: "column", alignItems: "center", gap: "8px",
+      }}
+    >
+      <span style={{ fontSize: "30px", lineHeight: 1 }}>{emoji}</span>
+      {label}
     </button>
   );
 }

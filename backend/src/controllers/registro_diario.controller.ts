@@ -168,7 +168,10 @@ export const createRegistro = async (req: AuthRequest, res: Response) => {
     // Se valida acá y no solo con los CHECK de la base para poder devolver
     // mensajes útiles al usuario en vez de un error 500 de Postgres.
     if (tipo === "toma") {
-      if (!["pecho_izq", "pecho_der", "biberon"].includes(fuente)) {
+      // 'pecho_izq'/'pecho_der' quedan como valores válidos en la base de
+      // datos (por los registros viejos), pero ya no se piden ni se
+      // generan desde acá: para registros nuevos solo se acepta 'pecho'.
+      if (!["pecho", "biberon"].includes(fuente)) {
         return res.status(400).json({ error: "Fuente inválida para una toma." });
       }
       if (fuente === "biberon") {
