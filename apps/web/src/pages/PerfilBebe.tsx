@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { 
-  User, Search, Lock, IdCard, Baby
+  User, Search, Lock, IdCard, Baby, Plus
 } from "lucide-react";
 import TopNav from "../components/TopNav";
 import CarnetDigital from "../components/CarnetDigital";
@@ -499,10 +499,10 @@ export default function PerfilBebe() {
             {editMode && (
               <div style={{ textAlign: "right", marginTop: "16px" }}>
                 <button 
-                  style={{ background: "var(--theme-primary)", color: "#fff", border: "none", padding: "16px 40px", borderRadius: "12px", fontSize: "16px", fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(124,92,191,0.3)" }}
+                  style={{ background: "var(--theme-primary)", color: "#fff", border: "none", padding: "16px 40px", borderRadius: "12px", fontSize: "16px", fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(124,92,191,0.3)", display: "inline-flex", alignItems: "center", gap: "8px" }}
                   onClick={() => handleSave(false)}
                 >
-                  💾 Guardar cambios
+                  <Plus size={18} /> Guardar cambios
                 </button>
               </div>
             )}
