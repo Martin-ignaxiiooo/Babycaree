@@ -36,7 +36,9 @@ export default function PerfilBebe() {
   const [editData, setEditData] = useState<any>({});
   
   const [accesos, setAccesos] = useState<any[]>([]);
-  const [auditoria, setAuditoria] = useState<any[]>([]);
+  // Persona ya registrada que corresponde al correo escrito en el buscador
+  // (null si el correo no existe todavía en Baby Care).
+  const [personaPorCorreo, setPersonaPorCorreo] = useState<any | null>(null);
   const [previsiones, setPrevisiones] = useState<any[]>([]);
   
   const [showConfirmGestation, setShowConfirmGestation] = useState(false);
@@ -65,7 +67,6 @@ export default function PerfilBebe() {
       fetchPerfil();
       if (activeTab === "compartir") {
         fetchAccesos();
-        fetchAuditoria();
       }
     }
   }, [token, id, activeTab]);
@@ -113,16 +114,30 @@ export default function PerfilBebe() {
     }
   };
 
-  const fetchAuditoria = async () => {
-    try {
-      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/perfiles-bebe/${id}/auditoria`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) setAuditoria(await res.json());
-    } catch (error) {
-      console.error(error);
+  // Cuando lo escrito es un correo válido, se consulta si ya pertenece a
+  // alguien registrado para poder mostrar su nombre antes de invitar.
+  useEffect(() => {
+    const correo = searchQuery.trim().toLowerCase();
+    const esCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo);
+    if (!esCorreo) {
+      setPersonaPorCorreo(null);
+      return;
     }
-  };
+    let cancelado = false;
+    const t = setTimeout(() => {
+      fetch(`https://babycare-backend-msyq.onrender.com/api/v1/personas/buscar?q=${encodeURIComponent(correo)}&fuente=contactos`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((r) => (r.ok ? r.json() : []))
+        .then((data: any[]) => {
+          if (cancelado) return;
+          const encontrada = (data || []).find((p) => p.email?.toLowerCase() === correo);
+          setPersonaPorCorreo(encontrada ?? null);
+        })
+        .catch(() => { if (!cancelado) setPersonaPorCorreo(null); });
+    }, 350); // pequeña espera para no consultar en cada tecla
+    return () => { cancelado = true; clearTimeout(t); };
+  }, [searchQuery, token]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setEditData({ ...editData, [e.target.name]: e.target.value });
@@ -200,7 +215,6 @@ export default function PerfilBebe() {
         setSelectedInvite(null);
         setSearchQuery("");
         fetchAccesos();
-        fetchAuditoria();
       } else {
          const err = await res.json();
          alert(err.error || "Error al invitar.");
@@ -222,7 +236,6 @@ export default function PerfilBebe() {
       });
       if (res.ok) {
         fetchAccesos();
-        fetchAuditoria();
       } else {
         const err = await res.json();
         alert(err.error || "Error al revocar");
@@ -244,7 +257,6 @@ export default function PerfilBebe() {
       });
       if (res.ok) {
         fetchAccesos();
-        fetchAuditoria();
       } else {
         const err = await res.json();
         alert(err.error || "Error al modificar permiso");
@@ -510,7 +522,7 @@ export default function PerfilBebe() {
         )}
 
         {activeTab === "compartir" && (
-          <div className="responsive-grid" style={{ width: "100%" }}>
+          <div style={{ width: "100%" }}>
             
             {/* LEFT COLUMN: LIST & SEARCH */}
             <div>
@@ -638,19 +650,33 @@ export default function PerfilBebe() {
                   </div>
                 )}
                 
-                {searchQuery.includes("@") && searchQuery.includes(".") && !searchResults.some(res => res.email.toLowerCase() === searchQuery.trim().toLowerCase()) && (
-                  <div style={{ display: "flex", alignItems: "center", padding: "12px", borderBottom: "1px solid #F3F4F6" }}>
-                    <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "var(--theme-bg-light)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", marginRight: "12px" }}>✉️</div>
+                {searchQuery.includes("@") && searchQuery.includes(".") && !searchResults.some(res => res.email.toLowerCase() === searchQuery.trim().toLowerCase()) && (() => {
+                  // Si el correo escrito ya pertenece a alguien registrado, se
+                  // muestra su nombre (viene de la búsqueda por correo exacto
+                  // del backend) en vez del texto genérico "Invitar por correo".
+                  const yaRegistrado = personaPorCorreo;
+                  return (
+                  <div style={{ display: "flex", alignItems: "center", padding: "12px", borderBottom: "1px solid #F3F4F6", flexWrap: "wrap", gap: "10px" }}>
+                    <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "var(--theme-bg-light)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", flexShrink: 0 }}>
+                      {yaRegistrado ? "🧑" : "✉️"}
+                    </div>
                     <div style={{ flex: 1, minWidth: "160px" }}>
                       <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>
-                        Invitar por correo electrónico
+                        {yaRegistrado
+                          ? [yaRegistrado.nombre, yaRegistrado.apellidos].filter(Boolean).join(" ")
+                          : "Invitar por correo electrónico"}
                       </div>
                       <div style={{ fontSize: "13px", color: "#6B7280" }}>{searchQuery.trim()}</div>
+                      {yaRegistrado && (
+                        <div style={{ fontSize: "12px", color: "#3E8E6E", fontWeight: 700, marginTop: "2px" }}>
+                          Ya tiene cuenta en Baby Care
+                        </div>
+                      )}
                     </div>
                     <select 
                       value={invitePerm} 
                       onChange={e => setInvitePerm(e.target.value)} 
-                      style={{ padding: "6px 10px", borderRadius: "8px", border: "1px solid #E5E7EB", background: "var(--surface-2)", color: "var(--text)", fontWeight: 700, marginRight: "12px", fontSize: "12px" }}
+                      style={{ padding: "6px 10px", borderRadius: "8px", border: "1px solid #E5E7EB", background: "var(--surface-2)", color: "var(--text)", fontWeight: 700, fontSize: "12px" }}
                     >
                       <option value="solo_lectura">Solo lectura</option>
                       <option value="papa">Papá (Acceso a todo)</option>
@@ -662,30 +688,11 @@ export default function PerfilBebe() {
                       disabled={isInviting}
                       style={{ background: "var(--theme-primary)", color: "#fff", border: "none", padding: "8px 16px", borderRadius: "20px", fontWeight: 700, cursor: isInviting ? "not-allowed" : "pointer", fontSize: "13px", opacity: isInviting ? 0.6 : 1 }}
                     >
-                      {isInviting ? "Enviando..." : "Enviar invitación"}
+                      {isInviting ? "Enviando..." : yaRegistrado ? "Invitar" : "Enviar invitación"}
                     </button>
                   </div>
-                )}
-              </div>
-            </div>
-
-            {/* RIGHT COLUMN: AUDIT */}
-            <div>
-              <div style={cardStyle}>
-                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "17px", fontWeight: 700, color: "var(--text)", marginBottom: "16px" }}>Historial de actividad</h3>
-                <div>
-                  {auditoria.length === 0 ? (
-                    <div style={{ fontSize: "13px", color: "#6B7280", textAlign: "center", padding: "20px" }}>Sin registros aún.</div>
-                  ) : (
-                    auditoria.map(log => (
-                      <div key={log.id} style={{ marginBottom: "16px", paddingLeft: "16px", borderLeft: "2px solid var(--theme-light)", position: "relative" }}>
-                        <div style={{ position: "absolute", left: "-5px", top: "6px", width: "8px", height: "8px", borderRadius: "50%", background: "var(--theme-primary)" }}></div>
-                        <div style={{ fontSize: "13px", color: "var(--text)", fontWeight: 500 }}>{log.descripcion}</div>
-                        <div style={{ fontSize: "11px", color: "#9CA3AF", marginTop: "4px" }}>{new Date(log.fecha_hora_utc).toLocaleString('es-CL')}</div>
-                      </div>
-                    ))
-                  )}
-                </div>
+                  );
+                })()}
               </div>
             </div>
 
