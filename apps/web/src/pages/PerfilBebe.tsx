@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { 
-  User, Search, Lock, IdCard
+  User, Search, Lock, IdCard, Baby
 } from "lucide-react";
 import TopNav from "../components/TopNav";
 import CarnetDigital from "../components/CarnetDigital";
@@ -287,11 +287,10 @@ export default function PerfilBebe() {
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", paddingBottom: "18px", flexWrap: "wrap", gap: "20px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "18px" }}>
-            <div style={{ width: "68px", height: "68px", borderRadius: "50%", background: "linear-gradient(135deg, var(--theme-light), var(--accent-coral))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "28px", boxShadow: "0 0 0 4px rgba(255,255,255,0.2)" }}>
-              👶
-            </div>
             <div>
-              <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "26px", fontWeight: 700, margin: 0 }}>{perfil.nombre}</h1>
+              <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "26px", fontWeight: 700, margin: 0, display: "flex", alignItems: "center", gap: "10px" }}>
+                <Baby size={24} /> {perfil.nombre}
+              </h1>
               <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.75)", marginTop: "3px", fontWeight: 600 }}>Apodo: {perfil.apodo || "No definido"}</div>
             </div>
           </div>
