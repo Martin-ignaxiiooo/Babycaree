@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { X, RotateCw, Download, Droplet, Phone, AlertCircle, User } from "lucide-react";
+import { X, RotateCw, Download, Droplet, Phone, AlertCircle, User, Stethoscope, Building2 } from "lucide-react";
 
 interface CarnetDigitalProps {
   perfil: any;
@@ -37,6 +37,13 @@ export default function CarnetDigital({ perfil, onClose }: CarnetDigitalProps) {
 
   const edad = calcularEdad(perfil.fecha_nacimiento);
   const nombreCompleto = perfil.apodo ? `${perfil.nombre} "${perfil.apodo}"` : perfil.nombre;
+  // Nº de carnet "de mentira" a partir del id real, solo para que se sienta
+  // como un documento con identidad propia (igual que un carnet físico).
+  const numeroCarnet = perfil.id ? String(perfil.id).replace(/-/g, "").slice(0, 8).toUpperCase() : "--------";
+  const pesoTalla = [
+    perfil.peso_nacimiento_g ? `${(perfil.peso_nacimiento_g / 1000).toFixed(2)} kg` : null,
+    perfil.talla_nacimiento_cm ? `${perfil.talla_nacimiento_cm} cm` : null,
+  ].filter(Boolean).join(" · ") || "No registrado";
 
   // Dibuja el lado visible actualmente (frente o dorso) en un canvas y lo
   // descarga como PNG. Dibujar a mano en vez de usar una librería tipo
@@ -44,7 +51,7 @@ export default function CarnetDigital({ perfil, onClose }: CarnetDigitalProps) {
   const descargarComoPNG = async () => {
     setDescargando(true);
     try {
-      const W = 900, H = 560, R = 32;
+      const W = 900, H = 640, R = 32;
       const canvas = document.createElement("canvas");
       canvas.width = W;
       canvas.height = H;
@@ -74,39 +81,39 @@ export default function CarnetDigital({ perfil, onClose }: CarnetDigitalProps) {
       ctx.fillText("Baby Care", 48, 64);
       ctx.font = "700 15px 'Nunito', sans-serif";
       ctx.fillStyle = "rgba(255,255,255,0.7)";
-      ctx.fillText(volteado ? "Carnet Pediátrico Digital · Datos clínicos" : "Carnet Pediátrico Digital", 48, 88);
+      ctx.fillText(volteado ? "Carnet Pediátrico Digital · Datos médicos" : "Carnet Pediátrico Digital", 48, 88);
 
       if (!volteado) {
         // ── FRENTE ──
         const drawFrontBody = () => {
           ctx.fillStyle = "#fff";
           ctx.font = "900 40px 'Nunito', sans-serif";
-          ctx.fillText(nombreCompleto, 48, 220);
+          ctx.fillText(nombreCompleto, 48, 200);
 
           ctx.font = "700 20px 'Nunito', sans-serif";
           ctx.fillStyle = "rgba(255,255,255,0.85)";
-          ctx.fillText(edad, 48, 254);
+          ctx.fillText(`${edad}${perfil.sexo ? " · " + perfil.sexo : ""}`, 48, 232);
 
           const filas = [
             ["Fecha de nacimiento", formatFecha(perfil.fecha_nacimiento)],
-            ["RUT", perfil.rut || "No registrado"],
-            ["Tipo de sangre", perfil.tipo_sangre || "No registrado"],
+            ["Peso y talla al nacer", pesoTalla],
+            ["Semanas de gestación", perfil.semanas_gestacion_nac ? `${perfil.semanas_gestacion_nac} semanas` : "No registrado"],
             ["Previsión", perfil.nombre_prevision || perfil.prevision_salud || "No registrada"],
           ];
-          let y = 320;
+          let y = 288;
           filas.forEach(([label, val]) => {
-            ctx.font = "700 13px 'Nunito', sans-serif";
+            ctx.font = "700 12px 'Nunito', sans-serif";
             ctx.fillStyle = "rgba(255,255,255,0.6)";
             ctx.fillText(label.toUpperCase(), 48, y);
-            ctx.font = "800 22px 'Nunito', sans-serif";
+            ctx.font = "800 19px 'Nunito', sans-serif";
             ctx.fillStyle = "#fff";
-            ctx.fillText(String(val), 48, y + 28);
-            y += 68;
+            ctx.fillText(String(val), 48, y + 24);
+            y += 56;
           });
 
           ctx.font = "700 12px 'Nunito', sans-serif";
           ctx.fillStyle = "rgba(255,255,255,0.55)";
-          ctx.fillText("Generado en Baby Care · " + new Date().toLocaleDateString("es-CL"), 48, H - 32);
+          ctx.fillText(`N° Carnet ${numeroCarnet} · Generado en Baby Care`, 48, H - 32);
 
           const a = document.createElement("a");
           a.download = `carnet-${perfil.nombre.replace(/\s+/g, "-").toLowerCase()}.png`;
@@ -136,6 +143,7 @@ export default function CarnetDigital({ perfil, onClose }: CarnetDigitalProps) {
       } else {
         // ── DORSO ──
         const filas = [
+          ["Tipo de sangre", perfil.tipo_sangre || "No registrado"],
           ["Alergias conocidas", perfil.alergias || "Ninguna registrada"],
           ["Condiciones crónicas", perfil.condiciones_cronicas || "Ninguna registrada"],
           ["Pediatra de cabecera", perfil.pediatra_nombre || "No registrado"],
@@ -144,20 +152,20 @@ export default function CarnetDigital({ perfil, onClose }: CarnetDigitalProps) {
             ? `${perfil.contacto_emergencia_nombre}${perfil.contacto_emergencia_telefono ? " · " + perfil.contacto_emergencia_telefono : ""}`
             : "No registrado"],
         ];
-        let y = 150;
+        let y = 140;
         filas.forEach(([label, val]) => {
-          ctx.font = "700 13px 'Nunito', sans-serif";
+          ctx.font = "700 12px 'Nunito', sans-serif";
           ctx.fillStyle = "rgba(255,255,255,0.6)";
           ctx.fillText(label.toUpperCase(), 48, y);
-          ctx.font = "800 19px 'Nunito', sans-serif";
+          ctx.font = "800 18px 'Nunito', sans-serif";
           ctx.fillStyle = "#fff";
-          wrapText(ctx, String(val), 48, y + 26, W - 96, 24);
-          y += 84;
+          wrapText(ctx, String(val), 48, y + 24, W - 96, 22);
+          y += 70;
         });
 
         ctx.font = "700 12px 'Nunito', sans-serif";
         ctx.fillStyle = "rgba(255,255,255,0.55)";
-        ctx.fillText("Generado en Baby Care · " + new Date().toLocaleDateString("es-CL"), 48, H - 32);
+        ctx.fillText(`N° Carnet ${numeroCarnet} · Generado en Baby Care`, 48, H - 32);
 
         const a = document.createElement("a");
         a.download = `carnet-${perfil.nombre.replace(/\s+/g, "-").toLowerCase()}-dorso.png`;
@@ -214,7 +222,7 @@ export default function CarnetDigital({ perfil, onClose }: CarnetDigitalProps) {
             ref={cardRef}
             onClick={() => setVolteado(!volteado)}
             style={{
-              position: "relative", width: "100%", aspectRatio: "900 / 560",
+              position: "relative", width: "100%", aspectRatio: "900 / 640",
               transformStyle: "preserve-3d", transition: "transform 0.6s",
               transform: volteado ? "rotateY(180deg)" : "rotateY(0deg)",
               cursor: "pointer",
@@ -223,35 +231,55 @@ export default function CarnetDigital({ perfil, onClose }: CarnetDigitalProps) {
             {/* FRENTE */}
             <div style={{
               position: "absolute", inset: 0, backfaceVisibility: "hidden",
-              borderRadius: "20px", padding: "28px",
+              borderRadius: "20px", padding: "24px 28px",
               background: `linear-gradient(135deg, ${COLOR_DARKER}, ${COLOR_PRIMARY})`,
               boxShadow: "0 20px 50px rgba(45,38,64,0.4)",
               display: "flex", flexDirection: "column",
+              overflow: "hidden",
             }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                <div>
-                  <div style={{ color: "#fff", fontWeight: 900, fontSize: "clamp(14px, 4vw, 20px)" }}>Baby Care</div>
-                  <div style={{ color: "rgba(255,255,255,0.7)", fontWeight: 700, fontSize: "clamp(9px, 2.2vw, 11px)" }}>Carnet Pediátrico Digital</div>
+              {/* Círculo decorativo, como el patrón de fondo de un carnet real */}
+              <div style={{
+                position: "absolute", top: "-60px", right: "-60px", width: "180px", height: "180px",
+                borderRadius: "50%", background: "rgba(255,255,255,0.06)", pointerEvents: "none",
+              }} />
+
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  {/* "Chip" tipo tarjeta, solo decorativo */}
+                  <div style={{
+                    width: "22px", height: "17px", borderRadius: "4px",
+                    background: "linear-gradient(135deg, #E8D391, #C9A84C)",
+                  }} />
+                  <div>
+                    <div style={{ color: "#fff", fontWeight: 900, fontSize: "clamp(13px, 3.6vw, 18px)" }}>Baby Care</div>
+                    <div style={{ color: "rgba(255,255,255,0.7)", fontWeight: 700, fontSize: "clamp(8px, 2vw, 10px)" }}>Carnet Pediátrico Digital</div>
+                  </div>
                 </div>
                 {perfil.foto_perfil ? (
-                  <img src={perfil.foto_perfil} alt={perfil.nombre} style={{ width: "clamp(50px, 15vw, 72px)", height: "clamp(50px, 15vw, 72px)", borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(255,255,255,0.5)" }} />
+                  <img src={perfil.foto_perfil} alt={perfil.nombre} style={{ width: "clamp(46px, 13vw, 64px)", height: "clamp(46px, 13vw, 64px)", borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(255,255,255,0.5)", flexShrink: 0 }} />
                 ) : (
-                  <div style={{ width: "clamp(50px, 15vw, 72px)", height: "clamp(50px, 15vw, 72px)", borderRadius: "50%", background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <User size={28} color="rgba(255,255,255,0.6)" />
+                  <div style={{ width: "clamp(46px, 13vw, 64px)", height: "clamp(46px, 13vw, 64px)", borderRadius: "50%", background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <User size={24} color="rgba(255,255,255,0.6)" />
                   </div>
                 )}
               </div>
 
-              <div style={{ marginTop: "clamp(8px, 3vw, 20px)" }}>
-                <div style={{ color: "#fff", fontWeight: 900, fontSize: "clamp(18px, 5.5vw, 28px)", lineHeight: 1.1 }}>{nombreCompleto}</div>
-                <div style={{ color: "rgba(255,255,255,0.85)", fontWeight: 700, fontSize: "clamp(11px, 3vw, 14px)", marginTop: "2px" }}>{edad}</div>
+              <div style={{ marginTop: "clamp(6px, 2.5vw, 14px)", position: "relative" }}>
+                <div style={{ color: "#fff", fontWeight: 900, fontSize: "clamp(16px, 5vw, 24px)", lineHeight: 1.1 }}>{nombreCompleto}</div>
+                <div style={{ color: "rgba(255,255,255,0.85)", fontWeight: 700, fontSize: "clamp(10px, 2.6vw, 13px)", marginTop: "2px" }}>
+                  {edad}{perfil.sexo ? ` · ${perfil.sexo}` : ""}
+                </div>
               </div>
 
-              <div style={{ marginTop: "auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(8px,2.5vw,16px)" }}>
+              <div style={{ marginTop: "auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(6px,2vw,12px)", position: "relative" }}>
                 <CampoCarnet label="Fecha de nacimiento" valor={formatFecha(perfil.fecha_nacimiento)} />
-                <CampoCarnet label="RUT" valor={perfil.rut || "No registrado"} />
-                <CampoCarnet label="Tipo de sangre" valor={perfil.tipo_sangre || "No registrado"} />
+                <CampoCarnet label="Peso y talla al nacer" valor={pesoTalla} />
+                <CampoCarnet label="Semanas de gestación" valor={perfil.semanas_gestacion_nac ? `${perfil.semanas_gestacion_nac} sem.` : "No registrado"} />
                 <CampoCarnet label="Previsión" valor={perfil.nombre_prevision || perfil.prevision_salud || "No registrada"} />
+              </div>
+
+              <div style={{ marginTop: "10px", paddingTop: "10px", borderTop: "1px solid rgba(255,255,255,0.15)", position: "relative", color: "rgba(255,255,255,0.5)", fontWeight: 700, fontSize: "clamp(8px, 1.8vw, 10px)", letterSpacing: "0.03em" }}>
+                N° CARNET {numeroCarnet}
               </div>
             </div>
 
@@ -259,21 +287,26 @@ export default function CarnetDigital({ perfil, onClose }: CarnetDigitalProps) {
             <div style={{
               position: "absolute", inset: 0, backfaceVisibility: "hidden",
               transform: "rotateY(180deg)",
-              borderRadius: "20px", padding: "28px",
+              borderRadius: "20px", padding: "20px 24px",
               background: `linear-gradient(135deg, ${COLOR_DARKER}, ${COLOR_PRIMARY})`,
               boxShadow: "0 20px 50px rgba(45,38,64,0.4)",
-              display: "flex", flexDirection: "column", gap: "clamp(8px,2.5vw,14px)",
-              overflow: "hidden",
+              display: "flex", flexDirection: "column", gap: "clamp(5px,1.5vw,9px)",
+              overflowY: "auto", overflowX: "hidden",
             }}>
               <div>
-                <div style={{ color: "#fff", fontWeight: 900, fontSize: "clamp(14px, 4vw, 18px)" }}>Datos clínicos</div>
+                <div style={{ color: "#fff", fontWeight: 900, fontSize: "clamp(14px, 4vw, 18px)" }}>Datos médicos</div>
                 <div style={{ color: "rgba(255,255,255,0.7)", fontWeight: 700, fontSize: "clamp(9px, 2.2vw, 11px)" }}>Para uso del equipo de salud</div>
               </div>
 
+              <CampoCarnetIcon icon={<Droplet size={14} color="#fff" />} label="Tipo de sangre" valor={perfil.tipo_sangre || "No registrado"} />
               <CampoCarnetIcon icon={<AlertCircle size={14} color="#fff" />} label="Alergias conocidas" valor={perfil.alergias || "Ninguna registrada"} />
-              <CampoCarnetIcon icon={<Droplet size={14} color="#fff" />} label="Condiciones crónicas" valor={perfil.condiciones_cronicas || "Ninguna registrada"} />
-              <CampoCarnetIcon icon={<User size={14} color="#fff" />} label="Pediatra / Centro de salud" valor={[perfil.pediatra_nombre, perfil.centro_salud].filter(Boolean).join(" · ") || "No registrado"} />
+              <CampoCarnetIcon icon={<Stethoscope size={14} color="#fff" />} label="Condiciones crónicas" valor={perfil.condiciones_cronicas || "Ninguna registrada"} />
+              <CampoCarnetIcon icon={<Building2 size={14} color="#fff" />} label="Pediatra / Centro de salud" valor={[perfil.pediatra_nombre, perfil.centro_salud].filter(Boolean).join(" · ") || "No registrado"} />
               <CampoCarnetIcon icon={<Phone size={14} color="#fff" />} label="Contacto de emergencia" valor={perfil.contacto_emergencia_nombre ? `${perfil.contacto_emergencia_nombre}${perfil.contacto_emergencia_telefono ? " · " + perfil.contacto_emergencia_telefono : ""}` : "No registrado"} />
+
+              <div style={{ marginTop: "auto", paddingTop: "8px", borderTop: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.5)", fontWeight: 700, fontSize: "clamp(8px, 1.8vw, 10px)", letterSpacing: "0.03em" }}>
+                N° CARNET {numeroCarnet}
+              </div>
             </div>
           </div>
         </div>

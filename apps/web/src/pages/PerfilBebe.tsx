@@ -489,41 +489,21 @@ export default function PerfilBebe() {
                 </div>
               </div>
 
-              {/* CARNET DIGITAL: RUT Y CONTACTO DE EMERGENCIA */}
+              {/* CARNET DIGITAL */}
               <div style={{ ...cardStyle, gridColumn: "1 / -1" }}>
-                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--text)", marginBottom: "6px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "12px" }}>Carnet Digital</h3>
-                <p style={{ fontSize: "13px", color: "var(--text-muted)", margin: "10px 0 20px" }}>Estos datos aparecen en el carnet pediátrico digital que puedes mostrar en el consultorio.</p>
-
-                <div className="hero-stats-grid" style={{ marginBottom: "16px" }}>
-                  <div>
-                    <label style={labelStyle}>RUT del bebé (opcional)</label>
-                    {editMode ? <input type="text" name="rut" placeholder="12.345.678-9" value={editData.rut || ""} onChange={handleChange} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.rut || "-"}</div>}
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Contacto de emergencia — nombre</label>
-                    {editMode ? <input type="text" name="contacto_emergencia_nombre" value={editData.contacto_emergencia_nombre || ""} onChange={handleChange} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.contacto_emergencia_nombre || "-"}</div>}
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Contacto de emergencia — teléfono</label>
-                    {editMode ? <input type="tel" name="contacto_emergencia_telefono" placeholder="+56 9 1234 5678" value={editData.contacto_emergencia_telefono || ""} onChange={handleChange} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.contacto_emergencia_telefono || "-"}</div>}
-                  </div>
-                </div>
-
-                {!editMode && (
-                  <button
-                    type="button"
-                    onClick={() => setShowCarnet(true)}
-                    style={{
-                      display: "flex", alignItems: "center", gap: "8px",
-                      background: "var(--theme-bg-light)", color: "var(--theme-primary)",
-                      border: "none", borderRadius: "12px", padding: "12px 20px",
-                      fontWeight: 800, fontSize: "14px", cursor: "pointer",
-                    }}
-                  >
-                    <IdCard size={18} />
-                    Ver carnet digital
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => setShowCarnet(true)}
+                  style={{
+                    display: "flex", alignItems: "center", gap: "8px",
+                    background: "var(--theme-bg-light)", color: "var(--theme-primary)",
+                    border: "none", borderRadius: "12px", padding: "12px 20px",
+                    fontWeight: 800, fontSize: "14px", cursor: "pointer",
+                  }}
+                >
+                  <IdCard size={18} />
+                  Ver carnet digital
+                </button>
               </div>
             </div>
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Bell, LogOut, Menu, X, ChevronDown, Baby, Check, Plus, Sparkles,
-  Home, CalendarDays, HeartPulse, MessageSquare, Stethoscope, Images, NotebookPen } from "lucide-react";
+  Home, CalendarDays, HeartPulse, MessageSquare, Stethoscope, Images, NotebookPen, UserCog } from "lucide-react";
 import NotificacionDetalleModal from "./NotificacionDetalleModal";
 import { cargarNotifsLeidas, marcarNotifLeida, claveNotif, onNotifLeida } from "../utils/notificacionesLeidas";
 
@@ -470,14 +470,13 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
               </button>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "4px", fontSize: "15.5px", fontWeight: 700 }}>
-              <NavLinks />
-            </div>
-
+            {/* Se sacaron los botones de navegación (Inicio...Galería) de este
+                drawer a pedido: quedan disponibles en la barra inferior de
+                móvil, y acá solo interesa el cambio de perfil + logout. */}
             {babies.length > 1 && (
               <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "18px" }}>
                 <div style={{ fontSize: "11px", fontWeight: 800, color: "rgba(255,255,255,0.45)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "10px" }}>
-                  Tus perfiles
+                  Tus bebés
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                   {babies.map((baby) => (
@@ -509,6 +508,15 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
                 </div>
               </div>
             )}
+
+            <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "18px" }}>
+              <button
+                onClick={() => { setMobileMenuOpen(false); navigate("/mi-perfil"); }}
+                style={{ background: "rgba(255,255,255,0.06)", border: "none", borderRadius: "12px", color: "rgba(255,255,255,0.85)", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontSize: "15px", fontWeight: 700, padding: "12px 14px", width: "100%" }}
+              >
+                <UserCog size={18} /> Editar tu perfil
+              </button>
+            </div>
 
             <div style={{ marginTop: "auto", borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "18px" }}>
               <button onClick={handleLogout} style={{ background: "rgba(255,255,255,0.06)", border: "none", borderRadius: "12px", color: "rgba(255,255,255,0.8)", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontSize: "15px", fontWeight: 700, padding: "12px 14px", width: "100%" }}>

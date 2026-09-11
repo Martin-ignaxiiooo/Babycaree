@@ -37,3 +37,8 @@ tools/codemods/                <- Scripts únicos de refactor ya aplicados (refe
 - Frontend web: `cd apps/web && npm run dev` (http://localhost:5173)
 - Mobile: `cd apps/mobile && npm start`
 
+## Más contexto
+Ver [`CONTEXTO.md`](./CONTEXTO.md): estado actual, pendientes de
+seguridad, módulos deshabilitados a propósito, y convenciones que no
+están escritas en ningún otro lado.
+
