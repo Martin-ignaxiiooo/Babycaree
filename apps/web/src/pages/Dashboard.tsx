@@ -8,6 +8,7 @@ import {
 import TopNav from "../components/TopNav";
 import NotificacionDetalleModal from "../components/NotificacionDetalleModal";
 import DiarioResumenMini from "../components/DiarioResumenMini";
+import AccesosRapidos from "../components/AccesosRapidos";
 import { marcarNotifLeida } from "../utils/notificacionesLeidas";
 import DashboardEmbarazo from "./DashboardEmbarazo";
 
@@ -510,6 +511,14 @@ export default function Dashboard() {
           @keyframes spin-icon-kf { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
           .spin-icon { animation: spin-icon-kf 0.9s linear infinite; }
         `}</style>
+
+        {activeBabyId && (
+          <AccesosRapidos
+            bebeId={activeBabyId}
+            token={localStorage.getItem("token")!}
+            onRegistrado={() => fetchDashboard(localStorage.getItem("token")!, activeBabyId)}
+          />
+        )}
 
         {/* ── GRID DESKTOP Y MOBILE ── */}
         <div className="responsive-grid">
