@@ -175,6 +175,7 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
       <>
         {items.map((item) => {
           const active = activePath.includes(item.match);
+          const Icono = ICONOS[item.match];
           return (
             <span
               key={item.path}
@@ -183,6 +184,7 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
                 cursor: "pointer",
                 padding: "9px 16px",
                 borderRadius: "100px",
+                display: "flex", alignItems: "center", gap: "8px",
                 background: active ? "rgba(255,255,255,0.16)" : "transparent",
                 color: active ? "#fff" : "rgba(255,255,255,0.72)",
                 transition: "background 0.18s, color 0.18s",
@@ -196,6 +198,7 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
               onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
               onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = "transparent"; }}
             >
+              {Icono && <Icono size={pill ? 16 : 18} strokeWidth={active ? 2.4 : 2} />}
               {item.label}
             </span>
           );
