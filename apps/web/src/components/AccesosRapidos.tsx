@@ -597,7 +597,7 @@ function ModalRegistrarVacuna({ bebeId, token, onClose, onSaved }: any) {
    ──────────────────────────────────────────────────────────────── */
 type AccionRapida = "toma" | "sueno" | "panal" | "cita" | "vacuna" | null;
 
-export default function AccesosRapidos({ bebeId, token, onRegistrado }: { bebeId: string; token: string; onRegistrado?: () => void }) {
+export default function AccesosRapidos({ bebeId, token, onRegistrado, sinTitulo }: { bebeId: string; token: string; onRegistrado?: () => void; sinTitulo?: boolean }) {
   const [abierto, setAbierto] = useState<AccionRapida>(null);
   // Objeto {id, sueno_inicio} si hay un sueño abierto, o null si no.
   // Antes se guardaba solo un boolean y se perdía el id, así que no
@@ -644,10 +644,12 @@ export default function AccesosRapidos({ bebeId, token, onRegistrado }: { bebeId
   ];
 
   return (
-    <div style={{ marginBottom: "22px" }}>
-      <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "16px", fontWeight: 700, color: "var(--text)", margin: "0 0 12px 2px" }}>
-        Accesos rápidos
-      </h3>
+    <div style={{ marginBottom: sinTitulo ? 0 : "22px" }}>
+      {!sinTitulo && (
+        <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "16px", fontWeight: 700, color: "var(--text)", margin: "0 0 12px 2px" }}>
+          Accesos rápidos
+        </h3>
+      )}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))", gap: "10px" }}>
         {botones.map(({ key, icon: Icon, label, bg, color, onClick }) => (
           <button

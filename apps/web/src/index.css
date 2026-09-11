@@ -609,26 +609,6 @@ body {
   min-width: 0;
 }
 
-.hero-stats-grid {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.stat-icon-circle {
-  width: 76px;
-  height: 76px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 6px;
-}
-.stat-icon-circle svg {
-  width: 42px;
-  height: 42px;
-}
-
 .nav-links-desktop {
   display: flex;
   gap: 32px;
@@ -658,35 +638,6 @@ body {
     gap: 16px;
   }
   
-  .hero-stats-grid {
-    justify-content: center;
-    width: 100%;
-    flex-wrap: nowrap;
-    gap: 8px;
-  }
-  
-  .hero-stats-grid > div {
-    flex: 0 1 100px;
-    min-width: 0 !important;
-    padding: 10px 6px !important;
-  }
-  
-  .hero-stats-grid > div > div:first-child {
-    font-size: 18px !important;
-  }
-
-  /* Textos de la tarjeta (label y valor) más chicos en mobile para que
-     "Percentil:" / "P100" quepan sin desbordar el ancho de la tarjeta
-     cuando las 3 comparten una sola fila. */
-  .hero-stats-grid > div > div:nth-child(2) {
-    font-size: 10px !important;
-    white-space: nowrap;
-  }
-  .hero-stats-grid > div > div:nth-child(3) {
-    font-size: 14px !important;
-    white-space: nowrap;
-  }
-
   /* Registro diario: las 4 tarjetas de resumen (tomas hoy, biberón,
      durmiendo, pañales) en una sola fila también en móvil, en vez de
      acomodarse en 2x2. */
@@ -746,16 +697,6 @@ body {
      en vez de superponerse por falta de espacio horizontal. */
   .controles-calendario-grid {
     grid-template-columns: 1fr !important;
-  }
-
-  .stat-icon-circle {
-    width: 46px;
-    height: 46px;
-    margin-bottom: 4px;
-  }
-  .stat-icon-circle svg {
-    width: 24px;
-    height: 24px;
   }
 
   .nav-links-desktop {

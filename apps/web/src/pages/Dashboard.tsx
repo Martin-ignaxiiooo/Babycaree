@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   Camera, X,
-  Ruler, Star, Check, Clock, Loader2, Plus, Syringe,
+  Check, Clock, Loader2, Plus, Syringe,
 } from "lucide-react";
 import TopNav from "../components/TopNav";
 import NotificacionDetalleModal from "../components/NotificacionDetalleModal";
@@ -13,17 +13,6 @@ import { marcarNotifLeida } from "../utils/notificacionesLeidas";
 import DashboardEmbarazo from "./DashboardEmbarazo";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api";
-
-// Icono que no existe en lucide-react, dibujado a mano para calzar con el diseño de referencia
-function ScaleIcon({ size = 20, color = "var(--theme-primary)" }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <rect x="4" y="4" width="16" height="16" rx="4" stroke={color} strokeWidth="2" />
-      <ellipse cx="12" cy="12" rx="5" ry="3.2" stroke={color} strokeWidth="2" />
-      <circle cx="12" cy="12" r="1" fill={color} />
-    </svg>
-  );
-}
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -468,41 +457,14 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <div className="hero-stats-grid" style={{ alignItems: "center", padding: "14px 24px 14px 0" }}>
-              <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "10px 16px", textAlign: "center", minWidth: "100px", boxShadow: "0 4px 14px rgba(45,38,64,0.06)" }}>
-                <div className="stat-icon-circle" style={{ background: "#DED0F7" }}>
-                  <ScaleIcon size={42} color="#7C5CBF" />
-                </div>
-                <div style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: 600 }}>Peso:</div>
-                <div style={{ fontSize: "16px", fontWeight: 800, color: "var(--text)" }}>{hero.peso_kg !== "-" && hero.peso_kg !== 0 ? `${hero.peso_kg}kg` : "N/A"}</div>
-              </div>
-              <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "10px 16px", textAlign: "center", minWidth: "100px", boxShadow: "0 4px 14px rgba(45,38,64,0.06)" }}>
-                <div className="stat-icon-circle" style={{ background: "#F7B8C4" }}>
-                  <Ruler size={42} color="#7A3B45" strokeWidth={2.2} />
-                </div>
-                <div style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: 600 }}>Altura:</div>
-                <div style={{ fontSize: "16px", fontWeight: 800, color: "var(--text)" }}>{hero.talla_cm !== "-" && hero.talla_cm !== 0 ? `${hero.talla_cm}cm` : "N/A"}</div>
-              </div>
-              <div style={{ background: "var(--surface)", borderRadius: "20px", padding: "10px 16px", textAlign: "center", minWidth: "100px", boxShadow: "0 4px 14px rgba(45,38,64,0.06)" }}>
-                <div className="stat-icon-circle" style={{ background: "#F7DE8B" }}>
-                  <Star size={42} color="#8A6D1D" strokeWidth={2.2} />
-                </div>
-                <div style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: 600 }}>Percentil:</div>
-                <div style={{ fontSize: "16px", fontWeight: 800, color: "var(--text)" }}>P{hero.percentil}</div>
-              </div>
-            </div>
-
-            {/* Fecha del último registro: deja claro a qué momento corresponden
-                las medidas de arriba, en vez de parecer siempre "de hoy". */}
-            {hero.fecha_medicion && (
-              <div style={{
-                textAlign: "center", fontSize: "12px",
-                color: "var(--text-muted)", fontWeight: 600, marginTop: "-4px", paddingBottom: "4px",
-              }}>
-                {hero.medicion_es_nacimiento ? "Medidas de nacimiento · " : "Último registro · "}
-                {new Date(hero.fecha_medicion).toLocaleDateString("es-CL", { day: "numeric", month: "long", year: "numeric" })}
-              </div>
+          <div style={{ display: "flex", flexDirection: "column", flex: 1, minWidth: "260px" }}>
+            {activeBabyId && (
+              <AccesosRapidos
+                bebeId={activeBabyId}
+                token={localStorage.getItem("token")!}
+                onRegistrado={() => fetchDashboard(localStorage.getItem("token")!, activeBabyId)}
+                sinTitulo
+              />
             )}
           </div>
         </div>
@@ -511,14 +473,6 @@ export default function Dashboard() {
           @keyframes spin-icon-kf { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
           .spin-icon { animation: spin-icon-kf 0.9s linear infinite; }
         `}</style>
-
-        {activeBabyId && (
-          <AccesosRapidos
-            bebeId={activeBabyId}
-            token={localStorage.getItem("token")!}
-            onRegistrado={() => fetchDashboard(localStorage.getItem("token")!, activeBabyId)}
-          />
-        )}
 
         {/* ── GRID DESKTOP Y MOBILE ── */}
         <div className="responsive-grid">
