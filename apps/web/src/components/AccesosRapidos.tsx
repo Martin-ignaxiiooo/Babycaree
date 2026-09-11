@@ -126,6 +126,11 @@ function BotonGuardar({ disabled, onClick, texto = "Guardar" }: any) {
   );
 }
 
+function MensajeError({ error }: { error: string | null }) {
+  if (!error) return null;
+  return <p style={{ fontSize: "12.5px", color: "#D97070", fontWeight: 700, marginBottom: "14px", lineHeight: 1.4 }}>{error}</p>;
+}
+
 const inputStyle: React.CSSProperties = {
   width: "100%", padding: "10px 12px", border: "1.5px solid #E5E7EB", borderRadius: "10px",
   fontSize: "14px", outline: "none", boxSizing: "border-box", fontFamily: "'Nunito', sans-serif", color: "var(--text)",
@@ -140,9 +145,11 @@ function ModalRegistrarToma({ bebeId, token, onClose, onSaved }: any) {
   const [duracionMin, setDuracionMin] = useState(10);
   const [nota, setNota] = useState("");
   const [guardando, setGuardando] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const guardar = async () => {
     setGuardando(true);
+    setError(null);
     try {
       const cuerpo = fuente === "biberon"
         ? { tipo: "toma", fuente, cantidad_ml: cantidadMl }
@@ -152,7 +159,15 @@ function ModalRegistrarToma({ bebeId, token, onClose, onSaved }: any) {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ ...cuerpo, nota: nota.trim() || null }),
       });
-      if (res.ok) { onSaved(); onClose(); }
+      if (res.ok) {
+        onSaved();
+        onClose();
+      } else {
+        const d = await res.json().catch(() => ({}));
+        setError(d.error || "No se pudo guardar. Intenta de nuevo.");
+      }
+    } catch {
+      setError("Error de red. Revisa tu conexión e intenta de nuevo.");
     } finally {
       setGuardando(false);
     }
@@ -180,6 +195,7 @@ function ModalRegistrarToma({ bebeId, token, onClose, onSaved }: any) {
       )}
 
       <CampoNota nota={nota} setNota={setNota} />
+      <MensajeError error={error} />
       <BotonGuardar disabled={guardando} onClick={guardar} />
     </Modal>
   );
@@ -192,16 +208,26 @@ function ModalCambioPanal({ bebeId, token, onClose, onSaved }: any) {
   const [panalTipo, setPanalTipo] = useState<"pis" | "caca" | "mixto">("pis");
   const [nota, setNota] = useState("");
   const [guardando, setGuardando] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const guardar = async () => {
     setGuardando(true);
+    setError(null);
     try {
       const res = await fetch(`${API_URL}/v1/diario/${bebeId}/registros`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ tipo: "panal", panal_tipo: panalTipo, nota: nota.trim() || null }),
       });
-      if (res.ok) { onSaved(); onClose(); }
+      if (res.ok) {
+        onSaved();
+        onClose();
+      } else {
+        const d = await res.json().catch(() => ({}));
+        setError(d.error || "No se pudo guardar. Intenta de nuevo.");
+      }
+    } catch {
+      setError("Error de red. Revisa tu conexión e intenta de nuevo.");
     } finally {
       setGuardando(false);
     }
@@ -216,6 +242,7 @@ function ModalCambioPanal({ bebeId, token, onClose, onSaved }: any) {
         <Opcion activo={panalTipo === "mixto"} onClick={() => setPanalTipo("mixto")}>Ambos</Opcion>
       </div>
       <CampoNota nota={nota} setNota={setNota} />
+      <MensajeError error={error} />
       <BotonGuardar disabled={guardando} onClick={guardar} />
     </Modal>
   );
@@ -229,8 +256,11 @@ function ConfirmarSueno({ bebeId, token, onClose, onSaved }: any) {
   const [hora, setHora] = useState(`${String(ahora.getHours()).padStart(2, "0")}:${String(ahora.getMinutes()).padStart(2, "0")}`);
   const [guardando, setGuardando] = useState(false);
 
+  const [error, setError] = useState<string | null>(null);
+
   const confirmar = async () => {
     setGuardando(true);
+    setError(null);
     try {
       const [h, m] = hora.split(":").map(Number);
       const inicio = new Date();
@@ -240,7 +270,15 @@ function ConfirmarSueno({ bebeId, token, onClose, onSaved }: any) {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ tipo: "sueno", fecha_hora: inicio.toISOString() }),
       });
-      if (res.ok) { onSaved(); onClose(); }
+      if (res.ok) {
+        onSaved();
+        onClose();
+      } else {
+        const d = await res.json().catch(() => ({}));
+        setError(d.error || "No se pudo registrar. Intenta de nuevo.");
+      }
+    } catch {
+      setError("Error de red. Revisa tu conexión e intenta de nuevo.");
     } finally {
       setGuardando(false);
     }
@@ -260,6 +298,9 @@ function ConfirmarSueno({ bebeId, token, onClose, onSaved }: any) {
           type="time" value={hora} onChange={(e) => setHora(e.target.value)}
           style={{ display: "inline-block", background: "var(--surface-2)", border: "1.5px solid var(--border)", borderRadius: "100px", padding: "8px 16px", fontSize: "14px", fontWeight: 800, color: "var(--text)", marginBottom: "20px", outline: "none" }}
         />
+        {error && (
+          <p style={{ fontSize: "12.5px", color: "#D97070", fontWeight: 700, marginBottom: "14px", lineHeight: 1.4 }}>{error}</p>
+        )}
         <div style={{ display: "flex", gap: "10px" }}>
           <button onClick={onClose} style={{ flex: 1, padding: "12px", borderRadius: "100px", border: "none", background: "var(--surface-2)", color: "var(--text-muted)", fontWeight: 800, fontSize: "13.5px", cursor: "pointer", fontFamily: "'Nunito', sans-serif" }}>
             Cancelar
@@ -329,9 +370,12 @@ function ModalAgendarCita({ bebeId, token, onClose, onSaved }: any) {
     }
   });
 
+  const [errorManual, setErrorManual] = useState<string | null>(null);
+
   const guardarManual = async () => {
     if (!fecha || !hora) return;
     setGuardandoManual(true);
+    setErrorManual(null);
     try {
       const [anio, mes, dia] = fecha.split("-").map(Number);
       const [h, m] = hora.split(":").map(Number);
@@ -346,8 +390,8 @@ function ModalAgendarCita({ bebeId, token, onClose, onSaved }: any) {
       });
       onSaved();
       onClose();
-    } catch (e) {
-      // silencioso: se puede reintentar
+    } catch (e: any) {
+      setErrorManual(e.message || "No se pudo guardar la cita. Intenta de nuevo.");
     } finally {
       setGuardandoManual(false);
     }
@@ -424,6 +468,7 @@ function ModalAgendarCita({ bebeId, token, onClose, onSaved }: any) {
             </div>
           </div>
 
+          <MensajeError error={errorManual} />
           <BotonGuardar disabled={!fecha || !hora || guardandoManual} onClick={guardarManual} texto="Agendar" />
         </>
       )}
@@ -446,6 +491,7 @@ function ModalRegistrarVacuna({ bebeId, token, onClose, onSaved }: any) {
   const [hora, setHora] = useState(`${p(ahora.getHours())}:${p(ahora.getMinutes())}`);
   const [notas, setNotas] = useState("");
   const [guardando, setGuardando] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch(`${API_URL}/v1/salud/${bebeId}/vacunas`, { headers: { Authorization: `Bearer ${token}` } })
@@ -463,6 +509,7 @@ function ModalRegistrarVacuna({ bebeId, token, onClose, onSaved }: any) {
   const confirmar = async () => {
     if (!seleccionada) return;
     setGuardando(true);
+    setError(null);
     try {
       const [anio, mes, dia] = fecha.split("-").map(Number);
       const [h, m] = hora.split(":").map(Number);
@@ -472,7 +519,15 @@ function ModalRegistrarVacuna({ bebeId, token, onClose, onSaved }: any) {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ aplicada: true, fecha_aplicacion: fechaISO, notas: notas.trim() || null }),
       });
-      if (res.ok) { onSaved(); onClose(); }
+      if (res.ok) {
+        onSaved();
+        onClose();
+      } else {
+        const d = await res.json().catch(() => ({}));
+        setError(d.error || "No se pudo registrar. Intenta de nuevo.");
+      }
+    } catch {
+      setError("Error de red. Revisa tu conexión e intenta de nuevo.");
     } finally {
       setGuardando(false);
     }
@@ -529,6 +584,7 @@ function ModalRegistrarVacuna({ bebeId, token, onClose, onSaved }: any) {
           <Etiqueta>Notas / Reacciones</Etiqueta>
           <input type="text" placeholder="Fiebre leve, etc." value={notas} onChange={(e) => setNotas(e.target.value)} style={{ ...inputStyle, marginBottom: "18px" }} />
 
+          <MensajeError error={error} />
           <BotonGuardar disabled={guardando} onClick={confirmar} texto="Registrar" />
         </div>
       )}
