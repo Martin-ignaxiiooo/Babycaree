@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {
-  Milk, Moon, Baby, Syringe, CalendarClock, X, Mic, MicOff, Plus, Sun,
+  Milk, Moon, Baby, Syringe, CalendarClock, X, Mic, MicOff, Plus, Sun, Ruler,
 } from "lucide-react";
 import { useDictado } from "../hooks/useDictado";
 import { interpretarDictado } from "../utils/interpretarDictado";
@@ -617,7 +617,7 @@ function ModalRegistrarVacuna({ bebeId, token, onClose, onSaved }: any) {
    ──────────────────────────────────────────────────────────────── */
 type AccionRapida = "toma" | "sueno" | "panal" | "cita" | "vacuna" | null;
 
-export default function AccesosRapidos({ bebeId, token, onRegistrado, sinTitulo }: { bebeId: string; token: string; onRegistrado?: () => void; sinTitulo?: boolean }) {
+export default function AccesosRapidos({ bebeId, token, onRegistrado, sinTitulo, onRegistrarMedidas }: { bebeId: string; token: string; onRegistrado?: () => void; sinTitulo?: boolean; onRegistrarMedidas?: () => void }) {
   const [abierto, setAbierto] = useState<AccionRapida>(null);
   // Objeto {id, sueno_inicio} si hay un sueño abierto, o null si no.
   // Antes se guardaba solo un boolean y se perdía el id, así que no
@@ -661,6 +661,9 @@ export default function AccesosRapidos({ bebeId, token, onRegistrado, sinTitulo 
     { key: "panal", icon: Baby, label: "Cambio de pañal", bg: "#FFF4E0", color: "#B27B16" },
     { key: "cita", icon: CalendarClock, label: "Agendar cita", bg: "#D7EEFF", color: "#1E4E8C" },
     { key: "vacuna", icon: Syringe, label: "Registrar vacuna", bg: "#FFE6CD", color: "#8A5212" },
+    ...(onRegistrarMedidas
+      ? [{ key: null, icon: Ruler, label: "Registrar medidas", bg: "#F7B8C4", color: "#7A3B45", onClick: onRegistrarMedidas }]
+      : []),
   ];
 
   return (

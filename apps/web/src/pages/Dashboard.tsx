@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   Camera, X,
-  Check, Clock, Loader2, Plus, Syringe,
+  Check, Clock, Loader2, Syringe,
 } from "lucide-react";
 import TopNav from "../components/TopNav";
 import NotificacionDetalleModal from "../components/NotificacionDetalleModal";
@@ -464,6 +464,11 @@ export default function Dashboard() {
                 token={localStorage.getItem("token")!}
                 onRegistrado={() => fetchDashboard(localStorage.getItem("token")!, activeBabyId)}
                 sinTitulo
+                onRegistrarMedidas={
+                  (!homeData?.rol_acceso || !homeData.rol_acceso.startsWith('solo_lectura'))
+                    ? () => { setIsModalOpen(true); setGrowthError(""); }
+                    : undefined
+                }
               />
             )}
           </div>
@@ -560,20 +565,6 @@ export default function Dashboard() {
                 <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--text)", margin: 0 }}>
                   📈 Evolución de Crecimiento
                 </h3>
-                {(!homeData?.rol_acceso || !homeData.rol_acceso.startsWith('solo_lectura')) && (
-                  <button 
-                    onClick={() => { setIsModalOpen(true); setGrowthError(""); }}
-                    style={{
-                      background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))", color: "#fff",
-                      padding: "9px 17px", borderRadius: "12px", border: "none",
-                      fontSize: "13px", fontWeight: 700, cursor: "pointer",
-                      display: "flex", alignItems: "center", gap: "6px",
-                      boxShadow: "0 4px 14px var(--theme-shadow-light)",
-                    }}
-                  >
-                    <Plus size={16} /> Registrar Medidas
-                  </button>
-                )}
               </div>
 
               {/* ── GRÁFICO DE PESO ── */}
