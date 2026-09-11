@@ -131,7 +131,9 @@ export const sendInvitationAlert = async (
   email: string,
   nombreFamiliar: string,
   nombreBebe: string,
+  tokenInvitacion: string,
 ): Promise<void> => {
+  const enlace = `https://babycaree-web.vercel.app/invitacion/${tokenInvitacion}`;
   await sendEmail(
     email,
     `Has sido invitado a ver el perfil de ${nombreBebe} — Baby Care`,
@@ -146,17 +148,15 @@ export const sendInvitationAlert = async (
           <p style="color: #6B7280; font-size: 14px; line-height: 1.6; margin-bottom: 24px;">
             <strong>${nombreFamiliar}</strong> te ha invitado a ver el perfil de su bebé <strong>${nombreBebe}</strong> en Baby Care.
           </p>
-          <a href="https://babycaree-web.vercel.app/seleccionar-perfil" style="display: block; text-decoration: none;">
-            <div style="background: #E0E7FF; border-left: 4px solid #4F46E5; border-radius: 10px; padding: 18px 20px; margin-bottom: 12px; text-align: center;">
-              <p style="color: #3730A3; font-size: 14px; margin: 0; font-weight: 700;">👉 Ya tengo cuenta (Iniciar sesión)</p>
+          <a href="${enlace}" style="display: block; text-decoration: none;">
+            <div style="background: linear-gradient(135deg, #7C5CBF, #A07ADF); border-radius: 10px; padding: 16px 20px; margin-bottom: 20px; text-align: center;">
+              <p style="color: #fff; font-size: 15px; margin: 0; font-weight: 700;">Aceptar invitación</p>
             </div>
           </a>
-          <a href="https://babycaree-web.vercel.app/registro" style="display: block; text-decoration: none;">
-            <div style="background: #F3E8FF; border-left: 4px solid #9333EA; border-radius: 10px; padding: 18px 20px; margin-bottom: 24px; text-align: center;">
-              <p style="color: #6B21A8; font-size: 14px; margin: 0; font-weight: 700;">✨ Crear una cuenta nueva</p>
-            </div>
-          </a>
-          <p style="color: #9CA3AF; font-size: 12px;">Si no conoces a ${nombreFamiliar}, puedes ignorar este correo.</p>
+          <p style="color: #6B7280; font-size: 13px; line-height: 1.6; margin-bottom: 20px;">
+            Si todavía no tienes cuenta, el enlace te llevará a crearla en un solo paso. Si ya tienes, solo inicia sesión y verás a ${nombreBebe} en tu lista.
+          </p>
+          <p style="color: #9CA3AF; font-size: 12px;">Este enlace es personal y vence en 7 días. Si no conoces a ${nombreFamiliar}, puedes ignorar este correo.</p>
         </div>
       </div>
     `

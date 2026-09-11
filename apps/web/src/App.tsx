@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Onboarding from "./pages/Onboarding";
 import Login from "./pages/Login";
 import SeleccionarPerfil from "./pages/SeleccionarPerfil";
+import AceptarInvitacion from "./pages/AceptarInvitacion";
 import Dashboard from "./pages/Dashboard";
 import PerfilBebe from "./pages/PerfilBebe";
 import InfoEmbarazoSemana from "./pages/InfoEmbarazoSemana";
@@ -41,6 +42,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/registro" element={<Onboarding />} />
+        <Route path="/invitacion/:token" element={<AceptarInvitacion />} />
         <Route path="/seleccionar-perfil" element={<SeleccionarPerfil />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/perfil/:id" element={<PerfilBebe />} />

@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import crypto from 'crypto';
 import { query } from '../config/db';
 import { sendInvitationAlert } from '../config/mailer';
 
@@ -240,14 +241,19 @@ export const invitarAcceso = async (req: Request, res: Response): Promise<void> 
 
     const estado = id_usuario_invitado ? 'activo' : 'pendiente';
 
+    // Token único y personal del enlace del correo. Permite que quien lo
+    // reciba se registre sin pasar por el onboarding de bebé (no viene a
+    // registrar un bebé propio) y saber de antemano quién lo invitó.
+    const token_invitacion = crypto.randomBytes(24).toString('hex');
+
     const insert = await query(
-      `INSERT INTO accesos_compartidos_bebe (id_perfil_bebe, id_usuario_invitado, correo_invitado, nivel_permiso, invitado_por, fecha_expiracion, estado) 
-       VALUES ($1, $2, $3, $4, $5, now() + interval '7 days', $6) RETURNING *`,
-      [id, id_usuario_invitado, correo_invitado, nivel_permiso, userId, estado]
+      `INSERT INTO accesos_compartidos_bebe (id_perfil_bebe, id_usuario_invitado, correo_invitado, nivel_permiso, invitado_por, fecha_expiracion, estado, token_invitacion) 
+       VALUES ($1, $2, $3, $4, $5, now() + interval '7 days', $6, $7) RETURNING *`,
+      [id, id_usuario_invitado, correo_invitado, nivel_permiso, userId, estado, token_invitacion]
     );
 
     // Run email sending in the background without awaiting to prevent hanging the API request
-    sendInvitationAlert(correo_invitado, nombre_familiar, nombre_bebe).catch(emailError => {
+    sendInvitationAlert(correo_invitado, nombre_familiar, nombre_bebe, token_invitacion).catch(emailError => {
       console.error("Error sending email, but invitation was created:", emailError);
     });
 
