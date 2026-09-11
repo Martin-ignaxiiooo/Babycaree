@@ -497,7 +497,7 @@ export default function PerfilBebe() {
             </div>
 
             {editMode && (
-              <div style={{ textAlign: "right", marginTop: "16px" }}>
+              <div style={{ textAlign: "center", marginTop: "16px" }}>
                 <button 
                   style={{ background: "var(--theme-primary)", color: "#fff", border: "none", padding: "16px 40px", borderRadius: "12px", fontSize: "16px", fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(124,92,191,0.3)", display: "inline-flex", alignItems: "center", gap: "8px" }}
                   onClick={() => handleSave(false)}
