@@ -692,6 +692,23 @@ body {
     display: flex !important;
   }
 
+  /* Pestañas de Perfil del bebé (Datos del bebé / Compartir acceso):
+     mismo problema que las de Salud -nowrap + scroll lateral- pero con
+     solo 2 pestañas, así que se reparten el ancho a la mitad en vez de
+     quedar cortadas. */
+  .perfil-tabs-row {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    white-space: normal !important;
+    overflow: visible !important;
+  }
+  .perfil-tabs-row button {
+    padding: 11px 8px !important;
+    font-size: 12.5px !important;
+    justify-content: center !important;
+  }
+
   /* Calendario de controles (Salud): en desktop es calendario + detalle
      lado a lado; en móvil se apilan (calendario arriba, detalle abajo)
      en vez de superponerse por falta de espacio horizontal. */

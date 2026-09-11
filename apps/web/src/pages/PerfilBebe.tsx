@@ -326,7 +326,7 @@ export default function PerfilBebe() {
       <div className="page-container" style={{ marginTop: "-14px" }}>
 
         {/* TABS: mismo patrón de píldoras que usa Salud.tsx */}
-        <div className="responsive-overflow" style={{ display: "flex", gap: "10px", marginBottom: "32px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "16px", whiteSpace: "nowrap" }}>
+        <div className="responsive-overflow perfil-tabs-row" style={{ display: "flex", gap: "10px", marginBottom: "32px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "16px", whiteSpace: "nowrap" }}>
           <button
             onClick={() => { setActiveTab("detalle"); navigate(`/perfil/${id}?tab=detalle`, { replace: true }); }}
             style={{
