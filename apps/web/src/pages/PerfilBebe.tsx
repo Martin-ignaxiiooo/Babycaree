@@ -344,16 +344,6 @@ export default function PerfilBebe() {
         
         {activeTab === "detalle" && (
           <div style={{ width: "100%" }}>
-            
-            {editMode && (
-              <div style={{ background: "var(--theme-bg-light)", borderLeft: "4px solid var(--theme-primary)", padding: "16px 20px", borderRadius: "0 12px 12px 0", marginBottom: "32px", display: "flex", gap: "16px" }}>
-                <div style={{ fontSize: "24px" }}>✏️</div>
-                <div>
-                  <h4 style={{ fontSize: "16px", color: "var(--text)", margin: "0 0 4px", fontWeight: 800 }}>Modo edición activo</h4>
-                  <p style={{ fontSize: "14px", color: "#6B7280", margin: 0 }}>Modifica los datos y recuerda presionar "Guardar cambios" al final de la página.</p>
-                </div>
-              </div>
-            )}
 
             <div className="responsive-grid">
               {/* DATOS GENERALES */}
@@ -446,8 +436,8 @@ export default function PerfilBebe() {
               <div style={{ ...cardStyle, gridColumn: "1 / -1" }}>
                 <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--text)", marginBottom: "20px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "12px" }}>Información Médica</h3>
                 
-                <div className="hero-stats-grid" style={{ marginBottom: "24px" }}>
-                  <div>
+                <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", marginBottom: "24px" }}>
+                  <div style={{ flex: 1, minWidth: "160px" }}>
                     <label style={labelStyle}>Tipo de sangre</label>
                     {editMode ? (
                       <select name="tipo_sangre" value={editData.tipo_sangre || ""} onChange={handleChange} style={inputStyle}>
@@ -466,17 +456,17 @@ export default function PerfilBebe() {
                       <div style={readOnlyStyle}>{perfil.tipo_sangre || "-"}</div>
                     )}
                   </div>
-                  <div>
+                  <div style={{ flex: 1, minWidth: "160px" }}>
                     <label style={labelStyle}>Pediatra de cabecera</label>
                     {editMode ? <input type="text" name="pediatra_nombre" value={editData.pediatra_nombre || ""} onChange={handleChange} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.pediatra_nombre || "-"}</div>}
                   </div>
-                  <div>
+                  <div style={{ flex: 1, minWidth: "160px" }}>
                     <label style={labelStyle}>Centro de salud</label>
                     {editMode ? <input type="text" name="centro_salud" value={editData.centro_salud || ""} onChange={handleChange} style={inputStyle} /> : <div style={readOnlyStyle}>{perfil.centro_salud || "-"}</div>}
                   </div>
                 </div>
 
-                <div className="hero-stats-grid">
+                <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
                   <div style={{ flex: 1, minWidth: "160px" }}>
                     <label style={labelStyle}>Alergias conocidas</label>
                     {editMode ? <textarea name="alergias" rows={3} value={editData.alergias || ""} onChange={handleChange} style={inputStyle}></textarea> : <div style={{ ...readOnlyStyle, minHeight: "80px" }}>{perfil.alergias || "-"}</div>}
@@ -512,7 +502,7 @@ export default function PerfilBebe() {
                   style={{ background: "var(--theme-primary)", color: "#fff", border: "none", padding: "16px 40px", borderRadius: "12px", fontSize: "16px", fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(124,92,191,0.3)" }}
                   onClick={() => handleSave(false)}
                 >
-                  💾 Guardar todos los cambios
+                  💾 Guardar cambios
                 </button>
               </div>
             )}
