@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { 
-  MessageCircle, FileText, ChevronRight, ThumbsUp, MessageSquare, Clock, X
+  MessageCircle, FileText, ChevronRight, ThumbsUp, MessageSquare, X
 } from "lucide-react";
 import axios from "axios";
 import TopNav from "../components/TopNav";
@@ -313,12 +313,9 @@ export default function Comunidad() {
                   {art.imagen_portada}
                 </div>
                 <div className="articulo-body" style={{ padding: "24px", flex: 1, display: "flex", flexDirection: "column" }}>
-                  <div className="articulo-meta" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                  <div className="articulo-meta" style={{ display: "flex", justifyContent: "flex-start", alignItems: "center", marginBottom: "12px" }}>
                     <span className="articulo-categoria" style={{ fontSize: "12px", fontWeight: 800, color: "var(--theme-primary)", background: "var(--theme-bg-light)", padding: "4px 12px", borderRadius: "12px" }}>
                       {art.categoria}
-                    </span>
-                    <span className="articulo-mins" style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "12px", color: "#6B7280", fontWeight: 600 }}>
-                      <Clock size={14} /> 5 min
                     </span>
                   </div>
                   <h3 className="articulo-titulo" style={{ margin: "0 0 12px 0", fontSize: "18px", fontWeight: 800, color: "var(--text)" }}>{art.titulo}</h3>
