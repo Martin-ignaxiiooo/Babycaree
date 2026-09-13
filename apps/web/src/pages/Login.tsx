@@ -4,7 +4,7 @@ import axios from "axios";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import heroImg from "../assets/madre-bebe-hero.jpg";
 
-const API_URL = "https://babycare-backend-msyq.onrender.com/api";
+import { API_URL } from "../config/api";
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined;
 
 declare global {

@@ -6,7 +6,7 @@ import { useDictado } from "../hooks/useDictado";
 import { interpretarDictado } from "../utils/interpretarDictado";
 import ModalDictadoUniversal from "./ModalDictadoUniversal";
 
-const API_URL = "https://babycare-backend-msyq.onrender.com/api";
+import { API_URL } from "../config/api";
 
 /* ────────────────────────────────────────────────────────────────
    Componentes compartidos (mismo estilo que ya usan RegistroDiario.tsx

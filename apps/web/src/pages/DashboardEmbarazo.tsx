@@ -4,7 +4,7 @@ import axios from "axios";
 import { CalendarPlus, Settings2, Loader2, ChevronRight, Camera } from "lucide-react";
 import BabyGrowthIcon, { HITOS_POR_MES, mesDesdeSemanas } from "../components/BabyGrowthIcon";
 
-const API_URL = "https://babycare-backend-msyq.onrender.com/api";
+import { API_URL } from "../config/api";
 
 interface DashboardEmbarazoProps {
   user: any;

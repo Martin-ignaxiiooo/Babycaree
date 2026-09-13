@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Shield, Heart, TrendingUp, Lock, Eye, EyeOff } from "lucide-react";
 
-const API_URL = "https://babycare-backend-msyq.onrender.com/api";
+import { API_URL } from "../config/api";
 
 type Step = "email" | "code" | "reset" | "success" | "lockout";
 

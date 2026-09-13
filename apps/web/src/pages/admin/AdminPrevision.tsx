@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import AdminModal from "../../components/admin/AdminModal";
 import { useAdminAuth } from "../../hooks/useAdminAuth";
+import { API_URL } from "../../config/api";
 
 export default function AdminPrevision() {
   const { canManageDirectorio } = useAdminAuth();
@@ -22,7 +23,7 @@ export default function AdminPrevision() {
       const token = localStorage.getItem("admin_token");
       if (!token) return navigate("/admin/login");
       const res = await axios.get(
-        "https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/prevision",
+        `${API_URL}/v1/admin/directorio/prevision`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -65,7 +66,7 @@ export default function AdminPrevision() {
     try {
       const token = localStorage.getItem("admin_token");
       await axios.delete(
-        `https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/prevision/${codigo}`,
+        `${API_URL}/v1/admin/directorio/prevision/${codigo}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -82,7 +83,7 @@ export default function AdminPrevision() {
       const token = localStorage.getItem("admin_token");
       if (isEditing) {
         await axios.put(
-          `https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/prevision/${editId}`,
+          `${API_URL}/v1/admin/directorio/prevision/${editId}`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -90,7 +91,7 @@ export default function AdminPrevision() {
         );
       } else {
         await axios.post(
-          "https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/prevision",
+          `${API_URL}/v1/admin/directorio/prevision`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },

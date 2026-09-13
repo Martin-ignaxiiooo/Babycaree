@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { X, Printer, Loader2 } from "lucide-react";
 
-const API_URL = "https://babycare-backend-msyq.onrender.com/api";
+import { API_URL } from "../config/api";
 
 /**
  * Informe médico para llevar al pediatra.

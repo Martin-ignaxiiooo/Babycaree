@@ -4,6 +4,7 @@ import { ArrowLeft, User, Mail, Save, ChevronRight } from "lucide-react";
 import TopNav from "../components/TopNav";
 import { useNotificaciones } from "../hooks/useNotificaciones";
 import { vozSoportada, vozActiva, setVozActiva } from "../utils/voz";
+import { API_URL } from "../config/api";
 
 export default function MiPerfil() {
   const notif = useNotificaciones();
@@ -40,7 +41,7 @@ export default function MiPerfil() {
   const [guardandoRecordatorios, setGuardandoRecordatorios] = useState(false);
 
   React.useEffect(() => {
-    fetch("https://babycare-backend-msyq.onrender.com/api/profiles/me/password-estado", {
+    fetch(`${API_URL}/profiles/me/password-estado`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => (r.ok ? r.json() : null))
@@ -49,7 +50,7 @@ export default function MiPerfil() {
   }, [token]);
 
   React.useEffect(() => {
-    fetch("https://babycare-backend-msyq.onrender.com/api/profiles/me/preferencias-notificaciones", {
+    fetch(`${API_URL}/profiles/me/preferencias-notificaciones`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => (r.ok ? r.json() : null))
@@ -64,7 +65,7 @@ export default function MiPerfil() {
   const guardarPreferenciasRecordatorios = async (cambios: { activos?: boolean; horas?: number[] }) => {
     setGuardandoRecordatorios(true);
     try {
-      const res = await fetch("https://babycare-backend-msyq.onrender.com/api/profiles/me/preferencias-notificaciones", {
+      const res = await fetch(`${API_URL}/profiles/me/preferencias-notificaciones`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(cambios),
@@ -104,7 +105,7 @@ export default function MiPerfil() {
     setMessage("");
 
     try {
-      const res = await fetch("https://babycare-backend-msyq.onrender.com/api/profiles/me", {
+      const res = await fetch(`${API_URL}/profiles/me`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -139,7 +140,7 @@ export default function MiPerfil() {
         if (tienePassword && !passwordData.currentPassword) {
           errorPassword = "Debes ingresar tu contraseña actual para poder cambiarla.";
         } else {
-          const passRes = await fetch("https://babycare-backend-msyq.onrender.com/api/profiles/me/password", {
+          const passRes = await fetch(`${API_URL}/profiles/me/password`, {
             method: "PATCH",
             headers: {
               "Content-Type": "application/json",

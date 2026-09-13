@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Lock, Mail, ShieldAlert, KeyRound } from "lucide-react";
 
-const API_URL = "https://babycare-backend-msyq.onrender.com/api";
+import { API_URL } from "../../config/api";
 
 export default function AdminLogin() {
   const navigate = useNavigate();

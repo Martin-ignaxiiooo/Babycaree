@@ -1,6 +1,9 @@
 node_modules/
 .env
 .env.*
+# Los .env.example sí se versionan: documentan qué variables existen,
+# con valores vacíos o de producción pública (nunca credenciales).
+!.env.example
 .DS_Store
 
 # Scripts temporales de migración/test con credenciales

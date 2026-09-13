@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import AdminModal from "../../components/admin/AdminModal";
 import { useAdminAuth } from "../../hooks/useAdminAuth";
+import { API_URL } from "../../config/api";
 
 export default function AdminVacunas() {
   const { canManageVacunas } = useAdminAuth();
@@ -47,7 +48,7 @@ export default function AdminVacunas() {
       return;
     try {
       const token = localStorage.getItem("admin_token");
-      await axios.delete(`https://babycare-backend-msyq.onrender.com/api/v1/admin/vacunas/${id}`, {
+      await axios.delete(`${API_URL}/v1/admin/vacunas/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchData();
@@ -61,7 +62,7 @@ export default function AdminVacunas() {
       const token = localStorage.getItem("admin_token");
       if (!token) return navigate("/admin/login");
       const res = await axios.get(
-        "https://babycare-backend-msyq.onrender.com/api/v1/admin/vacunas",
+        `${API_URL}/v1/admin/vacunas`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -83,7 +84,7 @@ export default function AdminVacunas() {
       const token = localStorage.getItem("admin_token");
       if (isEditing) {
         await axios.put(
-          `https://babycare-backend-msyq.onrender.com/api/v1/admin/vacunas/${editId}`,
+          `${API_URL}/v1/admin/vacunas/${editId}`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -91,7 +92,7 @@ export default function AdminVacunas() {
         );
       } else {
         await axios.post(
-          "https://babycare-backend-msyq.onrender.com/api/v1/admin/vacunas",
+          `${API_URL}/v1/admin/vacunas`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },

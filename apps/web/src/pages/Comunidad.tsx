@@ -6,7 +6,9 @@ import {
 import axios from "axios";
 import TopNav from "../components/TopNav";
 
-const API_URL = "https://babycare-backend-msyq.onrender.com/api/v1";
+import { API_URL as API_BASE } from "../config/api";
+
+const API_URL = `${API_BASE}/v1`;
 
 // Corta el resumen a un largo fijo de caracteres para que todas las
 // tarjetas midan parecido. El artículo completo se ve al hacer clic en la

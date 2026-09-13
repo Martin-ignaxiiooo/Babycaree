@@ -9,7 +9,7 @@ import {
   mesDesdeSemanas,
 } from "../components/BabyGrowthIcon";
 
-const API_URL = "https://babycare-backend-msyq.onrender.com/api";
+import { API_URL } from "../config/api";
 
 export default function InfoEmbarazoSemana() {
   const navigate = useNavigate();

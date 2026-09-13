@@ -12,7 +12,7 @@ import AccesosRapidos from "../components/AccesosRapidos";
 import { marcarNotifLeida } from "../utils/notificacionesLeidas";
 import DashboardEmbarazo from "./DashboardEmbarazo";
 
-const API_URL = "https://babycare-backend-msyq.onrender.com/api";
+import { API_URL } from "../config/api";
 
 export default function Dashboard() {
   const navigate = useNavigate();

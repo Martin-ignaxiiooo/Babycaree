@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import AdminModal from "../../components/admin/AdminModal";
 import { useAdminAuth } from "../../hooks/useAdminAuth";
+import { API_URL } from "../../config/api";
 
 export default function AdminEspecialidades() {
   const { canManageDirectorio } = useAdminAuth();
@@ -62,7 +63,7 @@ export default function AdminEspecialidades() {
     try {
       const token = localStorage.getItem("admin_token");
       await axios.delete(
-        `https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/especialidades/${codigo}`,
+        `${API_URL}/v1/admin/directorio/especialidades/${codigo}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -79,13 +80,13 @@ export default function AdminEspecialidades() {
       if (!token) return navigate("/admin/login");
       
       const res = await axios.get(
-        "https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/especialidades",
+        `${API_URL}/v1/admin/directorio/especialidades`,
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setData(res.data);
 
       const statsRes = await axios.get(
-        "https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/especialidades/stats",
+        `${API_URL}/v1/admin/directorio/especialidades/stats`,
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setStats(statsRes.data);
@@ -105,7 +106,7 @@ export default function AdminEspecialidades() {
       const token = localStorage.getItem("admin_token");
       if (isEditing) {
         await axios.put(
-          `https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/especialidades/${editId}`,
+          `${API_URL}/v1/admin/directorio/especialidades/${editId}`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -113,7 +114,7 @@ export default function AdminEspecialidades() {
         );
       } else {
         await axios.post(
-          "https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/especialidades",
+          `${API_URL}/v1/admin/directorio/especialidades`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },

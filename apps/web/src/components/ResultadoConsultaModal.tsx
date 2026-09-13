@@ -3,7 +3,7 @@ import { X, Camera, Loader2, Trash2, Mic, MicOff, FileText } from "lucide-react"
 import { useDictado } from "../hooks/useDictado";
 import { interpretarExamenesDictados } from "../utils/interpretarDictado";
 
-const API_URL = "https://babycare-backend-msyq.onrender.com/api";
+import { API_URL } from "../config/api";
 
 /**
  * Comprime la foto antes de subirla. Las recetas son texto, así que se

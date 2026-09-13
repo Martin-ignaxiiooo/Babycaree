@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import AdminModal from "../../components/admin/AdminModal";
 import { useAdminAuth } from "../../hooks/useAdminAuth";
+import { API_URL } from "../../config/api";
 
 export default function AdminCentros() {
   const { canManageDirectorio } = useAdminAuth();
@@ -47,7 +48,7 @@ export default function AdminCentros() {
     try {
       const token = localStorage.getItem("admin_token");
       await axios.delete(
-        `https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/centros/${codigo}`,
+        `${API_URL}/v1/admin/directorio/centros/${codigo}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -63,7 +64,7 @@ export default function AdminCentros() {
       const token = localStorage.getItem("admin_token");
       if (!token) return navigate("/admin/login");
       const res = await axios.get(
-        "https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/centros",
+        `${API_URL}/v1/admin/directorio/centros`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -85,7 +86,7 @@ export default function AdminCentros() {
       const token = localStorage.getItem("admin_token");
       if (isEditing) {
         await axios.put(
-          `https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/centros/${editId}`,
+          `${API_URL}/v1/admin/directorio/centros/${editId}`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -93,7 +94,7 @@ export default function AdminCentros() {
         );
       } else {
         await axios.post(
-          "https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/centros",
+          `${API_URL}/v1/admin/directorio/centros`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },

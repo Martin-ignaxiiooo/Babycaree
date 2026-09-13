@@ -4,7 +4,7 @@ import { useDictado } from "../hooks/useDictado";
 import { clasificarDictado, type RegistroDictado, type TipoRegistro } from "../utils/clasificarDictado";
 import { hablar, callar, vozActiva } from "../utils/voz";
 
-const API_URL = "https://babycare-backend-msyq.onrender.com/api";
+import { API_URL } from "../config/api";
 
 const ICONOS: Record<TipoRegistro, any> = {
   panal: Baby,

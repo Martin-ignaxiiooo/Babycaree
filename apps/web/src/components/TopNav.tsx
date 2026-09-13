@@ -6,7 +6,7 @@ import { Bell, LogOut, Menu, X, ChevronDown, Baby, Check, Plus, Sparkles,
 import NotificacionDetalleModal from "./NotificacionDetalleModal";
 import { cargarNotifsLeidas, marcarNotifLeida, claveNotif, onNotifLeida } from "../utils/notificacionesLeidas";
 
-const API_URL = "https://babycare-backend-msyq.onrender.com/api";
+import { API_URL } from "../config/api";
 
 interface TopNavProps {
   user: any;

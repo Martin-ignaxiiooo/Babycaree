@@ -10,6 +10,7 @@ import EditarCitaModal from "../components/EditarCitaModal";
 import InformeMedico from "../components/InformeMedico";
 import { useDictado } from "../hooks/useDictado";
 import { interpretarDictado } from "../utils/interpretarDictado";
+import { API_URL } from "../config/api";
 
 const DIAS_CAL = ["D", "L", "M", "M", "J", "V", "S"];
 const MESES_CAL = [
@@ -147,7 +148,7 @@ export default function Salud() {
       // había otra cita el mismo día, por si fue un dictado duplicado.
       const duplicado = buscarDuplicadoMismoDia(datos.fecha);
 
-      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/citas`, {
+      const res = await fetch(`${API_URL}/v1/salud/${bebeId}/citas`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({
@@ -223,7 +224,7 @@ export default function Salud() {
       if (activeTab === "controles") fetchCitas();
       
       // Fetch user role and profile state for this baby
-      fetch(`https://babycare-backend-msyq.onrender.com/api/v1/home/${bebeId}`, {
+      fetch(`${API_URL}/v1/home/${bebeId}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then(res => res.json())
@@ -246,7 +247,7 @@ export default function Salud() {
 
   const fetchVacunas = async () => {
     try {
-      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/vacunas`, {
+      const res = await fetch(`${API_URL}/v1/salud/${bebeId}/vacunas`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) setVacunas(await res.json());
@@ -260,7 +261,7 @@ export default function Salud() {
 
   const fetchCrecimientoData = async () => {
     try {
-      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/home/${bebeId}`, {
+      const res = await fetch(`${API_URL}/v1/home/${bebeId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -274,7 +275,7 @@ export default function Salud() {
 
   const fetchCitas = async () => {
     try {
-      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/citas`, {
+      const res = await fetch(`${API_URL}/v1/salud/${bebeId}/citas`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -288,7 +289,7 @@ export default function Salud() {
   const eliminarCita = async (citaId: string) => {
     if (!confirm("¿Eliminar esta cita? No se puede deshacer.")) return;
     try {
-      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/citas/${citaId}`, {
+      const res = await fetch(`${API_URL}/v1/salud/${bebeId}/citas/${citaId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -326,7 +327,7 @@ export default function Salud() {
     if (!pesoInput || !tallaInput || !bebeId) return;
     setIsSaving(true);
     try {
-      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/home/${bebeId}/crecimiento`, {
+      const res = await fetch(`${API_URL}/v1/home/${bebeId}/crecimiento`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ peso: parseFloat(pesoInput), talla: parseFloat(tallaInput) })
@@ -364,7 +365,7 @@ export default function Salud() {
 
     setIsSavingCita(true);
     try {
-      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/citas`, {
+      const res = await fetch(`${API_URL}/v1/salud/${bebeId}/citas`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({
@@ -429,7 +430,7 @@ export default function Salud() {
 
     setGuardandoVacuna(true);
     try {
-      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/vacunas/${vacunaId}`, {
+      const res = await fetch(`${API_URL}/v1/salud/${bebeId}/vacunas/${vacunaId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -460,7 +461,7 @@ export default function Salud() {
     if (rolAcceso.startsWith('solo_lectura')) return;
     if (!window.confirm(`¿Quitar el registro de "${vacuna.nombre}"? Se borrará la fecha y las notas guardadas.`)) return;
     try {
-      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/salud/${bebeId}/vacunas/${vacuna.vacuna_id}`, {
+      const res = await fetch(`${API_URL}/v1/salud/${bebeId}/vacunas/${vacuna.vacuna_id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

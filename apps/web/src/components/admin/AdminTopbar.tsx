@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { LogOut, UserCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../../config/api";
 
 export default function AdminTopbar() {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ export default function AdminTopbar() {
     const token = localStorage.getItem("admin_token");
     try {
       if (token) {
-        await fetch("https://babycare-backend-msyq.onrender.com/api/v1/admin/auth/logout", {
+        await fetch(`${API_URL}/v1/admin/auth/logout`, {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
         });

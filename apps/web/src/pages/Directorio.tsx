@@ -6,7 +6,9 @@ import {
 import axios from "axios";
 import TopNav from "../components/TopNav";
 
-const API_URL = "https://babycare-backend-msyq.onrender.com/api/v1";
+import { API_URL as API_BASE } from "../config/api";
+
+const API_URL = `${API_BASE}/v1`;
 
 // Directorio de médicos deshabilitado para el público mientras se termina
 // de definir/verificar el contenido. La funcionalidad real queda intacta

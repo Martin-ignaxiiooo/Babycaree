@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 import TopNav from "../components/TopNav";
 import CarnetDigital from "../components/CarnetDigital";
+import { API_URL } from "../config/api";
 
 export default function PerfilBebe() {
   const { id } = useParams();
@@ -59,7 +60,7 @@ export default function PerfilBebe() {
   const [errorPerfil, setErrorPerfil] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("https://babycare-backend-msyq.onrender.com/api/v1/directorio/previsiones")
+    fetch(`${API_URL}/v1/directorio/previsiones`)
       .then(r => r.json())
       .then(data => setPrevisiones(data))
       .catch(e => console.error("Error fetching previsiones", e));
@@ -76,7 +77,7 @@ export default function PerfilBebe() {
 
   useEffect(() => {
     if (!token || !id) return;
-    fetch(`https://babycare-backend-msyq.onrender.com/api/v1/home/${id}`, {
+    fetch(`${API_URL}/v1/home/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => (r.ok ? r.json() : null))
@@ -88,7 +89,7 @@ export default function PerfilBebe() {
 
   const fetchPerfil = async () => {
     try {
-      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/perfiles-bebe/${id}`, {
+      const res = await fetch(`${API_URL}/v1/perfiles-bebe/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -108,7 +109,7 @@ export default function PerfilBebe() {
 
   const fetchAccesos = async () => {
     try {
-      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/perfiles-bebe/${id}/accesos`, {
+      const res = await fetch(`${API_URL}/v1/perfiles-bebe/${id}/accesos`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) setAccesos(await res.json());
@@ -128,7 +129,7 @@ export default function PerfilBebe() {
     }
     let cancelado = false;
     const t = setTimeout(() => {
-      fetch(`https://babycare-backend-msyq.onrender.com/api/v1/personas/buscar?q=${encodeURIComponent(correo)}&fuente=contactos`, {
+      fetch(`${API_URL}/v1/personas/buscar?q=${encodeURIComponent(correo)}&fuente=contactos`, {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((r) => (r.ok ? r.json() : []))
@@ -148,7 +149,7 @@ export default function PerfilBebe() {
 
   const handleSave = async (confirmado = false) => {
     try {
-      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/perfiles-bebe/${id}`, {
+      const res = await fetch(`${API_URL}/v1/perfiles-bebe/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -186,7 +187,7 @@ export default function PerfilBebe() {
         setSearchResults([]);
         return;
       }
-      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/personas/buscar?q=${encodeURIComponent(query)}&fuente=${fuente}`, {
+      const res = await fetch(`${API_URL}/v1/personas/buscar?q=${encodeURIComponent(query)}&fuente=${fuente}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -202,7 +203,7 @@ export default function PerfilBebe() {
     if (!correo) return;
     setIsInviting(true);
     try {
-      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/perfiles-bebe/${id}/accesos/invitar`, {
+      const res = await fetch(`${API_URL}/v1/perfiles-bebe/${id}/accesos/invitar`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -233,7 +234,7 @@ export default function PerfilBebe() {
   const revocarAcceso = async (idAcceso: string) => {
     if (!window.confirm("¿Seguro que deseas revocar este acceso?")) return;
     try {
-      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/perfiles-bebe/${id}/accesos/${idAcceso}`, {
+      const res = await fetch(`${API_URL}/v1/perfiles-bebe/${id}/accesos/${idAcceso}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -250,7 +251,7 @@ export default function PerfilBebe() {
 
   const modificarPermiso = async (idAcceso: string, nivel_permiso: string) => {
     try {
-      const res = await fetch(`https://babycare-backend-msyq.onrender.com/api/v1/perfiles-bebe/${id}/accesos/${idAcceso}`, {
+      const res = await fetch(`${API_URL}/v1/perfiles-bebe/${id}/accesos/${idAcceso}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

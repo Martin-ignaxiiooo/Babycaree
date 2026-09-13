@@ -7,7 +7,7 @@ import {
 import TopNav from "../components/TopNav";
 import EstadisticasDiario from "../components/EstadisticasDiario";
 
-const API_URL = "https://babycare-backend-msyq.onrender.com/api";
+import { API_URL } from "../config/api";
 
 type Tipo = "toma" | "sueno" | "panal";
 

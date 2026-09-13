@@ -18,6 +18,7 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
+import { API_URL } from "../config/api";
 
 const TOTAL_STEPS = 4;
 // v2.0 - embarazo flow fix
@@ -487,7 +488,7 @@ function StepTwo({ account, setAccount, error, honeypot, setHoneypot }: any) {
 function StepThree({ baby, setBaby, flow, error }: any) {
   const [previsiones, setPrevisiones] = useState<any[]>([]);
   useEffect(() => {
-    fetch("https://babycare-backend-msyq.onrender.com/api/v1/directorio/previsiones")
+    fetch(`${API_URL}/v1/directorio/previsiones`)
       .then(r => r.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -1122,7 +1123,7 @@ export default function Onboarding() {
           }
           userToken = existingToken;
           await axios.post(
-            `https://babycare-backend-msyq.onrender.com/api/auth/consentimiento`,
+            `${API_URL}/auth/consentimiento`,
             {
               consentimiento_ley_19628: true,
               consentimiento_ley_21719: true,
@@ -1130,7 +1131,7 @@ export default function Onboarding() {
             { headers: { Authorization: `Bearer ${userToken}` } },
           );
         } else {
-          const authRes = await axios.post(`https://babycare-backend-msyq.onrender.com/api/auth/register`, {
+          const authRes = await axios.post(`${API_URL}/auth/register`, {
             email: account.email,
             password: account.password,
             nombre: account.nombre,
@@ -1155,7 +1156,7 @@ export default function Onboarding() {
         }
 
         const babyRes = await axios.post(
-          `https://babycare-backend-msyq.onrender.com/api/profiles/babies`,
+          `${API_URL}/profiles/babies`,
           {
             nombre: baby.nombre,
             fecha_nacimiento: flow === "hijo" ? baby.fecha_nacimiento : null,

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Plus, Loader2, Heart, Scale, CheckCircle2, ChevronRight } from "lucide-react";
 import TopNav from "../components/TopNav";
 
-const API_URL = "https://babycare-backend-msyq.onrender.com/api";
+import { API_URL } from "../config/api";
 
 /** Los síntomas frecuentes del embarazo, para no obligar a escribirlos. */
 const SINTOMAS = [

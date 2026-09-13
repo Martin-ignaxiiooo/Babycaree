@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { API_URL } from "../../config/api";
 
 export default function AdminBitacora() {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ export default function AdminBitacora() {
         const token = localStorage.getItem("admin_token");
         if (!token) return navigate("/admin/login");
         const res = await axios.get(
-          "https://babycare-backend-msyq.onrender.com/api/v1/admin/bitacora",
+          `${API_URL}/v1/admin/bitacora`,
           {
             headers: { Authorization: `Bearer ${token}` },
           },

@@ -3,7 +3,7 @@ import { FlaskConical, Check, Clock, AlertTriangle, Camera, Loader2, Trash2, Fil
 import { useDictado } from "../hooks/useDictado";
 import { interpretarExamenesDictados } from "../utils/interpretarDictado";
 
-const API_URL = "https://babycare-backend-msyq.onrender.com/api";
+import { API_URL } from "../config/api";
 
 function comprimirImagen(file: File, maxDim = 1400, quality = 0.75): Promise<string> {
   return new Promise((resolve, reject) => {

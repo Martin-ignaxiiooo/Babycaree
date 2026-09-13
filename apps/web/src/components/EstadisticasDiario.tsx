@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { Loader2, TrendingUp, TrendingDown, Minus, Moon, Milk, Baby } from "lucide-react";
 
-const API_URL = "https://babycare-backend-msyq.onrender.com/api";
+import { API_URL } from "../config/api";
 
 export function duracion(min: number): string {
   if (!min) return "—";

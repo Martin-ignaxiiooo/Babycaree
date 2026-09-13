@@ -3,6 +3,7 @@ import { MessageCircle, Trash2, Search, ChevronDown, ChevronUp } from "lucide-re
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAdminAuth } from "../../hooks/useAdminAuth";
+import { API_URL } from "../../config/api";
 
 export default function AdminComunidad() {
   const { canManageComunidad } = useAdminAuth();
@@ -20,13 +21,13 @@ export default function AdminComunidad() {
       const token = localStorage.getItem("admin_token");
       if (!token) return navigate("/admin/login");
       const res = await axios.get(
-        "https://babycare-backend-msyq.onrender.com/api/v1/admin/comunidad/foros",
+        `${API_URL}/v1/admin/comunidad/foros`,
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setData(res.data);
 
       const statsRes = await axios.get(
-        "https://babycare-backend-msyq.onrender.com/api/v1/admin/comunidad/stats",
+        `${API_URL}/v1/admin/comunidad/stats`,
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setStats(statsRes.data);
@@ -52,7 +53,7 @@ export default function AdminComunidad() {
       try {
         const token = localStorage.getItem("admin_token");
         const res = await axios.get(
-          `https://babycare-backend-msyq.onrender.com/api/v1/admin/comunidad/foros/${foroId}/comentarios`,
+          `${API_URL}/v1/admin/comunidad/foros/${foroId}/comentarios`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setComentarios(prev => ({ ...prev, [foroId]: res.data }));
@@ -69,7 +70,7 @@ export default function AdminComunidad() {
     try {
       const token = localStorage.getItem("admin_token");
       await axios.delete(
-        `https://babycare-backend-msyq.onrender.com/api/v1/admin/comunidad/comentarios/${comentarioId}`,
+        `${API_URL}/v1/admin/comunidad/comentarios/${comentarioId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       // Remove from state
@@ -90,7 +91,7 @@ export default function AdminComunidad() {
     try {
       const token = localStorage.getItem("admin_token");
       const res = await axios.post(
-        `https://babycare-backend-msyq.onrender.com/api/v1/admin/comunidad/foros/${foroId}/comentarios`,
+        `${API_URL}/v1/admin/comunidad/foros/${foroId}/comentarios`,
         { contenido: texto },
         { headers: { Authorization: `Bearer ${token}` } }
       );

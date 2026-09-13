@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import AdminModal from "../../components/admin/AdminModal";
 import { useAdminAuth } from "../../hooks/useAdminAuth";
+import { API_URL } from "../../config/api";
 
 export default function AdminMedicos() {
   const { canManageDirectorio } = useAdminAuth();
@@ -92,7 +93,7 @@ export default function AdminMedicos() {
     try {
       const token = localStorage.getItem("admin_token");
       await axios.delete(
-        `https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/medicos/${id}`,
+        `${API_URL}/v1/admin/directorio/medicos/${id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -108,7 +109,7 @@ export default function AdminMedicos() {
       const token = localStorage.getItem("admin_token");
       if (!token) return navigate("/admin/login");
       const res = await axios.get(
-        "https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/medicos",
+        `${API_URL}/v1/admin/directorio/medicos`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -130,7 +131,7 @@ export default function AdminMedicos() {
       const token = localStorage.getItem("admin_token");
       if (isEditing) {
         await axios.put(
-          `https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/medicos/${editId}`,
+          `${API_URL}/v1/admin/directorio/medicos/${editId}`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -138,7 +139,7 @@ export default function AdminMedicos() {
         );
       } else {
         await axios.post(
-          "https://babycare-backend-msyq.onrender.com/api/v1/admin/directorio/medicos",
+          `${API_URL}/v1/admin/directorio/medicos`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },

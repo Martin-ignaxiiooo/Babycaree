@@ -4,7 +4,7 @@ import axios from "axios";
 import { Plus, X, Check, Trash2, Sparkles, Heart } from "lucide-react";
 import DateSelect from "../components/DateSelect";
 
-const API_URL = "https://babycare-backend-msyq.onrender.com/api";
+import { API_URL } from "../config/api";
 
 export default function SeleccionarPerfil() {
   const navigate = useNavigate();

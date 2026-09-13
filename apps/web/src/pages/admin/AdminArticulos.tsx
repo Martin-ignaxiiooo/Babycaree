@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import AdminModal from "../../components/admin/AdminModal";
 import { useAdminAuth } from "../../hooks/useAdminAuth";
+import { API_URL } from "../../config/api";
 
 export default function AdminArticulos() {
   const { canManageArticulos } = useAdminAuth();
@@ -97,7 +98,7 @@ export default function AdminArticulos() {
       return;
     try {
       const token = localStorage.getItem("admin_token");
-      await axios.delete(`https://babycare-backend-msyq.onrender.com/api/v1/admin/articulos/${id}`, {
+      await axios.delete(`${API_URL}/v1/admin/articulos/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchData();
@@ -111,13 +112,13 @@ export default function AdminArticulos() {
       const token = localStorage.getItem("admin_token");
       if (!token) return navigate("/admin/login");
       const res = await axios.get(
-        "https://babycare-backend-msyq.onrender.com/api/v1/admin/articulos",
+        `${API_URL}/v1/admin/articulos`,
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setData(res.data);
 
       const statsRes = await axios.get(
-        "https://babycare-backend-msyq.onrender.com/api/v1/admin/articulos/stats",
+        `${API_URL}/v1/admin/articulos/stats`,
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setStats(statsRes.data);
@@ -137,7 +138,7 @@ export default function AdminArticulos() {
       const token = localStorage.getItem("admin_token");
       if (isEditing) {
         await axios.put(
-          `https://babycare-backend-msyq.onrender.com/api/v1/admin/articulos/${editId}`,
+          `${API_URL}/v1/admin/articulos/${editId}`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -145,7 +146,7 @@ export default function AdminArticulos() {
         );
       } else {
         await axios.post(
-          "https://babycare-backend-msyq.onrender.com/api/v1/admin/articulos",
+          `${API_URL}/v1/admin/articulos`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },

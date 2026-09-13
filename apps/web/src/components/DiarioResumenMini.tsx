@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Loader2 } from "lucide-react";
 import { Lineas, duracion } from "./EstadisticasDiario";
 
-const API_URL = "https://babycare-backend-msyq.onrender.com/api";
+import { API_URL } from "../config/api";
 
 /**
  * Versión compacta de los gráficos de Patrones del Diario, para el

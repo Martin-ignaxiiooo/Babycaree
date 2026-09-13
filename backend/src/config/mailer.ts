@@ -6,6 +6,17 @@ const BREVO_API_KEY = process.env.BREVO_API_KEY || "";
 const SENDER_EMAIL = process.env.SMTP_FROM_EMAIL || "babyyycareee@gmail.com";
 const SENDER_NAME = "Baby Care";
 
+/**
+ * URL pública del frontend, usada para armar los enlaces que van en los
+ * correos (por ejemplo, el de aceptar una invitación).
+ *
+ * Estaba escrita a mano acá: si el dominio cambiaba, los correos seguían
+ * enviando enlaces al dominio viejo sin que nada fallara visiblemente.
+ * El valor por defecto es el dominio actual, así que si no se define
+ * APP_URL todo sigue funcionando igual.
+ */
+const APP_URL = process.env.APP_URL || "https://babycaree-web.vercel.app";
+
 async function sendEmail(to: string, subject: string, html: string): Promise<void> {
   const response = await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST",
@@ -133,7 +144,7 @@ export const sendInvitationAlert = async (
   nombreBebe: string,
   tokenInvitacion: string,
 ): Promise<void> => {
-  const enlace = `https://babycaree-web.vercel.app/invitacion/${tokenInvitacion}`;
+  const enlace = `${APP_URL}/invitacion/${tokenInvitacion}`;
   await sendEmail(
     email,
     `Has sido invitado a ver el perfil de ${nombreBebe} — Baby Care`,

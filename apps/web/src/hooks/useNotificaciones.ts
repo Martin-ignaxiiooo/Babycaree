@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-const API_URL = "https://babycare-backend-msyq.onrender.com/api";
+import { API_URL } from "../config/api";
 
 /**
  * Gestiona el permiso y la suscripción a notificaciones push.

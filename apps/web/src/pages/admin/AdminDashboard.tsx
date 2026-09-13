@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../../config/api";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ export default function AdminDashboard() {
         const token = localStorage.getItem("admin_token");
         if (!token) return navigate("/admin/login");
         const res = await axios.get(
-          "https://babycare-backend-msyq.onrender.com/api/v1/admin/dashboard/stats",
+          `${API_URL}/v1/admin/dashboard/stats`,
           {
             headers: { Authorization: `Bearer ${token}` },
           },
