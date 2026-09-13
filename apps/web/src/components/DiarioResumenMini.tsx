@@ -11,7 +11,7 @@ const API_URL = "https://babycare-backend-msyq.onrender.com/api";
  * 7/14/30 días). Reutiliza el mismo componente Lineas para no duplicar
  * la lógica de dibujo del gráfico.
  */
-export default function DiarioResumenMini({ bebeId, token }: { bebeId: string; token: string }) {
+export default function DiarioResumenMini({ bebeId, token, refreshKey }: { bebeId: string; token: string; refreshKey?: number }) {
   const [datos, setDatos] = useState<any>(null);
   const [cargando, setCargando] = useState(true);
 
@@ -29,7 +29,10 @@ export default function DiarioResumenMini({ bebeId, token }: { bebeId: string; t
     }
   }, [bebeId, token]);
 
-  useEffect(() => { cargar(); }, [cargar]);
+  // refreshKey cambia cada vez que se registra algo desde Accesos
+  // Rápidos, para que estos gráficos se actualicen sin recargar la
+  // página (tienen su propio fetch, aparte del del Dashboard).
+  useEffect(() => { cargar(); }, [cargar, refreshKey]);
 
   if (cargando) {
     return <div style={{ textAlign: "center", padding: "30px" }}><Loader2 size={22} className="spin-icon" color="var(--theme-primary)" /></div>;

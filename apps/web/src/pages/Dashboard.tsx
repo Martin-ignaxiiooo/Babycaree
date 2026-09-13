@@ -23,6 +23,10 @@ export default function Dashboard() {
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
+  // Cambia cada vez que se registra algo desde Accesos Rápidos, para que
+  // los gráficos del diario (que tienen su propio fetch, aparte del de
+  // fetchDashboard) también se refresquen.
+  const [diarioRefreshKey, setDiarioRefreshKey] = useState(0);
   // Notificación cuyo detalle se está viendo en el popup de "Lo que se viene".
   const [notifDetalle, setNotifDetalle] = useState<any | null>(null);
   const [pesoInput, setPesoInput] = useState("");
@@ -462,7 +466,10 @@ export default function Dashboard() {
               <AccesosRapidos
                 bebeId={activeBabyId}
                 token={localStorage.getItem("token")!}
-                onRegistrado={() => fetchDashboard(localStorage.getItem("token")!, activeBabyId)}
+                onRegistrado={() => {
+                  fetchDashboard(localStorage.getItem("token")!, activeBabyId);
+                  setDiarioRefreshKey((k) => k + 1);
+                }}
                 sinTitulo
                 onRegistrarMedidas={
                   (!homeData?.rol_acceso || !homeData.rol_acceso.startsWith('solo_lectura'))
@@ -676,7 +683,7 @@ export default function Dashboard() {
             <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--text)", marginBottom: "20px" }}>
               Patrones del Diario
             </h3>
-            {activeBabyId && <DiarioResumenMini bebeId={activeBabyId} token={localStorage.getItem("token")!} />}
+            {activeBabyId && <DiarioResumenMini bebeId={activeBabyId} token={localStorage.getItem("token")!} refreshKey={diarioRefreshKey} />}
           </div>
         </div>
 
