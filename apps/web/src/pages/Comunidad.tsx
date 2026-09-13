@@ -301,47 +301,53 @@ export default function Comunidad() {
 
         {/* ARTICULOS */}
         {activeTab === "articulos" && (
-          <div className="responsive-grid">
+          <div className="responsive-grid articulos-grid">
             {loading ? <div style={{ padding: "40px", color: "#6B7280", gridColumn: "1/-1", textAlign: "center" }}>Cargando artículos...</div> : articulosData.map(art => (
-              <div key={art.id} onClick={() => navigate(`/comunidad/articulo/${art.id}`)} style={{ 
+              <div key={art.id} className="articulo-card" onClick={() => navigate(`/comunidad/articulo/${art.id}`)} style={{ 
                 background: "var(--surface)", borderRadius: "22px", overflow: "hidden",
                 boxShadow: "0 6px 20px rgba(124,92,191,0.08)", cursor: "pointer",
                 transition: "transform 0.2s, box-shadow 0.2s",
                 display: "flex", flexDirection: "column"
               }} onMouseEnter={e => { e.currentTarget.style.transform="translateY(-4px)"; e.currentTarget.style.boxShadow="0 16px 32px rgba(124,92,191,0.16)"; }} onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 6px 20px rgba(124,92,191,0.08)"; }}>
-                <div style={{ height: "160px", background: "var(--theme-bg-light)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "64px" }}>
+                <div className="articulo-portada" style={{ height: "160px", background: "var(--theme-bg-light)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "64px" }}>
                   {art.imagen_portada}
                 </div>
-                <div style={{ padding: "24px", flex: 1, display: "flex", flexDirection: "column" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-                    <span style={{ fontSize: "12px", fontWeight: 800, color: "var(--theme-primary)", background: "var(--theme-bg-light)", padding: "4px 12px", borderRadius: "12px" }}>
+                <div className="articulo-body" style={{ padding: "24px", flex: 1, display: "flex", flexDirection: "column" }}>
+                  <div className="articulo-meta" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                    <span className="articulo-categoria" style={{ fontSize: "12px", fontWeight: 800, color: "var(--theme-primary)", background: "var(--theme-bg-light)", padding: "4px 12px", borderRadius: "12px" }}>
                       {art.categoria}
                     </span>
-                    <span style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "12px", color: "#6B7280", fontWeight: 600 }}>
+                    <span className="articulo-mins" style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "12px", color: "#6B7280", fontWeight: 600 }}>
                       <Clock size={14} /> 5 min
                     </span>
                   </div>
-                  <h3 style={{ margin: "0 0 12px 0", fontSize: "18px", fontWeight: 800, color: "var(--text)" }}>{art.titulo}</h3>
-                  <p style={{ margin: "0 0 8px 0", fontSize: "14px", color: "#6B7280", lineHeight: "1.5", flex: 1 }}>
+                  <h3 className="articulo-titulo" style={{ margin: "0 0 12px 0", fontSize: "18px", fontWeight: 800, color: "var(--text)" }}>{art.titulo}</h3>
+                  <p className="articulo-resumen" style={{ margin: "0 0 8px 0", fontSize: "14px", color: "#6B7280", lineHeight: "1.5", flex: 1 }}>
                     {truncarTexto(art.resumen, 120)}
                   </p>
                   {art.resumen && art.resumen.length > 120 && (
-                    <span style={{ fontSize: "13px", fontWeight: 700, color: "var(--theme-primary)", marginBottom: "16px" }}>
+                    <span className="articulo-leer-mas" style={{ fontSize: "13px", fontWeight: 700, color: "var(--theme-primary)", marginBottom: "16px" }}>
                       Leer artículo completo →
                     </span>
                   )}
-                  <button
-                    onClick={(e) => handleLikeArticulo(e, art.id)}
-                    style={{
-                      display: "flex", alignItems: "center", gap: "6px", alignSelf: "flex-start",
-                      background: "none", border: "none", cursor: "pointer", padding: "4px 0",
-                      marginTop: "8px",
-                      color: art.has_liked ? "var(--theme-primary)" : "#6B7280",
-                    }}
-                  >
-                    <ThumbsUp size={16} fill={art.has_liked ? "var(--theme-primary)" : "none"} />
-                    <span style={{ fontWeight: 700, fontSize: "13px" }}>{art.likes || 0}</span>
-                  </button>
+                  <div className="articulo-footer" style={{ display: "flex", alignItems: "center", justifyContent: "flex-start", gap: "10px" }}>
+                    <span className="articulo-categoria-movil" style={{ display: "none", fontSize: "10.5px", fontWeight: 800, color: "var(--theme-primary)", background: "var(--theme-bg-light)", padding: "3px 9px", borderRadius: "10px" }}>
+                      {art.categoria}
+                    </span>
+                    <button
+                      className="articulo-like"
+                      onClick={(e) => handleLikeArticulo(e, art.id)}
+                      style={{
+                        display: "flex", alignItems: "center", gap: "6px",
+                        background: "none", border: "none", cursor: "pointer", padding: "4px 0",
+                        marginTop: "8px",
+                        color: art.has_liked ? "var(--theme-primary)" : "#6B7280",
+                      }}
+                    >
+                      <ThumbsUp size={16} fill={art.has_liked ? "var(--theme-primary)" : "none"} />
+                      <span style={{ fontWeight: 700, fontSize: "13px" }}>{art.likes || 0}</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
