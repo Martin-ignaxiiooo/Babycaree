@@ -17,7 +17,7 @@ import {
  * ("pañal con pipí amarillo" → tipo pipí, nota "amarillo").
  */
 
-export type TipoRegistro = "panal" | "alimentacion" | "sueno" | "cita" | "medidas";
+export type TipoRegistro = "panal" | "alimentacion" | "sueno" | "despertar" | "cita" | "medidas";
 
 export interface RegistroDictado {
   tipo: TipoRegistro;
@@ -154,8 +154,22 @@ export function clasificarDictado(textoOriginal: string, ahora = new Date()): Re
     };
   }
 
+  // ── Despertar ────────────────────────────────────────────────────────
+  // Va antes de "dormir" a propósito: "ya despertó de la siesta" contiene
+  // ambas familias de palabras, y la intención real es cerrar el sueño.
+  if (/\b(desperto|despierta|despierto|desperte|levanto|levanta)\b/.test(texto)) {
+    return {
+      tipo: "despertar",
+      resumen: "Fin del sueño: el bebé despertó",
+      detalles: [{ etiqueta: "Acción", valor: "Cerrar el sueño en curso" }],
+      // No lleva datos: el componente necesita el id del sueño abierto,
+      // que solo se conoce al momento de guardar.
+      datos: {},
+    };
+  }
+
   // ── Sueño ────────────────────────────────────────────────────────────
-  if (/\b(durmio|duerme|dormir|siesta|desperto|despierta)\b/.test(texto)) {
+  if (/\b(durmio|duerme|dormir|durmiendo|siesta|acosto|acuesta)\b/.test(texto)) {
     const hora = extraerHora(texto);
     const inicio = new Date(ahora);
     if (hora) inicio.setHours(hora.hora, hora.minuto, 0, 0);

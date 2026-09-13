@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Mic, MicOff, X, Volume2, Baby, Milk, Moon, CalendarClock, Ruler } from "lucide-react";
+import { Mic, MicOff, X, Volume2, Baby, Milk, Moon, Sun, CalendarClock, Ruler } from "lucide-react";
 import { useDictado } from "../hooks/useDictado";
 import { clasificarDictado, type RegistroDictado, type TipoRegistro } from "../utils/clasificarDictado";
 import { hablar, callar, vozActiva } from "../utils/voz";
@@ -10,6 +10,7 @@ const ICONOS: Record<TipoRegistro, any> = {
   panal: Baby,
   alimentacion: Milk,
   sueno: Moon,
+  despertar: Sun,
   cita: CalendarClock,
   medidas: Ruler,
 };
@@ -18,6 +19,7 @@ const TITULOS: Record<TipoRegistro, string> = {
   panal: "Cambio de pañal",
   alimentacion: "Alimentación",
   sueno: "Sueño",
+  despertar: "Ya despertó",
   cita: "Cita médica",
   medidas: "Medidas",
 };
@@ -61,7 +63,26 @@ export default function ModalDictadoUniversal({ bebeId, token, onClose, onSaved 
     callar();
     try {
       let res: Response;
-      if (interpretado.tipo === "cita") {
+      if (interpretado.tipo === "despertar") {
+        // Cerrar un sueño necesita el id del que está abierto, que no se
+        // puede saber al interpretar el texto: se consulta acá.
+        const resumenRes = await fetch(`${API_URL}/v1/diario/${bebeId}/registros/resumen`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const resumen = resumenRes.ok ? await resumenRes.json() : null;
+        const suenoAbierto = resumen?.sueno_en_curso;
+
+        if (!suenoAbierto?.id) {
+          setError("No hay ningún sueño en curso para cerrar.");
+          setGuardando(false);
+          return;
+        }
+
+        res = await fetch(`${API_URL}/v1/diario/${bebeId}/registros/${suenoAbierto.id}/despertar`, {
+          method: "PATCH",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } else if (interpretado.tipo === "cita") {
         res = await fetch(`${API_URL}/v1/salud/${bebeId}/citas`, {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
