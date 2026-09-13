@@ -153,22 +153,8 @@ export default function Comunidad() {
       </div>
 
       <div className="page-container" style={{ marginTop: "-14px" }}>
-        
-        <div style={{ marginBottom: "24px", display: "flex", justifyContent: "flex-end", flexWrap: "wrap", gap: "16px" }}>
-          {activeTab === "foros" && (
-            <button style={{ 
-              background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))", color: "#fff", border: "none", 
-              padding: "12px 24px", borderRadius: "14px", fontWeight: 800, 
-              cursor: "pointer", display: "flex", alignItems: "center", gap: "8px",
-              boxShadow: "0 8px 20px var(--theme-shadow-light)"
-            }} onClick={() => setShowModal(true)}>
-              <MessageCircle size={20} />
-              Crear nuevo tema
-            </button>
-          )}
-        </div>
 
-        <div className="responsive-overflow" style={{ display: "flex", gap: "10px", marginBottom: "32px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "16px", whiteSpace: "nowrap" }}>
+        <div className="responsive-overflow comunidad-tabs-row" style={{ display: "flex", gap: "10px", marginBottom: "32px", borderBottom: "1px solid var(--theme-bg-light)", paddingBottom: "16px", whiteSpace: "nowrap" }}>
           <button 
             onClick={() => setActiveTab("foros")}
             style={{ 
@@ -201,43 +187,20 @@ export default function Comunidad() {
         <div className="comunidad-grid" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1.9fr) minmax(260px, 1fr)", gap: "22px", alignItems: "start" }}>
           <div style={{ display: "grid", gap: "16px" }}>
 
-            {/* Compositor: abre el mismo modal que el botón de arriba, pero
-                acá arriba del feed es donde uno espera encontrarlo. */}
-            <div
+            <button
               onClick={() => setShowModal(true)}
               style={{
-                display: "flex", alignItems: "center", gap: "14px",
-                background: "var(--surface)", borderRadius: "20px", padding: "16px 18px",
-                boxShadow: "0 6px 20px rgba(124,92,191,0.08)", cursor: "pointer",
+                background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
+                color: "#fff", border: "none", borderRadius: "16px", padding: "14px 24px",
+                fontWeight: 800, fontSize: "14.5px", cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
+                boxShadow: "0 8px 20px var(--theme-shadow-light)",
+                fontFamily: "'Nunito', sans-serif",
               }}
             >
-              <div style={{
-                width: "42px", height: "42px", borderRadius: "50%", flexShrink: 0,
-                background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                color: "#fff", fontWeight: 900, fontSize: "17px", fontFamily: "'Baloo 2', sans-serif",
-              }}>
-                {(user?.nombre ?? "?").charAt(0).toUpperCase()}
-              </div>
-              <div style={{
-                flex: 1, background: "var(--surface-2)", border: "1px solid var(--border)",
-                borderRadius: "100px", padding: "12px 18px",
-                fontSize: "14px", color: "var(--text-muted)",
-              }}>
-                ¿Qué quieres compartir hoy?
-              </div>
-              <button
-                onClick={(e) => { e.stopPropagation(); setShowModal(true); }}
-                style={{
-                  background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
-                  color: "#fff", border: "none", borderRadius: "100px", padding: "11px 22px",
-                  fontWeight: 800, fontSize: "13.5px", cursor: "pointer", whiteSpace: "nowrap",
-                  fontFamily: "'Nunito', sans-serif",
-                }}
-              >
-                Publicar
-              </button>
-            </div>
+              <MessageCircle size={20} />
+              Crear nuevo tema
+            </button>
 
             {loading ? <div style={{ padding: "40px", textAlign: "center", color: "var(--text-muted)" }}>Cargando foros...</div> : forosData.map(foro => (
               <div key={foro.id} onClick={() => navigate(`/comunidad/foro/${foro.id}`)} style={{ 

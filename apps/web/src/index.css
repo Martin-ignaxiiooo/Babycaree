@@ -709,6 +709,23 @@ body {
     justify-content: center !important;
   }
 
+  /* Pestañas de Comunidad (Temas a compartir / Artículos educativos):
+     mismo caso que Perfil del bebé — 2 pestañas con texto largo que
+     quedaban cortadas con scroll lateral. Se reparten el ancho. */
+  .comunidad-tabs-row {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    white-space: normal !important;
+    overflow: visible !important;
+  }
+  .comunidad-tabs-row button {
+    padding: 11px 8px !important;
+    font-size: 12.5px !important;
+    justify-content: center !important;
+    line-height: 1.25 !important;
+  }
+
   /* Calendario de controles (Salud): en desktop es calendario + detalle
      lado a lado; en móvil se apilan (calendario arriba, detalle abajo)
      en vez de superponerse por falta de espacio horizontal. */
