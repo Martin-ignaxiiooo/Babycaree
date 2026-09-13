@@ -4,6 +4,7 @@ import {
 } from "lucide-react";
 import { useDictado } from "../hooks/useDictado";
 import { interpretarDictado } from "../utils/interpretarDictado";
+import ModalDictadoUniversal from "./ModalDictadoUniversal";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api";
 
@@ -615,7 +616,7 @@ function ModalRegistrarVacuna({ bebeId, token, onClose, onSaved }: any) {
 /* ────────────────────────────────────────────────────────────────
    Componente principal: fila de accesos rápidos + modales
    ──────────────────────────────────────────────────────────────── */
-type AccionRapida = "toma" | "sueno" | "panal" | "cita" | "vacuna" | null;
+type AccionRapida = "toma" | "sueno" | "panal" | "cita" | "vacuna" | "dictado" | null;
 
 export default function AccesosRapidos({ bebeId, token, onRegistrado, sinTitulo, onRegistrarMedidas }: { bebeId: string; token: string; onRegistrado?: () => void; sinTitulo?: boolean; onRegistrarMedidas?: () => void }) {
   const [abierto, setAbierto] = useState<AccionRapida>(null);
@@ -653,6 +654,12 @@ export default function AccesosRapidos({ bebeId, token, onRegistrado, sinTitulo,
     }
   };
 
+  // Igual que en useDictado: Firefox no implementa esta API. Se detecta
+  // acá directamente para decidir si mostrar el botón, sin montar el hook
+  // completo (que además crearía un reconocedor de voz sin usarlo).
+  const dictadoSoportado = typeof window !== "undefined" &&
+    Boolean((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);
+
   const botones: { key: AccionRapida; icon: any; label: string; bg: string; color: string; onClick?: () => void }[] = [
     { key: "toma", icon: Milk, label: "Registrar alimentación", bg: "#E3F2FD", color: "#1976D2" },
     suenoEnCurso
@@ -673,6 +680,28 @@ export default function AccesosRapidos({ bebeId, token, onRegistrado, sinTitulo,
           Accesos rápidos
         </h3>
       )}
+      {/* Dictado universal: solo aparece si el navegador soporta
+          reconocimiento de voz (Firefox no lo tiene). Los botones de
+          abajo se mantienen para quien prefiere tocar, o para cuando
+          hablarle al teléfono es incómodo (lugares públicos). */}
+      {dictadoSoportado && (
+        <button
+          onClick={() => setAbierto("dictado")}
+          style={{
+            width: "100%", marginBottom: "10px", border: "none", borderRadius: "18px",
+            padding: "14px", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
+            background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: "10px",
+            boxShadow: "0 6px 18px var(--theme-shadow-light)",
+          }}
+        >
+          <div style={{ width: "38px", height: "38px", borderRadius: "50%", background: "rgba(255,255,255,0.22)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Mic size={19} color="#fff" />
+          </div>
+          <span style={{ fontSize: "14px", fontWeight: 800, color: "#fff" }}>Registrar hablando</span>
+        </button>
+      )}
+
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))", gap: "10px" }}>
         {botones.map(({ key, icon: Icon, label, bg, color, onClick }) => (
           <button
@@ -698,6 +727,7 @@ export default function AccesosRapidos({ bebeId, token, onRegistrado, sinTitulo,
       {abierto === "sueno" && <ConfirmarSueno bebeId={bebeId} token={token} onClose={() => setAbierto(null)} onSaved={onSaved} />}
       {abierto === "cita" && <ModalAgendarCita bebeId={bebeId} token={token} onClose={() => setAbierto(null)} onSaved={onSaved} />}
       {abierto === "vacuna" && <ModalRegistrarVacuna bebeId={bebeId} token={token} onClose={() => setAbierto(null)} onSaved={onSaved} />}
+      {abierto === "dictado" && <ModalDictadoUniversal bebeId={bebeId} token={token} onClose={() => setAbierto(null)} onSaved={onSaved} />}
     </div>
   );
 }

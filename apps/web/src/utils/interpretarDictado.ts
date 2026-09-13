@@ -27,7 +27,7 @@ const MESES: Record<string, number> = {
 };
 
 // Números escritos con palabras, para horas y días dictados.
-const NUMEROS: Record<string, number> = {
+export const NUMEROS: Record<string, number> = {
   una: 1, uno: 1, dos: 2, tres: 3, cuatro: 4, cinco: 5, seis: 6,
   siete: 7, ocho: 8, nueve: 9, diez: 10, once: 11, doce: 12,
   trece: 13, catorce: 14, quince: 15, dieciseis: 16, dieciséis: 16,
@@ -47,7 +47,7 @@ const ESPECIALIDADES = [
   "fonoaudiologia", "odontología", "odontologia", "matrona", "urgencia",
 ];
 
-function quitarTildes(s: string): string {
+export function quitarTildes(s: string): string {
   return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
@@ -71,7 +71,7 @@ function recortarNombre(s: string): string {
 }
 
 /** Extrae la hora: "a las 10 y media", "a las 15:30", "a las tres de la tarde". */
-function extraerHora(texto: string): { hora: number; minuto: number } | null {
+export function extraerHora(texto: string): { hora: number; minuto: number } | null {
   // Formato numérico directo: 10:30, 15.45
   const conDosPuntos = texto.match(/\b(\d{1,2})[:.](\d{2})\b/);
   if (conDosPuntos) {
@@ -99,7 +99,16 @@ function extraerHora(texto: string): { hora: number; minuto: number } | null {
 
   // "de la tarde" / "de la noche" convierte a formato 24h.
   const esTarde = /de\s+la\s+(tarde|noche)|pm\b/.test(texto);
-  if (esTarde && hora < 12) hora += 12;
+  const esManana = /de\s+la\s+ma[ñn]ana|am\b|madrugada/.test(texto);
+  if (esTarde && hora < 12) {
+    hora += 12;
+  } else if (!esManana && hora >= 1 && hora <= 7) {
+    // Sin indicación de AM/PM, las horas entre 1 y 7 se asumen de la
+    // tarde: "a las 5" en una cita médica es 17:00, no las 5 de la
+    // madrugada. Las de 8 a 12 se dejan como están (8, 9, 10, 11 de la
+    // mañana son horarios habituales de consulta).
+    hora += 12;
+  }
 
   return { hora, minuto: Math.min(minuto, 59) };
 }

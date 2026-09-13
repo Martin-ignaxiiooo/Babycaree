@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, User, Mail, Save, ChevronRight } from "lucide-react";
 import TopNav from "../components/TopNav";
 import { useNotificaciones } from "../hooks/useNotificaciones";
+import { vozSoportada, vozActiva, setVozActiva } from "../utils/voz";
 
 export default function MiPerfil() {
   const notif = useNotificaciones();
@@ -32,6 +33,9 @@ export default function MiPerfil() {
   // Preferencias de recordatorios de citas por correo/push: activo o no, y
   // cuáles de las 5 ventanas disponibles quiere recibir.
   const [recordatoriosActivos, setRecordatoriosActivos] = useState(true);
+  // Preferencia local (no va al backend): si la app confirma en voz alta
+  // lo que entendió al registrar hablando.
+  const [vozConfirmacion, setVozConfirmacion] = useState(() => vozActiva());
   const [recordatoriosHoras, setRecordatoriosHoras] = useState<number[]>([168, 24, 2]);
   const [guardandoRecordatorios, setGuardandoRecordatorios] = useState(false);
 
@@ -368,6 +372,29 @@ export default function MiPerfil() {
                 Puedes elegir varias, ninguna, o todas. Los recordatorios llegan por correo y, si activaste las notificaciones de arriba, también al teléfono.
               </p>
             </Tarjeta>
+
+            {/* Confirmación hablada del dictado universal */}
+            {vozSoportada() && (
+              <Tarjeta>
+                <Titulo>Registro por voz</Titulo>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", marginTop: "16px", flexWrap: "wrap" }}>
+                  <div style={{ flex: "1 1 240px", minWidth: 0 }}>
+                    <div style={{ fontSize: "14.5px", fontWeight: 800, color: "#3F3A52" }}>Confirmar en voz alta</div>
+                    <div style={{ fontSize: "12.5px", color: "#8A849C", marginTop: "2px" }}>
+                      Al registrar hablando, la app lee lo que entendió antes de guardar. Puedes apagarlo si el bebé está durmiendo.
+                    </div>
+                  </div>
+                  <Interruptor
+                    activo={vozConfirmacion}
+                    onClick={() => {
+                      const nuevo = !vozConfirmacion;
+                      setVozConfirmacion(nuevo);
+                      setVozActiva(nuevo);
+                    }}
+                  />
+                </div>
+              </Tarjeta>
+            )}
 
             {/* Privacidad */}
             <Tarjeta>
