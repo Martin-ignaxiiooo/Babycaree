@@ -29,14 +29,48 @@ export interface RegistroDictado {
   datos: any;
 }
 
+/**
+ * Un número dictado: en dígitos ("120", "7,2") o en palabras, incluyendo
+ * compuestos con o sin "y" ("sesenta y cinco", "ciento veinte"). El
+ * dictado del navegador transcribe de las dos formas según el caso.
+ */
+const NUM_PALABRA = String.raw`(\d+(?:[.,]\d+)?|[a-z]+(?:\s+(?:y\s+)?[a-z]+)?)`;
+
 /** Convierte "ciento veinte" o "120" a número. Devuelve null si no hay. */
 function numeroCercaDe(texto: string, patron: RegExp): number | null {
   const m = texto.match(patron);
   if (!m) return null;
-  const bruto = m[1];
-  if (/^\d+([.,]\d+)?$/.test(bruto)) return Number(bruto.replace(",", "."));
-  return NUMEROS[quitarTildes(bruto)] ?? null;
+  return aNumero(m[1]);
 }
+
+/**
+ * Interpreta un número escrito en dígitos o en palabras, incluyendo
+ * compuestos con "y": "sesenta y cinco" → 65, "ciento veinte" → 120.
+ * El dictado del navegador a veces transcribe los números como palabras,
+ * sobre todo cuando se hablan seguidos de una unidad.
+ */
+function aNumero(bruto: string): number | null {
+  const limpio = quitarTildes(bruto.trim().toLowerCase());
+  if (/^\d+([.,]\d+)?$/.test(limpio)) return Number(limpio.replace(",", "."));
+
+  // Suma las partes: "sesenta y cinco" = 60 + 5, "ciento veinte" = 100 + 20.
+  const partes = limpio.split(/\s+y\s+|\s+/).filter(Boolean);
+  let total = 0;
+  let encontroAlguno = false;
+  for (const p of partes) {
+    const v = NUMEROS[p] ?? DECENAS_CENTENAS[p];
+    if (v == null) return encontroAlguno ? total : null;
+    total += v;
+    encontroAlguno = true;
+  }
+  return encontroAlguno ? total : null;
+}
+
+/** Decenas y centenas que no están en el mapa NUMEROS (que llega a 31). */
+const DECENAS_CENTENAS: Record<string, number> = {
+  cuarenta: 40, cincuenta: 50, sesenta: 60, setenta: 70, ochenta: 80,
+  noventa: 90, cien: 100, ciento: 100, doscientos: 200, trescientos: 300,
+};
 
 /**
  * Quita del texto las partes que ya se interpretaron como datos, para que
@@ -82,12 +116,12 @@ export function clasificarDictado(textoOriginal: string, ahora = new Date()): Re
   // ── Alimentación ─────────────────────────────────────────────────────
   if (/\b(biberon|mamadera|pecho|teta|mamo|mamar|tomo|tomar|lactancia|alimentacion|comio)\b/.test(texto)) {
     const esBiberon = /\b(biberon|mamadera)\b/.test(texto);
-    const ml = numeroCercaDe(texto, /\b(\d+|[a-z]+)\s*(?:ml\b|mililitros?)/);
-    const min = numeroCercaDe(texto, /\b(\d+|[a-z]+)\s*(?:min\b|minutos?)/);
+    const ml = numeroCercaDe(texto, new RegExp(String.raw`\b${NUM_PALABRA}\s*(?:ml\b|mililitros?)`));
+    const min = numeroCercaDe(texto, new RegExp(String.raw`\b${NUM_PALABRA}\s*(?:min\b|minutos?)`));
 
     const nota = restoComoNota(texto, [
       /\b(biberon|mamadera|pecho|teta|mamo|mamar|tomo|tomar|lactancia|alimentacion|comio)\b/g,
-      /\b(\d+|[a-z]+)\s*(?:ml\b|mililitros?|min\b|minutos?)/g,
+      new RegExp(String.raw`\b${NUM_PALABRA}\s*(?:ml\b|mililitros?|min\b|minutos?)`, "g"),
     ]);
 
     if (esBiberon) {
@@ -135,12 +169,14 @@ export function clasificarDictado(textoOriginal: string, ahora = new Date()): Re
   }
 
   // ── Medidas ──────────────────────────────────────────────────────────
-  if (/\b(peso|pesa|pesó|kilos?|kg\b|midio|mide|talla|centimetros?|cm\b)\b/.test(texto)) {
-    const kilos = numeroCercaDe(texto, /\b(\d+(?:[.,]\d+)?|[a-z]+)\s*(?:kilos?|kg\b)/);
+  if (/\b(peso|pesa|peso|kilos?|kg\b|midio|mide|medir|talla|estatura|centimetros?|cm\b)\b/.test(texto)) {
+    const kilos = numeroCercaDe(texto, new RegExp(String.raw`\b${NUM_PALABRA}\s*(?:kilos?|kg\b)`))
+      ?? numeroCercaDe(texto, new RegExp(String.raw`\b(?:peso|pesa)\s+${NUM_PALABRA}`));
     // "7 kilos 200" → los gramos vienen sueltos después de los kilos.
-    const gramos = texto.match(/\b\d+(?:[.,]\d+)?\s*(?:kilos?|kg\b)\s*(\d{2,3})\b/);
-    const cm = numeroCercaDe(texto, /\b(\d+(?:[.,]\d+)?|[a-z]+)\s*(?:centimetros?|cm\b)/)
-      ?? numeroCercaDe(texto, /\b(?:midio|mide)\s+(\d+(?:[.,]\d+)?)/);
+    const gramos = texto.match(/\b\d+(?:[.,]\d+)?\s*(?:kilos?|kg\b)\s*(?:con\s+)?(\d{2,3})\b/);
+
+    const cm = numeroCercaDe(texto, new RegExp(String.raw`\b${NUM_PALABRA}\s*(?:centimetros?|cms?\b)`))
+      ?? numeroCercaDe(texto, new RegExp(String.raw`\b(?:midio|mide|medir|talla|estatura)\s+(?:de\s+)?${NUM_PALABRA}`));
 
     let peso = kilos;
     if (peso != null && gramos) peso = peso + Number(gramos[1]) / 1000;
