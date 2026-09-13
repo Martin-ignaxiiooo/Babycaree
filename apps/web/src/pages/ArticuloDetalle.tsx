@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Clock, FileText, Eye, Star, ThumbsUp } from "lucide-react";
+import { ArrowLeft, FileText, Eye, Star, ThumbsUp } from "lucide-react";
 import axios from "axios";
 
 const API_URL = "https://babycare-backend-msyq.onrender.com/api/v1";
@@ -85,7 +85,6 @@ export default function ArticuloDetalle() {
               <FileText size={13} /> {articulo.categoria}
             </span>
             <div style={{ fontSize: "11.5px", color: "var(--text-muted)", fontWeight: 600, marginTop: "5px", display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-              <span style={{ display: "flex", alignItems: "center", gap: "4px" }}><Clock size={13} /> {articulo.rango_edad_meses}</span>
               <span style={{ display: "flex", alignItems: "center", gap: "4px" }}><Eye size={13} /> {articulo.contador_lecturas} vistas</span>
             </div>
           </div>
