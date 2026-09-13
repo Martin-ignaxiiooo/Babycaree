@@ -67,62 +67,75 @@ export default function ArticuloDetalle() {
       </nav>
 
       {/* ── CONTENIDO DEL ARTÍCULO ── */}
-      <div style={{ flex: 1, padding: "40px", maxWidth: "800px", margin: "0 auto", width: "100%" }}>
-        
-        {/* Cabecera visual */}
-        <div style={{ background: "linear-gradient(135deg, var(--theme-bg-light), var(--accent-coral-light))", borderRadius: "26px", padding: "60px 40px", display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "32px", fontSize: "80px", boxShadow: "0 8px 30px rgba(124,92,191,0.1)" }}>
-          {articulo.imagen_portada}
-        </div>
+      <div className="articulo-detalle" style={{ flex: 1, padding: "32px 24px 48px", maxWidth: "800px", margin: "0 auto", width: "100%" }}>
 
-        {/* Metadatos */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "12px" }}>
-          <span style={{ fontSize: "14px", fontWeight: 800, color: "var(--theme-primary)", background: "var(--theme-bg-light)", padding: "6px 16px", borderRadius: "16px", display: "flex", alignItems: "center", gap: "6px" }}>
-            <FileText size={16} /> {articulo.categoria}
-          </span>
-          <div style={{ display: "flex", gap: "16px", color: "var(--text-muted)", fontWeight: 600, fontSize: "14px" }}>
-            <span style={{ display: "flex", alignItems: "center", gap: "6px" }}><Clock size={16} /> Lectura recomendada ({articulo.rango_edad_meses})</span>
-            <span style={{ display: "flex", alignItems: "center", gap: "6px" }}><Eye size={16} /> {articulo.contador_lecturas} vistas</span>
+        {/* Ícono + categoría + datos, en una sola fila compacta. Antes el
+            ícono ocupaba un bloque de ~200px de alto que en móvil se comía
+            media pantalla sin aportar información. */}
+        <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "18px" }}>
+          <div className="articulo-detalle-icono" style={{
+            width: "56px", height: "56px", borderRadius: "16px", flexShrink: 0,
+            background: "var(--theme-bg-light)", display: "flex",
+            alignItems: "center", justifyContent: "center", fontSize: "28px",
+          }}>
+            {articulo.imagen_portada}
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <span style={{ fontSize: "11.5px", fontWeight: 800, color: "var(--theme-primary)", background: "var(--theme-bg-light)", padding: "4px 11px", borderRadius: "10px", display: "inline-flex", alignItems: "center", gap: "5px" }}>
+              <FileText size={13} /> {articulo.categoria}
+            </span>
+            <div style={{ fontSize: "11.5px", color: "var(--text-muted)", fontWeight: 600, marginTop: "5px", display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+              <span style={{ display: "flex", alignItems: "center", gap: "4px" }}><Clock size={13} /> {articulo.rango_edad_meses}</span>
+              <span style={{ display: "flex", alignItems: "center", gap: "4px" }}><Eye size={13} /> {articulo.contador_lecturas} vistas</span>
+            </div>
           </div>
         </div>
 
         {/* Título */}
-        <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "32px", fontWeight: 700, color: "var(--text)", margin: "0 0 24px 0", lineHeight: "1.25" }}>
+        <h1 className="articulo-detalle-titulo" style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "30px", fontWeight: 700, color: "var(--text)", margin: "0 0 16px 0", lineHeight: "1.28" }}>
           {articulo.titulo}
         </h1>
 
-        <div style={{ background: "var(--surface)", padding: "32px", borderRadius: "24px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)" }}>
-          <p style={{ margin: "0 0 32px 0", fontSize: "18px", color: "#4B5563", lineHeight: "1.6", fontWeight: 600 }}>
-            {articulo.resumen}
-          </p>
+        {/* Resumen y contenido van directo sobre el fondo, sin una tarjeta
+            que agregue otro nivel de padding (antes: 40px del contenedor +
+            32px de la tarjeta, dejando muy poco ancho real en móvil). */}
+        <p className="articulo-detalle-resumen" style={{ margin: "0 0 20px 0", fontSize: "16px", color: "#4B4560", lineHeight: "1.6", fontWeight: 700 }}>
+          {articulo.resumen}
+        </p>
 
-          <div style={{ fontSize: "16px", color: "#374151", lineHeight: "1.8", whiteSpace: "pre-wrap" }}>
-            {articulo.contenido_completo}
+        <div style={{ height: "1px", background: "var(--theme-bg-light)", marginBottom: "20px" }} />
+
+        <div className="articulo-detalle-texto" style={{ fontSize: "16px", color: "#374151", lineHeight: "1.8", whiteSpace: "pre-wrap" }}>
+          {articulo.contenido_completo}
+        </div>
+
+        <div style={{ marginTop: "32px", paddingTop: "20px", borderTop: "1px solid var(--theme-bg-light)" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", flexWrap: "wrap", marginBottom: "14px" }}>
+            {articulo.calificacion_utilidad && (
+              <div style={{ display: "flex", alignItems: "center", gap: "4px", color: "#F59E0B", fontWeight: 700, fontSize: "14px" }}>
+                <Star size={17} fill="#F59E0B" /> {articulo.calificacion_utilidad}/5
+              </div>
+            )}
+            <button
+              onClick={handleLike}
+              className="articulo-detalle-like"
+              style={{
+                display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
+                background: articulo.has_liked
+                  ? "linear-gradient(135deg, var(--theme-primary), var(--theme-light))"
+                  : "var(--surface-2)",
+                color: articulo.has_liked ? "#fff" : "#4B5563",
+                border: "none", borderRadius: "100px", padding: "12px 26px",
+                fontWeight: 800, fontSize: "14px", cursor: "pointer",
+                fontFamily: "'Nunito', sans-serif",
+              }}
+            >
+              <ThumbsUp size={17} fill={articulo.has_liked ? "#fff" : "none"} />
+              {articulo.likes || 0} me gusta
+            </button>
           </div>
-
-          <div style={{ marginTop: "40px", paddingTop: "24px", borderTop: "2px dashed #E5E7EB", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
-            <div style={{ fontSize: "14px", color: "#9CA3AF" }}>
-              <strong>Fuente:</strong> {articulo.fuente_citada}
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-              {articulo.calificacion_utilidad && (
-                <div style={{ display: "flex", alignItems: "center", gap: "4px", color: "#F59E0B", fontWeight: 700 }}>
-                  <Star size={18} fill="#F59E0B" /> {articulo.calificacion_utilidad}/5
-                </div>
-              )}
-              <button
-                onClick={handleLike}
-                style={{
-                  display: "flex", alignItems: "center", gap: "8px",
-                  background: articulo.has_liked ? "var(--theme-bg-light)" : "#F3F4F6",
-                  color: articulo.has_liked ? "var(--theme-primary)" : "#4B5563",
-                  border: "none", borderRadius: "14px", padding: "10px 18px",
-                  fontWeight: 800, fontSize: "14px", cursor: "pointer",
-                }}
-              >
-                <ThumbsUp size={18} fill={articulo.has_liked ? "var(--theme-primary)" : "none"} />
-                {articulo.likes || 0} {articulo.likes === 1 ? "me gusta" : "me gusta"}
-              </button>
-            </div>
+          <div style={{ fontSize: "11.5px", color: "#9CA3AF", textAlign: "center" }}>
+            <strong>Fuente:</strong> {articulo.fuente_citada}
           </div>
         </div>
 

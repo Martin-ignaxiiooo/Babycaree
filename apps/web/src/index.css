@@ -787,6 +787,31 @@ body {
     display: inline-block !important;
   }
 
+  /* Detalle de artículo: en móvil se reducen los tamaños para que el
+     texto quepa cómodo y el título no ocupe media pantalla. */
+  .articulo-detalle {
+    padding: 20px 18px 40px !important;
+  }
+  .articulo-detalle-icono {
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 24px !important;
+    border-radius: 14px !important;
+  }
+  .articulo-detalle-titulo {
+    font-size: 22px !important;
+  }
+  .articulo-detalle-resumen {
+    font-size: 14.5px !important;
+  }
+  .articulo-detalle-texto {
+    font-size: 15px !important;
+  }
+  /* El botón de like ocupa todo el ancho: más fácil de tocar. */
+  .articulo-detalle-like {
+    width: 100% !important;
+  }
+
   /* Calendario de controles (Salud): en desktop es calendario + detalle
      lado a lado; en móvil se apilan (calendario arriba, detalle abajo)
      en vez de superponerse por falta de espacio horizontal. */
