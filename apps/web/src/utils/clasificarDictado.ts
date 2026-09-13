@@ -68,6 +68,9 @@ function aNumero(bruto: string): number | null {
 
 /** Decenas y centenas que no están en el mapa NUMEROS (que llega a 31). */
 const DECENAS_CENTENAS: Record<string, number> = {
+  // 'un' no está en NUMEROS (tiene 'uno'/'una'), pero es la forma que se
+  // usa delante de una unidad: "un metro", "un kilo".
+  un: 1,
   cuarenta: 40, cincuenta: 50, sesenta: 60, setenta: 70, ochenta: 80,
   noventa: 90, cien: 100, ciento: 100, doscientos: 200, trescientos: 300,
 };
@@ -169,14 +172,34 @@ export function clasificarDictado(textoOriginal: string, ahora = new Date()): Re
   }
 
   // ── Medidas ──────────────────────────────────────────────────────────
-  if (/\b(peso|pesa|peso|kilos?|kg\b|midio|mide|medir|talla|estatura|centimetros?|cm\b)\b/.test(texto)) {
+  if (/\b(peso|pesa|kilos?|kg\b|midio|mide|medir|talla|estatura|centimetros?|cms?\b|metros?)\b/.test(texto)) {
     const kilos = numeroCercaDe(texto, new RegExp(String.raw`\b${NUM_PALABRA}\s*(?:kilos?|kg\b)`))
       ?? numeroCercaDe(texto, new RegExp(String.raw`\b(?:peso|pesa)\s+${NUM_PALABRA}`));
     // "7 kilos 200" → los gramos vienen sueltos después de los kilos.
     const gramos = texto.match(/\b\d+(?:[.,]\d+)?\s*(?:kilos?|kg\b)\s*(?:con\s+)?(\d{2,3})\b/);
 
-    const cm = numeroCercaDe(texto, new RegExp(String.raw`\b${NUM_PALABRA}\s*(?:centimetros?|cms?\b)`))
-      ?? numeroCercaDe(texto, new RegExp(String.raw`\b(?:midio|mide|medir|talla|estatura)\s+(?:de\s+)?${NUM_PALABRA}`));
+    // Talla en metros: "un metro", "un metro veinte", "1,20 metros".
+    // Se convierte a centímetros, que es como se guarda.
+    // Antes de "metro" se captura UNA sola palabra o número: si se
+    // permitiera un compuesto, "un metro veinte" se leería entero como
+    // el número de metros y se perdería el "veinte".
+    let cm: number | null = null;
+    const enMetros = texto.match(
+      new RegExp(String.raw`\b(\d+(?:[.,]\d+)?|[a-z]+)\s*metros?\s*(?:(?:con|y)\s+)?${NUM_PALABRA}?`),
+    );
+    if (enMetros) {
+      const metros = aNumero(enMetros[1]);
+      if (metros != null) {
+        // Lo que sigue al metro son centímetros: "un metro veinte" = 120.
+        const resto = enMetros[2] ? aNumero(enMetros[2]) : null;
+        cm = Math.round(metros * 100 + (resto ?? 0));
+      }
+    }
+
+    if (cm == null) {
+      cm = numeroCercaDe(texto, new RegExp(String.raw`\b${NUM_PALABRA}\s*(?:centimetros?|cms?\b)`))
+        ?? numeroCercaDe(texto, new RegExp(String.raw`\b(?:midio|mide|medir|talla|estatura)\s+(?:de\s+)?${NUM_PALABRA}`));
+    }
 
     let peso = kilos;
     if (peso != null && gramos) peso = peso + Number(gramos[1]) / 1000;
