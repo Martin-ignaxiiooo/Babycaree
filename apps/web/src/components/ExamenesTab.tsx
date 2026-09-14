@@ -1,7 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { FlaskConical, Check, Clock, AlertTriangle, Camera, Loader2, Trash2, FileText, Mic, MicOff } from "lucide-react";
-import { useDictado } from "../hooks/useDictado";
-import { interpretarExamenesDictados } from "../utils/interpretarDictado";
+import { FlaskConical, Check, Clock, AlertTriangle, Camera, Loader2, Trash2, FileText } from "lucide-react";
 
 import { API_URL } from "../config/api";
 
@@ -138,17 +136,6 @@ export default function ExamenesTab({ bebeId, token }: Props) {
     }
   };
 
-  // Dictado por voz: "hemograma y radiografía de tórax para el martes"
-  // agrega ambos exámenes de una vez, con esa misma fecha.
-  const dictado = useDictado((texto) => {
-    const { nombres, fecha } = interpretarExamenesDictados(texto);
-    if (nombres.length === 0) return;
-    const fechaStr = fecha
-      ? `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, "0")}-${String(fecha.getDate()).padStart(2, "0")}`
-      : null;
-    crearVarios(nombres, fechaStr);
-  });
-
   const actualizar = async (id: string, cambios: any) => {
     setGuardando(true);
     try {
@@ -217,34 +204,6 @@ export default function ExamenesTab({ bebeId, token }: Props) {
         <div style={{ fontWeight: 800, fontSize: "14px", color: "var(--text)", marginBottom: "10px" }}>
           Agregar un examen indicado
         </div>
-
-        {/* Dictado por voz: agrega uno o varios exámenes de una vez. */}
-        {dictado.soportado && (
-          <button
-            type="button"
-            onClick={dictado.escuchando ? dictado.detener : dictado.empezar}
-            style={{
-              display: "inline-flex", alignItems: "center", gap: "7px",
-              padding: "9px 16px", borderRadius: "100px", border: "none",
-              cursor: "pointer", fontFamily: "'Nunito', sans-serif",
-              fontWeight: 800, fontSize: "12.5px", color: "#fff", marginBottom: "10px",
-              background: dictado.escuchando ? "#D97070" : "var(--theme-primary)",
-            }}
-          >
-            {dictado.escuchando ? <MicOff size={14} /> : <Mic size={14} />}
-            {dictado.escuchando ? "Detener" : "Dictar exámenes"}
-          </button>
-        )}
-        {dictado.texto && (
-          <div style={{ background: "var(--theme-bg-light)", borderRadius: "10px", padding: "10px 12px", fontSize: "12.5px", color: "var(--text)", fontStyle: "italic", marginBottom: "10px" }}>
-            “{dictado.texto}”
-          </div>
-        )}
-        {dictado.error && (
-          <div style={{ color: "#D97070", fontSize: "12px", fontWeight: 600, marginBottom: "10px" }}>
-            {dictado.error}
-          </div>
-        )}
 
         {/* Foto de la orden: se adjunta a los exámenes que se agreguen mientras esté puesta. */}
         {ordenFoto ? (
