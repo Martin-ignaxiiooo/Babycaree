@@ -82,7 +82,12 @@ export default function BabyGrowthIcon({ semanas, porcentaje, fill }: BabyGrowth
   // se superponga con el contenido de al lado. Un tamaño fijo en píxeles
   // (que igual escala con el % de embarazo) es determinístico en todos
   // los navegadores.
-  const size = fill ? 160 + (220 - 160) * t : 135 + (185 - 135) * t;
+  //
+  // El rango de "fill" está calzado con el anillo de progreso del dashboard
+  // de embarazo (168px de caja, radio 74, borde 11 => 137px libres por
+  // dentro). Si ese anillo cambia de tamaño, hay que mover este rango
+  // también, o la ilustración vuelve a desbordarse sobre el texto de al lado.
+  const size = fill ? 104 + (130 - 104) * t : 135 + (185 - 135) * t;
   const mes = mesDesdeSemanas(semanas);
 
   return (

@@ -4,6 +4,7 @@ import { ArrowLeft, FileText, Eye, Star, ThumbsUp } from "lucide-react";
 import axios from "axios";
 
 import { API_URL as API_BASE } from "../config/api";
+import { formatearArticulo } from "../utils/formatoArticulo";
 
 const API_URL = `${API_BASE}/v1`;
 
@@ -14,6 +15,7 @@ export default function ArticuloDetalle() {
 
   const [articulo, setArticulo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!token) {
@@ -28,8 +30,7 @@ export default function ArticuloDetalle() {
         setArticulo(res.data);
       } catch (error) {
         console.error("Error fetching articulo detalle:", error);
-        alert("No se pudo cargar el artículo.");
-        navigate("/comunidad");
+        setError("No pudimos cargar este artículo. Intenta de nuevo en un momento.");
       } finally {
         setLoading(false);
       }
@@ -53,7 +54,21 @@ export default function ArticuloDetalle() {
   };
 
   if (loading) return <div style={{ padding: "40px", textAlign: "center", fontFamily: "'Nunito', sans-serif" }}>Cargando artículo...</div>;
-  if (!articulo) return <div style={{ padding: "40px", textAlign: "center", fontFamily: "'Nunito', sans-serif" }}>Artículo no encontrado.</div>;
+  if (error || !articulo) {
+    return (
+      <div style={{ minHeight: "100vh", background: "var(--page-bg)", fontFamily: "'Nunito', sans-serif", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "16px", padding: "40px 24px", textAlign: "center" }}>
+        <p style={{ fontSize: "15px", color: "var(--text)", margin: 0, maxWidth: "380px", lineHeight: 1.6 }}>
+          {error || "No encontramos este artículo."}
+        </p>
+        <button
+          onClick={() => navigate("/comunidad?tab=articulos")}
+          style={{ background: "var(--theme-primary)", color: "#fff", border: "none", borderRadius: "100px", padding: "11px 24px", fontWeight: 800, fontSize: "14px", cursor: "pointer", fontFamily: "'Nunito', sans-serif" }}
+        >
+          Volver a Artículos
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: "100vh", background: "linear-gradient(165deg, var(--page-bg) 0%, var(--theme-bg-light) 100%)", fontFamily: "'Nunito', sans-serif", display: "flex", flexDirection: "column" }}>
@@ -62,14 +77,14 @@ export default function ArticuloDetalle() {
       <nav style={{ width: "100%", background: "var(--surface)", padding: "16px 40px", display: "flex", alignItems: "center", boxShadow: "0 2px 8px rgba(0,0,0,.05)" }}>
         <button 
           onClick={() => navigate("/comunidad?tab=articulos")} 
-          style={{ background: "none", border: "none", color: "#6B7280", fontSize: "15px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
+          style={{ background: "none", border: "none", color: "var(--text-muted)", fontSize: "15px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
         >
           <ArrowLeft size={18} /> Volver a Artículos
         </button>
       </nav>
 
       {/* ── CONTENIDO DEL ARTÍCULO ── */}
-      <div className="articulo-detalle" style={{ flex: 1, padding: "32px 24px 48px", maxWidth: "800px", margin: "0 auto", width: "100%" }}>
+      <div className="articulo-detalle" style={{ flex: 1, padding: "32px 24px 56px", maxWidth: "720px", margin: "0 auto", width: "100%" }}>
 
         {/* Ícono + categoría + datos, en una sola fila compacta. Antes el
             ícono ocupaba un bloque de ~200px de alto que en móvil se comía
@@ -100,14 +115,56 @@ export default function ArticuloDetalle() {
         {/* Resumen y contenido van directo sobre el fondo, sin una tarjeta
             que agregue otro nivel de padding (antes: 40px del contenedor +
             32px de la tarjeta, dejando muy poco ancho real en móvil). */}
-        <p className="articulo-detalle-resumen" style={{ margin: "0 0 20px 0", fontSize: "16px", color: "#4B4560", lineHeight: "1.6", fontWeight: 700 }}>
+        <p className="articulo-detalle-resumen" style={{ margin: "0 0 20px 0", fontSize: "16.5px", color: "var(--text-muted)", lineHeight: "1.65", fontWeight: 700 }}>
           {articulo.resumen}
         </p>
 
         <div style={{ height: "1px", background: "var(--theme-bg-light)", marginBottom: "20px" }} />
 
-        <div className="articulo-detalle-texto" style={{ fontSize: "16px", color: "#374151", lineHeight: "1.8", whiteSpace: "pre-wrap" }}>
-          {articulo.contenido_completo}
+        {/* El contenido llega como un bloque plano desde el panel de
+            administración, así que se interpreta antes de mostrarlo: párrafos
+            separados, subtítulos destacados y los rangos de edad como lista.
+            Ver utils/formatoArticulo.ts */}
+        <div className="articulo-detalle-texto" style={{ fontSize: "16.5px", color: "var(--text)", lineHeight: "1.8" }}>
+          {formatearArticulo(articulo.contenido_completo).map((bloque, i) => {
+            if (bloque.tipo === "subtitulo") {
+              return (
+                <h2
+                  key={i}
+                  style={{
+                    fontFamily: "'Baloo 2', sans-serif", fontSize: "21px", fontWeight: 700,
+                    color: "var(--text)", margin: "32px 0 12px", lineHeight: 1.3,
+                  }}
+                >
+                  {bloque.texto}
+                </h2>
+              );
+            }
+            if (bloque.tipo === "item") {
+              return (
+                <div
+                  key={i}
+                  style={{
+                    display: "flex", gap: "14px", alignItems: "baseline",
+                    padding: "11px 0", borderBottom: "1px solid var(--border-soft)",
+                  }}
+                >
+                  <span style={{
+                    flexShrink: 0, minWidth: "104px",
+                    fontSize: "13px", fontWeight: 800, color: "var(--theme-primary)",
+                  }}>
+                    {bloque.etiqueta}
+                  </span>
+                  <span style={{ minWidth: 0 }}>{bloque.texto}</span>
+                </div>
+              );
+            }
+            return (
+              <p key={i} style={{ margin: "0 0 18px" }}>
+                {bloque.texto}
+              </p>
+            );
+          })}
         </div>
 
         <div style={{ marginTop: "32px", paddingTop: "20px", borderTop: "1px solid var(--theme-bg-light)" }}>
@@ -125,7 +182,7 @@ export default function ArticuloDetalle() {
                 background: articulo.has_liked
                   ? "linear-gradient(135deg, var(--theme-primary), var(--theme-light))"
                   : "var(--surface-2)",
-                color: articulo.has_liked ? "#fff" : "#4B5563",
+                color: articulo.has_liked ? "#fff" : "var(--text-muted)",
                 border: "none", borderRadius: "100px", padding: "12px 26px",
                 fontWeight: 800, fontSize: "14px", cursor: "pointer",
                 fontFamily: "'Nunito', sans-serif",
@@ -135,7 +192,7 @@ export default function ArticuloDetalle() {
               {articulo.likes || 0} me gusta
             </button>
           </div>
-          <div style={{ fontSize: "11.5px", color: "#9CA3AF", textAlign: "center" }}>
+          <div style={{ fontSize: "11.5px", color: "var(--text-muted)", textAlign: "center" }}>
             <strong>Fuente:</strong> {articulo.fuente_citada}
           </div>
         </div>

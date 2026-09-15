@@ -138,7 +138,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
     }
   };
 
-  const R = 54;
+  const R = 74;
   const circunferencia = 2 * Math.PI * R;
 
   return (
@@ -186,18 +186,18 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
             <Tarjeta>
               <Titulo>Progreso del Embarazo</Titulo>
               <div style={{ display: "flex", alignItems: "center", gap: "26px", flexWrap: "wrap", marginTop: "18px" }}>
-                <div style={{ position: "relative", width: "128px", height: "128px", flexShrink: 0 }}>
-                  <svg width="128" height="128" viewBox="0 0 128 128" style={{ transform: "rotate(-90deg)" }}>
-                    <circle cx="64" cy="64" r={R} fill="none" stroke="#EDE7F9" strokeWidth="11" />
+                <div style={{ position: "relative", width: "168px", height: "168px", flexShrink: 0 }}>
+                  <svg width="168" height="168" viewBox="0 0 168 168" style={{ transform: "rotate(-90deg)" }}>
+                    <circle cx="84" cy="84" r={R} fill="none" stroke="var(--theme-bg-light)" strokeWidth="11" />
                     <circle
-                      cx="64" cy="64" r={R} fill="none"
+                      cx="84" cy="84" r={R} fill="none"
                       stroke="#8B5FD6" strokeWidth="11" strokeLinecap="round"
                       strokeDasharray={circunferencia}
                       strokeDashoffset={circunferencia * (1 - porcentaje / 100)}
                       style={{ transition: "stroke-dashoffset .8s ease-out" }}
                     />
                   </svg>
-                  <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", borderRadius: "50%" }}>
                     <BabyGrowthIcon semanas={semanas} porcentaje={porcentaje} fill />
                   </div>
                 </div>

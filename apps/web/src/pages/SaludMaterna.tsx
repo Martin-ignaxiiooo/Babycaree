@@ -139,102 +139,90 @@ export default function SaludMaterna() {
       </div>
 
       <div style={{ maxWidth: "1240px", margin: "-60px auto 0", padding: "0 32px 48px" }}>
-        <div className="sm-grid" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr) minmax(280px, 0.9fr)", gap: "20px", alignItems: "start" }}>
+        <div className="sm-grid" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1.7fr) minmax(280px, 1fr)", gap: "20px", alignItems: "start" }}>
 
-          {/* Peso */}
-          <Tarjeta>
-            <Encabezado icono={<Scale size={17} color="#8B5FD6" />}>Peso</Encabezado>
-            {peso ? (
-              <>
-                <div style={{ display: "flex", alignItems: "baseline", gap: "6px", marginTop: "10px" }}>
-                  <span style={{ fontSize: "40px", fontWeight: 900, color: "#3F3A52", fontFamily: "'Baloo 2', sans-serif", lineHeight: 1 }}>
-                    {Number(peso.peso_kg)}
-                  </span>
-                  <span style={{ fontSize: "15px", fontWeight: 700, color: "#A99FC4" }}>kg</span>
-                </div>
-                {subida != null && (
-                  <div style={{ marginTop: "14px" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11.5px", fontWeight: 800, color: "#8A849C", marginBottom: "6px" }}>
-                      <span>DESDE EL INICIO</span>
-                      <span style={{ color: "#8B5FD6" }}>{subida > 0 ? "+" : ""}{subida} KG</span>
-                    </div>
-                    <div style={{ height: "7px", borderRadius: "4px", background: "#EDE7F9", overflow: "hidden" }}>
-                      {/* La barra usa 16 kg como referencia visual del rango
-                          habitual de aumento. No es una meta médica ni un
-                          límite: solo da escala al número. */}
-                      <div style={{ width: `${Math.min(Math.max((subida / 16) * 100, 0), 100)}%`, height: "100%", background: "linear-gradient(90deg, #8B5FD6, #C0A9EE)" }} />
-                    </div>
-                  </div>
-                )}
-                {datos?.peso_pregestacional_kg == null && (
-                  <button onClick={() => setModal("inicial")} style={{ ...enlace, marginTop: "12px" }}>
-                    Registra tu peso previo para ver cuánto llevas
-                  </button>
-                )}
-              </>
-            ) : (
-              <p style={{ fontSize: "13.5px", color: "#8A849C", marginTop: "10px", lineHeight: 1.6 }}>
-                Aún no has registrado tu peso.
-              </p>
-            )}
-            <button onClick={() => setModal("peso")} style={{ ...btnSuave, marginTop: "16px" }}>
-              <Plus size={15} /> Registrar peso
-            </button>
-          </Tarjeta>
+          {/* Columna principal: las dos medidas arriba, los síntomas debajo.
+              Antes las tres tarjetas iban sueltas en un grid de 3 columnas: peso
+              y presión quedaban cortas al lado de una barra de artículos mucho
+              más alta, y con alignItems:start eso dejaba un hueco muerto hasta
+              la fila de síntomas. Apilándolas en su propia columna, el alto de
+              la barra lateral ya no arrastra al resto. */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px", minWidth: 0 }}>
+            <div className="sm-medidas" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: "20px" }}>
 
-          {/* Presión arterial */}
-          <Tarjeta>
-            <Encabezado icono={<Heart size={17} color="#8B5FD6" />}>Presión Arterial</Encabezado>
-            {presion ? (
-              <>
-                <div style={{ display: "flex", alignItems: "baseline", gap: "6px", marginTop: "10px" }}>
-                  <span style={{ fontSize: "40px", fontWeight: 900, color: "#3F3A52", fontFamily: "'Baloo 2', sans-serif", lineHeight: 1 }}>
-                    {presion.presion_sistolica}/{presion.presion_diastolica}
-                  </span>
-                  <span style={{ fontSize: "14px", fontWeight: 700, color: "#A99FC4" }}>mmHg</span>
-                </div>
-                <div style={{ background: "#FAF8FE", border: "1px solid #EDE7F9", borderRadius: "12px", padding: "12px 14px", marginTop: "14px", fontSize: "12.5px", color: "#6B647F", lineHeight: 1.55 }}>
-                  Último registro del{" "}
-                  {new Date(presion.fecha_registro + "T12:00:00").toLocaleDateString("es-CL", { day: "numeric", month: "long" })}.
-                  {/* No se interpreta el valor a propósito: decir si una
-                      presión es normal en el embarazo es diagnóstico, y eso
-                      le corresponde a la matrona o al médico. */}
-                </div>
-              </>
-            ) : (
-              <p style={{ fontSize: "13.5px", color: "#8A849C", marginTop: "10px", lineHeight: 1.6 }}>
-                Aún no has registrado tu presión.
-              </p>
-            )}
-            <button onClick={() => setModal("presion")} style={{ ...btnPrimario, marginTop: "16px" }}>
-              <Plus size={15} /> Nuevo registro
-            </button>
-          </Tarjeta>
-
-          {/* Artículos */}
-          <Tarjeta>
-            <Encabezado>Artículos Recomendados</Encabezado>
-            <div style={{ display: "flex", flexDirection: "column", gap: "9px", marginTop: "14px" }}>
-              {articulos.length === 0 ? (
-                <p style={{ fontSize: "13.5px", color: "#8A849C", margin: 0 }}>Pronto habrá contenido.</p>
-              ) : (
-                articulos.slice(0, 3).map((a: any) => (
-                  <button key={a.id} onClick={() => navigate(`/comunidad/articulo/${a.id}`)} style={filaArticulo}>
-                    <div style={{ textAlign: "left", minWidth: 0 }}>
-                      <span style={{ display: "inline-block", background: "#F3EEFC", color: "#8B5FD6", borderRadius: "100px", padding: "2px 9px", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", marginBottom: "5px" }}>
-                        {a.categoria}
+              {/* Peso */}
+              <Tarjeta>
+                <Encabezado icono={<Scale size={17} color="#8B5FD6" />}>Peso</Encabezado>
+                {peso ? (
+                  <>
+                    <div style={{ display: "flex", alignItems: "baseline", gap: "6px", marginTop: "10px" }}>
+                      <span style={{ fontSize: "40px", fontWeight: 900, color: "#3F3A52", fontFamily: "'Baloo 2', sans-serif", lineHeight: 1 }}>
+                        {Number(peso.peso_kg)}
                       </span>
-                      <div style={{ fontSize: "13.5px", fontWeight: 700, color: "#3F3A52", lineHeight: 1.4 }}>{a.titulo}</div>
+                      <span style={{ fontSize: "15px", fontWeight: 700, color: "#A99FC4" }}>kg</span>
                     </div>
-                    <ChevronRight size={15} color="#A99FC4" style={{ flexShrink: 0 }} />
-                  </button>
-                ))
-              )}
-            </div>
-          </Tarjeta>
+                    {subida != null && (
+                      <div style={{ marginTop: "14px" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11.5px", fontWeight: 800, color: "#8A849C", marginBottom: "6px" }}>
+                          <span>DESDE EL INICIO</span>
+                          <span style={{ color: "#8B5FD6" }}>{subida > 0 ? "+" : ""}{subida} KG</span>
+                        </div>
+                        <div style={{ height: "7px", borderRadius: "4px", background: "#EDE7F9", overflow: "hidden" }}>
+                          {/* La barra usa 16 kg como referencia visual del rango
+                              habitual de aumento. No es una meta médica ni un
+                              límite: solo da escala al número. */}
+                          <div style={{ width: `${Math.min(Math.max((subida / 16) * 100, 0), 100)}%`, height: "100%", background: "linear-gradient(90deg, #8B5FD6, #C0A9EE)" }} />
+                        </div>
+                      </div>
+                    )}
+                    {datos?.peso_pregestacional_kg == null && (
+                      <button onClick={() => setModal("inicial")} style={{ ...enlace, marginTop: "12px" }}>
+                        Registra tu peso previo para ver cuánto llevas
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <p style={{ fontSize: "13.5px", color: "#8A849C", marginTop: "10px", lineHeight: 1.6 }}>
+                    Aún no has registrado tu peso.
+                  </p>
+                )}
+                <button onClick={() => setModal("peso")} style={{ ...btnSuave, marginTop: "16px" }}>
+                  <Plus size={15} /> Registrar peso
+                </button>
+              </Tarjeta>
 
-          {/* Síntomas: ocupa las dos primeras columnas */}
-          <div style={{ gridColumn: "span 2" }}>
+              {/* Presión arterial */}
+              <Tarjeta>
+                <Encabezado icono={<Heart size={17} color="#8B5FD6" />}>Presión Arterial</Encabezado>
+                {presion ? (
+                  <>
+                    <div style={{ display: "flex", alignItems: "baseline", gap: "6px", marginTop: "10px" }}>
+                      <span style={{ fontSize: "40px", fontWeight: 900, color: "#3F3A52", fontFamily: "'Baloo 2', sans-serif", lineHeight: 1 }}>
+                        {presion.presion_sistolica}/{presion.presion_diastolica}
+                      </span>
+                      <span style={{ fontSize: "14px", fontWeight: 700, color: "#A99FC4" }}>mmHg</span>
+                    </div>
+                    <div style={{ background: "#FAF8FE", border: "1px solid #EDE7F9", borderRadius: "12px", padding: "12px 14px", marginTop: "14px", fontSize: "12.5px", color: "#6B647F", lineHeight: 1.55 }}>
+                      Último registro del{" "}
+                      {new Date(presion.fecha_registro + "T12:00:00").toLocaleDateString("es-CL", { day: "numeric", month: "long" })}.
+                      {/* No se interpreta el valor a propósito: decir si una
+                          presión es normal en el embarazo es diagnóstico, y eso
+                          le corresponde a la matrona o al médico. */}
+                    </div>
+                  </>
+                ) : (
+                  <p style={{ fontSize: "13.5px", color: "#8A849C", marginTop: "10px", lineHeight: 1.6 }}>
+                    Aún no has registrado tu presión.
+                  </p>
+                )}
+                <button onClick={() => setModal("presion")} style={{ ...btnPrimario, marginTop: "16px" }}>
+                  <Plus size={15} /> Nuevo registro
+                </button>
+              </Tarjeta>
+
+            </div>
+
+            {/* Síntomas */}
             <Tarjeta>
               <Encabezado>Síntomas Físicos</Encabezado>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))", gap: "10px", marginTop: "16px" }}>
@@ -288,6 +276,29 @@ export default function SaludMaterna() {
               </div>
             </Tarjeta>
           </div>
+
+          {/* Barra lateral: artículos */}
+          <Tarjeta>
+            <Encabezado>Artículos Recomendados</Encabezado>
+            <div style={{ display: "flex", flexDirection: "column", gap: "9px", marginTop: "14px" }}>
+              {articulos.length === 0 ? (
+                <p style={{ fontSize: "13.5px", color: "#8A849C", margin: 0 }}>Pronto habrá contenido.</p>
+              ) : (
+                articulos.slice(0, 3).map((a: any) => (
+                  <button key={a.id} onClick={() => navigate(`/comunidad/articulo/${a.id}`)} style={filaArticulo}>
+                    <div style={{ textAlign: "left", minWidth: 0 }}>
+                      <span style={{ display: "inline-block", background: "#F3EEFC", color: "#8B5FD6", borderRadius: "100px", padding: "2px 9px", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", marginBottom: "5px" }}>
+                        {a.categoria}
+                      </span>
+                      <div style={{ fontSize: "13.5px", fontWeight: 700, color: "#3F3A52", lineHeight: 1.4 }}>{a.titulo}</div>
+                    </div>
+                    <ChevronRight size={15} color="#A99FC4" style={{ flexShrink: 0 }} />
+                  </button>
+                ))
+              )}
+            </div>
+          </Tarjeta>
+
         </div>
       </div>
 
@@ -335,7 +346,9 @@ export default function SaludMaterna() {
       <style>{`
         @media (max-width: 1000px) {
           .sm-grid { grid-template-columns: 1fr !important; }
-          .sm-grid > div[style*="span 2"] { grid-column: span 1 !important; }
+        }
+        @media (max-width: 560px) {
+          .sm-medidas { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </div>
