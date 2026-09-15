@@ -270,7 +270,7 @@ export default function PerfilBebe() {
     }
   };
 
-  const inputStyle = { width: "100%", padding: "12px 14px", border: "2px solid #EDE9F8", borderRadius: "12px", fontSize: "14px", outline: "none", color: "var(--text)", boxSizing: "border-box" as const };
+  const inputStyle = { width: "100%", padding: "12px 14px", border: "2px solid var(--border)", borderRadius: "12px", fontSize: "14px", outline: "none", color: "var(--text)", boxSizing: "border-box" as const };
   const readOnlyStyle = { padding: "12px 14px", background: "var(--theme-bg-light)", borderRadius: "12px", fontSize: "14px", color: "var(--text)", border: "1px dashed var(--theme-light)" };
   const cardStyle = { background: "var(--surface)", padding: "26px", borderRadius: "22px", boxShadow: "0 6px 24px rgba(124,92,191,0.07)", marginBottom: "24px", width: "100%" };
   const labelStyle = { display: "block", fontSize: "12px", fontWeight: 700, color: "var(--text-muted)", marginBottom: "6px" };
@@ -279,7 +279,7 @@ export default function PerfilBebe() {
     return (
       <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--page-bg)", padding: "20px" }}>
            <h2 style={{ color: "#EF4444", marginBottom: "16px" }}>Error al cargar el perfil</h2>
-           <p style={{ color: "#6B7280", marginBottom: "24px" }}>{errorPerfil}</p>
+           <p style={{ color: "var(--text-muted)", marginBottom: "24px" }}>{errorPerfil}</p>
            <button style={{ background: "var(--theme-primary)", color: "#fff", padding: "12px 24px", borderRadius: "12px", fontWeight: 700 }} onClick={() => fetchPerfil()}>Intentar de nuevo</button>
            <button style={{ marginTop: "16px", background: "transparent", border: "1px solid var(--theme-primary)", color: "var(--theme-primary)", padding: "12px 24px", borderRadius: "12px", fontWeight: 700 }} onClick={() => navigate("/dashboard")}>Volver al Inicio</button>
       </div>
@@ -289,7 +289,7 @@ export default function PerfilBebe() {
   if (!perfil) return <div style={{ padding: "40px", textAlign: "center", color: "var(--theme-primary)" }}>Cargando perfil...</div>;
 
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)", fontFamily: "'Nunito', sans-serif", display: "flex", flexDirection: "column" }}>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(165deg, var(--page-bg) 0%, var(--theme-bg-light) 100%)", fontFamily: "'Nunito', sans-serif", display: "flex", flexDirection: "column" }}>
       
       {/* ── TOP NAV GLOBAL ── */}
       <TopNav user={user} activePath="/perfil" />
@@ -298,7 +298,7 @@ export default function PerfilBebe() {
       {/* El fondo ocupa todo el ancho, pero el contenido se limita al mismo
           max-width que .page-container (1400px) para que quede alineado con
           el contenido de abajo, igual que en la pantalla de Inicio. */}
-      <div style={{ background: "linear-gradient(135deg, #8B5FD6 0%, #A47BE8 100%)", color: "#fff" }}>
+      <div style={{ background: "linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-light) 100%)", color: "#fff" }}>
         <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "20px 40px 0" }}>
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", paddingBottom: "18px", flexWrap: "wrap", gap: "20px" }}>
@@ -530,7 +530,7 @@ export default function PerfilBebe() {
             
             {/* LEFT COLUMN: LIST & SEARCH */}
             <div>
-              <div style={{ background: "#FFFBEB", borderLeft: "4px solid #F59E0B", padding: "16px 20px", borderRadius: "0 12px 12px 0", marginBottom: "32px", display: "flex", gap: "16px" }}>
+              <div style={{ background: "rgba(245,158,11,0.13)", borderLeft: "4px solid #F59E0B", padding: "16px 20px", borderRadius: "0 12px 12px 0", marginBottom: "32px", display: "flex", gap: "16px" }}>
                 <div style={{ fontSize: "24px" }}>🔒</div>
                 <div>
                   <h4 style={{ fontSize: "16px", color: "#92400E", margin: "0 0 4px", fontWeight: 800 }}>Tú controlas quién ve los datos</h4>
@@ -545,7 +545,7 @@ export default function PerfilBebe() {
                 </div>
 
                 {accesos.length === 0 ? (
-                  <div style={{ textAlign: "center", padding: "40px", color: "#6B7280" }}>
+                  <div style={{ textAlign: "center", padding: "40px", color: "var(--text-muted)" }}>
                     Aún no has compartido el acceso con nadie.
                   </div>
                 ) : (
@@ -556,16 +556,16 @@ export default function PerfilBebe() {
                     const nombreCompleto = [acceso.nombre, acceso.apellidos].filter(Boolean).join(" ");
                     const pendiente = acceso.estado === "pendiente";
                     return (
-                    <div key={acceso.id} style={{ display: "flex", alignItems: "center", padding: "16px", border: "1px solid #E5E7EB", borderRadius: "12px", marginBottom: "12px", flexWrap: "wrap", gap: "12px" }}>
+                    <div key={acceso.id} style={{ display: "flex", alignItems: "center", padding: "16px", border: "1px solid var(--border)", borderRadius: "12px", marginBottom: "12px", flexWrap: "wrap", gap: "12px" }}>
                       <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "var(--theme-bg-light)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "24px", flexShrink: 0 }}>🧑</div>
                       <div style={{ flex: 1, minWidth: "160px" }}>
                         <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--text)" }}>
                           {nombreCompleto || "Invitación pendiente"}
                         </div>
-                        <div style={{ fontSize: "13px", color: "#6B7280" }}>
+                        <div style={{ fontSize: "13px", color: "var(--text-muted)" }}>
                           {acceso.email_usuario || acceso.correo_invitado}
                         </div>
-                        <div style={{ fontSize: "12px", color: "#9CA3AF", marginTop: "3px" }}>
+                        <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "3px" }}>
                           {pendiente
                             ? "Aún no acepta la invitación"
                             : acceso.ultima_conexion
@@ -573,13 +573,13 @@ export default function PerfilBebe() {
                               : "Sin ingresos registrados"}
                         </div>
                       </div>
-                      <select value={acceso.nivel_permiso} onChange={(e) => modificarPermiso(acceso.id, e.target.value)} style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #E5E7EB", background: "var(--surface-2)", color: "var(--text)", fontWeight: 700 }}>
+                      <select value={acceso.nivel_permiso} onChange={(e) => modificarPermiso(acceso.id, e.target.value)} style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid var(--border)", background: "var(--surface-2)", color: "var(--text)", fontWeight: 700 }}>
                         <option value="solo_lectura">Solo lectura</option>
                         <option value="papa">Papá (Acceso a todo)</option>
                         <option value="abuela">Abuela (Acceso a todo)</option>
                         <option value="ver_editar">Ver y editar</option>
                       </select>
-                      <button onClick={() => revocarAcceso(acceso.id)} style={{ background: "#FEE2E2", color: "#EF4444", border: "none", padding: "10px", borderRadius: "8px", cursor: "pointer", fontWeight: "bold" }}>Revocar</button>
+                      <button onClick={() => revocarAcceso(acceso.id)} style={{ background: "rgba(239,68,68,0.14)", color: "#EF4444", border: "none", padding: "10px", borderRadius: "8px", cursor: "pointer", fontWeight: "bold" }}>Revocar</button>
                     </div>
                     );
                   })
@@ -591,10 +591,10 @@ export default function PerfilBebe() {
                   <Search size={20} style={{ color: "var(--theme-primary)" }} /> Buscar a quién compartir
                 </h3>
                 
-                <p style={{ fontSize: "13px", color: "#6B7280", marginBottom: "24px" }}>Busca entre tus contactos, familiares ya registrados en Baby Care, o escribe un correo para invitar a alguien nuevo.</p>
+                <p style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "24px" }}>Busca entre tus contactos, familiares ya registrados en Baby Care, o escribe un correo para invitar a alguien nuevo.</p>
 
                 <div style={{ position: "relative", marginBottom: "24px" }}>
-                  <Search size={20} style={{ position: "absolute", left: "16px", top: "14px", color: "#9CA3AF" }} />
+                  <Search size={20} style={{ position: "absolute", left: "16px", top: "14px", color: "var(--text-muted)" }} />
                   <input 
                     type="text" 
                     placeholder="Busca por correo electrónico" 
@@ -610,26 +610,26 @@ export default function PerfilBebe() {
                         buscarPersonas(searchQuery, searchTab);
                       }
                     }}
-                    style={{ width: "100%", padding: "14px 16px 14px 48px", borderRadius: "12px", border: "1px solid #E5E7EB", fontSize: "15px", outline: "none", color: "var(--text)" }}
+                    style={{ width: "100%", padding: "14px 16px 14px 48px", borderRadius: "12px", border: "1px solid var(--border)", fontSize: "15px", outline: "none", color: "var(--text)" }}
                   />
                 </div>
 
                 {searchResults.length > 0 && (
                   <div>
                     {searchResults.map(res => (
-                      <div key={res.email} style={{ display: "flex", alignItems: "center", padding: "12px", borderBottom: "1px solid #F3F4F6" }}>
+                      <div key={res.email} style={{ display: "flex", alignItems: "center", padding: "12px", borderBottom: "1px solid var(--border)" }}>
                         <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "var(--theme-bg-light)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", marginRight: "12px" }}>🧑</div>
                         <div style={{ flex: 1, minWidth: "160px" }}>
                           <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>
                             {res.nombre || "Usuario"} 
-                            {res.en_app && <span style={{ marginLeft: "8px", fontSize: "10px", background: "#D1FAE5", color: "#065F46", padding: "2px 8px", borderRadius: "12px" }}>En la app</span>}
+                            {res.en_app && <span style={{ marginLeft: "8px", fontSize: "10px", background: "rgba(6,95,70,0.16)", color: "#065F46", padding: "2px 8px", borderRadius: "12px" }}>En la app</span>}
                           </div>
-                          <div style={{ fontSize: "13px", color: "#6B7280" }}>{res.email}</div>
+                          <div style={{ fontSize: "13px", color: "var(--text-muted)" }}>{res.email}</div>
                         </div>
                         <select 
                           value={invitePerm} 
                           onChange={e => setInvitePerm(e.target.value)} 
-                          style={{ padding: "6px 10px", borderRadius: "8px", border: "1px solid #E5E7EB", background: "var(--surface-2)", color: "var(--text)", fontWeight: 700, marginRight: "12px", fontSize: "12px" }}
+                          style={{ padding: "6px 10px", borderRadius: "8px", border: "1px solid var(--border)", background: "var(--surface-2)", color: "var(--text)", fontWeight: 700, marginRight: "12px", fontSize: "12px" }}
                         >
                           <option value="solo_lectura">Solo lectura</option>
                           <option value="papa">Papá (Acceso a todo)</option>
@@ -654,7 +654,7 @@ export default function PerfilBebe() {
                   // del backend) en vez del texto genérico "Invitar por correo".
                   const yaRegistrado = personaPorCorreo;
                   return (
-                  <div style={{ display: "flex", alignItems: "center", padding: "12px", borderBottom: "1px solid #F3F4F6", flexWrap: "wrap", gap: "10px" }}>
+                  <div style={{ display: "flex", alignItems: "center", padding: "12px", borderBottom: "1px solid var(--border)", flexWrap: "wrap", gap: "10px" }}>
                     <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "var(--theme-bg-light)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", flexShrink: 0 }}>
                       {yaRegistrado ? "🧑" : "✉️"}
                     </div>
@@ -664,7 +664,7 @@ export default function PerfilBebe() {
                           ? [yaRegistrado.nombre, yaRegistrado.apellidos].filter(Boolean).join(" ")
                           : "Invitar por correo electrónico"}
                       </div>
-                      <div style={{ fontSize: "13px", color: "#6B7280" }}>{searchQuery.trim()}</div>
+                      <div style={{ fontSize: "13px", color: "var(--text-muted)" }}>{searchQuery.trim()}</div>
                       {yaRegistrado && (
                         <div style={{ fontSize: "12px", color: "#3E8E6E", fontWeight: 700, marginTop: "2px" }}>
                           Ya tiene cuenta en Baby Care
@@ -674,7 +674,7 @@ export default function PerfilBebe() {
                     <select 
                       value={invitePerm} 
                       onChange={e => setInvitePerm(e.target.value)} 
-                      style={{ padding: "6px 10px", borderRadius: "8px", border: "1px solid #E5E7EB", background: "var(--surface-2)", color: "var(--text)", fontWeight: 700, fontSize: "12px" }}
+                      style={{ padding: "6px 10px", borderRadius: "8px", border: "1px solid var(--border)", background: "var(--surface-2)", color: "var(--text)", fontWeight: 700, fontSize: "12px" }}
                     >
                       <option value="solo_lectura">Solo lectura</option>
                       <option value="papa">Papá (Acceso a todo)</option>

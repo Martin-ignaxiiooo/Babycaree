@@ -271,7 +271,7 @@ export default function Dashboard() {
 
     <div style={{
       minHeight: "100vh",
-      background: "linear-gradient(165deg, #F3EEFC 0%, #F1ECFB 40%, #FDF2F5 100%)",
+      background: "linear-gradient(165deg, var(--page-bg) 0%, var(--theme-bg-light) 100%)",
       fontFamily: "'Nunito', sans-serif",
       display: "flex",
       flexDirection: "column",
@@ -317,7 +317,7 @@ export default function Dashboard() {
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />
               ) : (
-                <Camera size={38} color="#C9BEE8" strokeWidth={2} />
+                <Camera size={38} color="var(--text-muted)" strokeWidth={2} />
               )}
 
               {hero.foto_perfil && !uploadingFoto && !confirmandoBorrarFoto && (
@@ -539,7 +539,7 @@ export default function Dashboard() {
                     Peso del bebé
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "var(--text-muted)", fontWeight: 600 }}>
-                    <span style={{ width: "16px", height: "0", borderTop: "2px dashed #9CA3AF", display: "inline-block" }} />
+                    <span style={{ width: "16px", height: "0", borderTop: "2px dashed var(--text-muted)", display: "inline-block" }} />
                     Promedio OMS
                   </div>
                 </div>
@@ -550,16 +550,16 @@ export default function Dashboard() {
                       <stop offset="100%" stopColor="var(--theme-primary)" stopOpacity="0" />
                     </linearGradient>
                   </defs>
-                  <rect width="340" height="100" fill="#F9FAFB" rx="8"/>
-                  <line x1="40" y1="10" x2="40" y2="85" stroke="#E5E7EB" strokeWidth="0.8"/>
-                  <line x1="40" y1="85" x2="330" y2="85" stroke="#E5E7EB" strokeWidth="0.8"/>
-                  <line x1="40" y1="35" x2="330" y2="35" stroke="#F3F4F6" strokeWidth="0.6"/>
-                  <line x1="40" y1="60" x2="330" y2="60" stroke="#F3F4F6" strokeWidth="0.6"/>
-                  <text x="35" y="13" textAnchor="end" fontSize="8" fill="#9CA3AF">15kg</text>
-                  <text x="35" y="38" textAnchor="end" fontSize="8" fill="#9CA3AF">10kg</text>
-                  <text x="35" y="63" textAnchor="end" fontSize="8" fill="#9CA3AF">5kg</text>
+                  <rect width="340" height="100" fill="var(--surface-2)" rx="8"/>
+                  <line x1="40" y1="10" x2="40" y2="85" stroke="var(--border)" strokeWidth="0.8"/>
+                  <line x1="40" y1="85" x2="330" y2="85" stroke="var(--border)" strokeWidth="0.8"/>
+                  <line x1="40" y1="35" x2="330" y2="35" stroke="var(--border)" strokeWidth="0.6"/>
+                  <line x1="40" y1="60" x2="330" y2="60" stroke="var(--border)" strokeWidth="0.6"/>
+                  <text x="35" y="13" textAnchor="end" fontSize="8" fill="var(--text-muted)">15kg</text>
+                  <text x="35" y="38" textAnchor="end" fontSize="8" fill="var(--text-muted)">10kg</text>
+                  <text x="35" y="63" textAnchor="end" fontSize="8" fill="var(--text-muted)">5kg</text>
                   {displayFechas.map((fecha, idx) => (
-                    <text key={idx} x={xPositions[idx]} y="105" textAnchor="middle" fontSize="9" fill="#9CA3AF" fontWeight="600">
+                    <text key={idx} x={xPositions[idx]} y="105" textAnchor="middle" fontSize="9" fill="var(--text-muted)" fontWeight="600">
                       {fecha || ""}
                     </text>
                   ))}
@@ -567,7 +567,7 @@ export default function Dashboard() {
                     <polygon points={areaPointsString} fill="url(#growthAreaGradientPeso)" />
                   )}
                   {pesoOmsPointsString && (
-                    <polyline points={pesoOmsPointsString} fill="none" stroke="#9CA3AF" strokeWidth="1.5" strokeDasharray="4,3"/>
+                    <polyline points={pesoOmsPointsString} fill="none" stroke="var(--text-muted)" strokeWidth="1.5" strokeDasharray="4,3"/>
                   )}
                   {pesoPointsString && (
                     <polyline points={pesoPointsString} fill="none" stroke="var(--theme-primary)" strokeWidth="2.5" strokeLinejoin="round"/>
@@ -593,26 +593,26 @@ export default function Dashboard() {
                     Talla del bebé
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "var(--text-muted)", fontWeight: 600 }}>
-                    <span style={{ width: "16px", height: "0", borderTop: "2px dashed #9CA3AF", display: "inline-block" }} />
+                    <span style={{ width: "16px", height: "0", borderTop: "2px dashed var(--text-muted)", display: "inline-block" }} />
                     Promedio OMS
                   </div>
                 </div>
                 <svg viewBox="0 0 340 120" style={{ width: "100%", height: "auto", overflow: "visible" }}>
-                  <rect width="340" height="100" fill="#F9FAFB" rx="8"/>
-                  <line x1="40" y1="10" x2="40" y2="85" stroke="#E5E7EB" strokeWidth="0.8"/>
-                  <line x1="40" y1="85" x2="330" y2="85" stroke="#E5E7EB" strokeWidth="0.8"/>
-                  <line x1="40" y1="35" x2="330" y2="35" stroke="#F3F4F6" strokeWidth="0.6"/>
-                  <line x1="40" y1="60" x2="330" y2="60" stroke="#F3F4F6" strokeWidth="0.6"/>
-                  <text x="35" y="13" textAnchor="end" fontSize="8" fill="#9CA3AF">120cm</text>
-                  <text x="35" y="38" textAnchor="end" fontSize="8" fill="#9CA3AF">93cm</text>
-                  <text x="35" y="63" textAnchor="end" fontSize="8" fill="#9CA3AF">67cm</text>
+                  <rect width="340" height="100" fill="var(--surface-2)" rx="8"/>
+                  <line x1="40" y1="10" x2="40" y2="85" stroke="var(--border)" strokeWidth="0.8"/>
+                  <line x1="40" y1="85" x2="330" y2="85" stroke="var(--border)" strokeWidth="0.8"/>
+                  <line x1="40" y1="35" x2="330" y2="35" stroke="var(--border)" strokeWidth="0.6"/>
+                  <line x1="40" y1="60" x2="330" y2="60" stroke="var(--border)" strokeWidth="0.6"/>
+                  <text x="35" y="13" textAnchor="end" fontSize="8" fill="var(--text-muted)">120cm</text>
+                  <text x="35" y="38" textAnchor="end" fontSize="8" fill="var(--text-muted)">93cm</text>
+                  <text x="35" y="63" textAnchor="end" fontSize="8" fill="var(--text-muted)">67cm</text>
                   {displayFechas.map((fecha, idx) => (
-                    <text key={idx} x={xPositions[idx]} y="105" textAnchor="middle" fontSize="9" fill="#9CA3AF" fontWeight="600">
+                    <text key={idx} x={xPositions[idx]} y="105" textAnchor="middle" fontSize="9" fill="var(--text-muted)" fontWeight="600">
                       {fecha || ""}
                     </text>
                   ))}
                   {tallaOmsPointsString && (
-                    <polyline points={tallaOmsPointsString} fill="none" stroke="#9CA3AF" strokeWidth="1.5" strokeDasharray="4,3"/>
+                    <polyline points={tallaOmsPointsString} fill="none" stroke="var(--text-muted)" strokeWidth="1.5" strokeDasharray="4,3"/>
                   )}
                   {tallaPointsString && (
                     <polyline points={tallaPointsString} fill="none" stroke="var(--accent-coral, #E8927C)" strokeWidth="2.5" strokeLinejoin="round"/>
@@ -656,41 +656,41 @@ export default function Dashboard() {
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
               <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "21px", fontWeight: 700, color: "var(--text)", margin: 0 }}>Registrar Medidas</h2>
-              <button onClick={() => { setIsModalOpen(false); setGrowthError(""); }} style={{ background: "#F3F1F9", border: "none", borderRadius: "50%", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-                <X size={18} color="#6B7280" />
+              <button onClick={() => { setIsModalOpen(false); setGrowthError(""); }} style={{ background: "var(--surface-2)", border: "none", borderRadius: "50%", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                <X size={18} color="var(--text-muted)" />
               </button>
             </div>
 
             {growthError && (
               <div style={{
-                background: "#FFF0F0", borderLeft: "4px solid #DC2626", borderRadius: "10px",
-                padding: "12px 16px", marginBottom: "18px", fontSize: "13px", color: "#7F1D1D", fontWeight: 600,
+                background: "rgba(217,112,112,0.14)", borderLeft: "4px solid #DC2626", borderRadius: "10px",
+                padding: "12px 16px", marginBottom: "18px", fontSize: "13px", color: "var(--text)", fontWeight: 600,
               }}>
                 {growthError}
               </div>
             )}
             
             <div style={{ marginBottom: "20px" }}>
-              <label style={{ display: "block", fontSize: "14px", fontWeight: 700, marginBottom: "8px", color: "#4B5563" }}>Peso (kg)</label>
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 700, marginBottom: "8px", color: "var(--text)" }}>Peso (kg)</label>
               <input 
                 type="number" 
                 step="0.01"
                 value={pesoInput}
                 onChange={e => { setPesoInput(e.target.value); setGrowthError(""); }}
                 placeholder="Ej. 7.4"
-                style={{ width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", outline: "none", fontSize: "15px" }}
+                style={{ width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid var(--border)", outline: "none", fontSize: "15px" }}
               />
             </div>
 
             <div style={{ marginBottom: "22px" }}>
-              <label style={{ display: "block", fontSize: "14px", fontWeight: 700, marginBottom: "8px", color: "#4B5563" }}>Talla (cm)</label>
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 700, marginBottom: "8px", color: "var(--text)" }}>Talla (cm)</label>
               <input 
                 type="number" 
                 step="0.1"
                 value={tallaInput}
                 onChange={e => { setTallaInput(e.target.value); setGrowthError(""); }}
                 placeholder="Ej. 67.5"
-                style={{ width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", outline: "none", fontSize: "15px" }}
+                style={{ width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid var(--border)", outline: "none", fontSize: "15px" }}
               />
             </div>
 
@@ -699,7 +699,7 @@ export default function Dashboard() {
               disabled={isSaving || !pesoInput || !tallaInput}
               style={{ 
                 width: "100%", 
-                background: (isSaving || !pesoInput || !tallaInput) ? "#D1D5DB" : "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
+                background: (isSaving || !pesoInput || !tallaInput) ? "var(--border)" : "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
                 color: "#fff", 
                 padding: "16px", borderRadius: "16px", border: "none", 
                 fontSize: "16px", fontWeight: 800, cursor: isSaving ? "not-allowed" : "pointer",
