@@ -278,7 +278,7 @@ export default function PerfilBebe() {
   if (errorPerfil) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--page-bg)", padding: "20px" }}>
-           <h2 style={{ color: "#EF4444", marginBottom: "16px" }}>Error al cargar el perfil</h2>
+           <h2 style={{ color: "var(--danger-text)", marginBottom: "16px" }}>Error al cargar el perfil</h2>
            <p style={{ color: "var(--text-muted)", marginBottom: "24px" }}>{errorPerfil}</p>
            <button style={{ background: "var(--theme-primary)", color: "#fff", padding: "12px 24px", borderRadius: "12px", fontWeight: 700 }} onClick={() => fetchPerfil()}>Intentar de nuevo</button>
            <button style={{ marginTop: "16px", background: "transparent", border: "1px solid var(--theme-primary)", color: "var(--theme-primary)", padding: "12px 24px", borderRadius: "12px", fontWeight: 700 }} onClick={() => navigate("/dashboard")}>Volver al Inicio</button>
@@ -298,7 +298,7 @@ export default function PerfilBebe() {
       {/* El fondo ocupa todo el ancho, pero el contenido se limita al mismo
           max-width que .page-container (1400px) para que quede alineado con
           el contenido de abajo, igual que en la pantalla de Inicio. */}
-      <div style={{ background: "linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-light) 100%)", color: "#fff" }}>
+      <div style={{ background: "linear-gradient(135deg, var(--header-from) 0%, var(--header-to) 100%)", color: "#fff" }}>
         <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "20px 40px 0" }}>
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", paddingBottom: "18px", flexWrap: "wrap", gap: "20px" }}>
@@ -530,11 +530,11 @@ export default function PerfilBebe() {
             
             {/* LEFT COLUMN: LIST & SEARCH */}
             <div>
-              <div style={{ background: "rgba(245,158,11,0.13)", borderLeft: "4px solid #F59E0B", padding: "16px 20px", borderRadius: "0 12px 12px 0", marginBottom: "32px", display: "flex", gap: "16px" }}>
+              <div style={{ background: "var(--warn-bg)", borderLeft: "4px solid var(--warn-border)", padding: "16px 20px", borderRadius: "0 12px 12px 0", marginBottom: "32px", display: "flex", gap: "16px" }}>
                 <div style={{ fontSize: "24px" }}>🔒</div>
                 <div>
-                  <h4 style={{ fontSize: "16px", color: "#92400E", margin: "0 0 4px", fontWeight: 800 }}>Tú controlas quién ve los datos</h4>
-                  <p style={{ fontSize: "14px", color: "#92400E", margin: 0 }}>Solo tú puedes invitar, cambiar permisos o revocar accesos de familiares.</p>
+                  <h4 style={{ fontSize: "16px", color: "var(--warn-text)", margin: "0 0 4px", fontWeight: 800 }}>Tú controlas quién ve los datos</h4>
+                  <p style={{ fontSize: "14px", color: "var(--warn-text)", margin: 0 }}>Solo tú puedes invitar, cambiar permisos o revocar accesos de familiares.</p>
                 </div>
               </div>
 
@@ -579,7 +579,7 @@ export default function PerfilBebe() {
                         <option value="abuela">Abuela (Acceso a todo)</option>
                         <option value="ver_editar">Ver y editar</option>
                       </select>
-                      <button onClick={() => revocarAcceso(acceso.id)} style={{ background: "rgba(239,68,68,0.14)", color: "#EF4444", border: "none", padding: "10px", borderRadius: "8px", cursor: "pointer", fontWeight: "bold" }}>Revocar</button>
+                      <button onClick={() => revocarAcceso(acceso.id)} style={{ background: "var(--danger-bg)", color: "var(--danger-text)", border: "none", padding: "10px", borderRadius: "8px", cursor: "pointer", fontWeight: "bold" }}>Revocar</button>
                     </div>
                     );
                   })
@@ -622,7 +622,7 @@ export default function PerfilBebe() {
                         <div style={{ flex: 1, minWidth: "160px" }}>
                           <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>
                             {res.nombre || "Usuario"} 
-                            {res.en_app && <span style={{ marginLeft: "8px", fontSize: "10px", background: "rgba(6,95,70,0.16)", color: "#065F46", padding: "2px 8px", borderRadius: "12px" }}>En la app</span>}
+                            {res.en_app && <span style={{ marginLeft: "8px", fontSize: "10px", background: "var(--success-bg)", color: "var(--success-text)", padding: "2px 8px", borderRadius: "12px" }}>En la app</span>}
                           </div>
                           <div style={{ fontSize: "13px", color: "var(--text-muted)" }}>{res.email}</div>
                         </div>
@@ -666,7 +666,7 @@ export default function PerfilBebe() {
                       </div>
                       <div style={{ fontSize: "13px", color: "var(--text-muted)" }}>{searchQuery.trim()}</div>
                       {yaRegistrado && (
-                        <div style={{ fontSize: "12px", color: "#3E8E6E", fontWeight: 700, marginTop: "2px" }}>
+                        <div style={{ fontSize: "12px", color: "var(--success-text)", fontWeight: 700, marginTop: "2px" }}>
                           Ya tiene cuenta en Baby Care
                         </div>
                       )}

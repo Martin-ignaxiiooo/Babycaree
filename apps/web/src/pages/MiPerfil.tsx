@@ -282,7 +282,7 @@ export default function MiPerfil() {
       <TopNav user={{ ...initialUser, foto_perfil: fotoPerfil }} activePath="/mi-perfil" />
 
       {/* Cabecera morada; las tarjetas flotan sobre ella. */}
-      <div style={{ background: "linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-light) 100%)", paddingBottom: "80px" }}>
+      <div style={{ background: "linear-gradient(135deg, var(--header-from) 0%, var(--header-to) 100%)", paddingBottom: "80px" }}>
         <div style={{ maxWidth: "1180px", margin: "0 auto", padding: "24px 32px 0" }}>
           <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "32px", fontWeight: 700, color: "#fff", margin: 0 }}>
             Hola, {formData.nombre || "!"}

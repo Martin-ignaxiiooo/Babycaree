@@ -77,6 +77,33 @@ body {
   --text-inverso: #ffffff;     /* sobre gradientes oscuros: no cambia */
   --border: #E4DBF7;
   --border-soft: #EDE9F8;
+
+  /* Avisos y estados. Cada par bg/text está calzado para mantener el
+     contraste mínimo legible dentro de su propio modo: un ámbar oscuro se
+     lee sobre fondo claro, pero desaparece sobre fondo oscuro, así que el
+     texto se aclara en el tema oscuro mientras el fondo se oscurece. */
+  --warn-bg: #FFF8E6;
+  --warn-border: #F59E0B;
+  --warn-text: #92400E;
+
+  --danger-bg: #FDEDED;
+  --danger-border: #DC2626;
+  --danger-text: #B42318;
+
+  --success-bg: #E8F7F1;
+  --success-text: #2F6F58;
+
+  --info-bg: #E6F1FB;
+  --info-text: #1E4E8C;
+
+  /* Cabeceras de gradiente. Necesitan sus propias variables y NO pueden
+     reutilizar --theme-primary/--theme-light: esas se ACLARAN en modo
+     oscuro (están pensadas para texto sobre fondo oscuro), así que usarlas
+     como fondo deja una cabecera lavanda clara con texto blanco encima,
+     casi ilegible. Estas se mantienen oscuras en ambos temas, que es lo que
+     pide el texto blanco que va sobre ellas. */
+  --header-from: #8B5FD6;
+  --header-to: #A47BE8;
 }
 
 [data-tema="oscuro"] {
@@ -97,6 +124,27 @@ body {
   --theme-light: #C0A9EE;
   --theme-bg-light: #2F2A44;
   --theme-bg-hover: #383150;
+
+  /* Fondos apenas teñidos y texto claro: sobre #191622 un pastel saturado
+     resalta como un parche, y el texto oscuro original se vuelve ilegible. */
+  --warn-bg: rgba(245, 158, 11, 0.13);
+  --warn-border: #D9941F;
+  --warn-text: #F0C070;
+
+  --danger-bg: rgba(220, 38, 38, 0.15);
+  --danger-border: #D96A6A;
+  --danger-text: #F3A6A6;
+
+  --success-bg: rgba(62, 142, 110, 0.16);
+  --success-text: #7FCFAE;
+
+  --info-bg: rgba(60, 130, 210, 0.15);
+  --info-text: #9CC7EE;
+
+  /* Más profundas que en el tema claro, para que la cabecera no sea una
+     franja brillante sobre una página oscura. */
+  --header-from: #4A3770;
+  --header-to: #634E96;
 }
 
 /* El fondo de página se aplica acá para que el modo oscuro alcance también

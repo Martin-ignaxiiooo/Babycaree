@@ -143,7 +143,7 @@ export default function Comunidad() {
       {/* ── MAIN CONTENT ── */}
       {/* Cabecera morada, igual que Inicio y Perfil: las tres pantallas
           del rediseño comparten el mismo encabezado. */}
-      <div style={{ background: "linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-light) 100%)", paddingBottom: "26px" }}>
+      <div style={{ background: "linear-gradient(135deg, var(--header-from) 0%, var(--header-to) 100%)", paddingBottom: "26px" }}>
         <div style={{ maxWidth: "1240px", margin: "0 auto", padding: "16px 32px 0" }}>
           <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "22px", fontWeight: 700, color: "#fff", margin: 0, display: "flex", alignItems: "center", gap: "10px" }}>
             <MessageSquare size={22} /> Comunidad

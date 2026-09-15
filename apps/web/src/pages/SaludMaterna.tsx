@@ -125,7 +125,7 @@ export default function SaludMaterna() {
     <div style={{ minHeight: "100vh", background: "var(--page-bg)", fontFamily: "'Nunito', sans-serif" }}>
       <TopNav user={user} activePath="/salud" perfilEstado="embarazo" />
 
-      <div style={{ background: "linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-light) 100%)", paddingBottom: "80px" }}>
+      <div style={{ background: "linear-gradient(135deg, var(--header-from) 0%, var(--header-to) 100%)", paddingBottom: "80px" }}>
         <div style={{ maxWidth: "1240px", margin: "0 auto", padding: "26px 32px 0" }}>
           {semanas > 0 && (
             <span style={{ display: "inline-block", background: "rgba(255,255,255,0.2)", color: "#fff", borderRadius: "100px", padding: "5px 14px", fontSize: "11.5px", fontWeight: 800, letterSpacing: "0.5px", marginBottom: "10px" }}>

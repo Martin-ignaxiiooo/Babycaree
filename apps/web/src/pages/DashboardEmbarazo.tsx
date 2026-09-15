@@ -119,7 +119,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
     <div style={{ minHeight: "100vh", background: "var(--page-bg)", fontFamily: "'Nunito', sans-serif" }}>
       {/* Cabecera morada; se extiende bajo las tarjetas para que floten
           sobre ella, como en el diseño. */}
-      <div style={{ background: "linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-light) 100%)", paddingBottom: "90px" }}>
+      <div style={{ background: "linear-gradient(135deg, var(--header-from) 0%, var(--header-to) 100%)", paddingBottom: "90px" }}>
         <div style={{ maxWidth: "1240px", margin: "0 auto", padding: "28px 32px 0" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             <label

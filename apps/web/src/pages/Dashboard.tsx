@@ -359,7 +359,7 @@ export default function Dashboard() {
                       type="button"
                       onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleEliminarFoto(); }}
                       style={{
-                        background: "var(--surface)", color: "#B91C1C", border: "none", borderRadius: "8px",
+                        background: "var(--surface)", color: "var(--danger-text)", border: "none", borderRadius: "8px",
                         padding: "5px 10px", fontSize: "11px", fontWeight: 800, cursor: "pointer",
                       }}
                     >
@@ -410,7 +410,7 @@ export default function Dashboard() {
               <div style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "27px", fontWeight: 700, color: "var(--text)", marginBottom: "4px" }}>{hero.nombre}</div>
               <div style={{ fontSize: "14px", color: "var(--text-muted)", fontWeight: 600 }}>{hero.edad_exacta}</div>
               {fotoError && (
-                <div style={{ fontSize: "12px", color: "#DC2626", marginTop: "4px", fontWeight: 600 }}>{fotoError}</div>
+                <div style={{ fontSize: "12px", color: "var(--danger-text)", marginTop: "4px", fontWeight: 600 }}>{fotoError}</div>
               )}
             </div>
           </div>
@@ -456,12 +456,16 @@ export default function Dashboard() {
                   // Colores/íconos por tipo real de notificación (no por prioridad
                   // genérica, para no rotular mal cosas como el artículo
                   // recomendado, que no es una "tarea completada").
+                  //
+                  // Los fondos usan las variables de aviso en vez de gradientes
+                  // pastel fijos: en modo oscuro un celeste o naranja saturado
+                  // resaltaba como un parche encendido sobre la página.
                   const config: Record<string, { icon: any; color: string; bg: string; label: string }> = {
-                    control_proximo: { icon: Clock, color: "#1E4E8C", bg: "linear-gradient(90deg, #8CC9F0 0%, #D7EEFF 100%)", label: "Agendado" },
-                    vacuna_atrasada: { icon: Syringe, color: "#8A5212", bg: "linear-gradient(90deg, #FEAD53 0%, #FFE6CD 100%)", label: "Pendiente" },
-                    vacuna_pendiente: { icon: Syringe, color: "#8A5212", bg: "linear-gradient(90deg, #FEAD53 0%, #FFE6CD 100%)", label: "Pendiente" },
-                    vacuna_proxima: { icon: Syringe, color: "#1E4E8C", bg: "linear-gradient(90deg, #8CC9F0 0%, #D7EEFF 100%)", label: "Próximo" },
-                    articulo: { icon: Check, color: "#7C5CBF", bg: "#E3D2FA", label: "Recomendado" },
+                    control_proximo: { icon: Clock, color: "var(--info-text)", bg: "var(--info-bg)", label: "Agendado" },
+                    vacuna_atrasada: { icon: Syringe, color: "var(--warn-text)", bg: "var(--warn-bg)", label: "Pendiente" },
+                    vacuna_pendiente: { icon: Syringe, color: "var(--warn-text)", bg: "var(--warn-bg)", label: "Pendiente" },
+                    vacuna_proxima: { icon: Syringe, color: "var(--info-text)", bg: "var(--info-bg)", label: "Próximo" },
+                    articulo: { icon: Check, color: "var(--theme-primary)", bg: "var(--theme-bg-light)", label: "Recomendado" },
                   };
                   const { icon: StatusIcon, color: statusColor, bg: statusBg, label: statusLabel } =
                     config[n.tipo] || config.articulo;
@@ -663,7 +667,7 @@ export default function Dashboard() {
 
             {growthError && (
               <div style={{
-                background: "rgba(217,112,112,0.14)", borderLeft: "4px solid #DC2626", borderRadius: "10px",
+                background: "var(--danger-bg)", borderLeft: "4px solid var(--danger-border)", borderRadius: "10px",
                 padding: "12px 16px", marginBottom: "18px", fontSize: "13px", color: "var(--text)", fontWeight: 600,
               }}>
                 {growthError}
