@@ -106,7 +106,16 @@ body {
   --header-to: #A47BE8;
 }
 
-[data-tema="oscuro"] {
+/* Se usa :root[data-tema="oscuro"] y no solo [data-tema="oscuro"]: más abajo
+   hay otro bloque :root con las variables del tema de color, y con la misma
+   especificidad ganaba el que viniera después en el archivo. El resultado era
+   que --theme-bg-light volvía al lavanda claro en modo oscuro, dejando el
+   hero del panel y el menú de perfiles casi blancos.
+
+   ThemeSelector quita --theme-bg-light y --theme-bg-hover del estilo inline
+   justamente para que caigan a los valores de acá, así que este bloque tiene
+   que ganar sí o sí. */
+:root[data-tema="oscuro"] {
   /* No se usa negro puro: en pantallas OLED el contraste puro cansa la
      vista, y de madrugada esta app se mira con el bebé en brazos. */
   --surface: #221E2E;

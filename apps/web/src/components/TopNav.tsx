@@ -295,9 +295,9 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
                     position: "absolute", top: "calc(100% + 12px)", right: 0,
                     background: "var(--surface)", borderRadius: "20px", boxShadow: "0 16px 40px rgba(45,38,64,0.22)",
                     minWidth: "240px", overflow: "hidden", zIndex: 200,
-                    border: "1px solid rgba(124,92,191,0.08)",
+                    border: "1px solid var(--border)",
                   }}>
-                    <div style={{ padding: "14px 18px 8px", fontSize: "11px", fontWeight: 800, color: "#A399B5", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                    <div style={{ padding: "14px 18px 8px", fontSize: "11px", fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
                       Tus peques
                     </div>
                     {babies.map((baby) => (
@@ -307,10 +307,10 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
                         style={{
                           display: "flex", alignItems: "center", gap: "11px",
                           padding: "10px 18px", cursor: "pointer",
-                          background: baby.id === activeBabyId ? "var(--theme-bg-light)" : "white",
+                          background: baby.id === activeBabyId ? "var(--theme-bg-light)" : "var(--surface)",
                         }}
-                        onMouseEnter={(e) => { if (baby.id !== activeBabyId) e.currentTarget.style.background = "#FAF9FD"; }}
-                        onMouseLeave={(e) => { if (baby.id !== activeBabyId) e.currentTarget.style.background = "white"; }}
+                        onMouseEnter={(e) => { if (baby.id !== activeBabyId) e.currentTarget.style.background = "var(--surface-2)"; }}
+                        onMouseLeave={(e) => { if (baby.id !== activeBabyId) e.currentTarget.style.background = "var(--surface)"; }}
                       >
                         <div style={{
                           width: "34px", height: "34px", borderRadius: "50%",
@@ -392,7 +392,7 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
                               key={i}
                               onClick={() => abrirDetalleNotif(n)}
                               style={{
-                                padding: "12px 16px", borderBottom: i < notifs.length - 1 ? "1px solid #F5F2FC" : "none",
+                                padding: "12px 16px", borderBottom: i < notifs.length - 1 ? "1px solid var(--border-soft)" : "none",
                                 cursor: "pointer", display: "flex", alignItems: "flex-start", gap: "8px",
                                 background: noLeida ? "var(--theme-bg-light)" : "transparent",
                               }}
