@@ -40,7 +40,58 @@ function comparar(antes: number, ahora: number, unidad: "tomas" | "sueno") {
     : { icono: TrendingDown, color: "#B27B16", texto: `duerme ${pct}% menos que hace unos días` };
 }
 
-/** Gráfico de barras simple, sin librerías: son pocos datos y así no pesa. */
+/**
+ * Devuelve los segmentos de curva ("C ...") que unen los puntos con trazo
+ * suave, sin el "M" inicial, para poder reusarlos tanto en la línea como en
+ * el relleno del área.
+ *
+ * Usa interpolación cúbica monótona (Fritsch-Carlson), no Catmull-Rom: una
+ * spline normal se pasa de largo en los picos y valles, y acá eso dibujaría
+ * valores que nunca ocurrieron (un día de 3 pañales se vería como si hubiera
+ * bajado a 2, o el sueño se iría bajo cero). La monótona nunca se sale del
+ * rango de los datos reales entre dos puntos.
+ */
+function segmentosSuaves(X: number[], Y: number[]): string {
+  const n = X.length;
+  if (n < 2) return "";
+  if (n === 2) return `L ${X[1]},${Y[1]}`;
+
+  // Pendiente de cada tramo entre puntos consecutivos
+  const dx: number[] = [];
+  const pendientes: number[] = [];
+  for (let i = 0; i < n - 1; i++) {
+    dx.push(X[i + 1] - X[i]);
+    pendientes.push((Y[i + 1] - Y[i]) / dx[i]);
+  }
+
+  // Tangente en cada punto. En los extremos se toma la pendiente del tramo
+  // vecino; cuando el punto es un pico o un valle (los tramos a cada lado van
+  // en sentidos opuestos) la tangente se fuerza a 0, que es justamente lo que
+  // impide que la curva se pase de largo.
+  const m: number[] = new Array(n);
+  m[0] = pendientes[0];
+  m[n - 1] = pendientes[n - 2];
+  for (let i = 1; i < n - 1; i++) {
+    if (pendientes[i - 1] * pendientes[i] <= 0) {
+      m[i] = 0;
+    } else {
+      const w1 = 2 * dx[i] + dx[i - 1];
+      const w2 = dx[i] + 2 * dx[i - 1];
+      m[i] = (w1 + w2) / (w1 / pendientes[i - 1] + w2 / pendientes[i]);
+    }
+  }
+
+  const partes: string[] = [];
+  for (let i = 0; i < n - 1; i++) {
+    const h = dx[i] / 3;
+    partes.push(
+      `C ${X[i] + h},${Y[i] + m[i] * h} ${X[i + 1] - h},${Y[i + 1] - m[i + 1] * h} ${X[i + 1]},${Y[i + 1]}`,
+    );
+  }
+  return partes.join(" ");
+}
+
+/** Gráfico de línea simple, sin librerías: son pocos datos y así no pesa. */
 export function Lineas({ datos, campo, color, formato }: any) {
   const max = Math.max(...datos.map((d: any) => d[campo]), 1);
   const alto = 110;
@@ -63,8 +114,16 @@ export function Lineas({ datos, campo, color, formato }: any) {
   const x = (i: number) => ((i + 0.5) / n) * 100;
   const y = (valor: number) => 92 - (valor / max) * 84; // deja margen arriba/abajo para que los puntos no se corten
 
-  const puntos = datos.map((d: any, i: number) => `${x(i)},${y(d[campo])}`).join(" ");
-  const area = `${x(0)},100 ${puntos} ${x(n - 1)},100`;
+  const coordX = datos.map((_: any, i: number) => x(i));
+  const coordY = datos.map((d: any) => y(d[campo]));
+
+  // La línea y el área comparten los mismos segmentos curvos, así el relleno
+  // sigue exactamente el borde de la línea.
+  const curva = segmentosSuaves(coordX, coordY);
+  const linea = n > 0 ? `M ${coordX[0]},${coordY[0]} ${curva}`.trim() : "";
+  const area = n > 0
+    ? `M ${coordX[0]},100 L ${coordX[0]},${coordY[0]} ${curva} L ${coordX[n - 1]},100 Z`.replace(/\s+/g, " ")
+    : "";
 
   return (
     <div style={{ marginTop: "14px", display: "flex", gap: "8px" }}>
@@ -83,8 +142,8 @@ export function Lineas({ datos, campo, color, formato }: any) {
               <stop offset="100%" stopColor={color} stopOpacity="0" />
             </linearGradient>
           </defs>
-          <polygon points={area} fill={`url(#grad-${campo})`} />
-          <polyline points={puntos} fill="none" stroke={color} strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
+          <path d={area} fill={`url(#grad-${campo})`} />
+          <path d={linea} fill="none" stroke={color} strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
           {datos.map((d: any, i: number) => {
             const valor = d[campo];
             const fecha = new Date(d.dia + "T12:00:00");
