@@ -1313,7 +1313,7 @@ export default function Salud() {
                           cursor: "pointer", fontFamily: "'Nunito', sans-serif", fontWeight: 800,
                           fontSize: "13.5px", textAlign: "left",
                           border: tipoCita === t ? "2px solid var(--theme-primary)" : "2px solid var(--border)",
-                          background: tipoCita === t ? "var(--theme-primary)" : "#fff",
+                          background: tipoCita === t ? "var(--theme-primary)" : "var(--surface)",
                           color: tipoCita === t ? "#fff" : "var(--theme-darker)",
                         }}
                       >

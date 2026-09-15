@@ -19,7 +19,7 @@ function ModuloEnDesarrollo({ user }: { user: any }) {
   return (
     <div style={{
       minHeight: "100vh",
-      background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)",
+      background: "linear-gradient(165deg, var(--page-bg) 0%, var(--theme-bg-light) 100%)",
       fontFamily: "'Nunito', sans-serif",
       display: "flex",
       flexDirection: "column",
@@ -112,7 +112,7 @@ export default function Directorio() {
   return (
     <div style={{
       minHeight: "100vh",
-      background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)",
+      background: "linear-gradient(165deg, var(--page-bg) 0%, var(--theme-bg-light) 100%)",
       fontFamily: "'Nunito', sans-serif",
       display: "flex",
       flexDirection: "column",
@@ -140,7 +140,7 @@ export default function Directorio() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 style={{ 
                   width: "100%", padding: "14px 16px 14px 48px", boxSizing: "border-box",
-                  borderRadius: "14px", border: "2px solid #EDE9F8", 
+                  borderRadius: "14px", border: "2px solid var(--border)", 
                   fontSize: "15px", outline: "none",
                 }}
               />
@@ -151,7 +151,7 @@ export default function Directorio() {
               onChange={(e) => setSelectedEspecialidad(e.target.value)}
               style={{ 
                 flex: "0 1 250px", padding: "14px 16px", 
-                borderRadius: "14px", border: "2px solid #EDE9F8", 
+                borderRadius: "14px", border: "2px solid var(--border)", 
                 fontSize: "15px", outline: "none", background: "var(--surface)", cursor: "pointer"
               }}>
               <option value="">Todas las especialidades</option>
@@ -192,7 +192,7 @@ export default function Directorio() {
                       <h3 style={{ margin: "0 0 4px 0", fontFamily: "'Baloo 2', sans-serif", fontSize: "18px", fontWeight: 700, color: "var(--text)" }}>
                         {medico.nombre_completo}
                       </h3>
-                      <div style={{ display: "flex", alignItems: "center", gap: "4px", background: "var(--accent-gold-light)", color: "#8A6D1D", padding: "4px 8px", borderRadius: "8px", fontSize: "13px", fontWeight: 700, flexShrink: 0 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "4px", background: "var(--accent-gold-light)", color: "var(--warn-text)", padding: "4px 8px", borderRadius: "8px", fontSize: "13px", fontWeight: 700, flexShrink: 0 }}>
                         <Star size={14} fill="currentColor" /> {medico.calificacion_promedio}
                       </div>
                     </div>

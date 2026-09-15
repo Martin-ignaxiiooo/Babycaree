@@ -262,7 +262,7 @@ export default function EstadisticasDiario({ bebeId, token, refreshKey }: { bebe
               padding: "8px 16px", borderRadius: "100px", cursor: "pointer",
               fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "13px",
               border: dias === d ? "2px solid var(--theme-primary)" : "1.5px solid #E4DBF7",
-              background: dias === d ? "var(--theme-primary)" : "#fff",
+              background: dias === d ? "var(--theme-primary)" : "var(--surface)",
               color: dias === d ? "#fff" : "#8A849C",
             }}
           >

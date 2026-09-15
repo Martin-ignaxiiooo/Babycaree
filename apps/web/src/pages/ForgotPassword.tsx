@@ -167,9 +167,9 @@ export default function ForgotPassword() {
     strengthColors[0] = "var(--theme-primary)"; // Morado
     strengthColors[1] = "var(--theme-primary)";
   } else if (passStrength === 3) {
-    strengthColors[0] = "#6DBE9E"; // Verde
-    strengthColors[1] = "#6DBE9E";
-    strengthColors[2] = "#6DBE9E";
+    strengthColors[0] = "var(--success-text)"; // Verde
+    strengthColors[1] = "var(--success-text)";
+    strengthColors[2] = "var(--success-text)";
   }
 
   const strengthLabel =
@@ -219,14 +219,14 @@ export default function ForgotPassword() {
     {
       icon: Heart,
       color: "#F4A0A0",
-      bg: "#FFF0F0",
+      bg: "var(--danger-bg)",
       title: "Control de Salud",
       desc: "Vacunas del PNI y controles de pediatría siempre al día.",
     },
     {
       icon: TrendingUp,
-      color: "#6DBE9E",
-      bg: "#E8F7F1",
+      color: "var(--success-text)",
+      bg: "var(--success-bg)",
       title: "Hitos del Desarrollo",
       desc: "Seguimiento preciso según su edad corregida y real.",
     },
@@ -238,7 +238,7 @@ export default function ForgotPassword() {
       style={{
         minHeight: "100vh",
         display: "flex",
-        background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)",
+        background: "linear-gradient(165deg, var(--page-bg) 0%, var(--theme-bg-light) 100%)",
         fontFamily: "'Nunito', sans-serif",
       }}
     >
@@ -490,7 +490,7 @@ export default function ForgotPassword() {
 
                 <div
                   style={{
-                    background: "#E8F7F1",
+                    background: "var(--success-bg)",
                     borderRadius: "14px",
                     padding: "14px",
                     fontSize: "13px",
@@ -498,7 +498,7 @@ export default function ForgotPassword() {
                     display: "flex",
                     gap: "10px",
                     alignItems: "flex-start",
-                    color: "#166534",
+                    color: "var(--success-text)",
                   }}
                 >
                   <span style={{ fontSize: "16px" }}>🔒</span>
@@ -511,13 +511,13 @@ export default function ForgotPassword() {
                 {error && (
                   <div
                     style={{
-                      background: "#FFF0F0",
-                      borderLeft: "4px solid #DC2626",
+                      background: "var(--danger-bg)",
+                      borderLeft: "4px solid var(--danger-border)",
                       borderRadius: "12px",
                       padding: "14px",
                       fontSize: "14px",
                       marginBottom: "24px",
-                      color: "#7F1D1D",
+                      color: "var(--danger-text)",
                     }}
                   >
                     ⚠️ {error}
@@ -554,7 +554,7 @@ export default function ForgotPassword() {
                         fontFamily: "'Nunito', sans-serif",
                         fontWeight: 500,
                         color: "var(--text)",
-                        background: "#FDFCFF",
+                        background: "var(--surface-2)",
                         outline: "none",
                         transition: "border-color 0.2s, box-shadow 0.2s",
                         boxSizing: "border-box",
@@ -584,9 +584,9 @@ export default function ForgotPassword() {
                       border: "none",
                       cursor: loading ? "not-allowed" : "pointer",
                       background: loading
-                        ? "#E5E3EC"
+                        ? "var(--border)"
                         : "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
-                      color: loading ? "#B0ABC4" : "white",
+                      color: loading ? "var(--text-muted)" : "white",
                       fontSize: "17px",
                       fontWeight: 800,
                       fontFamily: "'Nunito', sans-serif",
@@ -613,7 +613,7 @@ export default function ForgotPassword() {
                     style={{
                       textAlign: "center",
                       fontSize: "12px",
-                      color: "#9CA3AF",
+                      color: "var(--text-muted)",
                       marginTop: "20px",
                       lineHeight: 1.5,
                     }}
@@ -677,13 +677,13 @@ export default function ForgotPassword() {
                 {codeError && (
                   <div
                     style={{
-                      background: "#FFF0F0",
-                      borderLeft: "4px solid #DC2626",
+                      background: "var(--danger-bg)",
+                      borderLeft: "4px solid var(--danger-border)",
                       borderRadius: "12px",
                       padding: "14px",
                       fontSize: "14px",
                       marginBottom: "24px",
-                      color: "#7F1D1D",
+                      color: "var(--danger-text)",
                     }}
                   >
                     <div>
@@ -729,15 +729,15 @@ export default function ForgotPassword() {
                           borderRadius: "14px",
                           border: "2px solid",
                           borderColor: codeError
-                            ? "#DC2626"
+                            ? "var(--danger-text)"
                             : digit
                               ? "var(--theme-primary)"
                               : "var(--theme-bg-light)",
                           background: codeError
-                            ? "#FFF0F0"
+                            ? "var(--danger-bg)"
                             : digit
                               ? "#fff"
-                              : "#FDFCFF",
+                              : "var(--surface-2)",
                           color: "var(--text)",
                           outline: "none",
                           fontFamily: "'Nunito', sans-serif",
@@ -771,7 +771,7 @@ export default function ForgotPassword() {
                           height: "8px",
                           borderRadius: "50%",
                           background:
-                            i < 3 - intentosRestantes ? "#DC2626" : "var(--theme-bg-light)",
+                            i < 3 - intentosRestantes ? "var(--danger-text)" : "var(--theme-bg-light)",
                         }}
                       />
                     ))}
@@ -790,7 +790,7 @@ export default function ForgotPassword() {
                     <span
                       onClick={handleResend}
                       style={{
-                        color: canResend ? "var(--theme-primary)" : "#9CA3AF",
+                        color: canResend ? "var(--theme-primary)" : "var(--text-muted)",
                         cursor: canResend ? "pointer" : "not-allowed",
                         fontWeight: canResend ? 800 : 500,
                         textDecoration: canResend ? "underline" : "none",
@@ -829,9 +829,9 @@ export default function ForgotPassword() {
                       border: "none",
                       cursor: loading ? "not-allowed" : "pointer",
                       background: loading
-                        ? "#E5E3EC"
+                        ? "var(--border)"
                         : "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
-                      color: loading ? "#B0ABC4" : "white",
+                      color: loading ? "var(--text-muted)" : "white",
                       fontSize: "17px",
                       fontWeight: 800,
                       fontFamily: "'Nunito', sans-serif",
@@ -882,7 +882,7 @@ export default function ForgotPassword() {
 
                 <div
                   style={{
-                    background: "#E8F7F1",
+                    background: "var(--success-bg)",
                     borderRadius: "14px",
                     padding: "14px",
                     fontSize: "13px",
@@ -890,7 +890,7 @@ export default function ForgotPassword() {
                     display: "flex",
                     gap: "10px",
                     alignItems: "flex-start",
-                    color: "#166534",
+                    color: "var(--success-text)",
                   }}
                 >
                   <span style={{ fontSize: "16px" }}>✅</span>
@@ -903,13 +903,13 @@ export default function ForgotPassword() {
                 {error && (
                   <div
                     style={{
-                      background: "#FFF0F0",
-                      borderLeft: "4px solid #DC2626",
+                      background: "var(--danger-bg)",
+                      borderLeft: "4px solid var(--danger-border)",
                       borderRadius: "12px",
                       padding: "14px",
                       fontSize: "14px",
                       marginBottom: "24px",
-                      color: "#7F1D1D",
+                      color: "var(--danger-text)",
                     }}
                   >
                     ⚠️ {error}
@@ -950,7 +950,7 @@ export default function ForgotPassword() {
                           fontFamily: "'Nunito', sans-serif",
                           fontWeight: 500,
                           color: "var(--text)",
-                          background: "#FDFCFF",
+                          background: "var(--surface-2)",
                           outline: "none",
                           transition: "border-color 0.2s, box-shadow 0.2s",
                           boxSizing: "border-box",
@@ -976,7 +976,7 @@ export default function ForgotPassword() {
                           background: "none",
                           border: "none",
                           cursor: "pointer",
-                          color: "#9C94BC",
+                          color: "var(--text-muted)",
                           padding: "4px",
                         }}
                       >
@@ -1008,12 +1008,12 @@ export default function ForgotPassword() {
                         fontSize: "12px",
                         color:
                           passStrength === 3
-                            ? "#16A34A"
+                            ? "var(--success-text)"
                             : passStrength === 2
                               ? "var(--theme-primary)"
                               : passStrength === 1
-                                ? "#DC2626"
-                                : "#9CA3AF",
+                                ? "var(--danger-text)"
+                                : "var(--text-muted)",
                         marginTop: "8px",
                         fontWeight: 700,
                       }}
@@ -1025,7 +1025,7 @@ export default function ForgotPassword() {
                   {/* Checklist */}
                   <div
                     style={{
-                      background: "#FDFCFF",
+                      background: "var(--surface-2)",
                       border: "2px solid var(--theme-bg-light)",
                       borderRadius: "16px",
                       padding: "16px",
@@ -1046,8 +1046,8 @@ export default function ForgotPassword() {
                           fontSize: "13px",
                           marginBottom: "8px",
                           color: passReqs[key as keyof PasswordReq]
-                            ? "#16A34A"
-                            : "#8A849C",
+                            ? "var(--success-text)"
+                            : "var(--text-muted)",
                           fontWeight: passReqs[key as keyof PasswordReq]
                             ? 700
                             : 500,
@@ -1091,7 +1091,7 @@ export default function ForgotPassword() {
                           fontFamily: "'Nunito', sans-serif",
                           fontWeight: 500,
                           color: "var(--text)",
-                          background: "#FDFCFF",
+                          background: "var(--surface-2)",
                           outline: "none",
                           transition: "border-color 0.2s, box-shadow 0.2s",
                           boxSizing: "border-box",
@@ -1117,7 +1117,7 @@ export default function ForgotPassword() {
                           background: "none",
                           border: "none",
                           cursor: "pointer",
-                          color: "#9C94BC",
+                          color: "var(--text-muted)",
                           padding: "4px",
                         }}
                       >
@@ -1143,9 +1143,9 @@ export default function ForgotPassword() {
                       border: "none",
                       cursor: loading ? "not-allowed" : "pointer",
                       background: loading
-                        ? "#E5E3EC"
+                        ? "var(--border)"
                         : "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
-                      color: loading ? "#B0ABC4" : "white",
+                      color: loading ? "var(--text-muted)" : "white",
                       fontSize: "17px",
                       fontWeight: 800,
                       fontFamily: "'Nunito', sans-serif",
@@ -1234,7 +1234,7 @@ export default function ForgotPassword() {
               <>
                 <div
                   style={{
-                    background: "#FFF0F0",
+                    background: "var(--danger-bg)",
                     borderRadius: "20px",
                     padding: "24px",
                     textAlign: "center",
@@ -1246,7 +1246,7 @@ export default function ForgotPassword() {
                     style={{
                       fontSize: "18px",
                       fontWeight: 800,
-                      color: "#DC2626",
+                      color: "var(--danger-text)",
                       marginBottom: "8px",
                     }}
                   >
@@ -1255,7 +1255,7 @@ export default function ForgotPassword() {
                   <p
                     style={{
                       fontSize: "14px",
-                      color: "#7F1D1D",
+                      color: "var(--danger-text)",
                       lineHeight: 1.5,
                     }}
                   >
@@ -1266,7 +1266,7 @@ export default function ForgotPassword() {
 
                 <div
                   style={{
-                    background: "#FEF3C7",
+                    background: "var(--warn-bg)",
                     borderRadius: "14px",
                     padding: "14px",
                     fontSize: "14px",
@@ -1274,7 +1274,7 @@ export default function ForgotPassword() {
                     display: "flex",
                     gap: "10px",
                     alignItems: "center",
-                    color: "#92400E",
+                    color: "var(--warn-text)",
                   }}
                 >
                   <span style={{ fontSize: "18px" }}>⏱️</span>
@@ -1285,7 +1285,7 @@ export default function ForgotPassword() {
 
                 <div
                   style={{
-                    background: "#F0F9FF",
+                    background: "var(--info-bg)",
                     borderRadius: "14px",
                     padding: "14px",
                     fontSize: "14px",
@@ -1293,7 +1293,7 @@ export default function ForgotPassword() {
                     display: "flex",
                     gap: "10px",
                     alignItems: "center",
-                    color: "#0369A1",
+                    color: "var(--info-text)",
                   }}
                 >
                   <span style={{ fontSize: "18px" }}>💬</span>

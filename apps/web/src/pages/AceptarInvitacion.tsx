@@ -189,7 +189,7 @@ export default function AceptarInvitacion() {
         </label>
 
         {errorForm && (
-          <p style={{ fontSize: "13px", color: "#D97070", fontWeight: 700, marginBottom: "14px", lineHeight: 1.4 }}>{errorForm}</p>
+          <p style={{ fontSize: "13px", color: "var(--danger-text)", fontWeight: 700, marginBottom: "14px", lineHeight: 1.4 }}>{errorForm}</p>
         )}
 
         <button

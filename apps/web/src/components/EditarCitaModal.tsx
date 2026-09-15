@@ -97,7 +97,7 @@ export default function EditarCitaModal({ bebeId, cita, token, onClose, onGuarda
                   flex: 1, padding: "11px", borderRadius: "12px", cursor: "pointer",
                   fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "13.5px",
                   border: tipo === t ? "2px solid var(--theme-primary)" : "2px solid #E4DBF7",
-                  background: tipo === t ? "var(--theme-primary)" : "#fff",
+                  background: tipo === t ? "var(--theme-primary)" : "var(--surface)",
                   color: tipo === t ? "#fff" : "var(--theme-darker)",
                 }}
               >

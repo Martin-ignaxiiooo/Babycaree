@@ -77,7 +77,7 @@ function InputField({
             fontFamily: "'Nunito', sans-serif",
             fontWeight: 500,
             color: "var(--text)",
-            background: "#FDFCFF",
+            background: "var(--surface-2)",
             outline: "none",
             transition: "border-color 0.2s, box-shadow 0.2s",
             boxSizing: "border-box",
@@ -103,7 +103,7 @@ function InputField({
               background: "none",
               border: "none",
               cursor: "pointer",
-              color: "#9C94BC",
+              color: "var(--text-muted)",
               padding: "4px",
             }}
           >
@@ -175,8 +175,8 @@ function ProgressBar({ step }: { step: number }) {
                 fontWeight: 800,
                 transition: "all 0.3s",
                 background:
-                  n < step ? "#6DBE9E" : n === step ? "var(--theme-primary)" : "var(--theme-bg-light)",
-                color: n <= step ? "white" : "#9C94BC",
+                  n < step ? "var(--success-text)" : n === step ? "var(--theme-primary)" : "var(--theme-bg-light)",
+                color: n <= step ? "white" : "var(--text-muted)",
                 boxShadow:
                   n === step ? "0 6px 20px rgba(124,92,191,0.45)" : "none",
                 transform: n === step ? "scale(1.18)" : "scale(1)",
@@ -190,7 +190,7 @@ function ProgressBar({ step }: { step: number }) {
                 fontWeight: 700,
                 textTransform: "uppercase",
                 letterSpacing: "0.06em",
-                color: n === step ? "var(--theme-primary)" : "#B0ABC4",
+                color: n === step ? "var(--theme-primary)" : "var(--text-muted)",
               }}
             >
               {labels[n - 1]}
@@ -300,7 +300,7 @@ function StepOne({
                 borderRadius: "20px",
                 cursor: "pointer",
                 border: `2px solid ${active ? accent : "transparent"}`,
-                background: active ? accentBg : "white",
+                background: active ? accentBg : "var(--surface)",
                 boxShadow: active
                   ? `0 8px 30px rgba(0,0,0,0.07), 0 0 0 0px ${accent}`
                   : "0 2px 12px rgba(0,0,0,0.04)",
@@ -329,14 +329,14 @@ function StepOne({
                   width: "52px",
                   height: "52px",
                   borderRadius: "18px",
-                  background: active ? accent : "#F0EEF8",
+                  background: active ? accent : "var(--surface-2)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   transition: "background 0.25s",
                 }}
               >
-                <Icon size={24} color={active ? "white" : "#9C94BC"} />
+                <Icon size={24} color={active ? "white" : "var(--text-muted)"} />
               </div>
               <div style={{ flex: 1 }}>
                 <p
@@ -366,7 +366,7 @@ function StepOne({
                   width: "22px",
                   height: "22px",
                   borderRadius: "50%",
-                  border: `2px solid ${active ? accent : "#DDD"}`,
+                  border: `2px solid ${active ? accent : "var(--border)"}`,
                   background: active ? accent : "transparent",
                   display: "flex",
                   alignItems: "center",
@@ -560,7 +560,7 @@ function StepThree({ baby, setBaby, flow, error }: any) {
             <span
               style={{
                 fontSize: "11px",
-                color: "#B0ABC4",
+                color: "var(--text-muted)",
                 fontWeight: 500,
                 textTransform: "none",
               }}
@@ -582,7 +582,7 @@ function StepThree({ baby, setBaby, flow, error }: any) {
               fontFamily: "'Nunito', sans-serif",
               fontWeight: 500,
               color: "var(--text)",
-              background: "#FDFCFF",
+              background: "var(--surface-2)",
               outline: "none",
               cursor: "pointer",
               boxSizing: "border-box",
@@ -625,7 +625,7 @@ function StepThree({ baby, setBaby, flow, error }: any) {
             fontFamily: "'Nunito', sans-serif",
             fontWeight: 500,
             color: "var(--text)",
-            background: "#FDFCFF",
+            background: "var(--surface-2)",
             outline: "none",
             cursor: "pointer",
             boxSizing: "border-box",
@@ -650,7 +650,7 @@ function StepThree({ baby, setBaby, flow, error }: any) {
           style={{
             padding: "18px",
             borderRadius: "18px",
-            border: "2px dashed #DDD9F0",
+            border: "2px dashed var(--border)",
             cursor: "pointer",
             transition: "border-color 0.2s",
           }}
@@ -669,7 +669,7 @@ function StepThree({ baby, setBaby, flow, error }: any) {
                 height: "22px",
                 borderRadius: "8px",
                 flexShrink: 0,
-                border: `2px solid ${baby.es_prematuro ? "var(--theme-primary)" : "#CCC"}`,
+                border: `2px solid ${baby.es_prematuro ? "var(--theme-primary)" : "var(--text-muted)"}`,
                 background: baby.es_prematuro ? "var(--theme-primary)" : "transparent",
                 display: "flex",
                 alignItems: "center",
@@ -727,7 +727,7 @@ function StepThree({ baby, setBaby, flow, error }: any) {
                   fontFamily: "'Nunito', sans-serif",
                   fontWeight: 500,
                   color: "var(--text)",
-                  background: "#FDFCFF",
+                  background: "var(--surface-2)",
                   outline: "none",
                 }}
               />
@@ -779,20 +779,20 @@ function StepFour({ consents, setConsents, error }: any) {
           gap: "12px",
           padding: "14px 18px",
           borderRadius: "16px",
-          background: "#E8F7F1",
+          background: "var(--success-bg)",
           border: "1px solid rgba(109,190,158,0.3)",
           marginBottom: "6px",
         }}
       >
         <Shield
           size={18}
-          color="#6DBE9E"
+          color="var(--success-text)"
           style={{ flexShrink: 0, marginTop: "1px" }}
         />
         <p
           style={{
             fontSize: "13px",
-            color: "#3A7A5A",
+            color: "var(--success-text)",
             fontWeight: 600,
             lineHeight: 1.5,
           }}
@@ -818,7 +818,7 @@ function StepFour({ consents, setConsents, error }: any) {
               borderRadius: "18px",
               cursor: "pointer",
               border: `2px solid ${checked ? "rgba(109,190,158,0.5)" : error ? "rgba(244,160,160,0.4)" : "var(--theme-bg-light)"}`,
-              background: checked ? "#F2FAF6" : "white",
+              background: checked ? "var(--success-bg)" : "var(--surface)",
               transition: "all 0.2s",
             }}
           >
@@ -828,8 +828,8 @@ function StepFour({ consents, setConsents, error }: any) {
                 width: "22px",
                 height: "22px",
                 borderRadius: "8px",
-                border: `2px solid ${checked ? "#6DBE9E" : "#CCC"}`,
-                background: checked ? "#6DBE9E" : "transparent",
+                border: `2px solid ${checked ? "var(--success-text)" : "var(--text-muted)"}`,
+                background: checked ? "var(--success-text)" : "transparent",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -864,8 +864,8 @@ function StepFour({ consents, setConsents, error }: any) {
                     fontWeight: 800,
                     padding: "2px 8px",
                     borderRadius: "20px",
-                    background: "#FFE5E5",
-                    color: "#C06060",
+                    background: "var(--danger-bg)",
+                    color: "var(--danger-text)",
                     textTransform: "uppercase",
                     letterSpacing: "0.05em",
                   }}
@@ -917,12 +917,12 @@ function ErrorBanner({ message }: { message: string }) {
         gap: "10px",
         padding: "12px 16px",
         borderRadius: "14px",
-        background: "#FFF0F0",
+        background: "var(--danger-bg)",
         border: "1px solid rgba(244,160,160,0.4)",
       }}
     >
       <AlertCircle size={16} color="#F4A0A0" style={{ flexShrink: 0 }} />
-      <p style={{ fontSize: "14px", color: "#D97070", fontWeight: 600 }}>
+      <p style={{ fontSize: "14px", color: "var(--danger-text)", fontWeight: 600 }}>
         {message}
       </p>
     </div>
@@ -951,13 +951,13 @@ function SuccessScreen({
             width: "110px",
             height: "110px",
             borderRadius: "50%",
-            background: "#E8F7F1",
+            background: "var(--success-bg)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <CheckCircle2 size={54} color="#6DBE9E" strokeWidth={1.5} />
+          <CheckCircle2 size={54} color="var(--success-text)" strokeWidth={1.5} />
         </div>
         <div
           style={{
@@ -1213,14 +1213,14 @@ export default function Onboarding() {
     {
       icon: Heart,
       color: "#F4A0A0",
-      bg: "#FFF0F0",
+      bg: "var(--danger-bg)",
       title: "Control de Salud",
       desc: "Vacunas del PNI y controles de pediatría siempre al día.",
     },
     {
       icon: TrendingUp,
-      color: "#6DBE9E",
-      bg: "#E8F7F1",
+      color: "var(--success-text)",
+      bg: "var(--success-bg)",
       title: "Hitos del Desarrollo",
       desc: "Seguimiento preciso según su edad corregida y real.",
     },
@@ -1231,7 +1231,7 @@ export default function Onboarding() {
       style={{
         minHeight: "100vh",
         display: "flex",
-        background: "linear-gradient(165deg, #FAF9FD 0%, #F6F2FF 100%)",
+        background: "linear-gradient(165deg, var(--page-bg) 0%, var(--theme-bg-light) 100%)",
         fontFamily: "'Nunito', sans-serif",
       }}
     >
@@ -1551,10 +1551,10 @@ export default function Onboarding() {
                         : "pointer",
                     background:
                       loading || (step === 1 && !flow)
-                        ? "#E5E3EC"
+                        ? "var(--border)"
                         : "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
                     color:
-                      loading || (step === 1 && !flow) ? "#B0ABC4" : "white",
+                      loading || (step === 1 && !flow) ? "var(--text-muted)" : "white",
                     fontSize: "19px",
                     fontWeight: 800,
                     fontFamily: "'Nunito', sans-serif",

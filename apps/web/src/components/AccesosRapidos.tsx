@@ -64,7 +64,7 @@ function Opcion({ activo, onClick, children }: any) {
         flex: "1 1 100px", padding: "12px", borderRadius: "14px", cursor: "pointer",
         fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "14px",
         border: activo ? "2px solid var(--theme-primary)" : "2px solid #E4DBF7",
-        background: activo ? "var(--theme-primary)" : "#fff",
+        background: activo ? "var(--theme-primary)" : "var(--surface)",
         color: activo ? "#fff" : "var(--theme-darker)",
       }}
     >
@@ -83,7 +83,7 @@ function OpcionIcono({ emoji, label, activo, onClick }: any) {
         flex: "0 1 110px", padding: "18px 10px", borderRadius: "18px", cursor: "pointer",
         fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "13.5px",
         border: activo ? "2px solid var(--theme-primary)" : "2px solid #E4DBF7",
-        background: activo ? "linear-gradient(135deg, var(--theme-primary), var(--theme-light))" : "#fff",
+        background: activo ? "linear-gradient(135deg, var(--theme-primary), var(--theme-light))" : "var(--surface)",
         color: activo ? "#fff" : "var(--theme-darker)",
         display: "flex", flexDirection: "column", alignItems: "center", gap: "8px",
       }}

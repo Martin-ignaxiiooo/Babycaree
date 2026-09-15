@@ -122,7 +122,7 @@ export default function ForoDetalle() {
         
         <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "32px" }}>
           {respuestas.length === 0 ? (
-            <div style={{ padding: "32px", textAlign: "center", color: "#6B7280", background: "var(--surface)", borderRadius: "16px", border: "1px dashed #D1D5DB" }}>
+            <div style={{ padding: "32px", textAlign: "center", color: "var(--text-muted)", background: "var(--surface)", borderRadius: "16px", border: "1px dashed var(--border)" }}>
               Sé el primero en comentar.
             </div>
           ) : respuestas.map(res => (
@@ -133,10 +133,10 @@ export default function ForoDetalle() {
                 </div>
                 <div>
                   <div style={{ fontWeight: 700, color: "var(--text)", fontSize: "15px" }}>{res.autor_nombre}</div>
-                  <div style={{ fontSize: "12px", color: "#9CA3AF" }}>{new Date(res.fecha_creacion).toLocaleString('es-CL')}</div>
+                  <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>{new Date(res.fecha_creacion).toLocaleString('es-CL')}</div>
                 </div>
               </div>
-              <p style={{ margin: 0, fontSize: "15px", color: "#4B5563", lineHeight: "1.6", whiteSpace: "pre-wrap" }}>
+              <p style={{ margin: 0, fontSize: "15px", color: "var(--text)", lineHeight: "1.6", whiteSpace: "pre-wrap" }}>
                 {res.contenido}
               </p>
             </div>
@@ -150,7 +150,7 @@ export default function ForoDetalle() {
             <textarea 
               required value={nuevoComentario} onChange={e => setNuevoComentario(e.target.value)}
               placeholder="Escribe tu respuesta aquí..." rows={4}
-              style={{ width: "100%", padding: "16px", border: "1px solid #D1D5DB", borderRadius: "12px", fontSize: "15px", outline: "none", resize: "none", fontFamily: "inherit" }}
+              style={{ width: "100%", padding: "16px", border: "1px solid var(--border)", borderRadius: "12px", fontSize: "15px", outline: "none", resize: "none", fontFamily: "inherit", background: "var(--surface-2)", color: "var(--text)", boxSizing: "border-box" }}
             />
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
               <button type="submit" disabled={isSubmitting} style={{ background: "var(--theme-primary)", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "12px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", opacity: isSubmitting ? 0.7 : 1 }}>

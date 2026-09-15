@@ -223,7 +223,7 @@ export default function Login() {
           alignItems: "center",
           justifyContent: "center",
           padding: "2.5rem",
-          background: "#EDE7F9",
+          background: "var(--border)",
           overflowY: "auto",
         }}
       >
@@ -253,7 +253,7 @@ export default function Login() {
             {bloqueado && (
               <div
                 style={{
-                  background: "#FFF0F0",
+                  background: "var(--danger-bg)",
                   borderRadius: "20px",
                   padding: "24px",
                   textAlign: "center",
@@ -265,7 +265,7 @@ export default function Login() {
                   style={{
                     fontSize: "18px",
                     fontWeight: 800,
-                    color: "#DC2626",
+                    color: "var(--danger-text)",
                     marginBottom: "8px",
                   }}
                 >
@@ -274,7 +274,7 @@ export default function Login() {
                 <p
                   style={{
                     fontSize: "14px",
-                    color: "#7F1D1D",
+                    color: "var(--danger-text)",
                     lineHeight: 1.5,
                   }}
                 >
@@ -283,19 +283,19 @@ export default function Login() {
                 </p>
                 <div
                   style={{
-                    background: "#FEF3C7",
+                    background: "var(--warn-bg)",
                     borderRadius: "14px",
                     padding: "12px",
                     fontSize: "13px",
                     marginTop: "16px",
-                    color: "#92400E",
+                    color: "var(--warn-text)",
                   }}
                 >
                   Intenta nuevamente en <strong>{minutosBloqueo} min</strong>{" "}
                   o{" "}
                   <Link
                     to="/recuperar-contrasena"
-                    style={{ color: "#D97706", fontWeight: 800 }}
+                    style={{ color: "var(--warn-border)", fontWeight: 800 }}
                   >
                     recupera tu contraseña
                   </Link>
@@ -307,8 +307,8 @@ export default function Login() {
             {error && !bloqueado && (
               <div
                 style={{
-                  background: "#FFF0F0",
-                  borderLeft: "4px solid #DC2626",
+                  background: "var(--danger-bg)",
+                  borderLeft: "4px solid var(--danger-border)",
                   borderRadius: "12px",
                   padding: "14px 18px",
                   fontSize: "14px",
@@ -316,7 +316,7 @@ export default function Login() {
                   display: "flex",
                   gap: "12px",
                   alignItems: "flex-start",
-                  color: "#7F1D1D",
+                  color: "var(--danger-text)",
                   textAlign: "left",
                 }}
               >
@@ -338,7 +338,7 @@ export default function Login() {
                 <div style={{ position: "relative", marginBottom: "16px" }}>
                   <Mail
                     size={19}
-                    color="#B39DDB"
+                    color="var(--theme-light)"
                     style={{
                       position: "absolute",
                       left: "18px",
@@ -372,7 +372,7 @@ export default function Login() {
                         "0 0 0 4px var(--theme-shadow-light)";
                     }}
                     onBlur={(e) => {
-                      e.target.style.borderColor = "#E4DBF7";
+                      e.target.style.borderColor = "var(--border)";
                       e.target.style.boxShadow = "none";
                     }}
                   />
@@ -381,7 +381,7 @@ export default function Login() {
                 <div style={{ position: "relative", marginBottom: "10px" }}>
                   <Lock
                     size={19}
-                    color="#B39DDB"
+                    color="var(--theme-light)"
                     style={{
                       position: "absolute",
                       left: "18px",
@@ -415,7 +415,7 @@ export default function Login() {
                         "0 0 0 4px var(--theme-shadow-light)";
                     }}
                     onBlur={(e) => {
-                      e.target.style.borderColor = "#E4DBF7";
+                      e.target.style.borderColor = "var(--border)";
                       e.target.style.boxShadow = "none";
                     }}
                   />
@@ -433,7 +433,7 @@ export default function Login() {
                       background: "none",
                       border: "none",
                       cursor: "pointer",
-                      color: "#B39DDB",
+                      color: "var(--theme-light)",
                       padding: "4px",
                       display: "flex",
                     }}
@@ -497,9 +497,9 @@ export default function Login() {
                     border: "none",
                     cursor: loading ? "not-allowed" : "pointer",
                     background: loading
-                      ? "#E5E3EC"
+                      ? "var(--border)"
                       : "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
-                    color: loading ? "#B0ABC4" : "white",
+                    color: loading ? "var(--text-muted)" : "white",
                     fontSize: "16px",
                     fontWeight: 800,
                     fontFamily: "'Nunito', sans-serif",
@@ -524,7 +524,7 @@ export default function Login() {
                   style={{
                     textAlign: "center",
                     fontSize: "12px",
-                    color: "#B0ABC4",
+                    color: "var(--text-muted)",
                     margin: "22px 0",
                     fontWeight: 700,
                     textTransform: "uppercase",
@@ -542,9 +542,9 @@ export default function Login() {
                         width: "100%",
                         textAlign: "center",
                         fontSize: "13px",
-                        color: "#B0ABC4",
+                        color: "var(--text-muted)",
                         padding: "14px",
-                        border: "2px dashed #E4DBF7",
+                        border: "2px dashed var(--border)",
                         borderRadius: "16px",
                       }}
                     >
@@ -555,7 +555,7 @@ export default function Login() {
                     <div
                       style={{
                         fontSize: "13px",
-                        color: "#B0ABC4",
+                        color: "var(--text-muted)",
                         padding: "10px",
                       }}
                     >

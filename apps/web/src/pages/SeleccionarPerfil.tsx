@@ -236,7 +236,7 @@ export default function SeleccionarPerfil() {
                 position: "absolute",
                 top: "12px",
                 right: "12px",
-                background: "#FFF0F0",
+                background: "var(--danger-bg)",
                 border: "none",
                 borderRadius: "50%",
                 width: "32px",
@@ -244,12 +244,12 @@ export default function SeleccionarPerfil() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "#DC6B6B",
+                color: "var(--danger-text)",
                 cursor: "pointer",
                 transition: "background 0.2s"
               }}
-              onMouseOver={(e) => e.currentTarget.style.background = "#FFDEDE"}
-              onMouseOut={(e) => e.currentTarget.style.background = "#FFF0F0"}
+              onMouseOver={(e) => e.currentTarget.style.background = "var(--danger-bg)"}
+              onMouseOut={(e) => e.currentTarget.style.background = "var(--danger-bg)"}
               title="Eliminar perfil"
             >
               <Trash2 size={15} />
@@ -308,14 +308,14 @@ export default function SeleccionarPerfil() {
               <button
                 type="button"
                 onClick={() => setBabyForm({...babyForm, flow: "hijo"})}
-                style={{ flex: 1, padding: "12px", borderRadius: "14px", border: babyForm.flow === "hijo" ? "2px solid var(--theme-primary)" : "2px solid #E5E7EB", background: babyForm.flow === "hijo" ? "var(--theme-bg-light)" : "white", fontWeight: 700, color: babyForm.flow === "hijo" ? "var(--theme-primary)" : "#6B7280", cursor: "pointer" }}
+                style={{ flex: 1, padding: "12px", borderRadius: "14px", border: babyForm.flow === "hijo" ? "2px solid var(--theme-primary)" : "2px solid var(--border)", background: babyForm.flow === "hijo" ? "var(--theme-bg-light)" : "var(--surface)", fontWeight: 700, color: babyForm.flow === "hijo" ? "var(--theme-primary)" : "var(--text-muted)", cursor: "pointer" }}
               >
                 Bebé nacido
               </button>
               <button
                 type="button"
                 onClick={() => setBabyForm({...babyForm, flow: "embarazo"})}
-                style={{ flex: 1, padding: "12px", borderRadius: "14px", border: babyForm.flow === "embarazo" ? "2px solid var(--theme-primary)" : "2px solid #E5E7EB", background: babyForm.flow === "embarazo" ? "var(--theme-bg-light)" : "white", fontWeight: 700, color: babyForm.flow === "embarazo" ? "var(--theme-primary)" : "#6B7280", cursor: "pointer" }}
+                style={{ flex: 1, padding: "12px", borderRadius: "14px", border: babyForm.flow === "embarazo" ? "2px solid var(--theme-primary)" : "2px solid var(--border)", background: babyForm.flow === "embarazo" ? "var(--theme-bg-light)" : "var(--surface)", fontWeight: 700, color: babyForm.flow === "embarazo" ? "var(--theme-primary)" : "var(--text-muted)", cursor: "pointer" }}
               >
                 Estoy embarazada
               </button>
@@ -324,7 +324,7 @@ export default function SeleccionarPerfil() {
             <form onSubmit={handleCreateBaby} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <div>
                 <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "var(--text)", marginBottom: "6px" }}>{babyForm.flow === "hijo" ? "Nombre del bebé *" : "Apodo o nombre del bebé *"}</label>
-                <input required type="text" placeholder={babyForm.flow === "hijo" ? "Ej: Sofía" : "Ej: Porotito"} value={babyForm.nombre} onChange={(e) => setBabyForm({...babyForm, nombre: e.target.value})} style={{ width: "100%", padding: "12px 14px", border: "2px solid #EDE9F8", borderRadius: "14px", outline: "none", boxSizing: "border-box", fontSize: "15px" }} />
+                <input required type="text" placeholder={babyForm.flow === "hijo" ? "Ej: Sofía" : "Ej: Porotito"} value={babyForm.nombre} onChange={(e) => setBabyForm({...babyForm, nombre: e.target.value})} style={{ width: "100%", padding: "12px 14px", border: "2px solid var(--border)", borderRadius: "14px", outline: "none", boxSizing: "border-box", fontSize: "15px" }} />
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem" }}>
@@ -334,7 +334,7 @@ export default function SeleccionarPerfil() {
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "var(--text)", marginBottom: "6px" }}>Sexo</label>
-                  <select value={babyForm.sexo} onChange={(e) => setBabyForm({...babyForm, sexo: e.target.value})} style={{ width: "100%", padding: "12px 14px", border: "2px solid #EDE9F8", borderRadius: "14px", outline: "none", boxSizing: "border-box", fontSize: "15px" }}>
+                  <select value={babyForm.sexo} onChange={(e) => setBabyForm({...babyForm, sexo: e.target.value})} style={{ width: "100%", padding: "12px 14px", border: "2px solid var(--border)", borderRadius: "14px", outline: "none", boxSizing: "border-box", fontSize: "15px" }}>
                     <option value="">Seleccionar...</option>
                     <option value="Femenino">Femenino</option>
                     <option value="Masculino">Masculino</option>
@@ -344,7 +344,7 @@ export default function SeleccionarPerfil() {
 
               <div>
                 <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "var(--text)", marginBottom: "6px" }}>Previsión de salud *</label>
-                <select required value={babyForm.prevision} onChange={(e) => setBabyForm({...babyForm, prevision: e.target.value})} style={{ width: "100%", padding: "12px 14px", border: "2px solid #EDE9F8", borderRadius: "14px", outline: "none", boxSizing: "border-box", fontSize: "15px" }}>
+                <select required value={babyForm.prevision} onChange={(e) => setBabyForm({...babyForm, prevision: e.target.value})} style={{ width: "100%", padding: "12px 14px", border: "2px solid var(--border)", borderRadius: "14px", outline: "none", boxSizing: "border-box", fontSize: "15px" }}>
                   <option value="">Seleccione previsión</option>
                   {previsiones.map(p => (
                     <option key={p.codigo} value={p.codigo}>{p.nombre_visible}</option>
@@ -357,7 +357,7 @@ export default function SeleccionarPerfil() {
                   <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "14px", fontWeight: 700, color: "var(--text)", cursor: "pointer" }}>
                     <div
                       onClick={() => setBabyForm({...babyForm, es_prematuro: !babyForm.es_prematuro})}
-                      style={{ width: "24px", height: "24px", borderRadius: "7px", border: "2px solid var(--theme-primary)", display: "flex", alignItems: "center", justifyContent: "center", background: babyForm.es_prematuro ? "var(--theme-primary)" : "white", cursor: "pointer", flexShrink: 0 }}
+                      style={{ width: "24px", height: "24px", borderRadius: "7px", border: "2px solid var(--theme-primary)", display: "flex", alignItems: "center", justifyContent: "center", background: babyForm.es_prematuro ? "var(--theme-primary)" : "var(--surface)", cursor: "pointer", flexShrink: 0 }}
                     >
                       {babyForm.es_prematuro && <Check size={14} color="white" />}
                     </div>
@@ -374,7 +374,7 @@ export default function SeleccionarPerfil() {
 
               <button disabled={isSaving} type="submit" style={{
                 width: "100%", padding: "16px",
-                background: isSaving ? "#D1D5DB" : "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
+                background: isSaving ? "var(--border)" : "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
                 color: "white", border: "none", borderRadius: "16px", fontSize: "16px", fontWeight: 800, marginTop: "8px",
                 cursor: isSaving ? "not-allowed" : "pointer",
                 boxShadow: isSaving ? "none" : "0 10px 26px var(--theme-shadow)",
