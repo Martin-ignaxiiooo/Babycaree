@@ -298,7 +298,7 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
                     border: "1px solid rgba(124,92,191,0.08)",
                   }}>
                     <div style={{ padding: "14px 18px 8px", fontSize: "11px", fontWeight: 800, color: "#A399B5", textTransform: "uppercase", letterSpacing: "0.06em" }}>
-                      Tus perfiles
+                      Tus peques
                     </div>
                     {babies.map((baby) => (
                       <div
@@ -339,7 +339,7 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
                         color: "var(--theme-primary)", fontSize: "14px", fontWeight: 700,
                       }}
                     >
-                      <Plus size={16} /> Gestionar perfiles
+                      <Plus size={16} /> Nuestra familia
                     </div>
                   </div>
                 )}
@@ -485,7 +485,7 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
             {babies.length > 1 && (
               <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "18px" }}>
                 <div style={{ fontSize: "11px", fontWeight: 800, color: "rgba(255,255,255,0.45)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "10px" }}>
-                  Tus bebés
+                  Tus peques
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                   {babies.map((baby) => (

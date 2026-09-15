@@ -26,9 +26,9 @@
 | 14 | `salud_materna.sql` | Datos de salud materna | ? | ✅ | Ejecutada |
 | 15 | `suscripciones_push.sql` | Suscripciones a push notifications | ? | ✅ | Ejecutada |
 | 16 | `vacunas_fecha_con_hora.sql` | Vacunas con fecha y hora | ? | ✅ | Ejecutada |
-| 17 | `usuario_foto_perfil.sql` | Foto de perfil del usuario (mamá/papá) | 2026-09-14 | ⏳ | **Pendiente** |
+| 17 | `usuario_foto_perfil.sql` | Foto de perfil del usuario (mamá/papá) | 2026-09-14 | ✅ | Ejecutada |
 
-**Total migraciones**: 17 (+ 1 en schema.sql base) — 16 ejecutadas, 1 pendiente
+**Total migraciones**: 17 (+ 1 en schema.sql base)
 
 ---
 
@@ -134,14 +134,14 @@
 -- Campo: hora (time)
 ```
 
-### 17. usuario_foto_perfil.sql ⏳ PENDIENTE DE EJECUTAR
+### 17. usuario_foto_perfil.sql
 ```sql
 -- Foto de perfil del usuario (mamá/papá/cuidador)
 -- Campo: foto_perfil TEXT (data URI base64, igual que perfiles_bebes)
 ALTER TABLE usuarios
   ADD COLUMN IF NOT EXISTS foto_perfil TEXT;
 ```
-**Ejecutar en Render:**
+Ejecutada en Render el 2026-09-14:
 ```bash
 psql "$DATABASE_URL" -f backend/src/db/migrations/usuario_foto_perfil.sql
 ```
@@ -201,9 +201,7 @@ Ninguno actualmente.
 
 ## ⚠️ Acción requerida
 
-`usuario_foto_perfil.sql` está en el repo pero **aún no se ha ejecutado** en la
-base de Render. Hasta que se ejecute, la subida de foto en Mi Perfil devolverá
-error 500 (`column "foto_perfil" does not exist`).
+Ninguna. Todas las migraciones del repo están ejecutadas en Render.
 
 ---
 
@@ -215,4 +213,4 @@ error 500 (`column "foto_perfil" does not exist`).
 
 ---
 
-**Última verificación**: 14 de Septiembre, 2026
+**Última verificación**: 14 de Septiembre, 2026 (17/17 ejecutadas)
