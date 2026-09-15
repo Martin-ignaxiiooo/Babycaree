@@ -26,8 +26,9 @@
 | 14 | `salud_materna.sql` | Datos de salud materna | ? | ✅ | Ejecutada |
 | 15 | `suscripciones_push.sql` | Suscripciones a push notifications | ? | ✅ | Ejecutada |
 | 16 | `vacunas_fecha_con_hora.sql` | Vacunas con fecha y hora | ? | ✅ | Ejecutada |
+| 17 | `usuario_foto_perfil.sql` | Foto de perfil del usuario (mamá/papá) | 2026-09-14 | ⏳ | **Pendiente** |
 
-**Total migraciones**: 16 (+ 1 en schema.sql base)
+**Total migraciones**: 17 (+ 1 en schema.sql base) — 16 ejecutadas, 1 pendiente
 
 ---
 
@@ -133,6 +134,18 @@
 -- Campo: hora (time)
 ```
 
+### 17. usuario_foto_perfil.sql ⏳ PENDIENTE DE EJECUTAR
+```sql
+-- Foto de perfil del usuario (mamá/papá/cuidador)
+-- Campo: foto_perfil TEXT (data URI base64, igual que perfiles_bebes)
+ALTER TABLE usuarios
+  ADD COLUMN IF NOT EXISTS foto_perfil TEXT;
+```
+**Ejecutar en Render:**
+```bash
+psql "$DATABASE_URL" -f backend/src/db/migrations/usuario_foto_perfil.sql
+```
+
 ---
 
 ## 📅 Próximas Migraciones Planeadas
@@ -183,6 +196,14 @@
 ## 🐛 Problemas Reportados
 
 Ninguno actualmente.
+
+---
+
+## ⚠️ Acción requerida
+
+`usuario_foto_perfil.sql` está en el repo pero **aún no se ha ejecutado** en la
+base de Render. Hasta que se ejecute, la subida de foto en Mi Perfil devolverá
+error 500 (`column "foto_perfil" does not exist`).
 
 ---
 

@@ -8,7 +8,7 @@ export const getMe = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user.id;
     const result = await query(
-      "SELECT id, email, nombre, apellidos, rol, consentimiento_ley_19628, consentimiento_ley_21719 FROM usuarios WHERE id = $1",
+      "SELECT id, email, nombre, apellidos, rol, foto_perfil, consentimiento_ley_19628, consentimiento_ley_21719 FROM usuarios WHERE id = $1",
       [userId],
     );
 
@@ -29,7 +29,7 @@ export const updateMe = async (req: AuthRequest, res: Response) => {
     const { nombre, apellidos } = req.body;
     
     const result = await query(
-      "UPDATE usuarios SET nombre = $1, apellidos = $2 WHERE id = $3 RETURNING id, email, nombre, apellidos, rol, consentimiento_ley_19628, consentimiento_ley_21719",
+      "UPDATE usuarios SET nombre = $1, apellidos = $2 WHERE id = $3 RETURNING id, email, nombre, apellidos, rol, foto_perfil, consentimiento_ley_19628, consentimiento_ley_21719",
       [nombre, apellidos, userId]
     );
 
@@ -41,6 +41,59 @@ export const updateMe = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error("Error in updateMe:", error);
     res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
+// La foto se guarda como data URI base64 en la propia fila de usuarios, no en
+// disco: el filesystem de Render se borra en cada redeploy. Mismo criterio que
+// perfiles_bebes.foto_perfil.
+//
+// A diferencia de la foto del bebé no hace falta chequear permisos: la ruta es
+// /me, así que el usuario solo puede tocar su propia foto.
+export const subirFotoUsuario = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user.id;
+    const file = (req as any).file as Express.Multer.File | undefined;
+
+    if (!file) {
+      return res.status(400).json({ error: "No se recibió ninguna imagen" });
+    }
+
+    const dataUri = `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
+
+    const result = await query(
+      "UPDATE usuarios SET foto_perfil = $2 WHERE id = $1 RETURNING foto_perfil",
+      [userId, dataUri],
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+
+    res.json({ foto_perfil: result.rows[0].foto_perfil });
+  } catch (error) {
+    console.error("Error in subirFotoUsuario:", error);
+    res.status(500).json({ error: "Error al subir la foto" });
+  }
+};
+
+export const eliminarFotoUsuario = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user.id;
+
+    const result = await query(
+      "UPDATE usuarios SET foto_perfil = NULL WHERE id = $1 RETURNING id",
+      [userId],
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+
+    res.json({ foto_perfil: null });
+  } catch (error) {
+    console.error("Error in eliminarFotoUsuario:", error);
+    res.status(500).json({ error: "Error al eliminar la foto" });
   }
 };
 

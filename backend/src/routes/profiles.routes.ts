@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { verifyToken } from "../middlewares/auth.middleware";
+import { uploadFotoMemoria } from "../middlewares/uploadMemoria.middleware";
 import {
   getMe,
   updateMe,
@@ -7,6 +8,8 @@ import {
   getPasswordEstado,
   getPreferenciasNotificaciones,
   updatePreferenciasNotificaciones,
+  subirFotoUsuario,
+  eliminarFotoUsuario,
   createBabyProfile,
   getMyBabies,
   deleteBabyProfile,
@@ -32,6 +35,8 @@ router.get("/me", getMe);
 router.patch("/me", updateMe);
 router.patch("/me/password", updatePassword);
 router.get("/me/password-estado", getPasswordEstado);
+router.post("/me/foto", uploadFotoMemoria.single("foto"), subirFotoUsuario);
+router.delete("/me/foto", eliminarFotoUsuario);
 router.get("/me/preferencias-notificaciones", getPreferenciasNotificaciones);
 router.patch("/me/preferencias-notificaciones", updatePreferenciasNotificaciones);
 router.post("/babies", createBabyProfile);

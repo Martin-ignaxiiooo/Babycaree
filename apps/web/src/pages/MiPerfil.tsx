@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, User, Mail, Save, ChevronRight } from "lucide-react";
+import { ArrowLeft, User, Mail, Save, ChevronRight, Camera, X, Loader2 } from "lucide-react";
 import TopNav from "../components/TopNav";
 import { useNotificaciones } from "../hooks/useNotificaciones";
 import { vozSoportada, vozActiva, setVozActiva } from "../utils/voz";
+import { ACCEPT_IMAGEN, resizeImageFile, validarImagen } from "../utils/imagen";
 import { API_URL } from "../config/api";
 
 export default function MiPerfil() {
@@ -27,6 +28,13 @@ export default function MiPerfil() {
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+  // Foto de perfil del usuario. Se guarda como data URI en la base (igual que
+  // la del bebé), así que acá basta con el string que devuelve el backend.
+  const [fotoPerfil, setFotoPerfil] = useState<string | null>(initialUser.foto_perfil || null);
+  const [uploadingFoto, setUploadingFoto] = useState(false);
+  const [fotoError, setFotoError] = useState("");
+  const [confirmandoBorrarFoto, setConfirmandoBorrarFoto] = useState(false);
   // Las cuentas creadas con Google no tienen contraseña propia todavía: a
   // esas no se les pide la "actual" (no existe una que puedan conocer).
   const [tienePassword, setTienePassword] = useState(true);
@@ -89,6 +97,90 @@ export default function MiPerfil() {
       : [...recordatoriosHoras, horas];
     setRecordatoriosHoras(nuevas);
     guardarPreferenciasRecordatorios({ horas: nuevas });
+  };
+
+  // Mantiene sincronizado el `user` de localStorage para que el avatar del
+  // menú superior (TopNav) refleje el cambio sin recargar la página.
+  const sincronizarFotoEnSesion = (nuevaFoto: string | null) => {
+    const guardado = JSON.parse(localStorage.getItem("user") || "{}");
+    localStorage.setItem("user", JSON.stringify({ ...guardado, foto_perfil: nuevaFoto }));
+    window.dispatchEvent(new Event("storage"));
+  };
+
+  const handleUploadFoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // permite volver a elegir el mismo archivo después
+    if (!file) return;
+
+    const errorValidacion = validarImagen(file);
+    if (errorValidacion) {
+      setFotoError(errorValidacion);
+      return;
+    }
+
+    setFotoError("");
+    setUploadingFoto(true);
+    try {
+      const resizedBlob = await resizeImageFile(file);
+
+      const formData = new FormData();
+      formData.append("foto", resizedBlob, "foto.jpg");
+
+      const res = await fetch(`${API_URL}/profiles/me/foto`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "No se pudo subir la foto");
+      }
+
+      const data = await res.json();
+      setFotoPerfil(data.foto_perfil);
+      sincronizarFotoEnSesion(data.foto_perfil);
+    } catch (error) {
+      console.error(error);
+      setFotoError(
+        error instanceof Error && error.message
+          ? error.message
+          : "No se pudo subir la foto. Intenta de nuevo.",
+      );
+    } finally {
+      setUploadingFoto(false);
+    }
+  };
+
+  const handleEliminarFoto = async () => {
+    if (uploadingFoto) return;
+
+    setFotoError("");
+    setUploadingFoto(true);
+    setConfirmandoBorrarFoto(false);
+    try {
+      const res = await fetch(`${API_URL}/profiles/me/foto`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "No se pudo quitar la foto");
+      }
+
+      setFotoPerfil(null);
+      sincronizarFotoEnSesion(null);
+    } catch (error) {
+      console.error(error);
+      setFotoError(
+        error instanceof Error && error.message
+          ? error.message
+          : "No se pudo quitar la foto. Intenta de nuevo.",
+      );
+    } finally {
+      setUploadingFoto(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -184,7 +276,10 @@ export default function MiPerfil() {
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--page-bg)", fontFamily: "'Nunito', sans-serif" }}>
-      <TopNav user={initialUser} activePath="/mi-perfil" />
+      {/* Se pasa fotoPerfil desde el estado (no desde initialUser) para que el
+          avatar del menú se actualice apenas se sube o se quita la foto, sin
+          tener que recargar la página. */}
+      <TopNav user={{ ...initialUser, foto_perfil: fotoPerfil }} activePath="/mi-perfil" />
 
       {/* Cabecera morada; las tarjetas flotan sobre ella. */}
       <div style={{ background: "linear-gradient(135deg, #8B5FD6 0%, #A47BE8 100%)", paddingBottom: "80px" }}>
@@ -206,20 +301,132 @@ export default function MiPerfil() {
 
           {/* ── Columna izquierda: identidad ── */}
           <Tarjeta style={{ textAlign: "center" }}>
-            <div style={{
-              width: "104px", height: "104px", borderRadius: "50%", margin: "0 auto 16px",
-              background: "linear-gradient(135deg, #8B5FD6, #C0A9EE)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              color: "#fff", fontSize: "38px", fontWeight: 900, fontFamily: "'Baloo 2', sans-serif",
-            }}>
-              {(formData.nombre || "?").charAt(0).toUpperCase()}
-            </div>
+            <label
+              htmlFor="foto-usuario-input"
+              title={fotoPerfil ? "Cambiar tu foto" : "Subir tu foto"}
+              style={{
+                position: "relative", display: "block",
+                width: "104px", height: "104px", margin: "0 auto 16px",
+                cursor: uploadingFoto ? "default" : "pointer",
+              }}
+            >
+              <div style={{
+                width: "104px", height: "104px", borderRadius: "50%", overflow: "hidden",
+                background: "linear-gradient(135deg, #8B5FD6, #C0A9EE)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                color: "#fff", fontSize: "38px", fontWeight: 900, fontFamily: "'Baloo 2', sans-serif",
+              }}>
+                {fotoPerfil ? (
+                  <img
+                    src={fotoPerfil}
+                    alt={formData.nombre || "Tu foto de perfil"}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                ) : (
+                  (formData.nombre || "?").charAt(0).toUpperCase()
+                )}
+              </div>
+
+              {fotoPerfil && !uploadingFoto && !confirmandoBorrarFoto && (
+                <button
+                  type="button"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setConfirmandoBorrarFoto(true); }}
+                  title="Quitar foto"
+                  aria-label="Quitar tu foto de perfil"
+                  style={{
+                    position: "absolute", top: "2px", right: "2px",
+                    width: "24px", height: "24px", borderRadius: "50%",
+                    background: "rgba(45,38,64,0.6)", border: "none",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    cursor: "pointer", padding: 0,
+                  }}
+                >
+                  <X size={14} color="#fff" strokeWidth={2.5} />
+                </button>
+              )}
+
+              {!uploadingFoto && !confirmandoBorrarFoto && (
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: "absolute", bottom: "2px", right: "2px",
+                    width: "32px", height: "32px", borderRadius: "50%",
+                    background: "#fff", border: "2px solid #EDE7F9",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                  }}
+                >
+                  <Camera size={16} color="#8B5FD6" strokeWidth={2.2} />
+                </div>
+              )}
+
+              {confirmandoBorrarFoto && !uploadingFoto && (
+                <div
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                  style={{
+                    position: "absolute", inset: 0, borderRadius: "50%",
+                    background: "rgba(45,38,64,0.85)",
+                    display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                    gap: "6px", padding: "8px", textAlign: "center",
+                  }}
+                >
+                  <span style={{ color: "#fff", fontSize: "11px", fontWeight: 700, lineHeight: 1.3 }}>
+                    ¿Quitar foto?
+                  </span>
+                  <div style={{ display: "flex", gap: "6px" }}>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleEliminarFoto(); }}
+                      style={{
+                        background: "#fff", color: "#B91C1C", border: "none", borderRadius: "8px",
+                        padding: "4px 10px", fontSize: "11px", fontWeight: 800, cursor: "pointer",
+                      }}
+                    >
+                      Sí
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); setConfirmandoBorrarFoto(false); }}
+                      style={{
+                        background: "rgba(255,255,255,0.2)", color: "#fff", border: "1px solid rgba(255,255,255,0.5)",
+                        borderRadius: "8px", padding: "4px 10px", fontSize: "11px", fontWeight: 700, cursor: "pointer",
+                      }}
+                    >
+                      No
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {uploadingFoto && (
+                <div style={{
+                  position: "absolute", inset: 0, borderRadius: "50%",
+                  background: "rgba(255,255,255,0.85)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  <Loader2 size={26} color="#8B5FD6" className="spin-icon" />
+                </div>
+              )}
+
+              <input
+                id="foto-usuario-input"
+                type="file"
+                accept={ACCEPT_IMAGEN}
+                onChange={handleUploadFoto}
+                disabled={uploadingFoto}
+                style={{ display: "none" }}
+              />
+            </label>
             <div style={{ fontSize: "19px", fontWeight: 800, color: "#8B5FD6", fontFamily: "'Baloo 2', sans-serif" }}>
               {formData.nombre} {formData.apellidos}
             </div>
             <div style={{ fontSize: "13.5px", color: "#8A849C", marginTop: "4px", wordBreak: "break-all" }}>
               {formData.email}
             </div>
+            {fotoError && (
+              <div style={{ fontSize: "12.5px", color: "#DC2626", marginTop: "10px", fontWeight: 600, lineHeight: 1.45 }}>
+                {fotoError}
+              </div>
+            )}
           </Tarjeta>
 
           {/* ── Columna derecha ── */}

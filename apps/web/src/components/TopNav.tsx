@@ -423,13 +423,22 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
             <div
               onClick={() => navigate("/mi-perfil")}
               style={{
-                width: "38px", height: "38px", borderRadius: "50%",
+                width: "38px", height: "38px", borderRadius: "50%", overflow: "hidden",
                 background: "linear-gradient(135deg, var(--theme-light), var(--accent-coral))",
                 display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800,
                 fontSize: "15px", cursor: "pointer", boxShadow: "0 0 0 2px rgba(255,255,255,0.25)",
                 fontFamily: "'Baloo 2', sans-serif",
-              }}>
-              {user?.nombre ? user.nombre.charAt(0).toUpperCase() : "U"}
+              }}
+              title="Mi perfil">
+              {user?.foto_perfil ? (
+                <img
+                  src={user.foto_perfil}
+                  alt=""
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              ) : (
+                user?.nombre ? user.nombre.charAt(0).toUpperCase() : "U"
+              )}
             </div>
             <button className="nav-links-desktop" onClick={handleLogout} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.65)", cursor: "pointer", display: "flex", alignItems: "center" }} title="Cerrar sesión">
               <LogOut size={19} />

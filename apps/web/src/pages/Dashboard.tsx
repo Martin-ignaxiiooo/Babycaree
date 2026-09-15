@@ -10,6 +10,7 @@ import NotificacionDetalleModal from "../components/NotificacionDetalleModal";
 import DiarioResumenMini from "../components/DiarioResumenMini";
 import AccesosRapidos from "../components/AccesosRapidos";
 import { marcarNotifLeida } from "../utils/notificacionesLeidas";
+import { ACCEPT_IMAGEN, resizeImageFile, validarImagen } from "../utils/imagen";
 import DashboardEmbarazo from "./DashboardEmbarazo";
 
 import { API_URL } from "../config/api";
@@ -128,61 +129,14 @@ export default function Dashboard() {
     }
   };
 
-  // Redimensiona/comprime la foto en el navegador antes de subirla, para no
-  // guardar imágenes pesadas en la base de datos (se guardan en base64).
-  const resizeImageFile = (file: File, maxDim = 480, quality = 0.82): Promise<Blob> => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      const objectUrl = URL.createObjectURL(file);
-      img.onload = () => {
-        let { width, height } = img;
-        if (width > height && width > maxDim) {
-          height = Math.round(height * (maxDim / width));
-          width = maxDim;
-        } else if (height >= width && height > maxDim) {
-          width = Math.round(width * (maxDim / height));
-          height = maxDim;
-        }
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-          URL.revokeObjectURL(objectUrl);
-          reject(new Error("No se pudo procesar la imagen"));
-          return;
-        }
-        ctx.drawImage(img, 0, 0, width, height);
-        canvas.toBlob(
-          (blob) => {
-            URL.revokeObjectURL(objectUrl);
-            if (blob) resolve(blob);
-            else reject(new Error("No se pudo procesar la imagen"));
-          },
-          "image/jpeg",
-          quality,
-        );
-      };
-      img.onerror = () => {
-        URL.revokeObjectURL(objectUrl);
-        reject(new Error("No se pudo leer la imagen"));
-      };
-      img.src = objectUrl;
-    });
-  };
-
   const handleUploadFoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = ""; // permite volver a elegir el mismo archivo después
     if (!file || !activeBabyId) return;
 
-    const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      setFotoError("Formato no soportado. Usa JPG, PNG, WEBP o GIF.");
-      return;
-    }
-    if (file.size > 8 * 1024 * 1024) {
-      setFotoError("La imagen no puede pesar más de 8MB.");
+    const errorValidacion = validarImagen(file);
+    if (errorValidacion) {
+      setFotoError(errorValidacion);
       return;
     }
 
@@ -445,7 +399,7 @@ export default function Dashboard() {
               <input
                 id="foto-bebe-input"
                 type="file"
-                accept="image/jpeg,image/png,image/webp,image/gif"
+                accept={ACCEPT_IMAGEN}
                 onChange={handleUploadFoto}
                 disabled={uploadingFoto}
                 style={{ display: "none" }}
