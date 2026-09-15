@@ -129,7 +129,7 @@ export default function Calendario() {
     <div style={{ minHeight: "100vh", background: "var(--page-bg)", fontFamily: "'Nunito', sans-serif" }}>
       <TopNav user={user} activePath="/calendario" perfilEstado={perfil?.estado} />
 
-      <div style={{ background: "linear-gradient(135deg, #8B5FD6 0%, #A47BE8 100%)", paddingBottom: "80px" }}>
+      <div style={{ background: "linear-gradient(135deg, var(--header-from) 0%, var(--header-to) 100%)", paddingBottom: "80px" }}>
         <div style={{ maxWidth: "1240px", margin: "0 auto", padding: "26px 32px 0" }}>
           {semanas != null && (
             <span style={{ display: "inline-block", background: "rgba(255,255,255,0.2)", color: "#fff", borderRadius: "100px", padding: "5px 14px", fontSize: "11.5px", fontWeight: 800, letterSpacing: "0.5px", marginBottom: "10px" }}>
@@ -152,7 +152,7 @@ export default function Calendario() {
           <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
             <Tarjeta>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
-                <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "21px", fontWeight: 700, color: "#3F3A52", margin: 0 }}>
+                <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "21px", fontWeight: 700, color: "var(--text)", margin: 0 }}>
                   {MESES[cursor.getMonth()]} {cursor.getFullYear()}
                 </h2>
                 <div style={{ display: "flex", gap: "8px" }}>
@@ -167,7 +167,7 @@ export default function Calendario() {
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "4px", marginBottom: "8px" }}>
                 {DIAS.map((d) => (
-                  <div key={d} style={{ textAlign: "center", fontSize: "11px", fontWeight: 800, color: "#A99FC4", letterSpacing: "0.5px", padding: "6px 0" }}>
+                  <div key={d} style={{ textAlign: "center", fontSize: "11px", fontWeight: 800, color: "var(--text-muted)", letterSpacing: "0.5px", padding: "6px 0" }}>
                     {d}
                   </div>
                 ))}
@@ -183,10 +183,10 @@ export default function Calendario() {
                       key={i}
                       onClick={() => c.delMes && setSeleccionado(c.fecha)}
                       style={{
-                        aspectRatio: "1", border: activo && !esHoy ? "1.5px solid #8B5FD6" : "1.5px solid transparent",
+                        aspectRatio: "1", border: activo && !esHoy ? "1.5px solid var(--theme-primary)" : "1.5px solid transparent",
                         borderRadius: "12px", cursor: c.delMes ? "pointer" : "default",
-                        background: esHoy ? "linear-gradient(135deg, #8B5FD6, #A47BE8)" : "transparent",
-                        color: esHoy ? "#fff" : !c.delMes ? "#D6D1E3" : tiene ? "#8B5FD6" : "#3F3A52",
+                        background: esHoy ? "linear-gradient(135deg, var(--theme-primary), var(--theme-light))" : "transparent",
+                        color: esHoy ? "#fff" : !c.delMes ? "var(--border)" : tiene ? "var(--theme-primary)" : "var(--text)",
                         fontWeight: esHoy || tiene ? 800 : 600, fontSize: "14px",
                         display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
                         gap: "3px", fontFamily: "'Nunito', sans-serif", position: "relative",
@@ -194,7 +194,7 @@ export default function Calendario() {
                     >
                       {c.dia}
                       {tiene && (
-                        <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: esHoy ? "#fff" : "#8B5FD6" }} />
+                        <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: esHoy ? "#fff" : "var(--theme-primary)" }} />
                       )}
                     </button>
                   );
@@ -204,7 +204,7 @@ export default function Calendario() {
 
             {/* Citas del día elegido, o el hito de la semana */}
             <Tarjeta>
-              <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "18px", fontWeight: 700, color: "#3F3A52", margin: 0 }}>
+              <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "18px", fontWeight: 700, color: "var(--text)", margin: 0 }}>
                 {delDia.length > 0
                   ? `Citas del ${seleccionado.getDate()} de ${MESES[seleccionado.getMonth()].toLowerCase()}`
                   : "Desarrollo Semanal"}
@@ -215,10 +215,10 @@ export default function Calendario() {
                   {delDia.map((c: any) => (
                     <div key={c.id} style={fila}>
                       <div>
-                        <div style={{ fontSize: "14px", fontWeight: 800, color: "#3F3A52" }}>
+                        <div style={{ fontSize: "14px", fontWeight: 800, color: "var(--text)" }}>
                           {c.especialidad || "Control"}
                         </div>
-                        <div style={{ fontSize: "12.5px", color: "#8A849C", marginTop: "1px" }}>
+                        <div style={{ fontSize: "12.5px", color: "var(--text-muted)", marginTop: "1px" }}>
                           {new Date(c.fecha_cita).toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" })}
                           {c.medico ? ` · ${c.medico}` : ""}
                         </div>
@@ -227,7 +227,7 @@ export default function Calendario() {
                   ))}
                 </div>
               ) : (
-                <p style={{ fontSize: "14px", color: "#6B647F", lineHeight: 1.7, marginTop: "10px" }}>
+                <p style={{ fontSize: "14px", color: "var(--text-muted)", lineHeight: 1.7, marginTop: "10px" }}>
                   {perfil?.hito_embarazo
                     ? `Semana ${semanas}: ${String(perfil.hito_embarazo).split(".")[0]}.`
                     : "Elige un día con punto morado para ver sus citas."}
@@ -239,32 +239,32 @@ export default function Calendario() {
           {/* ── Columna derecha ── */}
           <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
             <Tarjeta>
-              <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "18px", fontWeight: 700, color: "#3F3A52", margin: 0 }}>
+              <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "18px", fontWeight: 700, color: "var(--text)", margin: 0 }}>
                 Mis Citas Próximas
               </h3>
               <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "14px" }}>
                 {loading ? (
                   <Loader2 size={18} className="spin-icon" />
                 ) : proximas.length === 0 ? (
-                  <p style={{ fontSize: "13.5px", color: "#8A849C", margin: 0 }}>No tienes citas agendadas.</p>
+                  <p style={{ fontSize: "13.5px", color: "var(--text-muted)", margin: 0 }}>No tienes citas agendadas.</p>
                 ) : (
                   proximas.map((c: any) => {
                     const d = new Date(c.fecha_cita);
                     return (
                       <div key={c.id} style={fila}>
                         <div style={{ textAlign: "center", minWidth: "38px", flexShrink: 0 }}>
-                          <div style={{ fontSize: "18px", fontWeight: 900, color: "#3F3A52", lineHeight: 1, fontFamily: "'Baloo 2', sans-serif" }}>
+                          <div style={{ fontSize: "18px", fontWeight: 900, color: "var(--text)", lineHeight: 1, fontFamily: "'Baloo 2', sans-serif" }}>
                             {String(d.getDate()).padStart(2, "0")}
                           </div>
-                          <div style={{ fontSize: "10px", fontWeight: 800, color: "#A99FC4" }}>
+                          <div style={{ fontSize: "10px", fontWeight: 800, color: "var(--text-muted)" }}>
                             {d.toLocaleDateString("es-CL", { month: "short" }).replace(".", "").toUpperCase()}
                           </div>
                         </div>
                         <div style={{ minWidth: 0 }}>
-                          <div style={{ fontSize: "13.5px", fontWeight: 800, color: "#3F3A52" }}>
+                          <div style={{ fontSize: "13.5px", fontWeight: 800, color: "var(--text)" }}>
                             {c.especialidad || "Control"}
                           </div>
-                          <div style={{ fontSize: "12px", color: "#8A849C" }}>
+                          <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
                             {d.toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" })}
                             {c.medico ? ` · ${c.medico}` : ""}
                           </div>
@@ -279,8 +279,8 @@ export default function Calendario() {
             {/* Añadir cita */}
             <Tarjeta>
               <div style={{ display: "flex", alignItems: "center", gap: "9px" }}>
-                <PlusCircle size={19} color="#8B5FD6" />
-                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "18px", fontWeight: 700, color: "#3F3A52", margin: 0 }}>
+                <PlusCircle size={19} color="var(--theme-primary)" />
+                <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "18px", fontWeight: 700, color: "var(--text)", margin: 0 }}>
                   Añadir Cita
                 </h3>
               </div>
@@ -301,7 +301,7 @@ export default function Calendario() {
                 </div>
 
                 {error && (
-                  <p style={{ color: "#D97070", fontSize: "12.5px", fontWeight: 700, marginTop: "10px" }}>{error}</p>
+                  <p style={{ color: "var(--danger-text)", fontSize: "12.5px", fontWeight: 700, marginTop: "10px" }}>{error}</p>
                 )}
 
                 <button type="submit" disabled={guardando} style={{ ...btnPrimario, marginTop: "16px", opacity: guardando ? 0.6 : 1 }}>
@@ -337,8 +337,8 @@ function Flecha({ children, onClick }: { children: React.ReactNode; onClick: () 
     <button
       onClick={onClick}
       style={{
-        width: "32px", height: "32px", borderRadius: "10px", border: "1px solid #EDE7F9",
-        background: "#FAF8FE", color: "#8B5FD6", cursor: "pointer",
+        width: "32px", height: "32px", borderRadius: "10px", border: "1px solid var(--border)",
+        background: "var(--surface-2)", color: "var(--theme-primary)", cursor: "pointer",
         display: "flex", alignItems: "center", justifyContent: "center",
       }}
     >
@@ -349,7 +349,7 @@ function Flecha({ children, onClick }: { children: React.ReactNode; onClick: () 
 
 function Etiqueta({ children }: { children: React.ReactNode }) {
   return (
-    <label style={{ display: "block", fontSize: "11.5px", fontWeight: 800, color: "#8A849C", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "6px" }}>
+    <label style={{ display: "block", fontSize: "11.5px", fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "6px" }}>
       {children}
     </label>
   );
@@ -357,17 +357,17 @@ function Etiqueta({ children }: { children: React.ReactNode }) {
 
 const fila: React.CSSProperties = {
   display: "flex", alignItems: "center", gap: "12px",
-  background: "#FAF8FE", border: "1px solid #EDE7F9", borderRadius: "14px", padding: "11px 14px",
+  background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "14px", padding: "11px 14px",
 };
 
 const input: React.CSSProperties = {
   width: "100%", padding: "11px 13px", borderRadius: "11px",
-  border: "1px solid #E4DBF7", background: "#FAF8FE", fontSize: "14px",
-  fontFamily: "'Nunito', sans-serif", color: "#3F3A52", outline: "none", boxSizing: "border-box",
+  border: "1px solid var(--border)", background: "var(--surface-2)", fontSize: "14px",
+  fontFamily: "'Nunito', sans-serif", color: "var(--text)", outline: "none", boxSizing: "border-box",
 };
 
 const btnPrimario: React.CSSProperties = {
-  width: "100%", background: "linear-gradient(135deg, #8B5FD6, #A47BE8)", color: "#fff",
+  width: "100%", background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))", color: "#fff",
   border: "none", borderRadius: "12px", padding: "13px", fontWeight: 800, fontSize: "14.5px",
   cursor: "pointer", fontFamily: "'Nunito', sans-serif",
   boxShadow: "0 6px 16px rgba(139,95,214,0.28)",
