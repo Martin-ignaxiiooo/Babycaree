@@ -35,9 +35,9 @@ function duracionTexto(min: number): string {
 
 /** Colores e ícono por tipo de registro, usados en los botones rápidos. */
 const ESTILO_TIPO: Record<Tipo, { bg: string; fg: string; Icon: any }> = {
-  toma:  { bg: "#E3F2FD", fg: "#1976D2", Icon: Milk },
-  sueno: { bg: "#EDE7F6", fg: "#7C5CBF", Icon: Moon },
-  panal: { bg: "#FFF4E0", fg: "#B27B16", Icon: Baby },
+  toma:  { bg: "rgba(25,118,210,0.14)", fg: "#4BA3E8", Icon: Milk },
+  sueno: { bg: "rgba(124,92,191,0.16)", fg: "var(--theme-primary)", Icon: Moon },
+  panal: { bg: "rgba(178,123,22,0.16)", fg: "#D9A441", Icon: Baby },
 };
 
 export default function RegistroDiario() {
@@ -142,7 +142,7 @@ export default function RegistroDiario() {
       />
 
       {/* Cabecera: mismo color/gradiente morado que Comunidad y Salud. */}
-      <div style={{ background: "linear-gradient(135deg, #8B5FD6 0%, #A47BE8 100%)", color: "#fff" }}>
+      <div style={{ background: "linear-gradient(135deg, var(--header-from) 0%, var(--header-to) 100%)", color: "#fff" }}>
         <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "16px 40px 12px" }}>
           <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "22px", margin: 0, display: "flex", alignItems: "center", gap: "10px" }}>
             <NotebookPen size={22} /> Registro diario
@@ -199,10 +199,10 @@ export default function RegistroDiario() {
             Últimos registros de hoy
           </h2>
           <div className="diario-resumen-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "14px", marginBottom: "26px" }}>
-            <Tarjeta icono={<Milk size={19} color="#1976D2" />} bg="#E3F2FD" valor={resumen.hoy.tomas} etiqueta="tomas hoy" />
-            <Tarjeta icono={<Droplets size={19} color="#0288D1" />} bg="#E1F5FE" valor={`${resumen.hoy.ml_total} ml`} etiqueta="de biberón" />
-            <Tarjeta icono={<Moon size={19} color="#7C5CBF" />} bg="#EDE7F6" valor={duracionTexto(resumen.hoy.sueno_min)} etiqueta="durmiendo" />
-            <Tarjeta icono={<Baby size={19} color="#B27B16" />} bg="#FFF4E0" valor={resumen.hoy.panales} etiqueta="pañales" />
+            <Tarjeta icono={<Milk size={19} color="#4BA3E8" />} bg="rgba(25,118,210,0.14)" valor={resumen.hoy.tomas} etiqueta="tomas hoy" />
+            <Tarjeta icono={<Droplets size={19} color="#3FB0E8" />} bg="rgba(2,136,209,0.14)" valor={`${resumen.hoy.ml_total} ml`} etiqueta="de biberón" />
+            <Tarjeta icono={<Moon size={19} color="var(--theme-primary)" />} bg="rgba(124,92,191,0.16)" valor={duracionTexto(resumen.hoy.sueno_min)} etiqueta="durmiendo" />
+            <Tarjeta icono={<Baby size={19} color="#D9A441" />} bg="rgba(178,123,22,0.16)" valor={resumen.hoy.panales} etiqueta="pañales" />
           </div>
           </>
         )}
@@ -255,7 +255,7 @@ export default function RegistroDiario() {
         )}
 
         {error && (
-          <div style={{ background: "#FFF0F0", color: "#D97070", borderRadius: "12px", padding: "12px 16px", fontSize: "13.5px", fontWeight: 600, marginBottom: "16px" }}>
+          <div style={{ background: "var(--danger-bg)", color: "var(--danger-text)", borderRadius: "12px", padding: "12px 16px", fontSize: "13.5px", fontWeight: 600, marginBottom: "16px" }}>
             {error}
           </div>
         )}
@@ -292,8 +292,8 @@ function BotonRapido({ tipo, activo, onClick, label }: any) {
     <button
       onClick={onClick}
       style={{
-        background: activo ? est.fg : "#fff", color: activo ? "#fff" : "var(--theme-darker)",
-        border: `2px solid ${activo ? est.fg : "#EDE9F8"}`, borderRadius: "18px", padding: "18px 16px",
+        background: activo ? est.fg : "var(--surface)", color: activo ? "#fff" : "var(--text)",
+        border: `2px solid ${activo ? est.fg : "var(--border)"}`, borderRadius: "18px", padding: "18px 16px",
         cursor: "pointer", fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "14.5px",
         display: "flex", flexDirection: "column", alignItems: "center", gap: "8px",
         boxShadow: "0 4px 18px rgba(124,92,191,0.06)",
@@ -354,9 +354,9 @@ function Opcion({ activo, onClick, children }: any) {
       style={{
         flex: "1 1 100px", padding: "12px", borderRadius: "14px", cursor: "pointer",
         fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "14px",
-        border: activo ? "2px solid var(--theme-primary)" : "2px solid #E4DBF7",
-        background: activo ? "var(--theme-primary)" : "#fff",
-        color: activo ? "#fff" : "var(--theme-darker)",
+        border: activo ? "2px solid var(--theme-primary)" : "2px solid var(--border)",
+        background: activo ? "var(--theme-primary)" : "var(--surface)",
+        color: activo ? "#fff" : "var(--text)",
       }}
     >
       {children}
@@ -373,9 +373,9 @@ function OpcionIcono({ emoji, label, activo, onClick }: any) {
       style={{
         flex: "0 1 110px", padding: "18px 10px", borderRadius: "18px", cursor: "pointer",
         fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "13.5px",
-        border: activo ? "2px solid var(--theme-primary)" : "2px solid #E4DBF7",
-        background: activo ? "linear-gradient(135deg, var(--theme-primary), var(--theme-light))" : "#fff",
-        color: activo ? "#fff" : "var(--theme-darker)",
+        border: activo ? "2px solid var(--theme-primary)" : "2px solid var(--border)",
+        background: activo ? "linear-gradient(135deg, var(--theme-primary), var(--theme-light))" : "var(--surface)",
+        color: activo ? "#fff" : "var(--text)",
         display: "flex", flexDirection: "column", alignItems: "center", gap: "8px",
       }}
     >

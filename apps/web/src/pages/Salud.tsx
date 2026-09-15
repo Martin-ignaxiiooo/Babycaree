@@ -541,7 +541,7 @@ export default function Salud() {
       {/* ── HEADER ──
           Mismo patrón que Comunidad: banner morado con título+descripción,
           acciones y pestañas ya en el contenido claro de abajo. */}
-      <div style={{ background: "linear-gradient(135deg, #8B5FD6 0%, #A47BE8 100%)", paddingBottom: "26px" }}>
+      <div style={{ background: "linear-gradient(135deg, var(--header-from) 0%, var(--header-to) 100%)", paddingBottom: "26px" }}>
         <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "16px 40px 0" }}>
           <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "22px", fontWeight: 700, color: "#fff", margin: 0, display: "flex", alignItems: "center", gap: "10px" }}>
             <HeartPulse size={22} /> Salud y Crecimiento
@@ -674,8 +674,8 @@ export default function Salud() {
                       <div style={{ display: "flex", alignItems: "center", gap: "9px", marginBottom: "14px" }}>
                         <h3 style={{ fontSize: "16px", fontWeight: 800, color: "var(--text)", margin: 0 }}>{titulo}</h3>
                         <span style={{
-                          background: aplicadas ? "#E8F7F1" : "var(--theme-bg-light)",
-                          color: aplicadas ? "#3E8E6E" : "var(--theme-primary)",
+                          background: aplicadas ? "var(--success-bg)" : "var(--theme-bg-light)",
+                          color: aplicadas ? "var(--success-text)" : "var(--theme-primary)",
                           borderRadius: "100px", padding: "2px 10px", fontSize: "12px", fontWeight: 800,
                         }}>
                           {grupo.length}
@@ -691,21 +691,21 @@ export default function Salud() {
                 {grupo.map((vacuna) => {
                   const editando = editingVacunaId === vacuna.vacuna_id;
                   return (
-                  <div key={vacuna.vacuna_id} style={{ display: "flex", alignItems: "flex-start", gap: "20px", padding: "22px", border: vacuna.aplicada ? "1px solid #DCFCE7" : "1px solid #F1EEFA", borderRadius: "18px", background: vacuna.aplicada ? "#F3FDF6" : "#fff", boxShadow: "0 4px 16px rgba(124,92,191,0.06)" }}>
+                  <div key={vacuna.vacuna_id} style={{ display: "flex", alignItems: "flex-start", gap: "20px", padding: "22px", border: vacuna.aplicada ? "1px solid var(--success-text)" : "1px solid var(--border)", borderRadius: "18px", background: vacuna.aplicada ? "var(--success-bg)" : "var(--surface)", boxShadow: "0 4px 16px rgba(124,92,191,0.06)" }}>
                     
                     <button 
                       onClick={() => vacuna.aplicada ? desmarcarVacuna(vacuna) : (editando ? cancelarRegistroVacuna() : abrirRegistroVacuna(vacuna))}
                       style={{ background: "none", border: "none", cursor: "pointer", padding: 0, marginTop: "4px" }}
                       title={vacuna.aplicada ? "Quitar registro" : "Registrar aplicación"}
                     >
-                      {vacuna.aplicada ? <CheckCircle size={28} color="#16A34A" /> : <div style={{ width: "28px", height: "28px", borderRadius: "50%", border: editando ? "2px solid var(--theme-primary)" : "2px solid #D1D5DB" }}></div>}
+                      {vacuna.aplicada ? <CheckCircle size={28} color="var(--success-text)" /> : <div style={{ width: "28px", height: "28px", borderRadius: "50%", border: editando ? "2px solid var(--theme-primary)" : "2px solid var(--border)" }}></div>}
                     </button>
 
                     <div style={{ flex: 1 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                         <div>
-                          <h3 style={{ margin: "0 0 4px", fontSize: "16px", fontWeight: 800, color: vacuna.aplicada ? "#166534" : "var(--theme-darker)" }}>{vacuna.nombre}</h3>
-                          <div style={{ fontSize: "13px", color: "#6B7280", marginBottom: "12px" }}>{vacuna.enfermedades_previene}</div>
+                          <h3 style={{ margin: "0 0 4px", fontSize: "16px", fontWeight: 800, color: vacuna.aplicada ? "var(--success-text)" : "var(--theme-darker)" }}>{vacuna.nombre}</h3>
+                          <div style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "12px" }}>{vacuna.enfermedades_previene}</div>
                         </div>
                         <div style={{ background: "var(--theme-bg-light)", color: "var(--theme-primary)", padding: "4px 12px", borderRadius: "12px", fontSize: "12px", fontWeight: 800 }}>
                           {vacuna.meses_edad_recomendada === 0 ? "Recién nacido" : `${vacuna.meses_edad_recomendada} meses`}
@@ -714,12 +714,12 @@ export default function Salud() {
 
                       {/* Ya registrada: se muestra en modo lectura, con opción de editar */}
                       {vacuna.aplicada && !editando && (
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "12px", padding: "16px", background: "var(--surface)", borderRadius: "8px", border: "1px solid #DCFCE7" }}>
-                          <div style={{ fontSize: "13px", color: "#374151" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "12px", padding: "16px", background: "var(--surface)", borderRadius: "8px", border: "1px solid var(--success-text)" }}>
+                          <div style={{ fontSize: "13px", color: "var(--text)" }}>
                             <strong>Aplicada:</strong> {vacuna.fecha_aplicacion
                               ? `${new Date(vacuna.fecha_aplicacion).toLocaleDateString('es-CL')} · ${new Date(vacuna.fecha_aplicacion).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })}`
                               : "-"}
-                            {vacuna.notas && <div style={{ marginTop: "4px", color: "#6B7280" }}>{vacuna.notas}</div>}
+                            {vacuna.notas && <div style={{ marginTop: "4px", color: "var(--text-muted)" }}>{vacuna.notas}</div>}
                           </div>
                           <button
                             onClick={() => abrirRegistroVacuna(vacuna)}
@@ -732,10 +732,10 @@ export default function Salud() {
 
                       {/* Formulario de registro: no se guarda nada hasta presionar "Registrar" */}
                       {editando && (
-                        <div style={{ marginTop: "12px", padding: "16px", background: "var(--surface-2)", borderRadius: "8px", border: "1px solid #E5E7EB" }}>
+                        <div style={{ marginTop: "12px", padding: "16px", background: "var(--surface-2)", borderRadius: "8px", border: "1px solid var(--border)" }}>
                           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px", marginBottom: "16px" }}>
                             <div>
-                              <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#4B5563", marginBottom: "4px" }}>Fecha de aplicación *</label>
+                              <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "var(--text)", marginBottom: "4px" }}>Fecha de aplicación *</label>
                               <DateSelect
                                 value={formVacuna.fecha_aplicacion}
                                 onChange={(isoDate) => setFormVacuna(f => ({ ...f, fecha_aplicacion: isoDate }))}
@@ -744,7 +744,7 @@ export default function Salud() {
                               />
                             </div>
                             <div>
-                              <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#4B5563", marginBottom: "4px" }}>Hora de aplicación *</label>
+                              <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "var(--text)", marginBottom: "4px" }}>Hora de aplicación *</label>
                               <TimeSelect
                                 value={formVacuna.hora_aplicacion}
                                 onChange={(isoTime) => setFormVacuna(f => ({ ...f, hora_aplicacion: isoTime }))}
@@ -752,13 +752,13 @@ export default function Salud() {
                               />
                             </div>
                             <div>
-                              <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#4B5563", marginBottom: "4px" }}>Notas / Reacciones</label>
+                              <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "var(--text)", marginBottom: "4px" }}>Notas / Reacciones</label>
                               <input 
                                 type="text" 
                                 placeholder="Fiebre leve, etc."
                                 value={formVacuna.notas}
                                 onChange={(e) => setFormVacuna(f => ({ ...f, notas: e.target.value }))}
-                                style={{ width: "100%", padding: "8px", border: "1px solid #E5E7EB", borderRadius: "6px", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+                                style={{ width: "100%", padding: "8px", border: "1px solid var(--border)", borderRadius: "6px", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
                               />
                             </div>
                           </div>
@@ -767,7 +767,7 @@ export default function Salud() {
                               onClick={() => confirmarRegistroVacuna(vacuna.vacuna_id)}
                               disabled={!formVacuna.fecha_aplicacion || !formVacuna.hora_aplicacion || guardandoVacuna}
                               style={{
-                                background: !formVacuna.fecha_aplicacion || !formVacuna.hora_aplicacion || guardandoVacuna ? "#D1D5DB" : "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
+                                background: !formVacuna.fecha_aplicacion || !formVacuna.hora_aplicacion || guardandoVacuna ? "var(--border)" : "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
                                 color: "#fff", border: "none", borderRadius: "10px", padding: "10px 20px",
                                 fontWeight: 800, fontSize: "14px", cursor: !formVacuna.fecha_aplicacion || !formVacuna.hora_aplicacion || guardandoVacuna ? "not-allowed" : "pointer",
                               }}
@@ -776,7 +776,7 @@ export default function Salud() {
                             </button>
                             <button
                               onClick={cancelarRegistroVacuna}
-                              style={{ background: "none", border: "1px solid #E5E7EB", color: "#6B7280", borderRadius: "10px", padding: "10px 20px", fontWeight: 700, fontSize: "14px", cursor: "pointer" }}
+                              style={{ background: "none", border: "1px solid var(--border)", color: "var(--text-muted)", borderRadius: "10px", padding: "10px 20px", fontWeight: 700, fontSize: "14px", cursor: "pointer" }}
                             >
                               Cancelar
                             </button>
@@ -828,14 +828,14 @@ export default function Salud() {
                         padding: "11px 20px", borderRadius: "100px", border: "none",
                         cursor: guardandoPorVoz ? "not-allowed" : "pointer", fontFamily: "'Nunito', sans-serif",
                         fontWeight: 800, fontSize: "13.5px", color: "#fff",
-                        background: dictado.escuchando ? "#D97070" : "var(--theme-primary)",
+                        background: dictado.escuchando ? "var(--danger-border)" : "var(--theme-primary)",
                         opacity: guardandoPorVoz ? 0.6 : 1,
                       }}
                     >
                       {dictado.escuchando ? <MicOff size={16} /> : <Mic size={16} />}
                       {guardandoPorVoz ? "Guardando…" : dictado.escuchando ? "Detener" : "Dictar la cita"}
                     </button>
-                    <span style={{ fontSize: "12.5px", color: "#6B647F", flex: "1 1 220px", lineHeight: 1.5 }}>
+                    <span style={{ fontSize: "12.5px", color: "var(--text-muted)", flex: "1 1 220px", lineHeight: 1.5 }}>
                       Di algo como: “control sano el viernes 3 de octubre a las diez y media con la doctora Pérez”. Se detiene y guarda solo, apenas hagas una pausa.
                     </span>
                   </div>
@@ -845,13 +845,13 @@ export default function Salud() {
                     </div>
                   )}
                   {dictado.error && (
-                    <div style={{ marginTop: "10px", color: "#D97070", fontSize: "12.5px", fontWeight: 600 }}>
+                    <div style={{ marginTop: "10px", color: "var(--danger-text)", fontSize: "12.5px", fontWeight: 600 }}>
                       {dictado.error}
                     </div>
                   )}
                   {guardadoPorVoz?.ok === true && (
                     <>
-                      <div style={{ marginTop: "10px", display: "flex", alignItems: "center", gap: "8px", color: "#3E8E6E", fontSize: "13px", fontWeight: 700 }}>
+                      <div style={{ marginTop: "10px", display: "flex", alignItems: "center", gap: "8px", color: "var(--success-text)", fontSize: "13px", fontWeight: 700 }}>
                         <CheckCircle size={16} />
                         Cita guardada para el {guardadoPorVoz.cuando}. Puedes corregir cualquier dato abajo.
                       </div>
@@ -863,7 +863,7 @@ export default function Salud() {
                     </>
                   )}
                   {guardadoPorVoz?.ok === false && (
-                    <div style={{ marginTop: "10px", color: "#D97070", fontSize: "12.5px", fontWeight: 600 }}>
+                    <div style={{ marginTop: "10px", color: "var(--danger-text)", fontSize: "12.5px", fontWeight: 600 }}>
                       {guardadoPorVoz.motivo}
                     </div>
                   )}
@@ -926,7 +926,7 @@ export default function Salud() {
 
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "4px", marginBottom: "6px" }}>
                     {DIAS_CAL.map((d, i) => (
-                      <div key={i} style={{ textAlign: "center", fontSize: "10.5px", fontWeight: 800, color: "#A99FC4", padding: "5px 0" }}>{d}</div>
+                      <div key={i} style={{ textAlign: "center", fontSize: "10.5px", fontWeight: 800, color: "var(--text-muted)", padding: "5px 0" }}>{d}</div>
                     ))}
                   </div>
 
@@ -948,7 +948,7 @@ export default function Salud() {
                             borderRadius: "10px", fontSize: "13px", fontWeight: 700, gap: "3px", border: "none",
                             cursor: c.delMes ? "pointer" : "default", fontFamily: "'Nunito', sans-serif",
                             background: estaSeleccionado ? "var(--theme-primary)" : esHoy ? "var(--theme-bg-light)" : "transparent",
-                            color: estaSeleccionado ? "#fff" : !c.delMes ? "#C9C4D6" : esHoy ? "var(--theme-primary)" : "var(--text)",
+                            color: estaSeleccionado ? "#fff" : !c.delMes ? "var(--text-muted)" : esHoy ? "var(--theme-primary)" : "var(--text)",
                           }}
                         >
                           {c.dia}
@@ -999,21 +999,21 @@ export default function Salud() {
                         const isPast = date < new Date();
                         return (
                           <div key={cita.id} style={{
-                            background: isPast ? "#F9FAFB" : "#FDF4FF",
+                            background: isPast ? "var(--surface-2)" : "var(--surface)",
                             borderRadius: "16px",
                             padding: "16px",
                             borderLeft: `4px solid ${isPast ? "var(--theme-primary)" : "#D4A5E3"}`
                           }}>
                             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px", flexWrap: "wrap" }}>
-                              <h4 style={{ margin: 0, fontSize: "16px", color: isPast ? "#6B7280" : "var(--theme-darker)" }}>
+                              <h4 style={{ margin: 0, fontSize: "16px", color: isPast ? "var(--text-muted)" : "var(--theme-darker)" }}>
                                 {cita.especialidad || cita.notas || "Control Médico"}
                               </h4>
                               <span
                                 style={{
                                   fontSize: "10.5px", fontWeight: 800, padding: "2px 9px",
                                   borderRadius: "100px", textTransform: "uppercase", letterSpacing: "0.3px",
-                                  background: cita.tipo === "control" ? "#E8F7F1" : "var(--theme-bg-light)",
-                                  color: cita.tipo === "control" ? "#3E8E6E" : "var(--theme-primary)",
+                                  background: cita.tipo === "control" ? "var(--success-bg)" : "var(--theme-bg-light)",
+                                  color: cita.tipo === "control" ? "var(--success-text)" : "var(--theme-primary)",
                                 }}
                               >
                                 {cita.tipo === "control" ? "Control" : "Cita"}
@@ -1042,10 +1042,10 @@ export default function Salud() {
                                 title="Eliminar esta cita"
                                 style={{
                                   padding: "6px 10px", borderRadius: "100px",
-                                  border: "1.5px solid #FBDADA", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
+                                  border: "1.5px solid var(--danger-border)", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
                                   fontWeight: 800, fontSize: "11.5px", display: "inline-flex",
                                   alignItems: "center", gap: "4px", whiteSpace: "nowrap",
-                                  background: "var(--surface)", color: "#D97070",
+                                  background: "var(--surface)", color: "var(--danger-text)",
                                 }}
                               >
                                 <Trash2 size={12} /> Eliminar
@@ -1059,8 +1059,8 @@ export default function Salud() {
                                     border: "none", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
                                     fontWeight: 800, fontSize: "11.5px", display: "inline-flex",
                                     alignItems: "center", gap: "5px", whiteSpace: "nowrap",
-                                    background: cita.diagnostico ? "#E8F7F1" : "var(--theme-primary)",
-                                    color: cita.diagnostico ? "#3E8E6E" : "#fff",
+                                    background: cita.diagnostico ? "var(--success-bg)" : "var(--theme-primary)",
+                                    color: cita.diagnostico ? "var(--success-text)" : "#fff",
                                   }}
                                 >
                                   <ClipboardCheck size={13} />
@@ -1117,28 +1117,28 @@ export default function Salud() {
                     Peso del bebé
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "var(--text-muted)", fontWeight: 600 }}>
-                    <span style={{ width: "18px", height: "0", borderTop: "2px dashed #9CA3AF", display: "inline-block" }} />
+                    <span style={{ width: "18px", height: "0", borderTop: "2px dashed var(--text-muted)", display: "inline-block" }} />
                     Promedio OMS
                   </div>
                 </div>
                 <div style={{ width: "100%", overflowX: "auto" }}>
                   <svg viewBox="0 0 340 120" style={{ width: "100%", height: "auto", overflow: "visible", minWidth: "300px" }}>
-                    <rect width="340" height="100" fill="#F9FAFB" rx="8"/>
-                    <line x1="40" y1="10" x2="40" y2="85" stroke="#E5E7EB" strokeWidth="0.8"/>
-                    <line x1="40" y1="85" x2="330" y2="85" stroke="#E5E7EB" strokeWidth="0.8"/>
-                    <line x1="40" y1="35" x2="330" y2="35" stroke="#F3F4F6" strokeWidth="0.6"/>
-                    <line x1="40" y1="60" x2="330" y2="60" stroke="#F3F4F6" strokeWidth="0.6"/>
-                    <text x="35" y="13" textAnchor="end" fontSize="8" fill="#9CA3AF">15kg</text>
-                    <text x="35" y="38" textAnchor="end" fontSize="8" fill="#9CA3AF">10kg</text>
-                    <text x="35" y="63" textAnchor="end" fontSize="8" fill="#9CA3AF">5kg</text>
-                    <text x="35" y="88" textAnchor="end" fontSize="8" fill="#9CA3AF">0kg</text>
+                    <rect width="340" height="100" fill="var(--surface-2)" rx="8"/>
+                    <line x1="40" y1="10" x2="40" y2="85" stroke="var(--border)" strokeWidth="0.8"/>
+                    <line x1="40" y1="85" x2="330" y2="85" stroke="var(--border)" strokeWidth="0.8"/>
+                    <line x1="40" y1="35" x2="330" y2="35" stroke="var(--border)" strokeWidth="0.6"/>
+                    <line x1="40" y1="60" x2="330" y2="60" stroke="var(--border)" strokeWidth="0.6"/>
+                    <text x="35" y="13" textAnchor="end" fontSize="8" fill="var(--text-muted)">15kg</text>
+                    <text x="35" y="38" textAnchor="end" fontSize="8" fill="var(--text-muted)">10kg</text>
+                    <text x="35" y="63" textAnchor="end" fontSize="8" fill="var(--text-muted)">5kg</text>
+                    <text x="35" y="88" textAnchor="end" fontSize="8" fill="var(--text-muted)">0kg</text>
                     {displayFechas.map((fecha: string, idx: number) => (
-                      <text key={idx} x={xPositions[idx]} y="105" textAnchor="middle" fontSize="9" fill="#9CA3AF" fontWeight="600">
+                      <text key={idx} x={xPositions[idx]} y="105" textAnchor="middle" fontSize="9" fill="var(--text-muted)" fontWeight="600">
                         {fecha || ""}
                       </text>
                     ))}
                     {pesoOmsPointsString && (
-                      <polyline points={pesoOmsPointsString} fill="none" stroke="#9CA3AF" strokeWidth="1.5" strokeDasharray="4,3"/>
+                      <polyline points={pesoOmsPointsString} fill="none" stroke="var(--text-muted)" strokeWidth="1.5" strokeDasharray="4,3"/>
                     )}
                     {pesoPointsString && (
                       <polyline points={pesoPointsString} fill="none" stroke="var(--theme-primary)" strokeWidth="2.5" strokeLinejoin="round"/>
@@ -1164,28 +1164,28 @@ export default function Salud() {
                     Talla del bebé
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "var(--text-muted)", fontWeight: 600 }}>
-                    <span style={{ width: "18px", height: "0", borderTop: "2px dashed #9CA3AF", display: "inline-block" }} />
+                    <span style={{ width: "18px", height: "0", borderTop: "2px dashed var(--text-muted)", display: "inline-block" }} />
                     Promedio OMS
                   </div>
                 </div>
                 <div style={{ width: "100%", overflowX: "auto" }}>
                   <svg viewBox="0 0 340 120" style={{ width: "100%", height: "auto", overflow: "visible", minWidth: "300px" }}>
-                    <rect width="340" height="100" fill="#F9FAFB" rx="8"/>
-                    <line x1="40" y1="10" x2="40" y2="85" stroke="#E5E7EB" strokeWidth="0.8"/>
-                    <line x1="40" y1="85" x2="330" y2="85" stroke="#E5E7EB" strokeWidth="0.8"/>
-                    <line x1="40" y1="35" x2="330" y2="35" stroke="#F3F4F6" strokeWidth="0.6"/>
-                    <line x1="40" y1="60" x2="330" y2="60" stroke="#F3F4F6" strokeWidth="0.6"/>
-                    <text x="35" y="13" textAnchor="end" fontSize="8" fill="#9CA3AF">120cm</text>
-                    <text x="35" y="38" textAnchor="end" fontSize="8" fill="#9CA3AF">93cm</text>
-                    <text x="35" y="63" textAnchor="end" fontSize="8" fill="#9CA3AF">67cm</text>
-                    <text x="35" y="88" textAnchor="end" fontSize="8" fill="#9CA3AF">40cm</text>
+                    <rect width="340" height="100" fill="var(--surface-2)" rx="8"/>
+                    <line x1="40" y1="10" x2="40" y2="85" stroke="var(--border)" strokeWidth="0.8"/>
+                    <line x1="40" y1="85" x2="330" y2="85" stroke="var(--border)" strokeWidth="0.8"/>
+                    <line x1="40" y1="35" x2="330" y2="35" stroke="var(--border)" strokeWidth="0.6"/>
+                    <line x1="40" y1="60" x2="330" y2="60" stroke="var(--border)" strokeWidth="0.6"/>
+                    <text x="35" y="13" textAnchor="end" fontSize="8" fill="var(--text-muted)">120cm</text>
+                    <text x="35" y="38" textAnchor="end" fontSize="8" fill="var(--text-muted)">93cm</text>
+                    <text x="35" y="63" textAnchor="end" fontSize="8" fill="var(--text-muted)">67cm</text>
+                    <text x="35" y="88" textAnchor="end" fontSize="8" fill="var(--text-muted)">40cm</text>
                     {displayFechas.map((fecha: string, idx: number) => (
-                      <text key={idx} x={xPositions[idx]} y="105" textAnchor="middle" fontSize="9" fill="#9CA3AF" fontWeight="600">
+                      <text key={idx} x={xPositions[idx]} y="105" textAnchor="middle" fontSize="9" fill="var(--text-muted)" fontWeight="600">
                         {fecha || ""}
                       </text>
                     ))}
                     {tallaOmsPointsString && (
-                      <polyline points={tallaOmsPointsString} fill="none" stroke="#9CA3AF" strokeWidth="1.5" strokeDasharray="4,3"/>
+                      <polyline points={tallaOmsPointsString} fill="none" stroke="var(--text-muted)" strokeWidth="1.5" strokeDasharray="4,3"/>
                     )}
                     {tallaPointsString && (
                       <polyline points={tallaPointsString} fill="none" stroke="var(--accent-coral, #E8927C)" strokeWidth="2.5" strokeLinejoin="round"/>
@@ -1219,31 +1219,31 @@ export default function Salud() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
               <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "21px", fontWeight: 700, color: "var(--text)", margin: 0 }}>Registrar Medidas</h2>
               <button onClick={() => setIsModalOpen(false)} style={{ background: "none", border: "none", cursor: "pointer" }}>
-                <X size={24} color="#6B7280" />
+                <X size={24} color="var(--text-muted)" />
               </button>
             </div>
             
             <div style={{ marginBottom: "20px" }}>
-              <label style={{ display: "block", fontSize: "14px", fontWeight: 700, marginBottom: "8px", color: "#4B5563" }}>Peso (kg)</label>
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 700, marginBottom: "8px", color: "var(--text)" }}>Peso (kg)</label>
               <input 
                 type="number" 
                 step="0.01"
                 value={pesoInput}
                 onChange={e => setPesoInput(e.target.value)}
                 placeholder="Ej. 7.4"
-                style={{ width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", outline: "none", fontSize: "15px" }}
+                style={{ width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid var(--border)", outline: "none", fontSize: "15px" }}
               />
             </div>
 
             <div style={{ marginBottom: "32px" }}>
-              <label style={{ display: "block", fontSize: "14px", fontWeight: 700, marginBottom: "8px", color: "#4B5563" }}>Talla (cm)</label>
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 700, marginBottom: "8px", color: "var(--text)" }}>Talla (cm)</label>
               <input 
                 type="number" 
                 step="0.1"
                 value={tallaInput}
                 onChange={e => setTallaInput(e.target.value)}
                 placeholder="Ej. 67.5"
-                style={{ width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", outline: "none", fontSize: "15px" }}
+                style={{ width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid var(--border)", outline: "none", fontSize: "15px" }}
               />
             </div>
 
@@ -1312,7 +1312,7 @@ export default function Salud() {
                           flex: "1 1 160px", padding: "12px", borderRadius: "14px",
                           cursor: "pointer", fontFamily: "'Nunito', sans-serif", fontWeight: 800,
                           fontSize: "13.5px", textAlign: "left",
-                          border: tipoCita === t ? "2px solid var(--theme-primary)" : "2px solid #E4DBF7",
+                          border: tipoCita === t ? "2px solid var(--theme-primary)" : "2px solid var(--border)",
                           background: tipoCita === t ? "var(--theme-primary)" : "#fff",
                           color: tipoCita === t ? "#fff" : "var(--theme-darker)",
                         }}
@@ -1328,7 +1328,7 @@ export default function Salud() {
                   <form onSubmit={handleSaveCita} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                     <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
                       <div style={{ flex: "1 1 220px" }}>
-                        <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Fecha</label>
+                        <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "var(--text-muted)", fontWeight: 700 }}>Fecha</label>
                         <DateSelect
                           value={fechaCitaDate}
                           onChange={setFechaCitaDate}
@@ -1337,7 +1337,7 @@ export default function Salud() {
                         />
                       </div>
                       <div style={{ flex: "1 1 140px" }}>
-                        <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Hora</label>
+                        <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "var(--text-muted)", fontWeight: 700 }}>Hora</label>
                         <TimeSelect
                           value={fechaCitaTime}
                           onChange={setFechaCitaTime}
@@ -1346,14 +1346,14 @@ export default function Salud() {
                         />
                       </div>
                       <div style={{ flex: "1 1 200px" }}>
-                        <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Médico (Opcional)</label>
+                        <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "var(--text-muted)", fontWeight: 700 }}>Médico (Opcional)</label>
                         <input 
                           type="text" 
                           placeholder="Ej. Dra. Pérez"
                           value={medico}
                           onChange={e => setMedico(e.target.value)}
                           style={{ 
-                            width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", 
+                            width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid var(--border)", 
                             background: "var(--surface)", outline: "none", boxSizing: "border-box", fontFamily: "Nunito"
                           }} 
                         />
@@ -1362,27 +1362,27 @@ export default function Salud() {
 
                     <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
                       <div style={{ flex: "1 1 200px" }}>
-                        <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Especialidad (Opcional)</label>
+                        <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "var(--text-muted)", fontWeight: 700 }}>Especialidad (Opcional)</label>
                         <input 
                           type="text" 
                           placeholder="Ej. Pediatría"
                           value={especialidad}
                           onChange={e => setEspecialidad(e.target.value)}
                           style={{ 
-                            width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", 
+                            width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid var(--border)", 
                             background: "var(--surface)", outline: "none", boxSizing: "border-box", fontFamily: "Nunito"
                           }} 
                         />
                       </div>
                       <div style={{ flex: "1 1 200px" }}>
-                        <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Lugar (Opcional)</label>
+                        <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "var(--text-muted)", fontWeight: 700 }}>Lugar (Opcional)</label>
                         <input 
                           type="text" 
                           placeholder="Ej. Cesfam / Clínica"
                           value={lugar}
                           onChange={e => setLugar(e.target.value)}
                           style={{ 
-                            width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", 
+                            width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid var(--border)", 
                             background: "var(--surface)", outline: "none", boxSizing: "border-box", fontFamily: "Nunito"
                           }} 
                         />
@@ -1390,14 +1390,14 @@ export default function Salud() {
                     </div>
                 
                     <div>
-                      <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "#6B7280", fontWeight: 700 }}>Notas / Título</label>
+                      <label style={{ display: "block", fontSize: "12px", marginBottom: "8px", color: "var(--text-muted)", fontWeight: 700 }}>Notas / Título</label>
                       <input 
                         type="text" 
                         placeholder="Ej. Ecografía Estructural"
                         value={notas}
                         onChange={e => setNotas(e.target.value)}
                         style={{ 
-                          width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #E5E7EB", 
+                          width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid var(--border)", 
                           background: "var(--surface)", outline: "none", boxSizing: "border-box", fontFamily: "Nunito"
                         }} 
                       />
@@ -1408,8 +1408,8 @@ export default function Salud() {
                         type="submit" 
                         disabled={isSavingCita || !fechaCita}
                         style={{ 
-                          background: isSavingCita || !fechaCita ? "#F3F4F6" : "var(--theme-primary)",
-                          color: isSavingCita || !fechaCita ? "#9CA3AF" : "#fff",
+                          background: isSavingCita || !fechaCita ? "var(--border)" : "var(--theme-primary)",
+                          color: isSavingCita || !fechaCita ? "var(--text-muted)" : "#fff",
                           border: "none",
                           padding: "12px 24px",
                           borderRadius: "12px",
