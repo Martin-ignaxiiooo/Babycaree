@@ -154,7 +154,7 @@ export default function InfoEmbarazoSemana() {
                   Tu semana {semanas}
                 </div>
                 <div style={{ padding: "24px" }}>
-                  <p style={{ fontSize: "15px", color: "#6B647F", lineHeight: 1.7, margin: 0, whiteSpace: "pre-line" }}>
+                  <p style={{ fontSize: "15px", color: "var(--text-muted)", lineHeight: 1.7, margin: 0, whiteSpace: "pre-line" }}>
                     {hito}
                   </p>
                 </div>

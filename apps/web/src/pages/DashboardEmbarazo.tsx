@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { CalendarPlus, Settings2, Loader2, ChevronRight, Camera } from "lucide-react";
+import { CalendarPlus, Settings2, Loader2, ChevronRight, Camera, X } from "lucide-react";
 import BabyGrowthIcon, { HITOS_POR_MES, mesDesdeSemanas } from "../components/BabyGrowthIcon";
+import { ACCEPT_IMAGEN, resizeImageFile, validarImagen } from "../utils/imagen";
 
 import { API_URL } from "../config/api";
 
@@ -33,6 +34,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
   const [fotoPerfil, setFotoPerfil] = useState<string | null>(perfil?.foto_perfil ?? null);
   const [subiendoFoto, setSubiendoFoto] = useState(false);
   const [fotoError, setFotoError] = useState("");
+  const [confirmandoBorrarFoto, setConfirmandoBorrarFoto] = useState(false);
 
   const token = localStorage.getItem("token");
 
@@ -65,59 +67,14 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
     .sort((a, b) => new Date(a.fecha_cita).getTime() - new Date(b.fecha_cita).getTime())
     .slice(0, 4);
 
-  const resizeImageFile = (file: File, maxDim = 480, quality = 0.82): Promise<Blob> => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      const objectUrl = URL.createObjectURL(file);
-      img.onload = () => {
-        let { width, height } = img;
-        if (width > height && width > maxDim) {
-          height = Math.round(height * (maxDim / width));
-          width = maxDim;
-        } else if (height >= width && height > maxDim) {
-          width = Math.round(width * (maxDim / height));
-          height = maxDim;
-        }
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-          URL.revokeObjectURL(objectUrl);
-          reject(new Error("No se pudo procesar la imagen"));
-          return;
-        }
-        ctx.drawImage(img, 0, 0, width, height);
-        canvas.toBlob(
-          (blob) => {
-            URL.revokeObjectURL(objectUrl);
-            if (blob) resolve(blob);
-            else reject(new Error("No se pudo procesar la imagen"));
-          },
-          "image/jpeg",
-          quality,
-        );
-      };
-      img.onerror = () => {
-        URL.revokeObjectURL(objectUrl);
-        reject(new Error("No se pudo leer la imagen"));
-      };
-      img.src = objectUrl;
-    });
-  };
-
   const handleUploadFoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file || !activeBabyId) return;
 
-    const PERMITIDOS = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-    if (!PERMITIDOS.includes(file.type)) {
-      setFotoError("Formato no soportado. Usa JPG, PNG, WEBP o GIF.");
-      return;
-    }
-    if (file.size > 8 * 1024 * 1024) {
-      setFotoError("La imagen no puede pesar más de 8MB.");
+    const errorValidacion = validarImagen(file);
+    if (errorValidacion) {
+      setFotoError(errorValidacion);
       return;
     }
 
@@ -138,6 +95,23 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
     }
   };
 
+  const handleEliminarFoto = async () => {
+    if (!activeBabyId || subiendoFoto) return;
+    setFotoError("");
+    setSubiendoFoto(true);
+    setConfirmandoBorrarFoto(false);
+    try {
+      await axios.delete(`${API_URL}/v1/perfiles-bebe/${activeBabyId}/foto`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setFotoPerfil(null);
+    } catch {
+      setFotoError("No se pudo quitar la foto. Intenta de nuevo.");
+    } finally {
+      setSubiendoFoto(false);
+    }
+  };
+
   const R = 74;
   const circunferencia = 2 * Math.PI * R;
 
@@ -145,13 +119,15 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
     <div style={{ minHeight: "100vh", background: "var(--page-bg)", fontFamily: "'Nunito', sans-serif" }}>
       {/* Cabecera morada; se extiende bajo las tarjetas para que floten
           sobre ella, como en el diseño. */}
-      <div style={{ background: "linear-gradient(135deg, #8B5FD6 0%, #A47BE8 100%)", paddingBottom: "90px" }}>
+      <div style={{ background: "linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-light) 100%)", paddingBottom: "90px" }}>
         <div style={{ maxWidth: "1240px", margin: "0 auto", padding: "28px 32px 0" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             <label
-              title="Cambiar foto"
+              title={fotoPerfil ? "Cambiar foto" : "Subir foto"}
               style={{
-                width: "58px", height: "58px", borderRadius: "50%", flexShrink: 0, cursor: "pointer",
+                position: "relative",
+                width: "58px", height: "58px", borderRadius: "50%", flexShrink: 0,
+                cursor: subiendoFoto ? "default" : "pointer",
                 background: fotoPerfil ? `url(${fotoPerfil}) center/cover` : "rgba(255,255,255,0.22)",
                 border: "2.5px solid rgba(255,255,255,0.55)",
                 display: "flex", alignItems: "center", justifyContent: "center",
@@ -162,7 +138,70 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
               ) : !fotoPerfil ? (
                 <Camera size={22} color="rgba(255,255,255,0.9)" />
               ) : null}
-              <input type="file" accept="image/*" onChange={handleUploadFoto} style={{ display: "none" }} />
+
+              {fotoPerfil && !subiendoFoto && !confirmandoBorrarFoto && (
+                <button
+                  type="button"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setConfirmandoBorrarFoto(true); }}
+                  title="Quitar foto"
+                  aria-label="Quitar la foto del perfil"
+                  style={{
+                    position: "absolute", top: "-4px", right: "-4px",
+                    width: "22px", height: "22px", borderRadius: "50%",
+                    background: "rgba(45,38,64,0.72)", border: "none",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    cursor: "pointer", padding: 0,
+                  }}
+                >
+                  <X size={12} color="#fff" strokeWidth={2.5} />
+                </button>
+              )}
+
+              {confirmandoBorrarFoto && !subiendoFoto && (
+                <div
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                  style={{
+                    position: "absolute", inset: 0, borderRadius: "50%",
+                    background: "rgba(45,38,64,0.88)",
+                    display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                    gap: "3px", padding: "4px", textAlign: "center",
+                  }}
+                >
+                  <span style={{ color: "#fff", fontSize: "9px", fontWeight: 700, lineHeight: 1.2 }}>
+                    ¿Quitar?
+                  </span>
+                  <div style={{ display: "flex", gap: "4px" }}>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleEliminarFoto(); }}
+                      style={{
+                        background: "#fff", color: "#B91C1C", border: "none", borderRadius: "6px",
+                        padding: "2px 7px", fontSize: "10px", fontWeight: 800, cursor: "pointer",
+                      }}
+                    >
+                      Sí
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); setConfirmandoBorrarFoto(false); }}
+                      style={{
+                        background: "rgba(255,255,255,0.22)", color: "#fff", border: "1px solid rgba(255,255,255,0.5)",
+                        borderRadius: "6px", padding: "2px 7px", fontSize: "10px", fontWeight: 700, cursor: "pointer",
+                      }}
+                    >
+                      No
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <input
+                type="file"
+                accept={ACCEPT_IMAGEN}
+                onChange={handleUploadFoto}
+                disabled={subiendoFoto}
+                style={{ display: "none" }}
+              />
             </label>
 
             <div>
@@ -191,7 +230,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
                     <circle cx="84" cy="84" r={R} fill="none" stroke="var(--theme-bg-light)" strokeWidth="11" />
                     <circle
                       cx="84" cy="84" r={R} fill="none"
-                      stroke="#8B5FD6" strokeWidth="11" strokeLinecap="round"
+                      stroke="var(--theme-primary)" strokeWidth="11" strokeLinecap="round"
                       strokeDasharray={circunferencia}
                       strokeDashoffset={circunferencia * (1 - porcentaje / 100)}
                       style={{ transition: "stroke-dashoffset .8s ease-out" }}
@@ -203,15 +242,15 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
                 </div>
 
                 <div style={{ flex: "1 1 220px", minWidth: 0 }}>
-                  <p style={{ fontSize: "17px", color: "#3F3A52", lineHeight: 1.55, margin: 0, fontWeight: 600 }}>
+                  <p style={{ fontSize: "17px", color: "var(--text)", lineHeight: 1.55, margin: 0, fontWeight: 600 }}>
                     Semana {semanas} — ¡Tu beb&eacute; tiene el tama&ntilde;o de{" "}
                     {/^[aeiou]/.test(fruta) ? "un" : "una"}{" "}
-                    <strong style={{ color: "#8B5FD6" }}>{fruta}</strong>!
+                    <strong style={{ color: "var(--theme-primary)" }}>{fruta}</strong>!
                   </p>
-                  <div style={{ marginTop: "12px", height: "7px", borderRadius: "4px", background: "#EDE7F9", overflow: "hidden" }}>
-                    <div style={{ width: `${porcentaje}%`, height: "100%", background: "linear-gradient(90deg, #8B5FD6, #C0A9EE)", borderRadius: "4px" }} />
+                  <div style={{ marginTop: "12px", height: "7px", borderRadius: "4px", background: "var(--border)", overflow: "hidden" }}>
+                    <div style={{ width: `${porcentaje}%`, height: "100%", background: "linear-gradient(90deg, var(--theme-primary), var(--theme-light))", borderRadius: "4px" }} />
                   </div>
-                  <div style={{ fontSize: "12.5px", color: "#8A849C", fontWeight: 700, marginTop: "7px" }}>
+                  <div style={{ fontSize: "12.5px", color: "var(--text-muted)", fontWeight: 700, marginTop: "7px" }}>
                     Semana {semanas} de 40 &middot; {porcentaje}% del camino
                   </div>
                 </div>
@@ -221,7 +260,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
             {hito && (
               <Tarjeta>
                 <Titulo>Tu semana {semanas}</Titulo>
-                <p style={{ fontSize: "14.5px", color: "#6B647F", lineHeight: 1.75, marginTop: "12px", whiteSpace: "pre-line" }}>
+                <p style={{ fontSize: "14.5px", color: "var(--text-muted)", lineHeight: 1.75, marginTop: "12px", whiteSpace: "pre-line" }}>
                   {hito}
                 </p>
               </Tarjeta>
@@ -233,7 +272,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
                 {loading ? (
                   <Loader2 size={20} className="spin-icon" />
                 ) : articulos.length === 0 ? (
-                  <p style={{ fontSize: "14px", color: "#8A849C", margin: 0 }}>
+                  <p style={{ fontSize: "14px", color: "var(--text-muted)", margin: 0 }}>
                     Pronto habr&aacute; contenido para esta etapa.
                   </p>
                 ) : (
@@ -242,14 +281,14 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
                       key={a.id}
                       onClick={() => navigate(`/comunidad/articulo/${a.id}`)}
                       style={{
-                        background: "#FAF8FE", border: "1px solid #EDE7F9", borderRadius: "12px",
+                        background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "12px",
                         padding: "14px 16px", textAlign: "left", cursor: "pointer", width: "100%",
                         display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px",
                         fontFamily: "'Nunito', sans-serif",
                       }}
                     >
-                      <span style={{ fontSize: "14px", fontWeight: 700, color: "#3F3A52" }}>{a.titulo}</span>
-                      <ChevronRight size={16} color="#A99FC4" style={{ flexShrink: 0 }} />
+                      <span style={{ fontSize: "14px", fontWeight: 700, color: "var(--text)" }}>{a.titulo}</span>
+                      <ChevronRight size={16} color="var(--text-muted)" style={{ flexShrink: 0 }} />
                     </button>
                   ))
                 )}
@@ -265,7 +304,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
               {loading ? (
                 <Loader2 size={20} className="spin-icon" />
               ) : proximas.length === 0 ? (
-                <p style={{ fontSize: "14px", color: "#8A849C", margin: 0, lineHeight: 1.6 }}>
+                <p style={{ fontSize: "14px", color: "var(--text-muted)", margin: 0, lineHeight: 1.6 }}>
                   No tienes controles agendados. A&ntilde;ade el pr&oacute;ximo para que te lo recordemos.
                 </p>
               ) : (
@@ -276,23 +315,23 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
                       key={c.id}
                       style={{
                         display: "flex", alignItems: "center", gap: "14px",
-                        background: "#FAF8FE", border: "1px solid #EDE7F9",
+                        background: "var(--surface-2)", border: "1px solid var(--border)",
                         borderRadius: "14px", padding: "12px 14px",
                       }}
                     >
                       <div style={{ textAlign: "center", flexShrink: 0, minWidth: "42px" }}>
-                        <div style={{ fontSize: "21px", fontWeight: 900, color: "#3F3A52", lineHeight: 1, fontFamily: "'Baloo 2', sans-serif" }}>
+                        <div style={{ fontSize: "21px", fontWeight: 900, color: "var(--text)", lineHeight: 1, fontFamily: "'Baloo 2', sans-serif" }}>
                           {f.dia}
                         </div>
-                        <div style={{ fontSize: "10.5px", fontWeight: 800, color: "#A99FC4", letterSpacing: "0.5px" }}>
+                        <div style={{ fontSize: "10.5px", fontWeight: 800, color: "var(--text-muted)", letterSpacing: "0.5px" }}>
                           {f.mes}
                         </div>
                       </div>
                       <div style={{ minWidth: 0 }}>
-                        <div style={{ fontSize: "14px", fontWeight: 800, color: "#3F3A52" }}>
+                        <div style={{ fontSize: "14px", fontWeight: 800, color: "var(--text)" }}>
                           {c.especialidad || (c.tipo === "control" ? "Control" : "Cita m\u00e9dica")}
                         </div>
-                        <div style={{ fontSize: "12.5px", color: "#8A849C", marginTop: "1px" }}>
+                        <div style={{ fontSize: "12.5px", color: "var(--text-muted)", marginTop: "1px" }}>
                           {f.hora}{c.medico ? ` \u00b7 ${c.medico}` : ""}
                         </div>
                       </div>
@@ -327,7 +366,7 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
 function Tarjeta({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (
     <div style={{
-      background: "#fff", borderRadius: "20px", padding: "24px 26px",
+      background: "var(--surface)", borderRadius: "20px", padding: "24px 26px",
       boxShadow: "0 6px 28px rgba(90,60,150,0.08)", ...style,
     }}>
       {children}
@@ -337,7 +376,7 @@ function Tarjeta({ children, style }: { children: React.ReactNode; style?: React
 
 function Titulo({ children }: { children: React.ReactNode }) {
   return (
-    <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "#3F3A52", margin: 0 }}>
+    <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", fontWeight: 700, color: "var(--text)", margin: 0 }}>
       {children}
     </h2>
   );
@@ -352,13 +391,13 @@ const btnBase: React.CSSProperties = {
 
 const btnPrimario: React.CSSProperties = {
   ...btnBase,
-  background: "linear-gradient(135deg, #8B5FD6, #A47BE8)",
+  background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
   color: "#fff",
   boxShadow: "0 6px 16px rgba(139,95,214,0.28)",
 };
 
 const btnSecundario: React.CSSProperties = {
   ...btnBase,
-  background: "#F3EEFC",
-  color: "#8B5FD6",
+  background: "var(--theme-bg-light)",
+  color: "var(--theme-primary)",
 };

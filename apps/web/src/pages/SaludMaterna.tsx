@@ -125,7 +125,7 @@ export default function SaludMaterna() {
     <div style={{ minHeight: "100vh", background: "var(--page-bg)", fontFamily: "'Nunito', sans-serif" }}>
       <TopNav user={user} activePath="/salud" perfilEstado="embarazo" />
 
-      <div style={{ background: "linear-gradient(135deg, #8B5FD6 0%, #A47BE8 100%)", paddingBottom: "80px" }}>
+      <div style={{ background: "linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-light) 100%)", paddingBottom: "80px" }}>
         <div style={{ maxWidth: "1240px", margin: "0 auto", padding: "26px 32px 0" }}>
           {semanas > 0 && (
             <span style={{ display: "inline-block", background: "rgba(255,255,255,0.2)", color: "#fff", borderRadius: "100px", padding: "5px 14px", fontSize: "11.5px", fontWeight: 800, letterSpacing: "0.5px", marginBottom: "10px" }}>
@@ -152,26 +152,26 @@ export default function SaludMaterna() {
 
               {/* Peso */}
               <Tarjeta>
-                <Encabezado icono={<Scale size={17} color="#8B5FD6" />}>Peso</Encabezado>
+                <Encabezado icono={<Scale size={17} color="var(--theme-primary)" />}>Peso</Encabezado>
                 {peso ? (
                   <>
                     <div style={{ display: "flex", alignItems: "baseline", gap: "6px", marginTop: "10px" }}>
-                      <span style={{ fontSize: "40px", fontWeight: 900, color: "#3F3A52", fontFamily: "'Baloo 2', sans-serif", lineHeight: 1 }}>
+                      <span style={{ fontSize: "40px", fontWeight: 900, color: "var(--text)", fontFamily: "'Baloo 2', sans-serif", lineHeight: 1 }}>
                         {Number(peso.peso_kg)}
                       </span>
-                      <span style={{ fontSize: "15px", fontWeight: 700, color: "#A99FC4" }}>kg</span>
+                      <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--text-muted)" }}>kg</span>
                     </div>
                     {subida != null && (
                       <div style={{ marginTop: "14px" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11.5px", fontWeight: 800, color: "#8A849C", marginBottom: "6px" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11.5px", fontWeight: 800, color: "var(--text-muted)", marginBottom: "6px" }}>
                           <span>DESDE EL INICIO</span>
-                          <span style={{ color: "#8B5FD6" }}>{subida > 0 ? "+" : ""}{subida} KG</span>
+                          <span style={{ color: "var(--theme-primary)" }}>{subida > 0 ? "+" : ""}{subida} KG</span>
                         </div>
-                        <div style={{ height: "7px", borderRadius: "4px", background: "#EDE7F9", overflow: "hidden" }}>
+                        <div style={{ height: "7px", borderRadius: "4px", background: "var(--border)", overflow: "hidden" }}>
                           {/* La barra usa 16 kg como referencia visual del rango
                               habitual de aumento. No es una meta médica ni un
                               límite: solo da escala al número. */}
-                          <div style={{ width: `${Math.min(Math.max((subida / 16) * 100, 0), 100)}%`, height: "100%", background: "linear-gradient(90deg, #8B5FD6, #C0A9EE)" }} />
+                          <div style={{ width: `${Math.min(Math.max((subida / 16) * 100, 0), 100)}%`, height: "100%", background: "linear-gradient(90deg, var(--theme-primary), var(--theme-light))" }} />
                         </div>
                       </div>
                     )}
@@ -182,7 +182,7 @@ export default function SaludMaterna() {
                     )}
                   </>
                 ) : (
-                  <p style={{ fontSize: "13.5px", color: "#8A849C", marginTop: "10px", lineHeight: 1.6 }}>
+                  <p style={{ fontSize: "13.5px", color: "var(--text-muted)", marginTop: "10px", lineHeight: 1.6 }}>
                     Aún no has registrado tu peso.
                   </p>
                 )}
@@ -193,16 +193,16 @@ export default function SaludMaterna() {
 
               {/* Presión arterial */}
               <Tarjeta>
-                <Encabezado icono={<Heart size={17} color="#8B5FD6" />}>Presión Arterial</Encabezado>
+                <Encabezado icono={<Heart size={17} color="var(--theme-primary)" />}>Presión Arterial</Encabezado>
                 {presion ? (
                   <>
                     <div style={{ display: "flex", alignItems: "baseline", gap: "6px", marginTop: "10px" }}>
-                      <span style={{ fontSize: "40px", fontWeight: 900, color: "#3F3A52", fontFamily: "'Baloo 2', sans-serif", lineHeight: 1 }}>
+                      <span style={{ fontSize: "40px", fontWeight: 900, color: "var(--text)", fontFamily: "'Baloo 2', sans-serif", lineHeight: 1 }}>
                         {presion.presion_sistolica}/{presion.presion_diastolica}
                       </span>
-                      <span style={{ fontSize: "14px", fontWeight: 700, color: "#A99FC4" }}>mmHg</span>
+                      <span style={{ fontSize: "14px", fontWeight: 700, color: "var(--text-muted)" }}>mmHg</span>
                     </div>
-                    <div style={{ background: "#FAF8FE", border: "1px solid #EDE7F9", borderRadius: "12px", padding: "12px 14px", marginTop: "14px", fontSize: "12.5px", color: "#6B647F", lineHeight: 1.55 }}>
+                    <div style={{ background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "12px", padding: "12px 14px", marginTop: "14px", fontSize: "12.5px", color: "var(--text-muted)", lineHeight: 1.55 }}>
                       Último registro del{" "}
                       {new Date(presion.fecha_registro + "T12:00:00").toLocaleDateString("es-CL", { day: "numeric", month: "long" })}.
                       {/* No se interpreta el valor a propósito: decir si una
@@ -211,7 +211,7 @@ export default function SaludMaterna() {
                     </div>
                   </>
                 ) : (
-                  <p style={{ fontSize: "13.5px", color: "#8A849C", marginTop: "10px", lineHeight: 1.6 }}>
+                  <p style={{ fontSize: "13.5px", color: "var(--text-muted)", marginTop: "10px", lineHeight: 1.6 }}>
                     Aún no has registrado tu presión.
                   </p>
                 )}
@@ -233,9 +233,9 @@ export default function SaludMaterna() {
                       key={s.clave}
                       onClick={() => setElegidos(on ? elegidos.filter((x) => x !== s.clave) : [...elegidos, s.clave])}
                       style={{
-                        background: on ? "linear-gradient(135deg, #8B5FD6, #A47BE8)" : "#FAF8FE",
-                        border: on ? "1.5px solid #8B5FD6" : "1.5px solid #EDE7F9",
-                        color: on ? "#fff" : "#3F3A52",
+                        background: on ? "linear-gradient(135deg, var(--theme-primary), var(--theme-light))" : "var(--surface-2)",
+                        border: on ? "1.5px solid var(--theme-primary)" : "1.5px solid var(--border)",
+                        color: on ? "#fff" : "var(--text)",
                         borderRadius: "14px", padding: "14px 8px", cursor: "pointer",
                         display: "flex", flexDirection: "column", alignItems: "center", gap: "6px",
                         fontFamily: "'Nunito', sans-serif", fontWeight: 700, fontSize: "12.5px",
@@ -249,7 +249,7 @@ export default function SaludMaterna() {
               </div>
 
               <div style={{ marginTop: "16px" }}>
-                <label style={{ display: "block", fontSize: "11.5px", fontWeight: 800, color: "#8A849C", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "7px" }}>
+                <label style={{ display: "block", fontSize: "11.5px", fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "7px" }}>
                   Notas adicionales
                 </label>
                 <input
@@ -282,17 +282,17 @@ export default function SaludMaterna() {
             <Encabezado>Artículos Recomendados</Encabezado>
             <div style={{ display: "flex", flexDirection: "column", gap: "9px", marginTop: "14px" }}>
               {articulos.length === 0 ? (
-                <p style={{ fontSize: "13.5px", color: "#8A849C", margin: 0 }}>Pronto habrá contenido.</p>
+                <p style={{ fontSize: "13.5px", color: "var(--text-muted)", margin: 0 }}>Pronto habrá contenido.</p>
               ) : (
                 articulos.slice(0, 3).map((a: any) => (
                   <button key={a.id} onClick={() => navigate(`/comunidad/articulo/${a.id}`)} style={filaArticulo}>
                     <div style={{ textAlign: "left", minWidth: 0 }}>
-                      <span style={{ display: "inline-block", background: "#F3EEFC", color: "#8B5FD6", borderRadius: "100px", padding: "2px 9px", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", marginBottom: "5px" }}>
+                      <span style={{ display: "inline-block", background: "var(--theme-bg-light)", color: "var(--theme-primary)", borderRadius: "100px", padding: "2px 9px", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", marginBottom: "5px" }}>
                         {a.categoria}
                       </span>
-                      <div style={{ fontSize: "13.5px", fontWeight: 700, color: "#3F3A52", lineHeight: 1.4 }}>{a.titulo}</div>
+                      <div style={{ fontSize: "13.5px", fontWeight: 700, color: "var(--text)", lineHeight: 1.4 }}>{a.titulo}</div>
                     </div>
-                    <ChevronRight size={15} color="#A99FC4" style={{ flexShrink: 0 }} />
+                    <ChevronRight size={15} color="var(--text-muted)" style={{ flexShrink: 0 }} />
                   </button>
                 ))
               )}
@@ -306,7 +306,7 @@ export default function SaludMaterna() {
       {modal && (
         <div onClick={() => setModal(null)} style={overlay}>
           <div onClick={(e) => e.stopPropagation()} style={caja}>
-            <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", color: "#3F3A52", margin: "0 0 16px" }}>
+            <h3 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "19px", color: "var(--text)", margin: "0 0 16px" }}>
               {modal === "peso" ? "Registrar peso" : modal === "presion" ? "Registrar presión" : "Tu peso antes del embarazo"}
             </h3>
 
@@ -316,7 +316,7 @@ export default function SaludMaterna() {
                   <Etiqueta>Sistólica</Etiqueta>
                   <input type="number" value={valor1} onChange={(e) => setValor1(e.target.value)} placeholder="118" style={input} />
                 </div>
-                <span style={{ paddingBottom: "12px", fontSize: "20px", color: "#A99FC4" }}>/</span>
+                <span style={{ paddingBottom: "12px", fontSize: "20px", color: "var(--text-muted)" }}>/</span>
                 <div style={{ flex: 1 }}>
                   <Etiqueta>Diastólica</Etiqueta>
                   <input type="number" value={valor2} onChange={(e) => setValor2(e.target.value)} placeholder="78" style={input} />
@@ -369,7 +369,7 @@ function Encabezado({ children, icono }: { children: React.ReactNode; icono?: Re
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
       {icono}
-      <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "18px", fontWeight: 700, color: "#3F3A52", margin: 0 }}>
+      <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "18px", fontWeight: 700, color: "var(--text)", margin: 0 }}>
         {children}
       </h2>
     </div>
@@ -378,7 +378,7 @@ function Encabezado({ children, icono }: { children: React.ReactNode; icono?: Re
 
 function Etiqueta({ children }: { children: React.ReactNode }) {
   return (
-    <label style={{ display: "block", fontSize: "11.5px", fontWeight: 800, color: "#8A849C", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "6px" }}>
+    <label style={{ display: "block", fontSize: "11.5px", fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "6px" }}>
       {children}
     </label>
   );
@@ -386,33 +386,33 @@ function Etiqueta({ children }: { children: React.ReactNode }) {
 
 const input: React.CSSProperties = {
   width: "100%", padding: "12px 14px", borderRadius: "12px",
-  border: "1px solid #E4DBF7", background: "#FAF8FE", fontSize: "14.5px",
-  fontFamily: "'Nunito', sans-serif", color: "#3F3A52", outline: "none", boxSizing: "border-box",
+  border: "1px solid var(--border)", background: "var(--surface-2)", fontSize: "14.5px",
+  fontFamily: "'Nunito', sans-serif", color: "var(--text)", outline: "none", boxSizing: "border-box",
 };
 
 const btnPrimario: React.CSSProperties = {
   width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: "7px",
-  background: "linear-gradient(135deg, #8B5FD6, #A47BE8)", color: "#fff", border: "none",
+  background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))", color: "#fff", border: "none",
   borderRadius: "12px", padding: "12px 20px", fontWeight: 800, fontSize: "13.5px",
   cursor: "pointer", fontFamily: "'Nunito', sans-serif",
 };
 
 const btnSuave: React.CSSProperties = {
   width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: "7px",
-  background: "#FAF8FE", color: "#8B5FD6", border: "1px solid #EDE7F9",
+  background: "var(--surface-2)", color: "var(--theme-primary)", border: "1px solid var(--border)",
   borderRadius: "12px", padding: "12px 20px", fontWeight: 800, fontSize: "13.5px",
   cursor: "pointer", fontFamily: "'Nunito', sans-serif",
 };
 
 const enlace: React.CSSProperties = {
-  background: "none", border: "none", color: "#8B5FD6", fontSize: "12.5px",
+  background: "none", border: "none", color: "var(--theme-primary)", fontSize: "12.5px",
   fontWeight: 700, cursor: "pointer", padding: 0, textAlign: "left",
   textDecoration: "underline", fontFamily: "'Nunito', sans-serif",
 };
 
 const filaArticulo: React.CSSProperties = {
   display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px",
-  background: "#FAF8FE", border: "1px solid #EDE7F9", borderRadius: "12px",
+  background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "12px",
   padding: "12px 14px", cursor: "pointer", width: "100%", fontFamily: "'Nunito', sans-serif",
 };
 

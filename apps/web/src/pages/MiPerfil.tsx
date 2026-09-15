@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, User, Mail, Save, ChevronRight, Camera, X, Loader2 } from "lucide-react";
+import { User, Mail, Save, ChevronRight, Camera, X, Loader2 } from "lucide-react";
 import TopNav from "../components/TopNav";
 import { useNotificaciones } from "../hooks/useNotificaciones";
 import { vozSoportada, vozActiva, setVozActiva } from "../utils/voz";
@@ -282,14 +282,8 @@ export default function MiPerfil() {
       <TopNav user={{ ...initialUser, foto_perfil: fotoPerfil }} activePath="/mi-perfil" />
 
       {/* Cabecera morada; las tarjetas flotan sobre ella. */}
-      <div style={{ background: "linear-gradient(135deg, #8B5FD6 0%, #A47BE8 100%)", paddingBottom: "80px" }}>
+      <div style={{ background: "linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-light) 100%)", paddingBottom: "80px" }}>
         <div style={{ maxWidth: "1180px", margin: "0 auto", padding: "24px 32px 0" }}>
-          <button
-            onClick={() => navigate("/dashboard")}
-            style={{ background: "none", border: "none", color: "rgba(255,255,255,0.85)", fontSize: "14px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", marginBottom: "16px", fontFamily: "'Nunito', sans-serif", padding: 0 }}
-          >
-            <ArrowLeft size={16} /> Volver
-          </button>
           <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "32px", fontWeight: 700, color: "#fff", margin: 0 }}>
             Hola, {formData.nombre || "!"}
           </h1>
@@ -312,7 +306,7 @@ export default function MiPerfil() {
             >
               <div style={{
                 width: "104px", height: "104px", borderRadius: "50%", overflow: "hidden",
-                background: "linear-gradient(135deg, #8B5FD6, #C0A9EE)",
+                background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 color: "#fff", fontSize: "38px", fontWeight: 900, fontFamily: "'Baloo 2', sans-serif",
               }}>
@@ -351,11 +345,11 @@ export default function MiPerfil() {
                   style={{
                     position: "absolute", bottom: "2px", right: "2px",
                     width: "32px", height: "32px", borderRadius: "50%",
-                    background: "#fff", border: "2px solid #EDE7F9",
+                    background: "var(--surface)", border: "2px solid var(--border)",
                     display: "flex", alignItems: "center", justifyContent: "center",
                   }}
                 >
-                  <Camera size={16} color="#8B5FD6" strokeWidth={2.2} />
+                  <Camera size={16} color="var(--theme-primary)" strokeWidth={2.2} />
                 </div>
               )}
 
@@ -377,7 +371,7 @@ export default function MiPerfil() {
                       type="button"
                       onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleEliminarFoto(); }}
                       style={{
-                        background: "#fff", color: "#B91C1C", border: "none", borderRadius: "8px",
+                        background: "var(--surface)", color: "#B91C1C", border: "none", borderRadius: "8px",
                         padding: "4px 10px", fontSize: "11px", fontWeight: 800, cursor: "pointer",
                       }}
                     >
@@ -403,7 +397,7 @@ export default function MiPerfil() {
                   background: "rgba(255,255,255,0.85)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                 }}>
-                  <Loader2 size={26} color="#8B5FD6" className="spin-icon" />
+                  <Loader2 size={26} color="var(--theme-primary)" className="spin-icon" />
                 </div>
               )}
 
@@ -416,10 +410,10 @@ export default function MiPerfil() {
                 style={{ display: "none" }}
               />
             </label>
-            <div style={{ fontSize: "19px", fontWeight: 800, color: "#8B5FD6", fontFamily: "'Baloo 2', sans-serif" }}>
+            <div style={{ fontSize: "19px", fontWeight: 800, color: "var(--theme-primary)", fontFamily: "'Baloo 2', sans-serif" }}>
               {formData.nombre} {formData.apellidos}
             </div>
-            <div style={{ fontSize: "13.5px", color: "#8A849C", marginTop: "4px", wordBreak: "break-all" }}>
+            <div style={{ fontSize: "13.5px", color: "var(--text-muted)", marginTop: "4px", wordBreak: "break-all" }}>
               {formData.email}
             </div>
             {fotoError && (
@@ -437,24 +431,24 @@ export default function MiPerfil() {
               <Titulo>Editar Perfil</Titulo>
               <form onSubmit={handleSave} style={{ marginTop: "18px" }}>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "14px" }}>
-                  <Campo etiqueta="Nombre" icono={<User size={16} color="#A99FC4" />}>
+                  <Campo etiqueta="Nombre" icono={<User size={16} color="var(--text-muted)" />}>
                     <input name="nombre" value={formData.nombre} onChange={handleChange} style={input} />
                   </Campo>
-                  <Campo etiqueta="Apellidos" icono={<User size={16} color="#A99FC4" />}>
+                  <Campo etiqueta="Apellidos" icono={<User size={16} color="var(--text-muted)" />}>
                     <input name="apellidos" value={formData.apellidos} onChange={handleChange} style={input} />
                   </Campo>
                 </div>
 
-                <Campo etiqueta="Correo electrónico" icono={<Mail size={16} color="#A99FC4" />}>
-                  <input value={formData.email} disabled style={{ ...input, background: "#F3F1F8", color: "#A99FC4", cursor: "not-allowed" }} />
+                <Campo etiqueta="Correo electrónico" icono={<Mail size={16} color="var(--text-muted)" />}>
+                  <input value={formData.email} disabled style={{ ...input, background: "var(--surface-2)", color: "var(--text-muted)", cursor: "not-allowed" }} />
                 </Campo>
 
-                <div style={{ borderTop: "1px solid #EDE7F9", marginTop: "18px", paddingTop: "18px" }}>
+                <div style={{ borderTop: "1px solid var(--border)", marginTop: "18px", paddingTop: "18px" }}>
                   <Titulo pequeno>
                     {tienePassword ? "Cambiar contraseña" : "Definir una contraseña"}
                   </Titulo>
                   {!tienePassword && (
-                    <p style={{ fontSize: "13px", color: "#8A849C", margin: "6px 0 0", lineHeight: 1.55 }}>
+                    <p style={{ fontSize: "13px", color: "var(--text-muted)", margin: "6px 0 0", lineHeight: 1.55 }}>
                       Entraste con Google, así que todavía no tienes una contraseña propia.
                       Define una si quieres poder entrar también con tu correo.
                     </p>
@@ -474,7 +468,7 @@ export default function MiPerfil() {
                 {message && (
                   <div style={{
                     marginTop: "16px", padding: "12px 14px", borderRadius: "12px", fontSize: "13.5px", fontWeight: 700,
-                    background: message.includes("Error") || message.includes("No se") || message.includes("Debes") ? "#FFF0F0" : "#E8F7F1",
+                    background: message.includes("Error") || message.includes("No se") || message.includes("Debes") ? "rgba(217,112,112,0.14)" : "rgba(62,142,110,0.14)",
                     color: message.includes("Error") || message.includes("No se") || message.includes("Debes") ? "#D97070" : "#3E8E6E",
                   }}>
                     {message}
@@ -492,13 +486,13 @@ export default function MiPerfil() {
               <Titulo>Notificaciones</Titulo>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", marginTop: "16px", flexWrap: "wrap" }}>
                 <div style={{ flex: "1 1 240px", minWidth: 0 }}>
-                  <div style={{ fontSize: "14.5px", fontWeight: 800, color: "#3F3A52" }}>Citas y vacunas</div>
-                  <div style={{ fontSize: "12.5px", color: "#8A849C", marginTop: "2px" }}>
+                  <div style={{ fontSize: "14.5px", fontWeight: 800, color: "var(--text)" }}>Citas y vacunas</div>
+                  <div style={{ fontSize: "12.5px", color: "var(--text-muted)", marginTop: "2px" }}>
                     Avisos en el teléfono, además del correo.
                   </div>
                 </div>
 
-                {notif.estado === "cargando" && <span style={{ fontSize: "13px", color: "#A99FC4" }}>Revisando…</span>}
+                {notif.estado === "cargando" && <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>Revisando…</span>}
 
                 {notif.estado === "activo" && (
                   <Interruptor activo onClick={notif.desactivar} disabled={notif.procesando} />
@@ -530,8 +524,8 @@ export default function MiPerfil() {
               <Titulo>Recordatorios de citas</Titulo>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", marginTop: "16px", flexWrap: "wrap" }}>
                 <div style={{ flex: "1 1 240px", minWidth: 0 }}>
-                  <div style={{ fontSize: "14.5px", fontWeight: 800, color: "#3F3A52" }}>Recibir recordatorios</div>
-                  <div style={{ fontSize: "12.5px", color: "#8A849C", marginTop: "2px" }}>
+                  <div style={{ fontSize: "14.5px", fontWeight: 800, color: "var(--text)" }}>Recibir recordatorios</div>
+                  <div style={{ fontSize: "12.5px", color: "var(--text-muted)", marginTop: "2px" }}>
                     Avisos antes de cada cita o control médico agendado.
                   </div>
                 </div>
@@ -566,9 +560,9 @@ export default function MiPerfil() {
                       style={{
                         padding: "8px 16px", borderRadius: "100px", cursor: "pointer",
                         fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "13px",
-                        border: activa ? "none" : "1.5px solid #E4DBF7",
-                        background: activa ? "linear-gradient(135deg, #8B5FD6, #A47BE8)" : "#FAF8FE",
-                        color: activa ? "#fff" : "#8A849C",
+                        border: activa ? "none" : "1.5px solid var(--border)",
+                        background: activa ? "linear-gradient(135deg, var(--theme-primary), var(--theme-light))" : "var(--surface-2)",
+                        color: activa ? "#fff" : "var(--text-muted)",
                       }}
                     >
                       {etiqueta}
@@ -576,7 +570,7 @@ export default function MiPerfil() {
                   );
                 })}
               </div>
-              <p style={{ fontSize: "12px", color: "#A99FC4", marginTop: "12px", marginBottom: 0, lineHeight: 1.5 }}>
+              <p style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "12px", marginBottom: 0, lineHeight: 1.5 }}>
                 Puedes elegir varias, ninguna, o todas. Los recordatorios llegan por correo y, si activaste las notificaciones de arriba, también al teléfono.
               </p>
             </Tarjeta>
@@ -587,8 +581,8 @@ export default function MiPerfil() {
                 <Titulo>Registro por voz</Titulo>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", marginTop: "16px", flexWrap: "wrap" }}>
                   <div style={{ flex: "1 1 240px", minWidth: 0 }}>
-                    <div style={{ fontSize: "14.5px", fontWeight: 800, color: "#3F3A52" }}>Confirmar en voz alta</div>
-                    <div style={{ fontSize: "12.5px", color: "#8A849C", marginTop: "2px" }}>
+                    <div style={{ fontSize: "14.5px", fontWeight: 800, color: "var(--text)" }}>Confirmar en voz alta</div>
+                    <div style={{ fontSize: "12.5px", color: "var(--text-muted)", marginTop: "2px" }}>
                       Al registrar hablando, la app lee lo que entendió antes de guardar. Puedes apagarlo si el bebé está durmiendo.
                     </div>
                   </div>
@@ -615,12 +609,12 @@ export default function MiPerfil() {
                 style={filaEnlace}
               >
                 <div style={{ textAlign: "left" }}>
-                  <div style={{ fontSize: "14.5px", fontWeight: 800, color: "#3F3A52" }}>Datos compartidos</div>
-                  <div style={{ fontSize: "12.5px", color: "#8A849C", marginTop: "2px" }}>
+                  <div style={{ fontSize: "14.5px", fontWeight: 800, color: "var(--text)" }}>Datos compartidos</div>
+                  <div style={{ fontSize: "12.5px", color: "var(--text-muted)", marginTop: "2px" }}>
                     Gestiona quién más puede ver el perfil de tu bebé.
                   </div>
                 </div>
-                <ChevronRight size={18} color="#A99FC4" style={{ flexShrink: 0 }} />
+                <ChevronRight size={18} color="var(--text-muted)" style={{ flexShrink: 0 }} />
               </button>
             </Tarjeta>
           </div>
@@ -648,7 +642,7 @@ function Tarjeta({ children, style }: { children: React.ReactNode; style?: React
 
 function Titulo({ children, pequeno }: { children: React.ReactNode; pequeno?: boolean }) {
   return (
-    <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: pequeno ? "16px" : "19px", fontWeight: 700, color: "#3F3A52", margin: 0 }}>
+    <h2 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: pequeno ? "16px" : "19px", fontWeight: 700, color: "var(--text)", margin: 0 }}>
       {children}
     </h2>
   );
@@ -657,7 +651,7 @@ function Titulo({ children, pequeno }: { children: React.ReactNode; pequeno?: bo
 function Campo({ etiqueta, icono, children }: { etiqueta: string; icono?: React.ReactNode; children: React.ReactNode }) {
   return (
     <div style={{ marginTop: "12px" }}>
-      <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", fontWeight: 800, color: "#8A849C", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "7px" }}>
+      <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "7px" }}>
         {icono} {etiqueta}
       </label>
       {children}
@@ -674,7 +668,7 @@ function Interruptor({ activo, onClick, disabled }: { activo: boolean; onClick: 
       aria-pressed={activo}
       style={{
         width: "52px", height: "30px", borderRadius: "100px", border: "none", flexShrink: 0,
-        background: activo ? "linear-gradient(135deg, #8B5FD6, #A47BE8)" : "#DDD6EC",
+        background: activo ? "linear-gradient(135deg, var(--theme-primary), var(--theme-light))" : "var(--border)",
         cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.6 : 1,
         position: "relative", transition: "background .2s",
       }}
@@ -690,7 +684,7 @@ function Interruptor({ activo, onClick, disabled }: { activo: boolean; onClick: 
 
 function Aviso({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ background: "#FAF8FE", border: "1px solid #EDE7F9", borderRadius: "14px", padding: "14px 16px", fontSize: "13.5px", color: "#6B647F", lineHeight: 1.6 }}>
+    <div style={{ background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "14px", padding: "14px 16px", fontSize: "13.5px", color: "var(--text-muted)", lineHeight: 1.6 }}>
       {children}
     </div>
   );
@@ -698,13 +692,13 @@ function Aviso({ children }: { children: React.ReactNode }) {
 
 const input: React.CSSProperties = {
   width: "100%", padding: "12px 14px", borderRadius: "12px",
-  border: "1px solid #E4DBF7", background: "#FAF8FE", fontSize: "14.5px",
-  fontFamily: "'Nunito', sans-serif", color: "#3F3A52", outline: "none", boxSizing: "border-box",
+  border: "1px solid var(--border)", background: "var(--surface-2)", fontSize: "14.5px",
+  fontFamily: "'Nunito', sans-serif", color: "var(--text)", outline: "none", boxSizing: "border-box",
 };
 
 const btnPrimario: React.CSSProperties = {
   display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
-  background: "linear-gradient(135deg, #8B5FD6, #A47BE8)", color: "#fff", border: "none",
+  background: "linear-gradient(135deg, var(--theme-primary), var(--theme-light))", color: "#fff", border: "none",
   borderRadius: "12px", padding: "14px 28px", fontWeight: 800, fontSize: "14.5px",
   cursor: "pointer", fontFamily: "'Nunito', sans-serif",
   boxShadow: "0 6px 16px rgba(139,95,214,0.28)",
@@ -712,6 +706,6 @@ const btnPrimario: React.CSSProperties = {
 
 const filaEnlace: React.CSSProperties = {
   display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px",
-  width: "100%", background: "#FAF8FE", border: "1px solid #EDE7F9", borderRadius: "14px",
+  width: "100%", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "14px",
   padding: "14px 16px", cursor: "pointer", marginTop: "16px", fontFamily: "'Nunito', sans-serif",
 };

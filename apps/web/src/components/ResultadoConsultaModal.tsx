@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import { X, Camera, Loader2, Trash2, Mic, MicOff, FileText } from "lucide-react";
-import { useDictado } from "../hooks/useDictado";
-import { interpretarExamenesDictados } from "../utils/interpretarDictado";
+import { X, Camera, Loader2, Trash2, FileText } from "lucide-react";
 
 import { API_URL } from "../config/api";
 
@@ -61,17 +59,6 @@ export default function ResultadoConsultaModal({ bebeId, cita, token, onClose, o
   // cuando el examen ya se hizo, desde la pestaña de Exámenes).
   const [ordenExamenFoto, setOrdenExamenFoto] = useState<string | null>(null);
   const [subiendoFotoExamen, setSubiendoFotoExamen] = useState(false);
-
-  // Dictado por voz para agregar exámenes sin escribir: "hemograma y
-  // radiografía de tórax para el martes" agrega dos exámenes con esa fecha.
-  const dictadoExamenes = useDictado((texto) => {
-    const { nombres, fecha } = interpretarExamenesDictados(texto);
-    if (nombres.length === 0) return;
-    const fechaStr = fecha
-      ? `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, "0")}-${String(fecha.getDate()).padStart(2, "0")}`
-      : "";
-    setExamenes((prev) => [...prev, ...nombres.map((nombre) => ({ nombre, fecha_sugerida: fechaStr }))]);
-  });
 
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -305,31 +292,6 @@ export default function ResultadoConsultaModal({ bebeId, cita, token, onClose, o
               {/* Exámenes indicados */}
               <label style={label}>¿Te indicaron exámenes?</label>
 
-              {/* Dictado por voz: "hemograma y radiografía de tórax para el martes" */}
-              {dictadoExamenes.soportado && (
-                <button
-                  type="button"
-                  onClick={dictadoExamenes.escuchando ? dictadoExamenes.detener : dictadoExamenes.empezar}
-                  style={{
-                    display: "inline-flex", alignItems: "center", gap: "7px",
-                    padding: "9px 16px", borderRadius: "100px", border: "none",
-                    cursor: "pointer", fontFamily: "'Nunito', sans-serif",
-                    fontWeight: 800, fontSize: "12.5px", color: "#fff", marginBottom: "10px",
-                    background: dictadoExamenes.escuchando ? "#D97070" : "var(--theme-primary)",
-                  }}
-                >
-                  {dictadoExamenes.escuchando ? <MicOff size={14} /> : <Mic size={14} />}
-                  {dictadoExamenes.escuchando ? "Detener" : "Dictar exámenes"}
-                </button>
-              )}
-              {dictadoExamenes.texto && (
-                <div style={{ ...transcripcionPreview, marginBottom: "10px" }}>“{dictadoExamenes.texto}”</div>
-              )}
-              {dictadoExamenes.error && (
-                <div style={{ color: "#D97070", fontSize: "12px", fontWeight: 600, marginBottom: "10px" }}>
-                  {dictadoExamenes.error}
-                </div>
-              )}
               {examenes.map((ex, i) => (
                 <div key={i} style={examenRow}>
                   <div style={{ flex: 1 }}>
@@ -440,10 +402,6 @@ const toggleOff: React.CSSProperties = {
   flex: 1, padding: "11px", borderRadius: "12px", border: "2px solid var(--border)",
   background: "var(--surface)", color: "var(--text-muted)", fontWeight: 700,
   fontSize: "13.5px", cursor: "pointer", fontFamily: "'Nunito', sans-serif",
-};
-const transcripcionPreview: React.CSSProperties = {
-  background: "var(--theme-bg-light)", borderRadius: "10px", padding: "10px 12px",
-  fontSize: "12.5px", color: "var(--text)", fontStyle: "italic",
 };
 const uploadBox: React.CSSProperties = {
   display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
