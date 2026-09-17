@@ -60,6 +60,10 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
   const hito = perfil?.hito_embarazo || HITOS_POR_MES[mes];
   const fruta = String(perfil?.fruta_embarazo || "semillita").toLowerCase();
   const nombre = user?.nombre ? user.nombre.split(" ")[0] : "";
+  // Nombre del perfil en gestación. Se usa para dejar claro de quién es la
+  // foto que se sube; sin él, el texto quedaría ambiguo justo en la pantalla
+  // donde se confundía con la foto de la mamá.
+  const nombreBebe = perfil?.nombre?.trim() || "tu bebé";
 
   const ahora = new Date();
   const proximas = citas
@@ -122,95 +126,10 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
       <div style={{ background: "linear-gradient(135deg, var(--header-from) 0%, var(--header-to) 100%)", paddingBottom: "90px" }}>
         <div style={{ maxWidth: "1240px", margin: "0 auto", padding: "28px 32px 0" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <label
-              title={fotoPerfil ? "Cambiar foto" : "Subir foto"}
-              style={{
-                position: "relative",
-                width: "58px", height: "58px", borderRadius: "50%", flexShrink: 0,
-                cursor: subiendoFoto ? "default" : "pointer",
-                background: fotoPerfil ? `url(${fotoPerfil}) center/cover` : "rgba(255,255,255,0.22)",
-                border: "2.5px solid rgba(255,255,255,0.55)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-              }}
-            >
-              {subiendoFoto ? (
-                <Loader2 size={20} color="#fff" className="spin-icon" />
-              ) : !fotoPerfil ? (
-                <Camera size={22} color="rgba(255,255,255,0.9)" />
-              ) : null}
-
-              {fotoPerfil && !subiendoFoto && !confirmandoBorrarFoto && (
-                <button
-                  type="button"
-                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setConfirmandoBorrarFoto(true); }}
-                  title="Quitar foto"
-                  aria-label="Quitar la foto del perfil"
-                  style={{
-                    position: "absolute", top: "-4px", right: "-4px",
-                    width: "22px", height: "22px", borderRadius: "50%",
-                    background: "rgba(45,38,64,0.72)", border: "none",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    cursor: "pointer", padding: 0,
-                  }}
-                >
-                  <X size={12} color="#fff" strokeWidth={2.5} />
-                </button>
-              )}
-
-              {confirmandoBorrarFoto && !subiendoFoto && (
-                <div
-                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                  style={{
-                    position: "absolute", inset: 0, borderRadius: "50%",
-                    background: "rgba(45,38,64,0.88)",
-                    display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                    gap: "3px", padding: "4px", textAlign: "center",
-                  }}
-                >
-                  <span style={{ color: "#fff", fontSize: "9px", fontWeight: 700, lineHeight: 1.2 }}>
-                    ¿Quitar?
-                  </span>
-                  <div style={{ display: "flex", gap: "4px" }}>
-                    <button
-                      type="button"
-                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleEliminarFoto(); }}
-                      style={{
-                        background: "#fff", color: "#B91C1C", border: "none", borderRadius: "6px",
-                        padding: "2px 7px", fontSize: "10px", fontWeight: 800, cursor: "pointer",
-                      }}
-                    >
-                      Sí
-                    </button>
-                    <button
-                      type="button"
-                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); setConfirmandoBorrarFoto(false); }}
-                      style={{
-                        background: "rgba(255,255,255,0.22)", color: "#fff", border: "1px solid rgba(255,255,255,0.5)",
-                        borderRadius: "6px", padding: "2px 7px", fontSize: "10px", fontWeight: 700, cursor: "pointer",
-                      }}
-                    >
-                      No
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              <input
-                type="file"
-                accept={ACCEPT_IMAGEN}
-                onChange={handleUploadFoto}
-                disabled={subiendoFoto}
-                style={{ display: "none" }}
-              />
-            </label>
-
             <div>
               <h1 style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: "32px", fontWeight: 700, color: "#fff", margin: 0 }}>
                 Hola, {nombre}
               </h1>
-              {fotoError && (
-                <div style={{ fontSize: "12.5px", color: "#FFD9D9", fontWeight: 700, marginTop: "3px" }}>{fotoError}</div>
-              )}
             </div>
           </div>
         </div>
@@ -253,6 +172,113 @@ export default function DashboardEmbarazo({ user, perfil, activeBabyId }: Dashbo
                   <div style={{ fontSize: "12.5px", color: "var(--text-muted)", fontWeight: 700, marginTop: "7px" }}>
                     Semana {semanas} de 40 &middot; {porcentaje}% del camino
                   </div>
+                </div>
+              </div>
+            </Tarjeta>
+
+            {/* La foto vivía en la cabecera, pegada al "Hola, {nombre}": un
+                círculo con ícono de cámara al lado de un saludo personal se
+                lee como el avatar de quien usa la app, no como una foto del
+                bebé. Acá el contexto y el nombre del perfil lo dejan claro, y
+                el formato vertical respeta mejor una ecografía, que en un
+                círculo queda recortada justo por el centro. */}
+            <Tarjeta>
+              <Titulo>La primera foto de {nombreBebe}</Titulo>
+              <div style={{ display: "flex", alignItems: "center", gap: "16px", marginTop: "16px", flexWrap: "wrap" }}>
+                <label
+                  title={fotoPerfil ? `Cambiar la foto de ${nombreBebe}` : `Subir la foto de ${nombreBebe}`}
+                  style={{
+                    position: "relative", flexShrink: 0,
+                    width: "92px", height: "112px", borderRadius: "12px",
+                    cursor: subiendoFoto ? "default" : "pointer",
+                    overflow: "hidden",
+                    background: fotoPerfil ? `url(${fotoPerfil}) center/cover` : "var(--surface-2)",
+                    border: fotoPerfil ? "1px solid var(--border)" : "1.5px dashed var(--border)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                  }}
+                >
+                  {subiendoFoto ? (
+                    <Loader2 size={22} color="var(--theme-primary)" className="spin-icon" />
+                  ) : !fotoPerfil ? (
+                    <Camera size={24} color="var(--text-muted)" />
+                  ) : null}
+
+                  {fotoPerfil && !subiendoFoto && !confirmandoBorrarFoto && (
+                    <button
+                      type="button"
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); setConfirmandoBorrarFoto(true); }}
+                      title="Quitar foto"
+                      aria-label={`Quitar la foto de ${nombreBebe}`}
+                      style={{
+                        position: "absolute", top: "5px", right: "5px",
+                        width: "22px", height: "22px", borderRadius: "50%",
+                        background: "rgba(45,38,64,0.72)", border: "none",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        cursor: "pointer", padding: 0,
+                      }}
+                    >
+                      <X size={12} color="#fff" strokeWidth={2.5} />
+                    </button>
+                  )}
+
+                  {confirmandoBorrarFoto && !subiendoFoto && (
+                    <div
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                      style={{
+                        position: "absolute", inset: 0,
+                        background: "rgba(45,38,64,0.88)",
+                        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                        gap: "6px", padding: "8px", textAlign: "center",
+                      }}
+                    >
+                      <span style={{ color: "#fff", fontSize: "11px", fontWeight: 700, lineHeight: 1.3 }}>
+                        &iquest;Quitar foto?
+                      </span>
+                      <div style={{ display: "flex", gap: "6px" }}>
+                        <button
+                          type="button"
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleEliminarFoto(); }}
+                          style={{
+                            background: "#fff", color: "#B91C1C", border: "none", borderRadius: "7px",
+                            padding: "3px 9px", fontSize: "11px", fontWeight: 800, cursor: "pointer",
+                          }}
+                        >
+                          S&iacute;
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setConfirmandoBorrarFoto(false); }}
+                          style={{
+                            background: "rgba(255,255,255,0.2)", color: "#fff", border: "1px solid rgba(255,255,255,0.5)",
+                            borderRadius: "7px", padding: "3px 9px", fontSize: "11px", fontWeight: 700, cursor: "pointer",
+                          }}
+                        >
+                          No
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  <input
+                    type="file"
+                    accept={ACCEPT_IMAGEN}
+                    onChange={handleUploadFoto}
+                    disabled={subiendoFoto}
+                    style={{ display: "none" }}
+                  />
+                </label>
+
+                <div style={{ flex: "1 1 200px", minWidth: 0 }}>
+                  <p style={{ fontSize: "14.5px", color: "var(--text-muted)", lineHeight: 1.6, margin: 0 }}>
+                    {fotoPerfil
+                      ? `As\u00ed se ve ${nombreBebe} por ahora. Puedes reemplazarla con cada nueva ecograf\u00eda.`
+                      : `Sube la ecograf\u00eda de ${nombreBebe} y ac\u00f3mpa\u00f1ala con cada control.`}
+                  </p>
+                  {fotoError && (
+                    <p style={{ fontSize: "12.5px", color: "var(--danger-text)", fontWeight: 700, marginTop: "8px", marginBottom: 0 }}>
+                      {fotoError}
+                    </p>
+                  )}
                 </div>
               </div>
             </Tarjeta>
