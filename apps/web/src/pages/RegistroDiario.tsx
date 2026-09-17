@@ -8,6 +8,7 @@ import TopNav from "../components/TopNav";
 import EstadisticasDiario from "../components/EstadisticasDiario";
 
 import { API_URL } from "../config/api";
+import { useUsuario } from "../hooks/useUsuario";
 
 type Tipo = "toma" | "sueno" | "panal";
 
@@ -44,7 +45,7 @@ export default function RegistroDiario() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const [bebeId, setBebeId] = useState<string | null>(null);
-  const [user, setUser] = useState<any>(null);
+  const user = useUsuario();
   // Un familiar invitado como solo lectura puede ver el diario pero no
   // escribir en él: se le ocultan los botones en vez de dejar que fallen.
   const [soloLectura, setSoloLectura] = useState(false);
@@ -70,8 +71,6 @@ export default function RegistroDiario() {
 
   useEffect(() => {
     if (!token) { navigate("/"); return; }
-    const stored = localStorage.getItem("user");
-    if (stored) setUser(JSON.parse(stored));
     const id = localStorage.getItem("selectedBabyId");
     if (!id) { navigate("/seleccionar-perfil"); return; }
     setBebeId(id);

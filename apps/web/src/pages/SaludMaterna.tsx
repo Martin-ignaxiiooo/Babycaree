@@ -4,6 +4,7 @@ import { Plus, Loader2, Heart, Scale, CheckCircle2, ChevronRight } from "lucide-
 import TopNav from "../components/TopNav";
 
 import { API_URL } from "../config/api";
+import { useUsuario } from "../hooks/useUsuario";
 
 /** Los síntomas frecuentes del embarazo, para no obligar a escribirlos. */
 const SINTOMAS = [
@@ -21,7 +22,7 @@ const TRIMESTRE = (semanas: number) =>
 export default function SaludMaterna() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const user = useUsuario();
 
   const [bebeId, setBebeId] = useState<string | null>(null);
   const [perfil, setPerfil] = useState<any>(null);

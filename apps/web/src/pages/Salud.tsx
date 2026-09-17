@@ -11,6 +11,7 @@ import InformeMedico from "../components/InformeMedico";
 import { useDictado } from "../hooks/useDictado";
 import { interpretarDictado } from "../utils/interpretarDictado";
 import { API_URL } from "../config/api";
+import { useUsuario } from "../hooks/useUsuario";
 
 const DIAS_CAL = ["D", "L", "M", "M", "J", "V", "S"];
 const MESES_CAL = [
@@ -46,7 +47,7 @@ function armarMesCal(anio: number, mes: number) {
 export default function Salud() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const user = useUsuario();
 
   const [bebeId, setBebeId] = useState<string | null>(null);
   // Controles es la primera pestaña: es lo que se consulta y agenda más

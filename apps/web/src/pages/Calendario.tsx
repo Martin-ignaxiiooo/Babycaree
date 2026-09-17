@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, PlusCircle, Loader2, CalendarDays } from "lu
 import TopNav from "../components/TopNav";
 
 import { API_URL } from "../config/api";
+import { useUsuario } from "../hooks/useUsuario";
 
 const DIAS = ["DOM", "LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB"];
 const MESES = [
@@ -40,7 +41,7 @@ const mismoDia = (a: Date, b: Date) =>
 export default function Calendario() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const user = useUsuario();
 
   const [bebeId, setBebeId] = useState<string | null>(null);
   const [perfil, setPerfil] = useState<any>(null);

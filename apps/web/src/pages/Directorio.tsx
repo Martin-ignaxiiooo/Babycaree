@@ -7,6 +7,7 @@ import axios from "axios";
 import TopNav from "../components/TopNav";
 
 import { API_URL as API_BASE } from "../config/api";
+import { useUsuario } from "../hooks/useUsuario";
 
 const API_URL = `${API_BASE}/v1`;
 
@@ -61,7 +62,7 @@ interface Especialidad {
 
 export default function Directorio() {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const user = useUsuario();
   const token = localStorage.getItem("token");
   
   const [medicos, setMedicos] = useState<Medico[]>([]);

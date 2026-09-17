@@ -7,6 +7,7 @@ import axios from "axios";
 import TopNav from "../components/TopNav";
 
 import { API_URL as API_BASE } from "../config/api";
+import { useUsuario } from "../hooks/useUsuario";
 
 const API_URL = `${API_BASE}/v1`;
 
@@ -24,7 +25,7 @@ function truncarTexto(texto: string, maxCaracteres: number): string {
 export default function Comunidad() {
   const navigate = useNavigate();
   const location = useLocation();
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const user = useUsuario();
   const token = localStorage.getItem("token");
 
   const tabInicial = new URLSearchParams(location.search).get("tab") === "articulos" ? "articulos" : "foros";

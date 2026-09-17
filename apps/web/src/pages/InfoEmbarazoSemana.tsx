@@ -10,20 +10,16 @@ import {
 } from "../components/BabyGrowthIcon";
 
 import { API_URL } from "../config/api";
+import { useUsuario } from "../hooks/useUsuario";
 
 export default function InfoEmbarazoSemana() {
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams<{ id: string }>();
 
-  const [user, setUser] = useState<any>(null);
+  const user = useUsuario();
   const [perfil, setPerfil] = useState<any>(location.state?.perfil || null);
   const [loading, setLoading] = useState(!location.state?.perfil);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) setUser(JSON.parse(storedUser));
-  }, []);
 
   useEffect(() => {
     if (perfil || !id) return;

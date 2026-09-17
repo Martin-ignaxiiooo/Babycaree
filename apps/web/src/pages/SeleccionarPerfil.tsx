@@ -5,13 +5,14 @@ import { Plus, X, Check, Trash2, Sparkles, Heart } from "lucide-react";
 import DateSelect from "../components/DateSelect";
 
 import { API_URL } from "../config/api";
+import { useUsuario } from "../hooks/useUsuario";
 
 export default function SeleccionarPerfil() {
   const navigate = useNavigate();
   const [babies, setBabies] = useState<any[]>([]);
   const [previsiones, setPrevisiones] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
+  const user = useUsuario();
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -63,7 +64,6 @@ export default function SeleccionarPerfil() {
       navigate("/");
       return;
     }
-    setUser(JSON.parse(storedUser));
     fetchBabies();
     fetchPrevisiones();
   }, [navigate]);

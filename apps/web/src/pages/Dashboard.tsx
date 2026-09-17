@@ -14,10 +14,11 @@ import { ACCEPT_IMAGEN, resizeImageFile, validarImagen } from "../utils/imagen";
 import DashboardEmbarazo from "./DashboardEmbarazo";
 
 import { API_URL } from "../config/api";
+import { useUsuario } from "../hooks/useUsuario";
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const [user, setUser] = useState<any>(null);
+  const user = useUsuario();
   const [activeBabyId, setActiveBabyId] = useState<string | null>(null);
   const [homeData, setHomeData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -58,7 +59,6 @@ export default function Dashboard() {
       navigate("/");
       return;
     }
-    setUser(JSON.parse(storedUser));
 
     const selectedBabyId = localStorage.getItem("selectedBabyId");
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

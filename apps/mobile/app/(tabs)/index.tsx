@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   SafeAreaView,
   ScrollView,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { Bell, Scale, Ruler, Star, ChevronRight, Sparkles, Baby } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../../constants/colors';
@@ -41,17 +41,22 @@ export default function InicioScreen() {
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
+  // En una ref y no en estado: solo sirve para decidir que indicador mostrar,
+  // y como dependencia de cargar meteria al efecto en un bucle.
+  const tieneDatos = useRef(false);
+
   const cargar = useCallback(
     async (esRefresh = false) => {
       if (!activeBabyId) {
         setLoading(false);
         return;
       }
-      esRefresh ? setRefreshing(true) : setLoading(true);
+      esRefresh && tieneDatos.current ? setRefreshing(true) : setLoading(true);
       setError(null);
       try {
         const res = await api.get(`/v1/home/${activeBabyId}`);
         setData(res.data);
+        tieneDatos.current = true;
       } catch (e) {
         setError(errorMessage(e));
       } finally {
@@ -62,9 +67,12 @@ export default function InicioScreen() {
     [activeBabyId]
   );
 
-  useEffect(() => {
-    cargar();
-  }, [cargar]);
+  // Las pestañas quedan montadas al cambiar entre ellas, asi que un useEffect
+  // no se vuelve a ejecutar al volver aca. Sin esto, el resumen mostraba datos
+  // viejos despues de registrar algo en Diario o Salud.
+  // Se pasa true para que refresque sin mostrar el spinner de pantalla
+  // completa, que haria parpadear el contenido ya visible.
+  useFocusEffect(useCallback(() => { cargar(true); }, [cargar]));
 
   if (ctxLoading || (loading && !data)) {
     return (

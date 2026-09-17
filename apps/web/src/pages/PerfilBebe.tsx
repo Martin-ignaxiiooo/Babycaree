@@ -6,12 +6,13 @@ import {
 import TopNav from "../components/TopNav";
 import CarnetDigital from "../components/CarnetDigital";
 import { API_URL } from "../config/api";
+import { useUsuario } from "../hooks/useUsuario";
 
 export default function PerfilBebe() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const user = useUsuario();
   const token = localStorage.getItem("token");
   
   const searchParams = new URLSearchParams(location.search);
