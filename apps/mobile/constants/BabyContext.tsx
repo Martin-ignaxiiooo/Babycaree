@@ -49,10 +49,29 @@ export function BabyProvider({ children }: { children: React.ReactNode }) {
         router.replace('/');
         return;
       }
+      // Se muestra primero lo guardado para que la pantalla no quede en
+      // blanco, y enseguida se refresca contra el backend.
       setUser(JSON.parse(storedUser));
 
-      const res = await api.get('/profiles/babies');
-      const lista: Bebe[] = Array.isArray(res.data) ? res.data : [];
+      // El usuario se vuelve a pedir en cada carga, no solo al iniciar sesión:
+      // si cambia su nombre o su foto desde la web, el dato guardado acá queda
+      // viejo y antes seguía así hasta cerrar y volver a abrir la sesión.
+      //
+      // allSettled para que un fallo en una de las dos no deje la app sin la
+      // otra: si el perfil falla, al menos quedan los datos guardados.
+      const [resPerfil, resBebes] = await Promise.allSettled([
+        api.get('/profiles/me'),
+        api.get('/profiles/babies'),
+      ]);
+
+      if (resPerfil.status === 'fulfilled' && resPerfil.value.data) {
+        setUser(resPerfil.value.data);
+        await AsyncStorage.setItem('user', JSON.stringify(resPerfil.value.data));
+      }
+
+      const lista: Bebe[] = resBebes.status === 'fulfilled' && Array.isArray(resBebes.value.data)
+        ? resBebes.value.data
+        : [];
       setBebes(lista);
 
       // Respetamos el bebé que el usuario tenía elegido, si sigue existiendo.
