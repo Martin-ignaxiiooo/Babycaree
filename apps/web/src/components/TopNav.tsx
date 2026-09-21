@@ -149,10 +149,14 @@ export default function TopNav({ user, notificaciones = [], onLogout, activePath
         ? { label: "Mi Salud", path: "/mi-salud", match: "mi-salud" }
         : { label: "Salud", path: "/salud", match: "salud" },
       { label: "Comunidad", path: "/comunidad", match: "comunidad" },
-      ...(estadoPerfil !== "embarazo" ? [
-        { label: "Directorio", path: "/directorio", match: "directorio" },
-        { label: "Galería", path: "/galeria", match: "galeria" },
-      ] : []),
+      // Directorio y Galería están ocultos por ahora. Las rutas siguen
+      // existiendo y las páginas funcionan si se entra por URL; lo único que
+      // se quitó es la entrada del menú. Para reactivarlas basta con
+      // descomentar este bloque.
+      // ...(estadoPerfil !== "embarazo" ? [
+      //   { label: "Directorio", path: "/directorio", match: "directorio" },
+      //   { label: "Galería", path: "/galeria", match: "galeria" },
+      // ] : []),
   ];
 
 
